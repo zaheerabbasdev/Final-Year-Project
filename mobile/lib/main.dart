@@ -1,0 +1,96 @@
+import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'core/theme.dart';
+import 'features/auth/auth_service.dart';
+import 'features/auth/screens/splash_screen.dart';
+import 'features/auth/screens/onboarding_screen.dart';
+import 'features/auth/screens/login_screen.dart';
+import 'features/auth/screens/signup_screen.dart';
+import 'features/auth/screens/forgot_password_screen.dart';
+
+import 'features/customer/job_service.dart';
+import 'features/customer/category_service.dart';
+import 'features/provider/provider_service.dart';
+import 'shared/services/booking_service.dart';
+import 'features/customer/screens/home_screen.dart';
+import 'features/customer/screens/post_job_screen.dart';
+import 'features/provider/screens/dashboard_screen.dart';
+import 'features/provider/screens/browse_jobs_screen.dart';
+import 'features/provider/screens/place_bid_screen.dart';
+import 'shared/screens/job_detail_screen.dart';
+import 'shared/screens/navigation_screen.dart';
+import 'shared/screens/profile_screen.dart';
+
+void main() {
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthService()..checkAuth()),
+        ChangeNotifierProvider(create: (_) => CategoryService()),
+        ChangeNotifierProvider(create: (_) => JobService()),
+        ChangeNotifierProvider(create: (_) => ProviderService()),
+        ChangeNotifierProvider(create: (_) => BookingService()),
+      ],
+      child: const ServiceHubApp(),
+    ),
+  );
+}
+
+class ServiceHubApp extends StatelessWidget {
+  const ServiceHubApp({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
+
+    final router = GoRouter(
+      initialLocation: '/splash',
+      refreshListenable: authService,
+      redirect: (context, state) {
+        final bool isInitialized = authService.isInitialized;
+        final bool isAuthenticated = authService.isAuthenticated;
+        
+        final bool isSplash = state.matchedLocation == '/splash';
+        final bool isAuthRoute = state.matchedLocation == '/login' || 
+                                state.matchedLocation == '/signup' || 
+                                state.matchedLocation == '/onboarding';
+
+        if (!isInitialized && !isSplash) return '/splash';
+
+        if (isSplash && isInitialized) {
+          return isAuthenticated ? '/main' : '/login';
+        }
+
+        if (isAuthenticated && isAuthRoute) return '/main';
+
+        if (!isAuthenticated && !isAuthRoute && !isSplash && state.matchedLocation != '/forgot-password') {
+          return '/login';
+        }
+
+        return null;
+      },
+      routes: [
+        GoRoute(path: '/splash', builder: (context, state) => const SplashScreen()),
+        GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingScreen()),
+        GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
+        GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
+        GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordScreen()),
+        GoRoute(path: '/customer-home', builder: (context, state) => const CustomerHomeScreen()),
+        GoRoute(path: '/provider-dashboard', builder: (context, state) => const ProviderDashboardScreen()),
+        GoRoute(path: '/browse-jobs', builder: (context, state) => const BrowseJobsScreen()),
+        GoRoute(path: '/job-detail/:id', builder: (context, state) => JobDetailScreen(jobId: int.parse(state.pathParameters['id']!))),
+        GoRoute(path: '/place-bid/:id', builder: (context, state) => PlaceBidScreen(jobId: int.parse(state.pathParameters['id']!))),
+        GoRoute(path: '/post-job', builder: (context, state) => PostJobScreen()),
+        GoRoute(path: '/main', builder: (context, state) => const MainNavigationScreen()),
+      ],
+    );
+
+    return MaterialApp.router(
+      debugShowCheckedModeBanner: false,
+      title: 'ServiceHub',
+      theme: AppTheme.lightTheme,
+      routerConfig: router,
+    );
+  }
+}
