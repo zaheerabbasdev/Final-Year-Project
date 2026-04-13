@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../features/customer/job_service.dart';
 import '../../features/auth/auth_service.dart';
 import '../../../core/api_client.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class JobDetailScreen extends StatefulWidget {
   final int jobId;
@@ -249,6 +250,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            if (_job?['latitude'] != null && _job?['longitude'] != null)
+              _buildProviderDetailSection('Job Location', _buildMapCard(
+                double.parse(_job!['latitude'].toString()),
+                double.parse(_job!['longitude'].toString()),
+              )),
+            const SizedBox(height: 24),
             _buildProviderDetailSection('Job Description', Container(
               padding: const EdgeInsets.all(24),
               width: double.infinity,
@@ -488,6 +495,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           const SizedBox(height: 24),
           _buildStatsGrid(budget, location, createdAt, _bids.length),
           const SizedBox(height: 24),
+          if (_job!['latitude'] != null && _job!['longitude'] != null)
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildInfoSectionTitle('Job Location'),
+                const SizedBox(height: 16),
+                _buildMapCard(
+                  double.parse(_job!['latitude'].toString()),
+                  double.parse(_job!['longitude'].toString()),
+                ),
+                const SizedBox(height: 24),
+              ],
+            ),
           _buildInfoSectionTitle('Images'),
           const SizedBox(height: 16),
           _buildImageGallery(_job!['images']),
@@ -834,6 +854,37 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ],
           ),
         ],
+      ),
+    );
+  }
+
+  Widget _buildMapCard(double lat, double lng) {
+    return Container(
+      height: 200,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFF1F5F9)),
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(24),
+        child: GoogleMap(
+          initialCameraPosition: CameraPosition(
+            target: LatLng(lat, lng),
+            zoom: 15,
+          ),
+          markers: {
+            Marker(
+              markerId: const MarkerId('jobLocation'),
+              position: LatLng(lat, lng),
+            ),
+          },
+          liteModeEnabled: true, // Optimized for detail screens
+          myLocationButtonEnabled: false,
+          zoomControlsEnabled: false,
+          scrollGesturesEnabled: false,
+        ),
       ),
     );
   }

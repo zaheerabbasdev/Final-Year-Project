@@ -24,12 +24,13 @@ const getProfile = async (req, res) => {
 
 const updateProfile = async (req, res) => {
     try {
-        const { full_name, phone, location, bio, experience_years, skills, availability } = req.body;
+        const { full_name, phone, location, latitude, longitude, bio, experience_years, skills, availability } = req.body;
         
         console.log('DEBUG: Updating Profile for User', req.user.id);
         console.log('DEBUG: Received Data:', req.body);
+        console.log(`DEBUG: Saving Latitude: ${latitude}, Longitude: ${longitude}`);
         
-        await User.update(req.user.id, { full_name, phone, location });
+        await User.update(req.user.id, { full_name, phone, location, latitude, longitude });
 
         const currentRole = (req.user.role || '').toLowerCase();
         console.log('DEBUG: User Role:', currentRole);

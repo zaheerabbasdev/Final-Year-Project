@@ -2,10 +2,13 @@ import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../features/auth/auth_service.dart';
 import '../../features/customer/job_service.dart';
 import '../../features/provider/provider_service.dart';
 import '../../core/api_client.dart';
+import '../../core/services/location_service.dart';
+import 'map_picker_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
   const ProfileScreen({super.key});
@@ -32,18 +35,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
   Uint8List? _avatarBytes;
   List<String> _skills = [];
   int _experienceYears = 0;
+  LatLng? _selectedLocationData;
+  final LocationService _locationService = LocationService();
+  bool _isLoading = false;
 
   @override
   void initState() {
     super.initState();
     // Initially load if data is already there
-    _loadInitialData();
-  }
-
-  @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
-    // Refresh data if auth state changes (e.g. checkAuth completes)
     _loadInitialData();
   }
 
@@ -72,6 +71,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
         _emailController.text = user?['email'] ?? '';
         _phoneController.text = user?['phone'] ?? '';
         _locationController.text = user?['location'] ?? '';
+        if (user?['latitude'] != null && user?['longitude'] != null) {
+          _selectedLocationData = LatLng(
+            double.parse(user!['latitude'].toString()),
+            double.parse(user!['longitude'].toString()),
+          );
+        }
 
         if (role == 'provider') {
           final profile = user?['profile'];
@@ -98,6 +103,42 @@ class _ProfileScreenState extends State<ProfileScreen> {
     // Debugging to find why phone/category is missing
     print('DEBUG: User Object: $user');
     print('DEBUG: Profile Object: ${user?['profile']}');
+  }
+
+  Future<void> _pickLocation() async {
+    final LatLng? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapPickerScreen(initialLocation: _selectedLocationData),
+      ),
+    );
+
+    if (result != null) {
+      setState(() => _selectedLocationData = result);
+      final address = await _locationService.getAddressFromLatLng(result.latitude, result.longitude);
+      if (address != null) {
+        _locationController.text = address;
+      }
+    }
+  }
+
+  Future<void> _useCurrentLocation() async {
+    setState(() => _isLoading = true);
+    try {
+      final pos = await _locationService.getCurrentLocation();
+      if (pos != null) {
+        final latLng = LatLng(pos.latitude, pos.longitude);
+        setState(() => _selectedLocationData = latLng);
+        final address = await _locationService.getAddressFromLatLng(pos.latitude, pos.longitude);
+        if (address != null) {
+          _locationController.text = address;
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -292,6 +333,33 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildFieldLabel('Phone'),
           _buildTextField(_phoneController, 'Enter phone number', keyboardType: TextInputType.phone),
           const SizedBox(height: 20),
+          _buildFieldLabel('Service Location'),
+          Row(
+            children: [
+              Expanded(
+                child: _buildTextField(
+                  _locationController, 
+                  'Pick service location', 
+                  readOnly: true,
+                  onTap: _pickLocation,
+                ),
+              ),
+              const SizedBox(width: 8),
+              Container(
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6366F1).withOpacity(0.1),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: IconButton(
+                  icon: _isLoading 
+                    ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
+                    : const Icon(Icons.my_location, color: Color(0xFF6366F1), size: 18),
+                  onPressed: _useCurrentLocation,
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 20),
           if (role == 'provider') ...[
             const SizedBox(height: 20),
             _buildFieldLabel('Years of Experience'),
@@ -333,7 +401,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     final Map<String, dynamic> data = {
                       'full_name': _nameController.text,
                       'phone': _phoneController.text,
+                      'location': _locationController.text,
+                      'latitude': _selectedLocationData?.latitude,
+                      'longitude': _selectedLocationData?.longitude,
                     };
+
+                    debugPrint('DEBUG: Saving Profile Data: $data');
                     
                     if (role == 'provider') {
                       data['bio'] = _bioController.text;
@@ -500,11 +573,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, TextInputType keyboardType = TextInputType.text, Function(String)? onChanged}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool readOnly = false, VoidCallback? onTap, Function(String)? onChanged}) {
     return TextField(
       controller: controller,
       maxLines: maxLines,
       keyboardType: keyboardType,
+      readOnly: readOnly,
+      onTap: onTap,
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hint,

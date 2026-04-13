@@ -6,6 +6,7 @@ import '../../../core/api_client.dart';
 import '../../auth/auth_service.dart';
 
 import '../../provider/provider_service.dart';
+import '../../../core/services/location_service.dart';
 
 class ProviderDashboardScreen extends StatefulWidget {
   const ProviderDashboardScreen({super.key});
@@ -15,6 +16,9 @@ class ProviderDashboardScreen extends StatefulWidget {
 }
 
 class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
+  bool _isNearMeEnabled = false;
+  final LocationService _locationService = LocationService();
+  bool _isLocating = false;
   @override
   void initState() {
     super.initState();
@@ -22,6 +26,33 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       context.read<JobService>().fetchJobs();
       context.read<ProviderService>().fetchDashboardStats();
     });
+  }
+
+  Future<void> _toggleNearMe() async {
+    if (_isNearMeEnabled) {
+      setState(() => _isNearMeEnabled = false);
+      context.read<JobService>().fetchJobs();
+      return;
+    }
+
+    setState(() => _isLocating = true);
+    try {
+      final pos = await _locationService.getCurrentLocation();
+      if (pos != null) {
+        setState(() {
+          _isNearMeEnabled = true;
+          _isLocating = false;
+        });
+        context.read<JobService>().fetchJobs(filters: {
+          'lat': pos.latitude,
+          'lng': pos.longitude,
+          // 'radius': 20, // Backend now defaults to 20km for providers
+        });
+      }
+    } catch (e) {
+      setState(() => _isLocating = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
@@ -67,6 +98,10 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            if (user != null && _shouldShowLocationWarning(user))
+              _buildLocationWarning(),
+            if (user != null && _shouldShowLocationWarning(user))
+              const SizedBox(height: 24),
             _buildStatsGrid(),
             const SizedBox(height: 32),
             _buildSectionHeader('Quick Actions'),
@@ -75,7 +110,11 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
             const SizedBox(height: 32),
             _buildEarningsCard(),
             const SizedBox(height: 32),
-            _buildSectionHeader('New Job Opportunities', action: 'See All', onAction: () => context.push('/browse-jobs')),
+            _buildSectionHeader(
+              _isNearMeEnabled ? 'Jobs Near You (20km)' : 'New Job Opportunities', 
+              action: _isLocating ? 'Locating...' : (_isNearMeEnabled ? 'Show All' : 'Near Me'), 
+              onAction: _toggleNearMe
+            ),
             const SizedBox(height: 16),
             _buildOpportunitiesList(),
           ],
@@ -318,7 +357,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  job['location'] ?? 'Downtown',
+                  '${job['location'] ?? 'Downtown'}${job['distance'] != null ? ' (${double.parse(job['distance'].toString()).toStringAsFixed(1)} km away)' : ''}',
                   style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -352,6 +391,56 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 ),
               ),
             ],
+          ),
+        ],
+      ),
+    );
+  }
+
+  bool _shouldShowLocationWarning(Map<String, dynamic>? user) {
+    if (user == null) return false;
+    final lat = user['latitude'];
+    final lng = user['longitude'];
+    
+    // Show warning if coordinates are missing, null, or exactly zero
+    if (lat == null || lng == null) return true;
+    
+    final dLat = double.tryParse(lat.toString()) ?? 0.0;
+    final dLng = double.tryParse(lng.toString()) ?? 0.0;
+    
+    return dLat == 0.0 && dLng == 0.0;
+  }
+
+  Widget _buildLocationWarning() {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      decoration: BoxDecoration(
+        color: const Color(0xFFFEF2F2),
+        borderRadius: BorderRadius.circular(16),
+        border: Border.all(color: const Color(0xFFFECACA)),
+      ),
+      child: Row(
+        children: [
+          const Icon(Icons.location_off_outlined, color: Color(0xFFEF4444)),
+          const SizedBox(width: 12),
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Service Area Not Set',
+                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF991B1B)),
+                ),
+                Text(
+                  'Set your location in profile to see jobs near you automatically.',
+                  style: TextStyle(fontSize: 12, color: const Color(0xFF991B1B).withOpacity(0.8)),
+                ),
+              ],
+            ),
+          ),
+          TextButton(
+            onPressed: () => context.push('/profile'), // Navigate to profile to set location
+            child: const Text('Set Now', style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold)),
           ),
         ],
       ),

@@ -11,6 +11,8 @@ CREATE TABLE IF NOT EXISTS users (
     role ENUM('customer', 'provider', 'admin') DEFAULT 'customer',
     avatar VARCHAR(255),
     location VARCHAR(255),
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 );
 
@@ -49,6 +51,8 @@ CREATE TABLE IF NOT EXISTS jobs (
     preferred_time TIME,
     images JSON,
     status ENUM('open', 'active', 'completed', 'cancelled') DEFAULT 'open',
+    latitude DECIMAL(10, 8),
+    longitude DECIMAL(11, 8),
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL

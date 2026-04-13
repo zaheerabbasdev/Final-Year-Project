@@ -5,6 +5,8 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
+apply(from = project(":flutter_config").projectDir.path + "/dotenv.gradle")
+
 android {
     namespace = "com.servicehub.mobile"
     compileSdk = flutter.compileSdkVersion

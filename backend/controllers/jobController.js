@@ -1,11 +1,14 @@
 const Job = require('../models/jobModel');
+const User = require('../models/userModel');
+
+// ... rest of imports if any ...
 
 const createJob = async (req, res) => {
     try {
         const jobData = { ...req.body, customer_id: req.user.id };
 
         // Sanitize formData string "null" values
-        ['category_id', 'budget', 'location', 'preferred_date', 'preferred_time'].forEach(field => {
+        ['category_id', 'budget', 'location', 'preferred_date', 'preferred_time', 'latitude', 'longitude'].forEach(field => {
             if (jobData[field] === 'null' || jobData[field] === '') {
                 jobData[field] = null;
             }
@@ -26,9 +29,30 @@ const createJob = async (req, res) => {
 
 const getJobs = async (req, res) => {
     try {
-        const jobs = await Job.findAll(req.query);
+        const filters = { ...req.query };
+
+        // Proximity Fallback for Providers
+        if (req.user && req.user.role === 'provider') {
+            // Priority 1: Current GPS coordinates sent from Mobile app
+            if (!filters.lat || !filters.lng) {
+                // Priority 2: Fallback to saved location in user profile
+                const user = await User.findById(req.user.id);
+                if (user && user.latitude && user.longitude) {
+                    filters.lat = user.latitude;
+                    filters.lng = user.longitude;
+                }
+            }
+            
+            // Apply default 20km radius if proximity logic is triggered
+            if (filters.lat && filters.lng && !filters.radius) {
+                filters.radius = 20;
+            }
+        }
+
+        const jobs = await Job.findAll(filters);
         res.json(jobs);
     } catch (error) {
+        console.error("DEBUG getJobs error:", error);
         res.status(500).json({ message: 'Error fetching jobs' });
     }
 };

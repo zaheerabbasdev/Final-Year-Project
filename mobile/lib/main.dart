@@ -21,8 +21,12 @@ import 'features/provider/screens/place_bid_screen.dart';
 import 'shared/screens/job_detail_screen.dart';
 import 'shared/screens/navigation_screen.dart';
 import 'shared/screens/profile_screen.dart';
+import 'package:flutter_config/flutter_config.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await FlutterConfig.loadEnvVariables();
+  
   runApp(
     MultiProvider(
       providers: [
@@ -82,6 +86,7 @@ class ServiceHubApp extends StatelessWidget {
         GoRoute(path: '/job-detail/:id', builder: (context, state) => JobDetailScreen(jobId: int.parse(state.pathParameters['id']!))),
         GoRoute(path: '/place-bid/:id', builder: (context, state) => PlaceBidScreen(jobId: int.parse(state.pathParameters['id']!))),
         GoRoute(path: '/post-job', builder: (context, state) => PostJobScreen()),
+        GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
         GoRoute(path: '/main', builder: (context, state) => const MainNavigationScreen()),
       ],
     );

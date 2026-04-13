@@ -2,9 +2,9 @@ const db = require('../config/db');
 
 const Job = {
     create: async (jobData) => {
-        const { customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images } = jobData;
+        const { customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images, latitude, longitude } = jobData;
         const [result] = await db.execute(
-            'INSERT INTO jobs (customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO jobs (customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 customer_id || null, 
                 title || null, 
@@ -14,15 +14,37 @@ const Job = {
                 location || null, 
                 preferred_date || null, 
                 preferred_time || null, 
-                JSON.stringify(images || [])
+                JSON.stringify(images || []),
+                latitude || null,
+                longitude || null
             ]
         );
         return result.insertId;
     },
 
     findAll: async (filters = {}) => {
-        let query = 'SELECT j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar FROM jobs j LEFT JOIN categories c ON j.category_id = c.id JOIN users u ON j.customer_id = u.id WHERE 1=1';
+        let selectClause = `j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar`;
+        let proximityClause = '';
         const params = [];
+
+        if (filters.lat && filters.lng) {
+            proximityClause = `, (
+                6371 * acos(
+                    cos(radians(?)) * cos(radians(j.latitude)) *
+                    cos(radians(j.longitude) - radians(?)) +
+                    sin(radians(?)) * sin(radians(j.latitude))
+                )
+            ) AS distance`;
+            params.push(filters.lat, filters.lng, filters.lat);
+        }
+
+        let query = `
+            SELECT ${selectClause} ${proximityClause}
+            FROM jobs j 
+            LEFT JOIN categories c ON j.category_id = c.id 
+            JOIN users u ON j.customer_id = u.id 
+            WHERE 1=1
+        `;
 
         if (filters.category_id) {
             query += ' AND j.category_id = ?';
@@ -39,6 +61,12 @@ const Job = {
         if (filters.search) {
             query += ' AND (j.title LIKE ? OR j.description LIKE ?)';
             params.push(`%${filters.search}%`, `%${filters.search}%`);
+        }
+
+        // Proximity Filter in WHERE
+        if (filters.lat && filters.lng && filters.radius) {
+            query += ` HAVING distance <= ?`;
+            params.push(filters.radius);
         }
 
         query += ' ORDER BY j.created_at DESC';

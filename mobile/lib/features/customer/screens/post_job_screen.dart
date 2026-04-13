@@ -6,6 +6,9 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'dart:io' show File;
 import '../category_service.dart';
 import '../job_service.dart';
+import '../../../shared/screens/map_picker_screen.dart';
+import '../../../core/services/location_service.dart';
+import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 class PostJobScreen extends StatefulWidget {
   const PostJobScreen({super.key});
@@ -24,6 +27,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
   DateTime? _selectedDate;
   TimeOfDay? _selectedTime;
   List<XFile> _images = [];
+  LatLng? _selectedLocationData;
+  final LocationService _locationService = LocationService();
   bool _isLoading = false;
   final ImagePicker _picker = ImagePicker();
 
@@ -55,6 +60,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
       'category_id': _selectedCategoryId,
       'budget': double.parse(_budgetController.text),
       'location': _locationController.text,
+      'latitude': _selectedLocationData?.latitude,
+      'longitude': _selectedLocationData?.longitude,
       'preferred_date': _selectedDate != null ? DateFormat('yyyy-MM-dd').format(_selectedDate!) : null,
       'preferred_time': _selectedTime != null ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}' : null,
     }, _images);
@@ -84,6 +91,43 @@ class _PostJobScreenState extends State<PostJobScreen> {
       initialTime: TimeOfDay.now(),
     );
     if (picked != null) setState(() => _selectedTime = picked);
+  }
+
+  Future<void> _pickLocationOnMap() async {
+    final LatLng? result = await Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => MapPickerScreen(initialLocation: _selectedLocationData),
+      ),
+    );
+
+    if (result != null) {
+      setState(() => _selectedLocationData = result);
+      // Try to get address
+      final address = await _locationService.getAddressFromLatLng(result.latitude, result.longitude);
+      if (address != null) {
+        _locationController.text = address;
+      }
+    }
+  }
+
+  Future<void> _useCurrentLocation() async {
+    setState(() => _isLoading = true);
+    try {
+      final pos = await _locationService.getCurrentLocation();
+      if (pos != null) {
+        final latLng = LatLng(pos.latitude, pos.longitude);
+        setState(() => _selectedLocationData = latLng);
+        final address = await _locationService.getAddressFromLatLng(pos.latitude, pos.longitude);
+        if (address != null) {
+          _locationController.text = address;
+        }
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    } finally {
+      setState(() => _isLoading = false);
+    }
   }
 
   @override
@@ -132,8 +176,19 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     _buildSectionHeader('Budget (USD) *'),
                     _buildTextField(_budgetController, 'Enter your budget', isNumber: true, prefix: const Icon(Icons.attach_money, size: 20, color: Color(0xFF94A3B8))),
                     const SizedBox(height: 24),
-                    _buildSectionHeader('Location'),
-                    _buildTextField(_locationController, 'Enter location', prefix: const Icon(Icons.location_on_outlined, size: 20, color: Color(0xFF94A3B8))),
+                    _buildSectionHeader('Location *'),
+                    _buildTextField(
+                      _locationController, 
+                      'Enter or pick location', 
+                      prefix: const Icon(Icons.location_on_outlined, size: 20, color: Color(0xFF6366F1)),
+                      readOnly: true,
+                      onTap: _pickLocationOnMap,
+                      suffix: IconButton(
+                        icon: const Icon(Icons.my_location, color: Color(0xFF6366F1), size: 20),
+                        onPressed: _useCurrentLocation,
+                        tooltip: 'Use current location',
+                      ),
+                    ),
                     const SizedBox(height: 24),
                     Row(
                       children: [
@@ -193,14 +248,17 @@ class _PostJobScreenState extends State<PostJobScreen> {
     );
   }
 
-  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, bool isNumber = false, Widget? prefix}) {
+  Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, bool isNumber = false, Widget? prefix, Widget? suffix, bool readOnly = false, VoidCallback? onTap}) {
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
+      readOnly: readOnly,
+      onTap: onTap,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: prefix,
+        suffixIcon: suffix,
       ),
       validator: (v) => v!.isEmpty ? 'Field required' : null,
     );

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../customer/job_service.dart';
 import '../../customer/category_service.dart';
+import '../../../core/services/location_service.dart';
 
 class BrowseJobsScreen extends StatefulWidget {
   const BrowseJobsScreen({super.key});
@@ -17,20 +18,69 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   String selectedCategory = 'All Categories';
   String selectedSort = 'Most Recent';
   Timer? _debounce;
+  bool _isNearMeEnabled = false;
+  bool _isLocating = false;
+  final LocationService _locationService = LocationService();
 
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
       final filters = <String, dynamic>{};
       if (query.isNotEmpty) filters['search'] = query;
-      // Re-add category filter if one is selected
       if (selectedCategory != 'All Categories') {
         final categories = context.read<CategoryService>().categories;
         final cat = categories.firstWhere((c) => c['name'] == selectedCategory, orElse: () => null);
         if (cat != null) filters['category_id'] = cat['id'];
       }
-      context.read<JobService>().fetchJobs(filters: filters);
+      if (_isNearMeEnabled) {
+        _performNearMeSearch(filters);
+      } else {
+        context.read<JobService>().fetchJobs(filters: filters);
+      }
     });
+  }
+
+  Future<void> _performNearMeSearch(Map<String, dynamic> baseFilters) async {
+    try {
+      final pos = await _locationService.getCurrentLocation();
+      if (pos != null) {
+        baseFilters.addAll({
+          'lat': pos.latitude,
+          'lng': pos.longitude,
+          'radius': 20,
+        });
+        context.read<JobService>().fetchJobs(filters: baseFilters);
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
+  }
+
+  Future<void> _toggleNearMe() async {
+    if (_isNearMeEnabled) {
+      setState(() => _isNearMeEnabled = false);
+      context.read<JobService>().fetchJobs();
+      return;
+    }
+
+    setState(() => _isLocating = true);
+    try {
+      final pos = await _locationService.getCurrentLocation();
+      if (pos != null) {
+        setState(() {
+          _isNearMeEnabled = true;
+          _isLocating = false;
+        });
+        context.read<JobService>().fetchJobs(filters: {
+          'lat': pos.latitude,
+          'lng': pos.longitude,
+          'radius': 20,
+        });
+      }
+    } catch (e) {
+      setState(() => _isLocating = false);
+      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(e.toString())));
+    }
   }
 
   @override
@@ -224,14 +274,17 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
         children: [
           Consumer<JobService>(
             builder: (context, service, _) => Text(
-              '${service.jobs.length} jobs found',
+              '${service.jobs.length} ${_isNearMeEnabled ? 'nearby ' : ''}jobs found',
               style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
             ),
           ),
           TextButton.icon(
-            onPressed: () {},
-            icon: const Icon(Icons.tune, size: 16, color: Color(0xFF1E293B)),
-            label: const Text('Filters', style: TextStyle(color: Color(0xFF1E293B), fontSize: 14)),
+            onPressed: _toggleNearMe,
+            icon: Icon(_isNearMeEnabled ? Icons.location_off : Icons.near_me, size: 16, color: const Color(0xFF6366F1)),
+            label: Text(
+              _isLocating ? 'Locating...' : (_isNearMeEnabled ? 'Show All' : 'Near Me'), 
+              style: const TextStyle(color: Color(0xFF6366F1), fontSize: 14, fontWeight: FontWeight.bold)
+            ),
           ),
         ],
       ),
@@ -268,7 +321,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 },
               ),
               ...categories.map((cat) => ListTile(
-                leading: const Icon(Icons.category_outlined, color: Color(0xFF6366F1)), // Or use _getIconData
+                leading: const Icon(Icons.category_outlined, color: Color(0xFF6366F1)),
                 title: Text(cat['name'] as String),
                 onTap: () {
                   setState(() => selectedCategory = cat['name'] as String);
@@ -297,7 +350,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            job['title'] ?? 'Fix Kitchen Sink Leak',
+            job['title'] ?? 'Job Title',
             style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
           ),
           const SizedBox(height: 8),
@@ -312,7 +365,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
             padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
             decoration: BoxDecoration(color: const Color(0xFF10B981).withOpacity(0.1), borderRadius: BorderRadius.circular(12)),
             child: Text(
-              job['category_name']?.toUpperCase() ?? 'PLUMBER',
+              job['category_name']?.toUpperCase() ?? 'CAT',
               style: const TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold),
             ),
           ),
@@ -330,7 +383,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
               const SizedBox(width: 4),
               Expanded(
                 child: Text(
-                  job['location'] ?? 'Downtown',
+                  '${job['location'] ?? 'Downtown'}${job['distance'] != null ? ' (${double.parse(job['distance'].toString()).toStringAsFixed(1)} km away)' : ''}',
                   style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -348,7 +401,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 children: [
                   const Text('Budget', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
                   Text(
-                    '\$${job['budget'] ?? '150'}',
+                    '\$${job['budget'] ?? '0'}',
                     style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
                   ),
                 ],
@@ -362,11 +415,6 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 child: const Text('Place Bid'),
               ),
             ],
-          ),
-          const SizedBox(height: 16),
-          Text(
-            'Check details to place a bid',
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
           ),
         ],
       ),
