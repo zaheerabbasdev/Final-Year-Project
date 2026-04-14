@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../customer/job_service.dart';
+import 'package:go_router/go_router.dart';
+import '../../../shared/services/navigation_service.dart';
 
 class PlaceBidScreen extends StatefulWidget {
   final int jobId;
@@ -51,7 +53,8 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
     if (success) {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Bid submitted successfully!')));
-        Navigator.pop(context);
+        context.read<NavigationService>().setIndex(2);
+        context.go('/main');
       }
     } else {
       if (mounted) {

@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../customer/job_service.dart';
 import '../../../core/api_client.dart';
 import '../../auth/auth_service.dart';
+import '../../../shared/services/navigation_service.dart';
 
 import '../../provider/provider_service.dart';
 import '../../../core/services/location_service.dart';
@@ -24,6 +25,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
       context.read<JobService>().fetchJobs();
+      context.read<JobService>().fetchProviderBids();
       context.read<ProviderService>().fetchDashboardStats();
     });
   }
@@ -147,6 +149,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     return Consumer<ProviderService>(
       builder: (context, service, _) {
         final stats = service.dashboardStats;
+        final acceptedBidsCount = context.watch<JobService>().providerBids
+            .where((b) => b['status'] == 'accepted').length;
+            
         return GridView.count(
           shrinkWrap: true,
           physics: const NeverScrollableScrollPhysics(),
@@ -155,7 +160,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           mainAxisSpacing: 16,
           childAspectRatio: 1.1,
           children: [
-            _buildStatCard('Active Jobs', '0', Icons.work_outline, const Color(0xFF6366F1)), // Need booking service for this
+            _buildStatCard('Active Jobs', acceptedBidsCount.toString(), Icons.work_outline, const Color(0xFF6366F1)),
             _buildStatCard('Rating', (stats?['rating'] ?? '0.0').toString(), Icons.star_outline, const Color(0xFF10B981)),
             _buildStatCard('Jobs Done', (stats?['total_jobs'] ?? '0').toString(), Icons.check_circle_outline, const Color(0xFFF59E0B)),
             _buildStatCard('Experience', '${stats?['experience_years'] ?? '0'} Yrs', Icons.access_time, const Color(0xFF6366F1).withOpacity(0.7)),
@@ -204,7 +209,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       children: [
         Expanded(child: _buildActionItem(Icons.business_center_outlined, 'Browse Jobs', () => context.push('/browse-jobs'))),
         const SizedBox(width: 16),
-        Expanded(child: _buildActionItem(Icons.trending_up, 'My Bids', () => context.push('/my-bids'))),
+        Expanded(child: _buildActionItem(Icons.trending_up, 'My Bids', () => context.read<NavigationService>().setIndex(2))),
       ],
     );
   }

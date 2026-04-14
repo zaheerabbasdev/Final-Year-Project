@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import '../services/navigation_service.dart';
 import '../../features/auth/auth_service.dart';
 import '../../features/customer/screens/home_screen.dart';
 import '../../features/customer/screens/my_jobs_screen.dart';
@@ -8,19 +9,14 @@ import '../../features/provider/screens/browse_jobs_screen.dart';
 import '../../features/provider/screens/my_bids_screen.dart';
 import 'profile_screen.dart';
 
-class MainNavigationScreen extends StatefulWidget {
+class MainNavigationScreen extends StatelessWidget {
   const MainNavigationScreen({super.key});
-
-  @override
-  State<MainNavigationScreen> createState() => _MainNavigationScreenState();
-}
-
-class _MainNavigationScreenState extends State<MainNavigationScreen> {
-  int _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     final role = context.watch<AuthService>().role;
+    final navService = context.watch<NavigationService>();
+    final int selectedIndex = navService.selectedIndex;
     
     final List<Widget> customerScreens = [
       const CustomerHomeScreen(),
@@ -40,12 +36,12 @@ class _MainNavigationScreenState extends State<MainNavigationScreen> {
 
     return Scaffold(
       body: IndexedStack(
-        index: _selectedIndex,
+        index: selectedIndex,
         children: screens,
       ),
       bottomNavigationBar: BottomNavigationBar(
-        currentIndex: _selectedIndex,
-        onTap: (index) => setState(() => _selectedIndex = index),
+        currentIndex: selectedIndex,
+        onTap: (index) => navService.setIndex(index),
         type: BottomNavigationBarType.fixed,
         selectedItemColor: const Color(0xFF6366F1),
         unselectedItemColor: const Color(0xFF94A3B8),

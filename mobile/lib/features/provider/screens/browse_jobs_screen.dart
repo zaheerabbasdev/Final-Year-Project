@@ -25,7 +25,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
-      final filters = <String, dynamic>{};
+      final filters = <String, dynamic>{'status': 'open'};
       if (query.isNotEmpty) filters['search'] = query;
       if (selectedCategory != 'All Categories') {
         final categories = context.read<CategoryService>().categories;
@@ -59,7 +59,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   Future<void> _toggleNearMe() async {
     if (_isNearMeEnabled) {
       setState(() => _isNearMeEnabled = false);
-      context.read<JobService>().fetchJobs();
+      context.read<JobService>().fetchJobs(filters: {'status': 'open'});
       return;
     }
 
@@ -75,6 +75,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
           'lat': pos.latitude,
           'lng': pos.longitude,
           'radius': 20,
+          'status': 'open',
         });
       }
     } catch (e) {
@@ -94,7 +95,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<JobService>().fetchJobs();
+      context.read<JobService>().fetchJobs(filters: {'status': 'open'});
       context.read<CategoryService>().fetchCategories();
     });
   }
@@ -316,7 +317,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 title: const Text('All Categories'),
                 onTap: () {
                   setState(() => selectedCategory = 'All Categories');
-                  context.read<JobService>().fetchJobs();
+                  context.read<JobService>().fetchJobs(filters: {'status': 'open'});
                   Navigator.pop(context);
                 },
               ),
@@ -325,7 +326,10 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 title: Text(cat['name'] as String),
                 onTap: () {
                   setState(() => selectedCategory = cat['name'] as String);
-                  context.read<JobService>().fetchJobs(filters: {'category_id': cat['id']});
+                  context.read<JobService>().fetchJobs(filters: {
+                    'category_id': cat['id'],
+                    'status': 'open',
+                  });
                   Navigator.pop(context);
                 },
               )),

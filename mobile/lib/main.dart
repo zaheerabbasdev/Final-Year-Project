@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme.dart';
@@ -13,6 +14,7 @@ import 'features/customer/job_service.dart';
 import 'features/customer/category_service.dart';
 import 'features/provider/provider_service.dart';
 import 'shared/services/booking_service.dart';
+import 'shared/services/navigation_service.dart';
 import 'features/customer/screens/home_screen.dart';
 import 'features/customer/screens/post_job_screen.dart';
 import 'features/provider/screens/dashboard_screen.dart';
@@ -25,7 +27,9 @@ import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  await FlutterConfig.loadEnvVariables();
+  if (!kIsWeb) {
+    await FlutterConfig.loadEnvVariables();
+  }
   
   runApp(
     MultiProvider(
@@ -35,6 +39,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => JobService()),
         ChangeNotifierProvider(create: (_) => ProviderService()),
         ChangeNotifierProvider(create: (_) => BookingService()),
+        ChangeNotifierProvider(create: (_) => NavigationService()),
       ],
       child: const ServiceHubApp(),
     ),

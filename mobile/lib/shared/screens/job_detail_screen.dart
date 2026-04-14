@@ -736,6 +736,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       return const Center(child: Text('No bids yet.'));
     }
 
+    final bool hasAcceptedAny = _bids.any((b) => b['status'] == 'accepted');
+
     return SingleChildScrollView(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -750,6 +752,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 time: bid['estimated_time'] ?? 'N/A',
                 avatar: bid['provider_avatar'],
                 status: bid['status'],
+                hasAcceptedAny: hasAcceptedAny,
               )).toList(),
         ],
       ),
@@ -766,6 +769,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     required String time,
     String? avatar,
     required String status,
+    required bool hasAcceptedAny,
   }) {
     final avatarUrl = ApiClient.getImageUrl(avatar);
     return Container(
@@ -803,18 +807,28 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ],
               ),
               const Spacer(),
-              if (status != 'pending')
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: status == 'accepted' ? Colors.green.withOpacity(0.1) : Colors.red.withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    status.toUpperCase(),
-                    style: TextStyle(color: status == 'accepted' ? Colors.green : Colors.red, fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                ),
+              if (status != 'pending' || hasAcceptedAny)
+                Builder(builder: (context) {
+                  String label = status.toUpperCase();
+                  Color color = status == 'accepted' ? Colors.green : Colors.red;
+                  
+                  if (hasAcceptedAny && status != 'accepted') {
+                    label = 'SERVICE AVAILED';
+                    color = Colors.orange;
+                  }
+                  
+                  return Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: color.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Text(
+                      label,
+                      style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+                    ),
+                  );
+                }),
             ],
           ),
           const SizedBox(height: 16),

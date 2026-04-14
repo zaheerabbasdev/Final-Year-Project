@@ -32,11 +32,22 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
   @override
   Widget build(BuildContext context) {
     final _allBids = context.watch<JobService>().providerBids;
-    final pendingCount = _allBids.where((b) => b['status'] == 'pending').length;
-    final acceptedCount = _allBids.where((b) => b['status'] == 'accepted').length;
+    final activeCount = _allBids.where((b) => b['status'] == 'accepted').length;
+    
+    final availedCount = _allBids.where((b) {
+      if (b['status'] == 'accepted') return false;
+      final js = (b['job_status'] ?? 'open').toString().toLowerCase();
+      return js == 'active' || js == 'completed';
+    }).length;
+
+    final pendingCount = _allBids.where((b) {
+      if (b['status'] == 'accepted') return false;
+      final js = (b['job_status'] ?? 'open').toString().toLowerCase();
+      return js == 'open' && b['status'] == 'pending';
+    }).length;
 
     return DefaultTabController(
-      length: 3,
+      length: 4,
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         appBar: AppBar(
@@ -47,6 +58,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
             style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 20),
           ),
           bottom: TabBar(
+            isScrollable: true,
             indicatorColor: const Color(0xFF6366F1),
             indicatorWeight: 3,
             labelColor: const Color(0xFF6366F1),
@@ -55,15 +67,25 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
             tabs: [
               Tab(text: 'All (${_allBids.length})'),
               Tab(text: 'Pending ($pendingCount)'),
-              Tab(text: 'Accepted ($acceptedCount)'),
+              Tab(text: 'Active ($activeCount)'),
+              Tab(text: 'Availed ($availedCount)'),
             ],
           ),
         ),
         body: TabBarView(
           children: [
             _buildBidsList(_allBids),
-            _buildBidsList(_allBids.where((b) => b['status'] == 'pending').toList()),
+            _buildBidsList(_allBids.where((b) {
+              if (b['status'] == 'accepted') return false;
+              final js = (b['job_status'] ?? 'open').toString().toLowerCase();
+              return js == 'open' && b['status'] == 'pending';
+            }).toList()),
             _buildBidsList(_allBids.where((b) => b['status'] == 'accepted').toList()),
+            _buildBidsList(_allBids.where((b) {
+              if (b['status'] == 'accepted') return false;
+              final js = (b['job_status'] ?? 'open').toString().toLowerCase();
+              return js == 'active' || js == 'completed';
+            }).toList()),
           ],
         ),
       ),
@@ -103,7 +125,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                       style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
                     ),
                   ),
-                  _buildStatusBadge(status),
+                  _buildStatusBadge(bid),
                 ],
               ),
               const SizedBox(height: 12),
@@ -174,19 +196,31 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
     );
   }
 
-  Widget _buildStatusBadge(String status) {
+  Widget _buildStatusBadge(Map<String, dynamic> bid) {
+    String status = bid['status'] as String;
+    final String jobStatus = (bid['job_status'] ?? 'open').toString().toLowerCase();
+    
     Color color = const Color(0xFF94A3B8);
     IconData icon = Icons.access_time_filled;
-    
+    String label = status;
+
     if (status == 'accepted') {
       color = const Color(0xFF10B981);
       icon = Icons.check_circle;
+      label = 'active';
+    } else if (jobStatus == 'active' || jobStatus == 'completed') {
+      // The job was awarded to someone else, regardless of whether this bid is 'pending' or 'rejected'.
+      color = const Color(0xFFF59E0B);
+      icon = Icons.info_outline;
+      label = 'service availed';
     } else if (status == 'pending') {
       color = const Color(0xFF6366F1);
       icon = Icons.access_time_filled;
+      label = 'pending';
     } else if (status == 'rejected') {
       color = const Color(0xFFEF4444);
       icon = Icons.cancel;
+      label = 'rejected';
     }
 
     return Container(
@@ -201,7 +235,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
           Icon(icon, size: 12, color: color),
           const SizedBox(width: 6),
           Text(
-            status,
+            label.toUpperCase(),
             style: TextStyle(color: color, fontSize: 11, fontWeight: FontWeight.bold),
           ),
         ],

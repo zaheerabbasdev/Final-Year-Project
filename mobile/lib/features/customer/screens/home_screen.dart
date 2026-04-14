@@ -64,19 +64,25 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               const SizedBox(height: 20),
               _buildSearchBar(),
               const SizedBox(height: 24),
-              _buildPromoCard(context),
-              const SizedBox(height: 32),
-              _buildSectionHeader('Browse Categories', 'See All', () {}),
-              const SizedBox(height: 16),
-              _buildCategoryGrid(),
-              const SizedBox(height: 32),
-              _buildSectionHeader('Your Recent Jobs', 'View All', () {}),
-              const SizedBox(height: 16),
-              _buildRecentJobsList(),
-              const SizedBox(height: 32),
-              _buildSectionHeader('Top Rated Providers', 'See All', () {}),
-              const SizedBox(height: 16),
-              _buildTopProvidersList(),
+              if (_isSearching) ...[
+                _buildSectionHeader('Search Results', '', () {}),
+                const SizedBox(height: 16),
+                _buildSearchResults(),
+              ] else ...[
+                _buildPromoCard(context),
+                const SizedBox(height: 32),
+                _buildSectionHeader('Browse Categories', 'See All', () {}),
+                const SizedBox(height: 16),
+                _buildCategoryGrid(),
+                const SizedBox(height: 32),
+                _buildSectionHeader('Your Recent Jobs', 'View All', () {}),
+                const SizedBox(height: 16),
+                _buildRecentJobsList(),
+                const SizedBox(height: 32),
+                _buildSectionHeader('Top Rated Providers', 'See All', () {}),
+                const SizedBox(height: 16),
+                _buildTopProvidersList(),
+              ],
               const SizedBox(height: 32),
             ],
           ),
@@ -135,12 +141,21 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: TextField(
         controller: _searchController,
         onChanged: _onSearchChanged,
-        decoration: const InputDecoration(
+        decoration: InputDecoration(
           hintText: 'Search services or providers...',
-          hintStyle: TextStyle(color: Color(0xFF94A3B8), fontSize: 16),
-          prefixIcon: Icon(Icons.search, color: Color(0xFF94A3B8)),
+          hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 16),
+          prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
+          suffixIcon: _searchController.text.isNotEmpty
+              ? IconButton(
+                  icon: const Icon(Icons.clear, color: Color(0xFF94A3B8)),
+                  onPressed: () {
+                    _searchController.clear();
+                    _onSearchChanged('');
+                  },
+                )
+              : null,
           border: InputBorder.none,
-          contentPadding: EdgeInsets.symmetric(vertical: 16),
+          contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
       ),
     );
