@@ -85,6 +85,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     _buildLabel('Email Address'),
                     TextField(
                       controller: _emailController,
+                      textInputAction: TextInputAction.next,
                       decoration: const InputDecoration(
                         hintText: 'Enter your email',
                       ),
@@ -94,6 +95,8 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
+                      textInputAction: TextInputAction.done,
+                      onSubmitted: (_) => _login(),
                       decoration: InputDecoration(
                         hintText: 'Enter your password',
                         suffixIcon: IconButton(
