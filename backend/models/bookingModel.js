@@ -28,6 +28,16 @@ const Booking = {
     updateStatus: async (id, status) => {
         const [result] = await db.execute('UPDATE bookings SET status = ? WHERE id = ?', [status, id]);
         return result.affectedRows > 0;
+    },
+
+    findById: async (id) => {
+        const [rows] = await db.execute('SELECT * FROM bookings WHERE id = ?', [id]);
+        return rows[0] || null;
+    },
+
+    findByJobId: async (jobId) => {
+        const [rows] = await db.execute('SELECT * FROM bookings WHERE job_id = ?', [jobId]);
+        return rows[0] || null;
     }
 };
 

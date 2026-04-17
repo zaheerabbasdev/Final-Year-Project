@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../job_service.dart';
+import '../../../shared/services/booking_service.dart';
+import '../../../features/auth/auth_service.dart';
 
 class MyJobsScreen extends StatelessWidget {
   const MyJobsScreen({super.key});
@@ -219,6 +221,75 @@ class _JobsListViewState extends State<_JobsListView> {
                         ),
                       ],
                     ),
+                    if ((job['booking_status'] as String?) == 'awaiting_confirmation') ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            final success = await context.read<BookingService>().markJobCompletedOrAwaiting(
+                                  job['id'],
+                                  'completed',
+                                );
+                            if (success && context.mounted) {
+                              context.read<JobService>().fetchJobs();
+                              context.push('/submit-review', extra: {
+                                'bookingId': job['booking_id'],
+                                'jobId': job['id'],
+                                'providerId': job['provider_id'],
+                                'providerName': job['provider_name'] ?? 'Service Provider',
+                                'providerAvatar': job['provider_avatar'],
+                              });
+
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: const Text('Job completed! Please leave a review.'),
+                                  backgroundColor: const Color(0xFF6366F1),
+                                  behavior: SnackBarBehavior.floating,
+                                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                  margin: const EdgeInsets.all(12),
+                                ),
+                              );
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6366F1),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                          child: const Text(
+                            'Confirm Completion & Review',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ] else if ((job['status'] as String).toLowerCase() == 'completed' && job['review_id'] == null) ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: OutlinedButton(
+                          onPressed: () {
+                            context.push('/submit-review', extra: {
+                              'bookingId': job['booking_id'],
+                              'jobId': job['id'],
+                              'providerId': job['provider_id'],
+                              'providerName': job['provider_name'] ?? 'Service Provider',
+                              'providerAvatar': job['provider_avatar'],
+                            });
+                          },
+                          style: OutlinedButton.styleFrom(
+                            side: const BorderSide(color: Color(0xFF6366F1)),
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          ),
+                          child: const Text(
+                            'Leave a Review',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+                          ),
+                        ),
+                      ),
+                    ],
                   ],
                 ),
               ),

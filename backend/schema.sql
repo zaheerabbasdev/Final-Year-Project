@@ -106,3 +106,20 @@ INSERT IGNORE INTO categories (name, icon) VALUES
 ('Gardener', 'gardener_icon'),
 ('AC Repair', 'ac_repair_icon'),
 ('Appliance Repair', 'appliance_repair_icon');
+
+-- Reviews table
+CREATE TABLE IF NOT EXISTS reviews (
+    id          INT AUTO_INCREMENT PRIMARY KEY,
+    job_id      INT NOT NULL,
+    booking_id  INT NOT NULL,
+    customer_id INT NOT NULL,
+    provider_id INT NOT NULL,
+    rating      TINYINT NOT NULL CHECK (rating BETWEEN 1 AND 5),
+    comment     TEXT,
+    created_at  TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE KEY unique_booking_review (booking_id),
+    FOREIGN KEY (job_id)      REFERENCES jobs(id)      ON DELETE CASCADE,
+    FOREIGN KEY (booking_id)  REFERENCES bookings(id)  ON DELETE CASCADE,
+    FOREIGN KEY (customer_id) REFERENCES users(id)     ON DELETE CASCADE,
+    FOREIGN KEY (provider_id) REFERENCES users(id)     ON DELETE CASCADE
+);

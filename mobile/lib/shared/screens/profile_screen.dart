@@ -484,12 +484,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildProviderStats() {
-    return Consumer<ProviderService>(
-      builder: (context, service, _) {
+    return Consumer2<ProviderService, JobService>(
+      builder: (context, service, jobService, _) {
         final stats = service.dashboardStats;
+        final allBids = jobService.providerBids;
+        final completedJobsCount = allBids.where((b) {
+          if (b['status'] != 'accepted') return false;
+          final js = (b['job_status'] ?? '').toString().toLowerCase();
+          return js == 'completed';
+        }).length;
+
         return Row(
           children: [
-            Expanded(child: _buildStatCard(Icons.work_outline, (stats?['total_jobs'] ?? '0').toString(), 'Jobs Done', const Color(0xFF6366F1))),
+            Expanded(child: _buildStatCard(Icons.work_outline, completedJobsCount.toString(), 'Jobs Done', const Color(0xFF6366F1))),
             const SizedBox(width: 12),
             Expanded(child: _buildStatCard(Icons.stars_outlined, (stats?['rating'] ?? '5.0').toString(), 'Rating', const Color(0xFF10B981))),
             const SizedBox(width: 12),

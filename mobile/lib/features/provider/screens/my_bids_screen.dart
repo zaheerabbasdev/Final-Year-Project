@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../customer/job_service.dart';
+import '../../../shared/services/booking_service.dart';
 import '../../../core/api_client.dart';
 
 class MyBidsScreen extends StatefulWidget {
@@ -32,22 +33,35 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
   @override
   Widget build(BuildContext context) {
     final _allBids = context.watch<JobService>().providerBids;
-    final activeCount = _allBids.where((b) => b['status'] == 'accepted').length;
     
-    final availedCount = _allBids.where((b) {
-      if (b['status'] == 'accepted') return false;
-      final js = (b['job_status'] ?? 'open').toString().toLowerCase();
-      return js == 'active' || js == 'completed';
-    }).length;
-
     final pendingCount = _allBids.where((b) {
       if (b['status'] == 'accepted') return false;
       final js = (b['job_status'] ?? 'open').toString().toLowerCase();
       return js == 'open' && b['status'] == 'pending';
     }).length;
 
+    // Active: accepted bid + job is still in progress
+    final activeCount = _allBids.where((b) {
+      if (b['status'] != 'accepted') return false;
+      final js = (b['job_status'] ?? '').toString().toLowerCase();
+      return js == 'active' || js == 'awaiting_confirmation';
+    }).length;
+
+    // Completed: accepted bid + job is fully done
+    final completedCount = _allBids.where((b) {
+      if (b['status'] != 'accepted') return false;
+      final js = (b['job_status'] ?? '').toString().toLowerCase();
+      return js == 'completed';
+    }).length;
+
+    final availedCount = _allBids.where((b) {
+      if (b['status'] == 'accepted') return false;
+      final js = (b['job_status'] ?? 'open').toString().toLowerCase();
+      return js == 'active' || js == 'completed';
+    }).length;
+
     return DefaultTabController(
-      length: 4,
+      length: 5,
       child: Scaffold(
         backgroundColor: const Color(0xFFF8FAFC),
         appBar: AppBar(
@@ -68,6 +82,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
               Tab(text: 'All (${_allBids.length})'),
               Tab(text: 'Pending ($pendingCount)'),
               Tab(text: 'Active ($activeCount)'),
+              Tab(text: 'Completed ($completedCount)'),
               Tab(text: 'Availed ($availedCount)'),
             ],
           ),
@@ -75,12 +90,25 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
         body: TabBarView(
           children: [
             _buildBidsList(_allBids),
+            // Pending
             _buildBidsList(_allBids.where((b) {
               if (b['status'] == 'accepted') return false;
               final js = (b['job_status'] ?? 'open').toString().toLowerCase();
               return js == 'open' && b['status'] == 'pending';
             }).toList()),
-            _buildBidsList(_allBids.where((b) => b['status'] == 'accepted').toList()),
+            // Active (in progress)
+            _buildBidsList(_allBids.where((b) {
+              if (b['status'] != 'accepted') return false;
+              final js = (b['job_status'] ?? '').toString().toLowerCase();
+              return js == 'active' || js == 'awaiting_confirmation';
+            }).toList()),
+            // Completed
+            _buildBidsList(_allBids.where((b) {
+              if (b['status'] != 'accepted') return false;
+              final js = (b['job_status'] ?? '').toString().toLowerCase();
+              return js == 'completed';
+            }).toList()),
+            // Availed (lost bids)
             _buildBidsList(_allBids.where((b) {
               if (b['status'] == 'accepted') return false;
               final js = (b['job_status'] ?? 'open').toString().toLowerCase();
@@ -189,6 +217,41 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                   ),
                 ],
               ),
+              if (status == 'accepted' && bid['job_status'] == 'active') ...[
+                const SizedBox(height: 20),
+                SizedBox(
+                  width: double.infinity,
+                  height: 48,
+                  child: ElevatedButton(
+                    onPressed: () async {
+                      final messenger = ScaffoldMessenger.of(context);
+                      final success = await context.read<BookingService>().markJobCompletedOrAwaiting(
+                        bid['job_id'],
+                        'awaiting_confirmation',
+                      );
+                      
+                      if (success && mounted) {
+                        messenger.showSnackBar(
+                          SnackBar(
+                            content: const Text('Job marked as done! Waiting for customer confirmation.'),
+                            backgroundColor: const Color(0xFF10B981),
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            margin: const EdgeInsets.all(12),
+                          ),
+                        );
+                        await _loadBids();
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF10B981),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      elevation: 0,
+                    ),
+                    child: const Text('Mark Job as Done', style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16)),
+                  ),
+                ),
+              ],
             ],
           ),
         );
@@ -205,10 +268,20 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
     String label = status;
 
     if (status == 'accepted') {
-      color = const Color(0xFF10B981);
-      icon = Icons.check_circle;
-      label = 'active';
-    } else if (jobStatus == 'active' || jobStatus == 'completed') {
+      if (jobStatus == 'completed') {
+        color = const Color(0xFF10B981);
+        icon = Icons.check_circle;
+        label = 'completed';
+      } else if (jobStatus == 'awaiting_confirmation') {
+        color = const Color(0xFFF59E0B);
+        icon = Icons.hourglass_top;
+        label = 'awaiting confirmation';
+      } else {
+        color = const Color(0xFF10B981);
+        icon = Icons.check_circle;
+        label = 'active';
+      }
+    } else if (jobStatus == 'active' || jobStatus == 'completed' || jobStatus == 'awaiting_confirmation') {
       // The job was awarded to someone else, regardless of whether this bid is 'pending' or 'rejected'.
       color = const Color(0xFFF59E0B);
       icon = Icons.info_outline;

@@ -23,7 +23,10 @@ const Job = {
     },
 
     findAll: async (filters = {}) => {
-        let selectClause = `j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar`;
+        let selectClause = `j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar, 
+                            b.status as booking_status, b.id as booking_id, b.provider_id,
+                            up.full_name as provider_name, up.avatar as provider_avatar,
+                            r.id as review_id`;
         let proximityClause = '';
         const params = [];
 
@@ -43,6 +46,9 @@ const Job = {
             FROM jobs j 
             LEFT JOIN categories c ON j.category_id = c.id 
             JOIN users u ON j.customer_id = u.id 
+            LEFT JOIN bookings b ON j.id = b.job_id AND b.status != 'cancelled'
+            LEFT JOIN users up ON b.provider_id = up.id
+            LEFT JOIN reviews r ON b.id = r.booking_id
             WHERE 1=1
         `;
 
@@ -76,7 +82,17 @@ const Job = {
 
     findById: async (id) => {
         const [rows] = await db.execute(
-            'SELECT j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar FROM jobs j LEFT JOIN categories c ON j.category_id = c.id JOIN users u ON j.customer_id = u.id WHERE j.id = ?',
+            `SELECT j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar,
+                    b.status as booking_status, b.id as booking_id, b.provider_id,
+                    up.full_name as provider_name, up.avatar as provider_avatar,
+                    r.id as review_id
+             FROM jobs j 
+             LEFT JOIN categories c ON j.category_id = c.id 
+             JOIN users u ON j.customer_id = u.id 
+             LEFT JOIN bookings b ON j.id = b.job_id AND b.status != 'cancelled'
+             LEFT JOIN users up ON b.provider_id = up.id
+             LEFT JOIN reviews r ON b.id = r.booking_id
+             WHERE j.id = ?`,
             [id]
         );
         return rows[0];

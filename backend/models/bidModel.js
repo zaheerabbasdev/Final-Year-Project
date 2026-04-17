@@ -12,7 +12,14 @@ const Bid = {
 
     findByJobId: async (jobId) => {
         const [rows] = await db.execute(
-            'SELECT b.*, u.full_name as provider_name, u.avatar as provider_avatar, p.rating as provider_rating FROM bids b JOIN users u ON b.provider_id = u.id LEFT JOIN provider_profiles p ON u.id = p.user_id WHERE b.job_id = ? ORDER BY b.amount ASC',
+            `SELECT b.*, u.full_name as provider_name, u.avatar as provider_avatar, 
+                    p.rating as provider_rating,
+                    (SELECT COUNT(*) FROM reviews WHERE provider_id = b.provider_id) as review_count
+             FROM bids b 
+             JOIN users u ON b.provider_id = u.id 
+             LEFT JOIN provider_profiles p ON u.id = p.user_id 
+             WHERE b.job_id = ? 
+             ORDER BY b.amount ASC`,
             [jobId]
         );
         return rows;

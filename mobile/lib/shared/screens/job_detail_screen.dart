@@ -746,7 +746,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 id: bid['id'],
                 name: bid['provider_name'] ?? 'Unknown Provider',
                 rating: double.tryParse(bid['provider_rating']?.toString() ?? '0.0') ?? 0.0,
-                reviews: 0, // Mock for now
+                reviews: int.tryParse(bid['review_count']?.toString() ?? '0') ?? 0,
                 proposal: bid['cover_letter'] ?? 'No cover letter provided.',
                 price: double.tryParse(bid['amount']?.toString() ?? '0.0') ?? 0.0,
                 time: bid['estimated_time'] ?? 'N/A',

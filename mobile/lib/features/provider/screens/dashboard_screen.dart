@@ -149,8 +149,19 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     return Consumer<ProviderService>(
       builder: (context, service, _) {
         final stats = service.dashboardStats;
-        final acceptedBidsCount = context.watch<JobService>().providerBids
-            .where((b) => b['status'] == 'accepted').length;
+        final allBids = context.watch<JobService>().providerBids;
+        
+        final activeJobsCount = allBids.where((b) {
+          if (b['status'] != 'accepted') return false;
+          final js = (b['job_status'] ?? '').toString().toLowerCase();
+          return js == 'active' || js == 'awaiting_confirmation';
+        }).length;
+
+        final completedJobsCount = allBids.where((b) {
+          if (b['status'] != 'accepted') return false;
+          final js = (b['job_status'] ?? '').toString().toLowerCase();
+          return js == 'completed';
+        }).length;
             
         return GridView.count(
           shrinkWrap: true,
@@ -160,9 +171,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           mainAxisSpacing: 16,
           childAspectRatio: 1.1,
           children: [
-            _buildStatCard('Active Jobs', acceptedBidsCount.toString(), Icons.work_outline, const Color(0xFF6366F1)),
+            _buildStatCard('Active Jobs', activeJobsCount.toString(), Icons.work_outline, const Color(0xFF6366F1)),
             _buildStatCard('Rating', (stats?['rating'] ?? '0.0').toString(), Icons.star_outline, const Color(0xFF10B981)),
-            _buildStatCard('Jobs Done', (stats?['total_jobs'] ?? '0').toString(), Icons.check_circle_outline, const Color(0xFFF59E0B)),
+            _buildStatCard('Jobs Done', completedJobsCount.toString(), Icons.check_circle_outline, const Color(0xFFF59E0B)),
             _buildStatCard('Experience', '${stats?['experience_years'] ?? '0'} Yrs', Icons.access_time, const Color(0xFF6366F1).withOpacity(0.7)),
           ],
         );

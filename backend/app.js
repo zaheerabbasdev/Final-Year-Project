@@ -12,6 +12,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const bidRoutes = require('./routes/bidRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const adminRoutes = require('./routes/adminRoutes');
+const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 
@@ -29,6 +30,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/bids', bidRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
+app.use('/api/reviews', reviewRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: "Welcome to ServiceHub API" });

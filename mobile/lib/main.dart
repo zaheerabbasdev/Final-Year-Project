@@ -15,6 +15,7 @@ import 'features/customer/category_service.dart';
 import 'features/provider/provider_service.dart';
 import 'shared/services/booking_service.dart';
 import 'shared/services/navigation_service.dart';
+import 'shared/services/review_service.dart';
 import 'features/customer/screens/home_screen.dart';
 import 'features/customer/screens/post_job_screen.dart';
 import 'features/provider/screens/dashboard_screen.dart';
@@ -23,6 +24,7 @@ import 'features/provider/screens/place_bid_screen.dart';
 import 'shared/screens/job_detail_screen.dart';
 import 'shared/screens/navigation_screen.dart';
 import 'shared/screens/profile_screen.dart';
+import 'shared/screens/submit_review_screen.dart';
 import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
@@ -40,6 +42,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ProviderService()),
         ChangeNotifierProvider(create: (_) => BookingService()),
         ChangeNotifierProvider(create: (_) => NavigationService()),
+        ChangeNotifierProvider(create: (_) => ReviewService()),
       ],
       child: const ServiceHubApp(),
     ),
@@ -93,6 +96,19 @@ class ServiceHubApp extends StatelessWidget {
         GoRoute(path: '/post-job', builder: (context, state) => PostJobScreen()),
         GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
         GoRoute(path: '/main', builder: (context, state) => const MainNavigationScreen()),
+        GoRoute(
+          path: '/submit-review',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return SubmitReviewScreen(
+              bookingId: extra['bookingId'],
+              jobId: extra['jobId'],
+              providerId: extra['providerId'],
+              providerName: extra['providerName'],
+              providerAvatar: extra['providerAvatar'],
+            );
+          },
+        ),
       ],
     );
 

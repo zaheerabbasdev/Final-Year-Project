@@ -37,4 +37,31 @@ class BookingService extends ChangeNotifier {
     }
     return false;
   }
+
+  Future<bool> markJobCompletedOrAwaiting(int jobId, String status) async {
+    _isLoading = true;
+    notifyListeners();
+    try {
+      final response = await _apiClient.dio.put('/bookings/job/$jobId/status', data: {
+        'status': status,
+      });
+      return response.statusCode == 200;
+    } catch (e) {
+      print('Error updating booking status by job: $e');
+      return false;
+    } finally {
+      _isLoading = false;
+      notifyListeners();
+    }
+  }
+
+  Future<Map<String, dynamic>?> getBookingByJobId(int jobId) async {
+    try {
+      final response = await _apiClient.dio.get('/bookings/job/$jobId');
+      return response.data;
+    } catch (e) {
+      print('Error fetching booking by job: $e');
+      return null;
+    }
+  }
 }
