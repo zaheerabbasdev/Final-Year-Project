@@ -36,9 +36,15 @@ class ReviewService extends ChangeNotifier {
     }
   }
 
-  Future<List<dynamic>> fetchProviderReviews(int providerId) async {
+  Future<List<dynamic>> fetchProviderReviews(int providerId, {int? limit, int? offset}) async {
     try {
-      final response = await _apiClient.dio.get('/reviews/provider/$providerId');
+      final response = await _apiClient.dio.get(
+        '/reviews/provider/$providerId',
+        queryParameters: {
+          if (limit != null) 'limit': limit,
+          if (offset != null) 'offset': offset,
+        },
+      );
       return response.data;
     } catch (e) {
       print('Error fetching provider reviews: $e');

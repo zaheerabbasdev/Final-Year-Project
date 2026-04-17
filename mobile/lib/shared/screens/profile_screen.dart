@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:go_router/go_router.dart';
 import '../../features/auth/auth_service.dart';
 import '../../features/customer/job_service.dart';
 import '../../features/provider/provider_service.dart';
+import '../../shared/services/review_service.dart';
+import '../../shared/widgets/review_card.dart';
 import '../../core/api_client.dart';
 import '../../core/services/location_service.dart';
 import 'map_picker_screen.dart';
@@ -311,6 +314,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildEditButton(),
           const SizedBox(height: 32),
           _buildProviderStats(),
+          const SizedBox(height: 32),
+          _buildProviderReviews(user?['id']),
           const SizedBox(height: 40),
           _buildLogoutButton(authService),
         ],
@@ -524,6 +529,59 @@ class _ProfileScreenState extends State<ProfileScreen> {
           Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
         ],
       ),
+    );
+  }
+
+  Widget _buildProviderReviews(int? providerId) {
+    if (providerId == null) return const SizedBox.shrink();
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            const Text(
+              'My Reviews',
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            ),
+            TextButton(
+              onPressed: () => context.push('/provider-reviews/$providerId'),
+              child: const Text('View All', style: TextStyle(color: Color(0xFF6366F1))),
+            ),
+          ],
+        ),
+        const SizedBox(height: 8),
+        FutureBuilder<List<dynamic>>(
+          future: context.read<ReviewService>().fetchProviderReviews(providerId, limit: 3),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator());
+            }
+
+            if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
+              return Container(
+                padding: const EdgeInsets.all(24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFF8FAFC),
+                  borderRadius: BorderRadius.circular(20),
+                ),
+                child: const Center(
+                  child: Text(
+                    'No reviews yet',
+                    style: TextStyle(color: Color(0xFF94A3B8)),
+                  ),
+                ),
+              );
+            }
+
+            final reviews = snapshot.data!;
+            return Column(
+              children: reviews.map((review) => ReviewCard(review: review)).toList(),
+            );
+          },
+        ),
+      ],
     );
   }
 

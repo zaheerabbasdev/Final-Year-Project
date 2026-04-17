@@ -35,7 +35,8 @@ const submitReview = async (req, res) => {
 
 const getProviderReviews = async (req, res) => {
     try {
-        const reviews = await Review.findByProvider(req.params.providerId);
+        const { limit, offset } = req.query;
+        const reviews = await Review.findByProvider(req.params.providerId, limit, offset);
         res.json(reviews);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching provider reviews' });

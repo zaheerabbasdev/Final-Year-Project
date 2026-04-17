@@ -13,6 +13,7 @@ import 'features/auth/screens/forgot_password_screen.dart';
 import 'features/customer/job_service.dart';
 import 'features/customer/category_service.dart';
 import 'features/provider/provider_service.dart';
+import 'features/provider/screens/provider_reviews_screen.dart';
 import 'shared/services/booking_service.dart';
 import 'shared/services/navigation_service.dart';
 import 'shared/services/review_service.dart';
@@ -108,6 +109,12 @@ class ServiceHubApp extends StatelessWidget {
               providerAvatar: extra['providerAvatar'],
             );
           },
+        ),
+        GoRoute(
+          path: '/provider-reviews/:id',
+          builder: (context, state) => ProviderReviewsScreen(
+            providerId: int.parse(state.pathParameters['id']!),
+          ),
         ),
       ],
     );

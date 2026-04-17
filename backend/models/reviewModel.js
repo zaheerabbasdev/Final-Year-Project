@@ -32,15 +32,20 @@ const Review = {
         }
     },
 
-    findByProvider: async (providerId) => {
-        const [rows] = await db.execute(
-            `SELECT r.*, u.full_name as customer_name, u.avatar as customer_avatar 
-             FROM reviews r 
-             JOIN users u ON r.customer_id = u.id 
-             WHERE r.provider_id = ? 
-             ORDER BY r.created_at DESC`,
-            [providerId]
-        );
+    findByProvider: async (providerId, limit = null, offset = 0) => {
+        let sql = `SELECT r.*, u.full_name as customer_name, u.avatar as customer_avatar 
+                   FROM reviews r 
+                   JOIN users u ON r.customer_id = u.id 
+                   WHERE r.provider_id = ? 
+                   ORDER BY r.created_at DESC`;
+        const params = [providerId];
+
+        if (limit !== null) {
+            sql += ' LIMIT ? OFFSET ?';
+            params.push(parseInt(limit), parseInt(offset));
+        }
+
+        const [rows] = await db.execute(sql, params);
         return rows;
     },
 
