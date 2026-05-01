@@ -1,6 +1,6 @@
 'use client';
 import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useRouter, useSearchParams } from 'next/navigation';
 
 export default function LoginPage() {
   const [email, setEmail] = useState('');
@@ -8,6 +8,8 @@ export default function LoginPage() {
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const signupSuccess = searchParams.get('signup') === 'success';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -15,7 +17,7 @@ export default function LoginPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/auth/login', {
+      const res = await fetch('http://localhost:5000/api/admin/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),
@@ -23,11 +25,8 @@ export default function LoginPage() {
 
       const data = await res.json();
       if (res.ok) {
-        if (data.user.role !== 'admin') {
-          setError('Access denied. Admin only.');
-          return;
-        }
         localStorage.setItem('adminToken', data.token);
+        localStorage.setItem('adminUser', JSON.stringify(data.admin));
         router.push('/dashboard');
       } else {
         setError(data.message || 'Login failed');
@@ -54,6 +53,11 @@ export default function LoginPage() {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
+          {signupSuccess && (
+            <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center font-medium">
+              Account created! Please sign in.
+            </div>
+          )}
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
               {error}
@@ -92,6 +96,15 @@ export default function LoginPage() {
             >
               {loading ? 'Authenticating...' : 'Sign In'}
             </button>
+          </div>
+
+          <div className="text-center mt-4">
+            <p className="text-sm text-gray-600">
+              Don't have an admin account?{' '}
+              <a href="/signup" className="font-bold text-indigo-600 hover:text-indigo-500">
+                Sign Up
+              </a>
+            </p>
           </div>
         </form>
       </div>

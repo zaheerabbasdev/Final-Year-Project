@@ -4,64 +4,117 @@ import { api } from '@/lib/api';
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
-  const [newName, setNewName] = useState('');
+  const [newCategory, setNewCategory] = useState('');
   const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchCategories = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const data = await api.get('/admin/categories', token || '');
+      setCategories(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const fetchCats = async () => {
-      try {
-        const token = localStorage.getItem('adminToken');
-        const data = await api.get('/admin/categories', token || '');
-        setCategories(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
-    fetchCats();
+    fetchCategories();
   }, []);
 
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newName) return;
+    if (!newCategory.trim()) return;
+    
+    setSubmitting(true);
     try {
-        const token = localStorage.getItem('adminToken');
-        await api.post('/admin/categories', { name: newName, icon: 'default' }, token || '');
-        window.location.reload();
-    } catch (err) { console.error(err); }
+      const token = localStorage.getItem('adminToken');
+      await api.post('/admin/categories', { name: newCategory }, token || '');
+      setNewCategory('');
+      fetchCategories();
+    } catch (err) {
+      alert('Failed to add category');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this category?')) return;
+    try {
+      const token = localStorage.getItem('adminToken');
+      await api.delete(`/admin/categories/${id}`, token || '');
+      fetchCategories();
+    } catch (err) {
+      alert('Failed to delete category');
+    }
   };
 
   return (
     <div className="max-w-4xl space-y-8">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Service Categories</h2>
-        <form onSubmit={handleAdd} className="flex gap-2">
-            <input 
-                type="text" 
-                placeholder="New category..." 
-                className="rounded-xl border border-gray-200 px-4 py-2 text-sm focus:ring-2 focus:ring-indigo-500 outline-none"
-                value={newName}
-                onChange={e => setNewName(e.target.value)}
-            />
-            <button className="bg-indigo-600 text-white px-6 py-2 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all">+ Add</button>
+        <h2 className="text-2xl font-bold text-gray-900">Manage Categories</h2>
+      </div>
+
+      {/* Add Category Form */}
+      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
+        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Add New Category</h3>
+        <form onSubmit={handleAdd} className="flex gap-4">
+          <input 
+            type="text" 
+            placeholder="e.g. Home Cleaning, Plumber, etc."
+            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
+            value={newCategory}
+            onChange={(e) => setNewCategory(e.target.value)}
+            disabled={submitting}
+          />
+          <button 
+            type="submit" 
+            disabled={submitting}
+            className="bg-indigo-600 text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all disabled:opacity-50"
+          >
+            {submitting ? 'Adding...' : 'Add Category'}
+          </button>
         </form>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {loading ? (
-            [1, 2, 3].map(i => <div key={i} className="h-24 bg-gray-100 rounded-2xl animate-pulse" />)
-        ) : (
-            categories.map(cat => (
-                <div key={cat.id} className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 flex items-center justify-between group hover:border-indigo-200 transition-all">
-                    <div className="flex items-center gap-4">
-                        <div className="h-10 w-10 bg-indigo-50 rounded-lg flex items-center justify-center text-xl">📁</div>
-                        <span className="font-bold text-gray-800">{cat.name}</span>
-                    </div>
-                    <button className="text-gray-300 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all">🗑️</button>
-                </div>
-            ))
-        )}
+      {/* Categories List */}
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <table className="w-full text-left">
+          <thead className="bg-gray-50 border-b border-gray-100">
+            <tr>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Category Name</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
+            </tr>
+          </thead>
+          <tbody className="divide-y divide-gray-100">
+            {loading ? (
+              [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={3} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
+            ) : (
+              categories.map((cat) => (
+                <tr key={cat.id} className="hover:bg-gray-50/50 transition-colors">
+                  <td className="px-6 py-4 text-sm text-gray-500 font-mono">
+                    #{cat.id}
+                  </td>
+                  <td className="px-6 py-4 text-sm font-bold text-gray-900">
+                    {cat.name}
+                  </td>
+                  <td className="px-6 py-4 text-right">
+                    <button 
+                      onClick={() => handleDelete(cat.id)}
+                      className="text-gray-400 hover:text-red-600 p-2 transition-colors"
+                    >
+                      🗑️
+                    </button>
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
     </div>
   );

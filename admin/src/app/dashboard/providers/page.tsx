@@ -2,15 +2,15 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
-export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
+export default function ProvidersPage() {
+  const [providers, setProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
-  const fetchUsers = async () => {
+  const fetchProviders = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const data = await api.get('/admin/users?role=customer', token || '');
-      setUsers(data);
+      const data = await api.get('/admin/users?role=provider', token || '');
+      setProviders(data);
     } catch (err) {
       console.error(err);
     } finally {
@@ -19,38 +19,35 @@ export default function UsersPage() {
   };
 
   useEffect(() => {
-    fetchUsers();
+    fetchProviders();
   }, []);
 
   const handleDelete = async (id: number) => {
-    if (!confirm('Are you sure you want to delete this user?')) return;
+    if (!confirm('Are you sure you want to delete this service provider?')) return;
     try {
       const token = localStorage.getItem('adminToken');
       await api.delete(`/admin/users/${id}`, token || '');
-      fetchUsers();
+      fetchProviders();
     } catch (err) {
-      alert('Failed to delete user');
+      alert('Failed to delete provider');
     }
   };
 
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Customer Management</h2>
-        <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
-                {users.length} Total Customers
-            </span>
-            <button className="bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">Export CSV</button>
-        </div>
+        <h2 className="text-2xl font-bold text-gray-900">Service Providers</h2>
+        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
+            {providers.length} Total Providers
+        </span>
       </div>
 
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">User</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Role</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Provider</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Email</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Joined</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
@@ -60,23 +57,21 @@ export default function UsersPage() {
             {loading ? (
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
             ) : (
-              users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
+              providers.map((provider) => (
+                <tr key={provider.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-700">
-                        {user.full_name.charAt(0)}
+                      <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center font-bold text-orange-700">
+                        {provider.full_name.charAt(0)}
                       </div>
                       <div>
-                        <p className="text-sm font-bold text-gray-900">{user.full_name}</p>
-                        <p className="text-xs text-gray-500">{user.email}</p>
+                        <p className="text-sm font-bold text-gray-900">{provider.full_name}</p>
+                        <p className="text-xs text-gray-500">ID: #{provider.id}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider ${user.role === 'provider' ? 'bg-orange-50 text-orange-600' : 'bg-blue-50 text-blue-600'}`}>
-                      {user.role}
-                    </span>
+                  <td className="px-6 py-4 text-sm text-gray-600">
+                    {provider.email}
                   </td>
                   <td className="px-6 py-4">
                     <span className="flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full w-fit">
@@ -84,12 +79,12 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(user.created_at).toLocaleDateString()}
+                    {new Date(provider.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button className="text-gray-400 hover:text-indigo-600 p-2 transition-colors">⚙️</button>
                     <button 
-                      onClick={() => handleDelete(user.id)}
+                      onClick={() => handleDelete(provider.id)}
                       className="text-gray-400 hover:text-red-600 p-2 transition-colors"
                     >
                       🗑️

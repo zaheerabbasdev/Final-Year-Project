@@ -6,20 +6,32 @@ export default function JobsPage() {
   const [jobs, setJobs] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
 
+  const fetchJobs = async () => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      const data = await api.get('/admin/jobs', token || '');
+      setJobs(data);
+    } catch (err) {
+      console.error(err);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   useEffect(() => {
-    const fetchJobs = async () => {
-      try {
-        const token = localStorage.getItem('adminToken');
-        const data = await api.get('/admin/jobs', token || '');
-        setJobs(data);
-      } catch (err) {
-        console.error(err);
-      } finally {
-        setLoading(false);
-      }
-    };
     fetchJobs();
   }, []);
+
+  const handleDelete = async (id: number) => {
+    if (!confirm('Are you sure you want to delete this job?')) return;
+    try {
+      const token = localStorage.getItem('adminToken');
+      await api.delete(`/admin/jobs/${id}`, token || '');
+      fetchJobs();
+    } catch (err) {
+      alert('Failed to delete job');
+    }
+  };
 
   return (
     <div className="space-y-6">
@@ -69,7 +81,12 @@ export default function JobsPage() {
                   </td>
                   <td className="px-6 py-4 text-right">
                     <button className="text-gray-400 hover:text-indigo-600 p-2">👁️</button>
-                    <button className="text-gray-400 hover:text-red-600 p-2">🗑️</button>
+                    <button 
+                      onClick={() => handleDelete(job.id)}
+                      className="text-gray-400 hover:text-red-600 p-2"
+                    >
+                      🗑️
+                    </button>
                   </td>
                 </tr>
               ))

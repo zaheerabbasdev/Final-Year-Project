@@ -7,7 +7,10 @@ export const api = {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw new Error('API request failed');
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'API request failed');
+    }
     return res.json();
   },
 
@@ -20,7 +23,26 @@ export const api = {
       },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error('API request failed');
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'API request failed');
+    }
+    return res.json();
+  },
+
+  async put(endpoint: string, data: any, token?: string) {
+    const res = await fetch(`${this.baseUrl}${endpoint}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'API request failed');
+    }
     return res.json();
   },
 
@@ -31,7 +53,10 @@ export const api = {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if (!res.ok) throw new Error('API request failed');
+    if (!res.ok) {
+      const error = await res.json();
+      throw new Error(error.message || 'API request failed');
+    }
     return res.json();
   }
 };
