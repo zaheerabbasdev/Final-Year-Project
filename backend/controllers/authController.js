@@ -19,8 +19,18 @@ const register = async (req, res) => {
         const password_hash = await bcrypt.hash(password, salt);
 
         let avatarUrl = null;
-        if (req.file) {
-            avatarUrl = `/uploads/${req.file.filename}`;
+        let cnicUrl = null;
+        let certificatesUrl = null;
+
+        console.log('DEBUG: Register Body:', req.body);
+        console.log('DEBUG: Register Files:', req.files);
+
+        if (req.files && Array.isArray(req.files)) {
+            req.files.forEach(file => {
+                if (file.fieldname === 'avatar') avatarUrl = `/uploads/${file.filename}`;
+                if (file.fieldname === 'cnic') cnicUrl = `/uploads/${file.filename}`;
+                if (file.fieldname === 'certificates') certificatesUrl = `/uploads/${file.filename}`;
+            });
         }
 
         // Create user
@@ -38,7 +48,9 @@ const register = async (req, res) => {
             const { category_id } = req.body;
             await ProviderProfile.create(userId, { 
                 experience_years: parseInt(experience_years) || 0,
-                category_id: category_id ? parseInt(category_id) : null
+                category_id: category_id ? parseInt(category_id) : null,
+                cnic_url: cnicUrl,
+                certificates_url: certificatesUrl
             });
         }
 

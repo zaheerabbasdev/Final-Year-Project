@@ -28,6 +28,8 @@ class _SignupScreenState extends State<SignupScreen> {
   bool _isConfirmPasswordVisible = false;
   XFile? _avatarFile;
   Uint8List? _avatarBytes;
+  XFile? _cnicFile;
+  XFile? _certificateFile;
   int? _selectedCategoryId;
 
   @override
@@ -50,6 +52,26 @@ class _SignupScreenState extends State<SignupScreen> {
     }
   }
 
+  Future<void> _pickCnic() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _cnicFile = pickedFile;
+      });
+    }
+  }
+
+  Future<void> _pickCertificate() async {
+    final picker = ImagePicker();
+    final pickedFile = await picker.pickImage(source: ImageSource.gallery);
+    if (pickedFile != null) {
+      setState(() {
+        _certificateFile = pickedFile;
+      });
+    }
+  }
+
   void _signup() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_agreeToTerms) {
@@ -67,6 +89,8 @@ class _SignupScreenState extends State<SignupScreen> {
       'password': _passwordController.text,
       'role': _selectedRole,
       'avatar': _avatarFile,
+      'cnic': _cnicFile,
+      'certificates': _certificateFile,
       'category_id': _selectedCategoryId,
       'experience_years': _selectedRole == 'provider' ? _experienceController.text : '0',
     });
@@ -251,6 +275,22 @@ class _SignupScreenState extends State<SignupScreen> {
                         decoration: const InputDecoration(hintText: 'Enter your experience in years'),
                         validator: (v) => _selectedRole == 'provider' && v!.isEmpty ? 'Experience is required' : null,
                       ),
+                      const SizedBox(height: 20),
+                      _buildLabel('Upload CNIC'),
+                      _buildFileUploadTile(
+                        title: _cnicFile == null ? 'Select CNIC Image' : _cnicFile!.name,
+                        icon: Icons.badge_outlined,
+                        onTap: _pickCnic,
+                        isSelected: _cnicFile != null,
+                      ),
+                      const SizedBox(height: 20),
+                      _buildLabel('Upload Certificates'),
+                      _buildFileUploadTile(
+                        title: _certificateFile == null ? 'Select Certificate Image' : _certificateFile!.name,
+                        icon: Icons.card_membership_outlined,
+                        onTap: _pickCertificate,
+                        isSelected: _certificateFile != null,
+                      ),
                     ],
                     const SizedBox(height: 20),
                     _buildLabel('Password'),
@@ -358,6 +398,48 @@ class _SignupScreenState extends State<SignupScreen> {
           fontSize: 14,
           fontWeight: FontWeight.w600,
           color: Color(0xFF374151),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildFileUploadTile({
+    required String title,
+    required IconData icon,
+    required VoidCallback onTap,
+    required bool isSelected,
+  }) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+        decoration: BoxDecoration(
+          color: isSelected ? const Color(0xFFF5F3FF) : const Color(0xFFF9FAFB),
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF6366F1) : Colors.grey.shade300,
+          ),
+        ),
+        child: Row(
+          children: [
+            Icon(icon, size: 22, color: isSelected ? const Color(0xFF6366F1) : Colors.blueGrey.shade400),
+            const SizedBox(width: 12),
+            Expanded(
+              child: Text(
+                title,
+                style: TextStyle(
+                  color: isSelected ? const Color(0xFF1F2937) : Colors.blueGrey.shade500,
+                  fontSize: 14,
+                ),
+                overflow: TextOverflow.ellipsis,
+              ),
+            ),
+            if (isSelected)
+              const Icon(Icons.check_circle, size: 20, color: Color(0xFF6366F1))
+            else
+              const Icon(Icons.add_a_photo_outlined, size: 20, color: Color(0xFFCBD5E1)),
+          ],
         ),
       ),
     );

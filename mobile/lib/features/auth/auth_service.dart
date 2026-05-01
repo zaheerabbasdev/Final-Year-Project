@@ -77,22 +77,45 @@ class AuthService extends ChangeNotifier {
     try {
       dynamic dataToSubmit;
       
-      if (userData.containsKey('avatar') && userData['avatar'] != null) {
-        // Multi-part form data if there's an avatar
+      if (userData.containsKey('avatar') || userData.containsKey('cnic') || userData.containsKey('certificates')) {
+        // Multi-part form data if there are files
         final formDataMap = Map<String, dynamic>.from(userData);
-        final file = formDataMap.remove('avatar'); // Assuming it's a File or XFile
+        
+        final avatar = formDataMap.remove('avatar');
+        final cnic = formDataMap.remove('cnic');
+        final certificates = formDataMap.remove('certificates');
+        
+        // Remove any other null values
+        formDataMap.removeWhere((key, value) => value == null);
         
         final formData = FormData.fromMap(formDataMap);
-        final fileBytes = await file.readAsBytes();
-        final filename = file.name.contains('.') ? file.name : '${file.name}.jpg';
-        formData.files.add(MapEntry(
-          'avatar',
-          MultipartFile.fromBytes(fileBytes, filename: filename),
-        ));
+        
+        if (avatar != null && avatar is XFile) {
+          final bytes = await avatar.readAsBytes();
+          formData.files.add(MapEntry(
+            'avatar',
+            MultipartFile.fromBytes(bytes, filename: avatar.name.contains('.') ? avatar.name : '${avatar.name}.jpg'),
+          ));
+        }
+        
+        if (cnic != null && cnic is XFile) {
+          final bytes = await cnic.readAsBytes();
+          formData.files.add(MapEntry(
+            'cnic',
+            MultipartFile.fromBytes(bytes, filename: cnic.name.contains('.') ? cnic.name : '${cnic.name}.jpg'),
+          ));
+        }
+        
+        if (certificates != null && certificates is XFile) {
+          final bytes = await certificates.readAsBytes();
+          formData.files.add(MapEntry(
+            'certificates',
+            MultipartFile.fromBytes(bytes, filename: certificates.name.contains('.') ? certificates.name : '${certificates.name}.jpg'),
+          ));
+        }
+        
         dataToSubmit = formData;
       } else {
-        // Remove avatar key if null to avoid sending null
-        userData.remove('avatar');
         dataToSubmit = userData;
       }
 

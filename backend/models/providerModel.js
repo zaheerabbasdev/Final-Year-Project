@@ -2,10 +2,18 @@ const db = require('../config/db');
 
 const ProviderProfile = {
     create: async (userId, data = {}) => {
-        const { bio = '', experience_years = 0, skills = [], availability = true, category_id = null } = data;
+        const { 
+            bio = '', 
+            experience_years = 0, 
+            skills = [], 
+            availability = true, 
+            category_id = null,
+            cnic_url = null,
+            certificates_url = null
+        } = data;
         const [result] = await db.execute(
-            'INSERT INTO provider_profiles (user_id, bio, experience_years, skills, availability, category_id) VALUES (?, ?, ?, ?, ?, ?)',
-            [userId, bio, experience_years, JSON.stringify(skills), availability, category_id]
+            'INSERT INTO provider_profiles (user_id, bio, experience_years, skills, availability, category_id, cnic_url, certificates_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, bio, experience_years, JSON.stringify(skills), availability, category_id, cnic_url, certificates_url]
         );
         return result.affectedRows > 0;
     },
