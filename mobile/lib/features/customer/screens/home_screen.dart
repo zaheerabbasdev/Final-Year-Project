@@ -54,37 +54,47 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 16),
-              _buildHeader(avatarUrl),
-              const SizedBox(height: 20),
-              _buildSearchBar(),
-              const SizedBox(height: 24),
-              if (_isSearching) ...[
-                _buildSectionHeader('Search Results', '', () {}),
+        child: RefreshIndicator(
+          onRefresh: () async {
+            await Future.wait([
+              context.read<CategoryService>().fetchCategories(),
+              context.read<JobService>().fetchJobs(),
+              context.read<ProviderService>().fetchTopProviders(),
+            ]);
+          },
+          child: SingleChildScrollView(
+            physics: const AlwaysScrollableScrollPhysics(),
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
                 const SizedBox(height: 16),
-                _buildSearchResults(),
-              ] else ...[
-                _buildPromoCard(context),
+                _buildHeader(avatarUrl),
+                const SizedBox(height: 20),
+                _buildSearchBar(),
+                const SizedBox(height: 24),
+                if (_isSearching) ...[
+                  _buildSectionHeader('Search Results', '', () {}),
+                  const SizedBox(height: 16),
+                  _buildSearchResults(),
+                ] else ...[
+                  _buildPromoCard(context),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader('Browse Categories', 'See All', () {}),
+                  const SizedBox(height: 16),
+                  _buildCategoryGrid(),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader('Your Recent Jobs', 'View All', () {}),
+                  const SizedBox(height: 16),
+                  _buildRecentJobsList(),
+                  const SizedBox(height: 32),
+                  _buildSectionHeader('Top Rated Providers', 'See All', () {}),
+                  const SizedBox(height: 16),
+                  _buildTopProvidersList(),
+                ],
                 const SizedBox(height: 32),
-                _buildSectionHeader('Browse Categories', 'See All', () {}),
-                const SizedBox(height: 16),
-                _buildCategoryGrid(),
-                const SizedBox(height: 32),
-                _buildSectionHeader('Your Recent Jobs', 'View All', () {}),
-                const SizedBox(height: 16),
-                _buildRecentJobsList(),
-                const SizedBox(height: 32),
-                _buildSectionHeader('Top Rated Providers', 'See All', () {}),
-                const SizedBox(height: 16),
-                _buildTopProvidersList(),
               ],
-              const SizedBox(height: 32),
-            ],
+            ),
           ),
         ),
       ),
@@ -372,6 +382,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             location: job['location'] ?? 'Unknown',
             bids: job['bid_count'] ?? 0,
             status: job['status'],
+            isNegotiable: job['is_negotiable'] == 1 || job['is_negotiable'] == true,
           )).toList(),
         );
       },
@@ -386,6 +397,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     required String location,
     required int bids,
     required String status,
+    required bool isNegotiable,
   }) {
     return InkWell(
       onTap: () => context.push('/job-detail/$id'),
@@ -440,6 +452,20 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   '\$$price',
                   style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
                 ),
+                if (isNegotiable) ...[
+                  const SizedBox(width: 8),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                    decoration: BoxDecoration(
+                      color: const Color(0xFF6366F1).withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: const Text(
+                      'NEGOTIABLE',
+                      style: TextStyle(color: Color(0xFF6366F1), fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                    ),
+                  ),
+                ],
                 const SizedBox(width: 16),
                 const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
                 const SizedBox(width: 4),

@@ -19,6 +19,7 @@ class JobService extends ChangeNotifier {
     notifyListeners();
     try {
       final response = await _apiClient.dio.get('/jobs', queryParameters: filters);
+      print('DEBUG: Jobs from API: ${response.data}'); // THIS WILL SHOW US THE DATA
       _jobs = response.data;
     } catch (e) {
       print(e);
@@ -30,8 +31,10 @@ class JobService extends ChangeNotifier {
 
   Future<bool> createJob(Map<String, dynamic> jobData, List<XFile> images) async {
     try {
-      final Map<String, dynamic> formDataMap = Map.from(jobData)
-        ..removeWhere((key, value) => value == null || value == '');
+      final Map<String, dynamic> formDataMap = Map.from(jobData);
+      
+      // Remove nulls/empty strings but KEEP boolean values like is_negotiable
+      formDataMap.removeWhere((key, value) => value == null || value == '');
       
       if (images.isNotEmpty) {
         final List<MultipartFile> imageFiles = [];
@@ -44,7 +47,11 @@ class JobService extends ChangeNotifier {
 
       final formData = FormData.fromMap(formDataMap);
       final response = await _apiClient.dio.post('/jobs', data: formData);
-      return response.statusCode == 201;
+      if (response.statusCode == 201) {
+        await fetchJobs(); // Refresh the list so the new job shows up
+        return true;
+      }
+      return false;
     } catch (e) {
       print('Error creating job: $e');
       return false;

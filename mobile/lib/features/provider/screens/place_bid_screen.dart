@@ -156,7 +156,25 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                 children: [
                   const Text('Client Budget', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
                   const SizedBox(height: 4),
-                  Text('\$${_job!['budget'] ?? '0'}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF6366F1))),
+                  Row(
+                    children: [
+                      Text('\$${_job!['budget'] ?? '0'}', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF6366F1))),
+                      if (_job!['is_negotiable'].toString() == '1' || _job!['is_negotiable'] == true || _job!['is_negotiable'].toString() == 'true') ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6366F1).withOpacity(0.1),
+                            borderRadius: BorderRadius.circular(4),
+                          ),
+                          child: const Text(
+                            'NEGOTIABLE',
+                            style: TextStyle(color: Color(0xFF6366F1), fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                          ),
+                        ),
+                      ],
+                    ],
+                  ),
                 ],
               ),
               Column(

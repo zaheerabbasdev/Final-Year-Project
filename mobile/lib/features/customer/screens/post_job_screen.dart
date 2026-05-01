@@ -30,6 +30,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   LatLng? _selectedLocationData;
   final LocationService _locationService = LocationService();
   bool _isLoading = false;
+  bool _isNegotiable = false;
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImages() async {
@@ -64,6 +65,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       'longitude': _selectedLocationData?.longitude,
       'preferred_date': _selectedDate != null ? DateFormat('yyyy-MM-dd').format(_selectedDate!) : null,
       'preferred_time': _selectedTime != null ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}' : null,
+      'is_negotiable': _isNegotiable,
     }, _images);
     setState(() => _isLoading = false);
 
@@ -175,6 +177,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     const SizedBox(height: 24),
                     _buildSectionHeader('Budget (USD) *'),
                     _buildTextField(_budgetController, 'Enter your budget', isNumber: true, prefix: const Icon(Icons.attach_money, size: 20, color: Color(0xFF94A3B8))),
+                    const SizedBox(height: 12),
+                    SwitchListTile(
+                      contentPadding: EdgeInsets.zero,
+                      title: const Text('Budget is Negotiable', style: TextStyle(fontSize: 14, fontWeight: FontWeight.w500, color: Color(0xFF475569))),
+                      value: _isNegotiable,
+                      activeColor: const Color(0xFF6366F1),
+                      onChanged: (v) => setState(() => _isNegotiable = v),
+                    ),
                     const SizedBox(height: 24),
                     _buildSectionHeader('Location *'),
                     _buildTextField(

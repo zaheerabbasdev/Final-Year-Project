@@ -14,6 +14,10 @@ const createJob = async (req, res) => {
             }
         });
 
+        // Convert is_negotiable from string to boolean if it came from FormData
+        if (jobData.is_negotiable === 'true') jobData.is_negotiable = true;
+        if (jobData.is_negotiable === 'false') jobData.is_negotiable = false;
+
         // If images were uploaded, add them to jobData
         if (req.files) {
             jobData.images = req.files.map(file => `/uploads/${file.filename}`);
