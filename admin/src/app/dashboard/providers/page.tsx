@@ -37,6 +37,17 @@ export default function ProvidersPage() {
     }
   };
 
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      await api.put(`/admin/users/${id}/status`, { status: newStatus }, token || '');
+      toast.success(`Provider status updated to ${newStatus}`);
+      fetchProviders();
+    } catch (err) {
+      toast.error('Failed to update status');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -65,7 +76,20 @@ export default function ProvidersPage() {
                 <tr key={provider.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center font-bold text-orange-700">
+                      {provider.avatar ? (
+                        <img 
+                          src={`http://localhost:5000${provider.avatar}`} 
+                          alt={provider.full_name} 
+                          className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                          onError={(e) => {
+                            (e.target as any).style.display = 'none';
+                            (e.target as any).nextElementSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center font-bold text-orange-700 ${provider.avatar ? 'hidden' : 'flex'}`}
+                      >
                         {provider.full_name.charAt(0)}
                       </div>
                       <div>
@@ -90,16 +114,33 @@ export default function ProvidersPage() {
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(provider.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right flex justify-end gap-2">
                     <button 
                       onClick={() => setSelectedUserId(provider.id)}
-                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors mr-2"
+                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors"
                     >
                       View
                     </button>
+                    {provider.status !== 'verified' && (
+                      <button 
+                        onClick={() => handleStatusChange(provider.id, 'verified')}
+                        className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-green-100 transition-colors"
+                      >
+                        Accept
+                      </button>
+                    )}
+                    {provider.status !== 'rejected' && (
+                      <button 
+                        onClick={() => handleStatusChange(provider.id, 'rejected')}
+                        className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-orange-100 transition-colors"
+                      >
+                        Reject
+                      </button>
+                    )}
                     <button 
                       onClick={() => handleDelete(provider.id)}
-                      className="text-gray-400 hover:text-red-600 p-2 transition-colors"
+                      className="text-gray-400 hover:text-red-600 px-3 py-1.5 transition-colors"
+                      title="Delete Provider"
                     >
                       🗑️
                     </button>

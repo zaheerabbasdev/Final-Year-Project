@@ -25,18 +25,6 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
     }
   };
 
-  const handleStatusChange = async (newStatus: string) => {
-    if (!confirm(`Are you sure you want to mark this user as ${newStatus}?`)) return;
-    try {
-      const token = localStorage.getItem('adminToken');
-      await api.put(`/admin/users/${userId}/status`, { status: newStatus }, token || '');
-      toast.success(`User status updated to ${newStatus}`);
-      onRefresh();
-      onClose();
-    } catch (err) {
-      toast.error('Failed to update status');
-    }
-  };
 
   if (!userId) return null;
 
@@ -58,7 +46,20 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
           ) : user ? (
             <div className="space-y-6">
               <div className="flex items-center gap-4">
-                <div className="h-16 w-16 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-700 text-2xl">
+                {user.avatar ? (
+                  <img 
+                    src={`http://localhost:5000${user.avatar}`} 
+                    alt={user.full_name} 
+                    className="h-16 w-16 rounded-full object-cover border-2 border-indigo-100"
+                    onError={(e) => {
+                      (e.target as any).style.display = 'none';
+                      (e.target as any).nextElementSibling.style.display = 'flex';
+                    }}
+                  />
+                ) : null}
+                <div 
+                  className={`h-16 w-16 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-700 text-2xl ${user.avatar ? 'hidden' : 'flex'}`}
+                >
                   {user.full_name?.charAt(0)}
                 </div>
                 <div>
@@ -104,20 +105,6 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
                 </div>
               )}
 
-              <div className="pt-6 border-t border-gray-100 flex gap-3 justify-end">
-                {user.role === 'provider' && user.status === 'pending' && (
-                  <>
-                    <button onClick={() => handleStatusChange('rejected')} className="px-4 py-2 bg-red-50 text-red-600 font-medium rounded-xl hover:bg-red-100 transition-colors">Reject Application</button>
-                    <button onClick={() => handleStatusChange('verified')} className="px-4 py-2 bg-green-600 text-white font-medium rounded-xl hover:bg-green-700 transition-colors">Accept Provider</button>
-                  </>
-                )}
-                {user.role === 'customer' && user.status !== 'blocked' && (
-                  <button onClick={() => handleStatusChange('blocked')} className="px-4 py-2 bg-gray-900 text-white font-medium rounded-xl hover:bg-gray-800 transition-colors">Block Customer</button>
-                )}
-                {user.role === 'customer' && user.status === 'blocked' && (
-                  <button onClick={() => handleStatusChange('verified')} className="px-4 py-2 bg-green-50 text-green-600 font-medium rounded-xl hover:bg-green-100 transition-colors">Unblock Customer</button>
-                )}
-              </div>
             </div>
           ) : (
             <p className="text-gray-500 text-center py-8">User not found.</p>

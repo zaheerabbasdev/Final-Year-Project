@@ -37,6 +37,17 @@ export default function UsersPage() {
     }
   };
 
+  const handleStatusChange = async (id: number, newStatus: string) => {
+    try {
+      const token = localStorage.getItem('adminToken');
+      await api.put(`/admin/users/${id}/status`, { status: newStatus }, token || '');
+      toast.success(`User status updated to ${newStatus}`);
+      fetchUsers();
+    } catch (err) {
+      toast.error('Failed to update status');
+    }
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex justify-between items-center">
@@ -68,7 +79,21 @@ export default function UsersPage() {
                 <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
-                      <div className="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-700">
+                      {user.avatar ? (
+                        <img 
+                          src={`http://localhost:5000${user.avatar}`} 
+                          alt={user.full_name} 
+                          className="h-10 w-10 rounded-full object-cover border border-gray-200"
+                          onError={(e) => {
+                            // Fallback to initial if image fails to load
+                            (e.target as any).style.display = 'none';
+                            (e.target as any).nextElementSibling.style.display = 'flex';
+                          }}
+                        />
+                      ) : null}
+                      <div 
+                        className={`h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-700 ${user.avatar ? 'hidden' : 'flex'}`}
+                      >
                         {user.full_name.charAt(0)}
                       </div>
                       <div>
@@ -95,16 +120,32 @@ export default function UsersPage() {
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(user.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-6 py-4 text-right">
+                  <td className="px-6 py-4 text-right flex justify-end gap-2">
                     <button 
                       onClick={() => setSelectedUserId(user.id)}
-                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors mr-2"
+                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors"
                     >
                       View
                     </button>
+                    {user.status === 'blocked' ? (
+                      <button 
+                        onClick={() => handleStatusChange(user.id, 'verified')}
+                        className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-green-100 transition-colors"
+                      >
+                        Unblock
+                      </button>
+                    ) : (
+                      <button 
+                        onClick={() => handleStatusChange(user.id, 'blocked')}
+                        className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition-colors"
+                      >
+                        Block
+                      </button>
+                    )}
                     <button 
                       onClick={() => handleDelete(user.id)}
-                      className="text-gray-400 hover:text-red-600 p-2 transition-colors"
+                      className="text-gray-400 hover:text-red-600 px-3 py-1.5 transition-colors"
+                      title="Delete User"
                     >
                       🗑️
                     </button>
