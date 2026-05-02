@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import UserModal from '@/components/UserModal';
+import { toast } from 'react-hot-toast';
 
 export default function ProvidersPage() {
   const [providers, setProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const fetchProviders = async () => {
     try {
@@ -27,9 +30,10 @@ export default function ProvidersPage() {
     try {
       const token = localStorage.getItem('adminToken');
       await api.delete(`/admin/users/${id}`, token || '');
+      toast.success('Provider deleted successfully');
       fetchProviders();
     } catch (err) {
-      alert('Failed to delete provider');
+      toast.error('Failed to delete provider');
     }
   };
 
@@ -74,15 +78,25 @@ export default function ProvidersPage() {
                     {provider.email}
                   </td>
                   <td className="px-6 py-4">
-                    <span className="flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full w-fit">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-600" /> Active
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium w-fit ${
+                      provider.status === 'verified' ? 'text-green-600 bg-green-50' :
+                      provider.status === 'pending' ? 'text-yellow-600 bg-yellow-50' :
+                      provider.status === 'rejected' ? 'text-red-600 bg-red-50' :
+                      'text-gray-100 bg-gray-800'
+                    }`}>
+                      {provider.status || 'pending'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(provider.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-gray-400 hover:text-indigo-600 p-2 transition-colors">⚙️</button>
+                    <button 
+                      onClick={() => setSelectedUserId(provider.id)}
+                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors mr-2"
+                    >
+                      View
+                    </button>
                     <button 
                       onClick={() => handleDelete(provider.id)}
                       className="text-gray-400 hover:text-red-600 p-2 transition-colors"
@@ -96,6 +110,14 @@ export default function ProvidersPage() {
           </tbody>
         </table>
       </div>
+
+      {selectedUserId && (
+        <UserModal 
+          userId={selectedUserId} 
+          onClose={() => setSelectedUserId(null)} 
+          onRefresh={fetchProviders} 
+        />
+      )}
     </div>
   );
 }

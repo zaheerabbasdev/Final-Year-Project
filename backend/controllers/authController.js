@@ -3,6 +3,7 @@ const jwt = require('jsonwebtoken');
 const User = require('../models/userModel');
 const ProviderProfile = require('../models/providerModel');
 const db = require('../config/db');
+const mailer = require('../utils/mailer');
 
 const register = async (req, res) => {
     try {
@@ -33,14 +34,26 @@ const register = async (req, res) => {
             });
         }
 
+        let otpCode = null;
+        let otpExpiry = null;
+        let userRole = role || 'customer';
+
+        if (userRole === 'customer') {
+            otpCode = Math.floor(100000 + Math.random() * 900000).toString(); // 6 digit OTP
+            otpExpiry = new Date(Date.now() + 10 * 60000); // 10 mins expiry
+        }
+
         // Create user
         const userId = await User.create({
             full_name,
             email,
             phone,
             password_hash,
-            role: role || 'customer',
+            role: userRole,
             avatar: avatarUrl,
+            status: 'pending',
+            otp_code: otpCode,
+            otp_expiry: otpExpiry
         });
 
         // If provider, create profile
@@ -54,10 +67,30 @@ const register = async (req, res) => {
             });
         }
 
-        res.status(201).json({ message: 'User registered successfully', userId });
+        if (userRole === 'customer' && otpCode) {
+            await mailer.sendOTP(email, otpCode);
+            res.status(201).json({ message: 'User registered. Please check your email for the OTP.', userId, requiresOTP: true });
+        } else {
+            res.status(201).json({ message: 'Provider registered successfully. Please wait for admin approval.', userId, requiresOTP: false });
+        }
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: 'Server error during registration' });
+    }
+};
+
+const verifyOTP = async (req, res) => {
+    try {
+        const { email, otp } = req.body;
+        const verifiedUser = await User.verifyOTP(email, otp);
+        if (verifiedUser) {
+            res.json({ message: 'Email verified successfully. You can now login.' });
+        } else {
+            res.status(400).json({ message: 'Invalid or expired OTP.' });
+        }
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error during verification' });
     }
 };
 
@@ -73,6 +106,21 @@ const login = async (req, res) => {
         const isMatch = await bcrypt.compare(password, user.password_hash);
         if (!isMatch) {
             return res.status(400).json({ message: 'Invalid credentials' });
+        }
+
+        // Check user status
+        if (user.status === 'pending') {
+            if (user.role === 'customer') {
+                return res.status(403).json({ message: 'Please verify your email to login.', requiresOTP: true });
+            } else {
+                return res.status(403).json({ message: 'Your account is pending admin approval.' });
+            }
+        }
+        if (user.status === 'rejected') {
+            return res.status(403).json({ message: 'Your application has been rejected by the admin.' });
+        }
+        if (user.status === 'blocked') {
+            return res.status(403).json({ message: 'Your account has been blocked. Please contact support.' });
         }
 
         const payload = {
@@ -100,4 +148,4 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { register, login };
+module.exports = { register, login, verifyOTP };

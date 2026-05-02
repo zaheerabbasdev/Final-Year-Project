@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../auth_service.dart';
 import '../../customer/category_service.dart';
 
@@ -75,14 +76,17 @@ class _SignupScreenState extends State<SignupScreen> {
   void _signup() async {
     if (!_formKey.currentState!.validate()) return;
     if (!_agreeToTerms) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please agree to the Terms and Conditions')),
+      Fluttertoast.showToast(
+        msg: 'Please agree to the Terms and Conditions',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
       );
       return;
     }
 
     setState(() => _isLoading = true);
-    final success = await context.read<AuthService>().register({
+    final response = await context.read<AuthService>().register({
       'full_name': _nameController.text,
       'email': _emailController.text,
       'phone': _phoneController.text,
@@ -96,17 +100,35 @@ class _SignupScreenState extends State<SignupScreen> {
     });
     setState(() => _isLoading = false);
 
-    if (success) {
+    if (response['success'] == true) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration successful! Please login.')),
-        );
-        context.pop();
+        if (response['requiresOTP'] == true) {
+          Fluttertoast.showToast(
+            msg: 'Registration successful! Please check your email for the OTP.',
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            timeInSecForIosWeb: 3,
+            webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
+          );
+          context.push('/verify-otp', extra: _emailController.text);
+        } else {
+          Fluttertoast.showToast(
+            msg: 'Registration successful! Please wait for admin approval.',
+            backgroundColor: Colors.green,
+            textColor: Colors.white,
+            timeInSecForIosWeb: 3,
+            webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
+          );
+          context.pop();
+        }
       }
     } else {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Registration failed.')),
+        Fluttertoast.showToast(
+          msg: 'Registration failed. Email might already exist.',
+          backgroundColor: Colors.red,
+          textColor: Colors.white,
+          webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
         );
       }
     }

@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 import '../auth_service.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -28,8 +29,11 @@ class _LoginScreenState extends State<LoginScreen> {
     if (success) {
       if (mounted) context.go('/main');
     } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Login failed. Please check your credentials.')),
+      Fluttertoast.showToast(
+        msg: 'Login failed. Please check your credentials or account status.',
+        backgroundColor: Colors.red,
+        textColor: Colors.white,
+        webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)", // Red gradient
       );
     }
   }

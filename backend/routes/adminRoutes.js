@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { 
-    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, 
+    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus,
     getAllJobs, deleteJob, getAllBids, getAllCategories, createCategory, deleteCategory 
 } = require('../controllers/adminController');
 const adminAuth = require('../middleware/adminAuth');
@@ -13,6 +13,8 @@ router.post('/auth/login', loginAdmin);
 // Protected Admin Routes
 router.get('/stats', adminAuth, getStats);
 router.get('/users', adminAuth, getAllUsers);
+router.get('/users/:id', adminAuth, getUserDetails);
+router.put('/users/:id/status', adminAuth, updateUserStatus);
 router.delete('/users/:id', adminAuth, deleteUser);
 router.get('/jobs', adminAuth, getAllJobs);
 router.delete('/jobs/:id', adminAuth, deleteJob);

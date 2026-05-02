@@ -9,6 +9,7 @@ import 'features/auth/screens/onboarding_screen.dart';
 import 'features/auth/screens/login_screen.dart';
 import 'features/auth/screens/signup_screen.dart';
 import 'features/auth/screens/forgot_password_screen.dart';
+import 'features/auth/screens/otp_screen.dart';
 
 import 'features/customer/job_service.dart';
 import 'features/customer/category_service.dart';
@@ -67,7 +68,8 @@ class ServiceHubApp extends StatelessWidget {
         final bool isSplash = state.matchedLocation == '/splash';
         final bool isAuthRoute = state.matchedLocation == '/login' || 
                                 state.matchedLocation == '/signup' || 
-                                state.matchedLocation == '/onboarding';
+                                state.matchedLocation == '/onboarding' ||
+                                state.matchedLocation == '/verify-otp';
 
         if (!isInitialized && !isSplash) return '/splash';
 
@@ -88,6 +90,7 @@ class ServiceHubApp extends StatelessWidget {
         GoRoute(path: '/onboarding', builder: (context, state) => const OnboardingScreen()),
         GoRoute(path: '/login', builder: (context, state) => const LoginScreen()),
         GoRoute(path: '/signup', builder: (context, state) => const SignupScreen()),
+        GoRoute(path: '/verify-otp', builder: (context, state) => OtpScreen(email: state.extra as String)),
         GoRoute(path: '/forgot-password', builder: (context, state) => const ForgotPasswordScreen()),
         GoRoute(path: '/customer-home', builder: (context, state) => const CustomerHomeScreen()),
         GoRoute(path: '/provider-dashboard', builder: (context, state) => const ProviderDashboardScreen()),

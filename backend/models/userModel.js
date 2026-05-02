@@ -2,10 +2,10 @@ const db = require('../config/db');
 
 const User = {
     create: async (userData) => {
-        const { full_name, email, phone, password_hash, role, avatar, latitude, longitude } = userData;
+        const { full_name, email, phone, password_hash, role, avatar, latitude, longitude, status = 'pending', otp_code = null, otp_expiry = null } = userData;
         const [result] = await db.execute(
-            'INSERT INTO users (full_name, email, phone, password_hash, role, avatar, latitude, longitude) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [full_name, email, phone, password_hash, role, avatar || null, latitude || null, longitude || null]
+            'INSERT INTO users (full_name, email, phone, password_hash, role, avatar, latitude, longitude, status, otp_code, otp_expiry) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [full_name, email, phone, password_hash, role, avatar || null, latitude || null, longitude || null, status, otp_code, otp_expiry]
         );
         return result.insertId;
     },
@@ -33,6 +33,19 @@ const User = {
             values
         );
         return result.affectedRows > 0;
+    },
+
+    verifyOTP: async (email, otpCode) => {
+        const [rows] = await db.execute(
+            'SELECT * FROM users WHERE email = ? AND otp_code = ? AND otp_expiry > NOW()',
+            [email, otpCode]
+        );
+        
+        if (rows.length > 0) {
+            await db.execute('UPDATE users SET status = "verified", otp_code = NULL, otp_expiry = NULL WHERE id = ?', [rows[0].id]);
+            return rows[0];
+        }
+        return null;
     }
 };
 

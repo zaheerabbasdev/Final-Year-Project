@@ -73,7 +73,7 @@ class AuthService extends ChangeNotifier {
     return false;
   }
 
-  Future<bool> register(Map<String, dynamic> userData) async {
+  Future<Map<String, dynamic>> register(Map<String, dynamic> userData) async {
     try {
       dynamic dataToSubmit;
       
@@ -120,11 +120,27 @@ class AuthService extends ChangeNotifier {
       }
 
       final response = await _apiClient.dio.post('/auth/register', data: dataToSubmit);
-      return response.statusCode == 201;
+      return {
+        'success': response.statusCode == 201,
+        'requiresOTP': response.data['requiresOTP'] ?? false,
+      };
     } catch (e) {
       print(e);
     }
-    return false;
+    return {'success': false, 'requiresOTP': false};
+  }
+
+  Future<bool> verifyOTP(String email, String otp) async {
+    try {
+      final response = await _apiClient.dio.post('/auth/verify-otp', data: {
+        'email': email,
+        'otp': otp,
+      });
+      return response.statusCode == 200;
+    } catch (e) {
+      print(e);
+      return false;
+    }
   }
 
   Future<bool> updateAvatar(XFile file) async {

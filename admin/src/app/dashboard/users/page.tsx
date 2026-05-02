@@ -1,10 +1,13 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import UserModal from '@/components/UserModal';
+import { toast } from 'react-hot-toast';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -27,9 +30,10 @@ export default function UsersPage() {
     try {
       const token = localStorage.getItem('adminToken');
       await api.delete(`/admin/users/${id}`, token || '');
+      toast.success('User deleted successfully');
       fetchUsers();
     } catch (err) {
-      alert('Failed to delete user');
+      toast.error('Failed to delete user');
     }
   };
 
@@ -79,15 +83,25 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className="flex items-center gap-1.5 text-xs font-medium text-green-600 bg-green-50 px-2 py-1 rounded-full w-fit">
-                      <span className="h-1.5 w-1.5 rounded-full bg-green-600" /> Active
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium w-fit ${
+                      user.status === 'verified' ? 'text-green-600 bg-green-50' :
+                      user.status === 'pending' ? 'text-yellow-600 bg-yellow-50' :
+                      user.status === 'rejected' ? 'text-red-600 bg-red-50' :
+                      'text-gray-100 bg-gray-800'
+                    }`}>
+                      {user.status || 'pending'}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(user.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-gray-400 hover:text-indigo-600 p-2 transition-colors">⚙️</button>
+                    <button 
+                      onClick={() => setSelectedUserId(user.id)}
+                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors mr-2"
+                    >
+                      View
+                    </button>
                     <button 
                       onClick={() => handleDelete(user.id)}
                       className="text-gray-400 hover:text-red-600 p-2 transition-colors"
@@ -101,6 +115,14 @@ export default function UsersPage() {
           </tbody>
         </table>
       </div>
+
+      {selectedUserId && (
+        <UserModal 
+          userId={selectedUserId} 
+          onClose={() => setSelectedUserId(null)} 
+          onRefresh={fetchUsers} 
+        />
+      )}
     </div>
   );
 }

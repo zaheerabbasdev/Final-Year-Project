@@ -64,7 +64,7 @@ const getAllUsers = async (req, res) => {
         const { role } = req.query;
         console.log(`ADMIN_DEBUG: Fetching users with role filter: [${role}]`);
         
-        let query = 'SELECT id, full_name, email, role, created_at FROM users';
+        let query = 'SELECT id, full_name, email, role, status, created_at FROM users';
         const params = [];
         
         if (role && role !== 'all') {
@@ -87,6 +87,53 @@ const deleteUser = async (req, res) => {
         res.json({ message: 'User deleted successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error deleting user' });
+    }
+};
+
+const getUserDetails = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [users] = await db.execute('SELECT id, full_name, email, phone, role, status, avatar, created_at FROM users WHERE id = ?', [id]);
+        
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'User not found' });
+        }
+        
+        const user = users[0];
+        
+        if (user.role === 'provider') {
+            const [profiles] = await db.execute(`
+                SELECT p.*, c.name as category_name 
+                FROM provider_profiles p
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE p.user_id = ?
+            `, [id]);
+            if (profiles.length > 0) {
+                user.profile = profiles[0];
+            }
+        }
+        
+        res.json(user);
+    } catch (error) {
+        console.error("ADMIN_DEBUG_ERROR:", error);
+        res.status(500).json({ message: 'Error fetching user details' });
+    }
+};
+
+const updateUserStatus = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { status } = req.body;
+        
+        if (!['pending', 'verified', 'rejected', 'blocked'].includes(status)) {
+            return res.status(400).json({ message: 'Invalid status' });
+        }
+        
+        await db.execute('UPDATE users SET status = ? WHERE id = ?', [status, id]);
+        res.json({ message: `User status updated to ${status}` });
+    } catch (error) {
+        console.error("ADMIN_DEBUG_ERROR:", error);
+        res.status(500).json({ message: 'Error updating user status' });
     }
 };
 
@@ -160,6 +207,6 @@ const deleteCategory = async (req, res) => {
 };
 
 module.exports = { 
-    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, 
+    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus,
     getAllJobs, deleteJob, getAllBids, getAllCategories, createCategory, deleteCategory 
 };
