@@ -14,7 +14,8 @@ import '../../core/services/location_service.dart';
 import 'map_picker_screen.dart';
 
 class ProfileScreen extends StatefulWidget {
-  const ProfileScreen({super.key});
+  final bool initialEditMode;
+  const ProfileScreen({super.key, this.initialEditMode = false});
 
   @override
   State<ProfileScreen> createState() => _ProfileScreenState();
@@ -45,6 +46,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   @override
   void initState() {
     super.initState();
+    _isEditing = widget.initialEditMode;
     // Initially load if data is already there
     _loadInitialData();
   }

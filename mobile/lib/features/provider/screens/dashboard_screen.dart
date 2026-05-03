@@ -455,7 +455,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
             ),
           ),
           TextButton(
-            onPressed: () => context.push('/profile'), // Navigate to profile to set location
+            onPressed: () => context.push('/profile', extra: true), // Open profile in edit mode
             child: const Text('Set Now', style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold)),
           ),
         ],

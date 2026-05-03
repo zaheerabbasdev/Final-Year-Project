@@ -98,7 +98,13 @@ class ServiceHubApp extends StatelessWidget {
         GoRoute(path: '/job-detail/:id', builder: (context, state) => JobDetailScreen(jobId: int.parse(state.pathParameters['id']!))),
         GoRoute(path: '/place-bid/:id', builder: (context, state) => PlaceBidScreen(jobId: int.parse(state.pathParameters['id']!))),
         GoRoute(path: '/post-job', builder: (context, state) => PostJobScreen()),
-        GoRoute(path: '/profile', builder: (context, state) => const ProfileScreen()),
+        GoRoute(
+          path: '/profile', 
+          builder: (context, state) {
+            final bool editMode = state.extra is bool ? state.extra as bool : false;
+            return ProfileScreen(initialEditMode: editMode);
+          }
+        ),
         GoRoute(path: '/main', builder: (context, state) => const MainNavigationScreen()),
         GoRoute(
           path: '/submit-review',
