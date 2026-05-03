@@ -37,10 +37,10 @@ export default function UsersPage() {
     }
   };
 
-  const handleStatusChange = async (id: number, newStatus: string) => {
+  const handleStatusChange = async (id: number, newStatus: string, reason?: string) => {
     try {
       const token = localStorage.getItem('adminToken');
-      await api.put(`/admin/users/${id}/status`, { status: newStatus }, token || '');
+      await api.put(`/admin/users/${id}/status`, { status: newStatus, reason }, token || '');
       toast.success(`User status updated to ${newStatus}`);
       fetchUsers();
     } catch (err) {
@@ -136,7 +136,12 @@ export default function UsersPage() {
                       </button>
                     ) : (
                       <button 
-                        onClick={() => handleStatusChange(user.id, 'blocked')}
+                        onClick={() => {
+                          const reason = window.prompt('Enter suspension reason:');
+                          if (reason !== null) {
+                            handleStatusChange(user.id, 'blocked', reason);
+                          }
+                        }}
                         className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition-colors"
                       >
                         Suspend
