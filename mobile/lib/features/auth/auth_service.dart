@@ -47,7 +47,7 @@ class AuthService extends ChangeNotifier {
     }
   }
 
-  Future<bool> login(String email, String password) async {
+  Future<Map<String, dynamic>> login(String email, String password) async {
     try {
       final response = await _apiClient.dio.post('/auth/login', data: {
         'email': email,
@@ -65,12 +65,24 @@ class AuthService extends ChangeNotifier {
         await prefs.setString('role', _role ?? '');
         
         notifyListeners();
-        return true;
+        return {
+          'success': true,
+          'role': _role,
+        };
       }
     } catch (e) {
       print(e);
+      if (e is DioException) {
+        return {
+          'success': false,
+          'message': e.response?.data['message'] ?? 'Login failed',
+        };
+      }
     }
-    return false;
+    return {
+      'success': false,
+      'message': 'Login failed. Please check your connection.',
+    };
   }
 
   Future<Map<String, dynamic>> register(Map<String, dynamic> userData) async {

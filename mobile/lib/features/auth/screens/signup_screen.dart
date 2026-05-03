@@ -113,7 +113,7 @@ class _SignupScreenState extends State<SignupScreen> {
           context.push('/verify-otp', extra: _emailController.text);
         } else {
           Fluttertoast.showToast(
-            msg: 'Registration successful! Please wait for admin approval.',
+            msg: 'Wait for admin approval',
             backgroundColor: Colors.green,
             textColor: Colors.white,
             timeInSecForIosWeb: 3,

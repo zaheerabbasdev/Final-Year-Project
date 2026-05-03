@@ -20,20 +20,41 @@ class _LoginScreenState extends State<LoginScreen> {
 
   void _login() async {
     setState(() => _isLoading = true);
-    final success = await context.read<AuthService>().login(
+    final response = await context.read<AuthService>().login(
       _emailController.text,
       _passwordController.text,
     );
     setState(() => _isLoading = false);
     
-    if (success) {
+    if (response['success'] == true) {
+      if (response['role'] == 'provider') {
+        Fluttertoast.showToast(
+          msg: 'Approval accepted',
+          backgroundColor: Colors.green,
+          textColor: Colors.white,
+          webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
+        );
+      }
       if (mounted) context.go('/main');
     } else {
+      String errorMessage = 'Login failed. Please check your credentials.';
+      String? backendMessage = response['message'];
+
+      if (backendMessage != null) {
+        if (backendMessage.toLowerCase().contains('pending admin approval')) {
+          errorMessage = 'Wait for admin approval';
+        } else if (backendMessage.toLowerCase().contains('rejected by the admin')) {
+          errorMessage = 'Admin Rejected you';
+        } else {
+          errorMessage = backendMessage;
+        }
+      }
+
       Fluttertoast.showToast(
-        msg: 'Login failed. Please check your credentials or account status.',
+        msg: errorMessage,
         backgroundColor: Colors.red,
         textColor: Colors.white,
-        webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)", // Red gradient
+        webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
       );
     }
   }
