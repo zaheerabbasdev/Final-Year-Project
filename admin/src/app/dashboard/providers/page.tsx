@@ -108,7 +108,7 @@ export default function ProvidersPage() {
                       provider.status === 'rejected' ? 'text-red-600 bg-red-50' :
                       'text-gray-100 bg-gray-800'
                     }`}>
-                      {provider.status || 'pending'}
+                      {provider.status === 'blocked' ? 'suspended' : (provider.status || 'pending')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
@@ -121,21 +121,21 @@ export default function ProvidersPage() {
                     >
                       View
                     </button>
-                    {provider.status !== 'verified' && (
-                      <button 
-                        onClick={() => handleStatusChange(provider.id, 'verified')}
-                        className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-green-100 transition-colors"
-                      >
-                        Accept
-                      </button>
-                    )}
-                    {provider.status !== 'rejected' && (
-                      <button 
-                        onClick={() => handleStatusChange(provider.id, 'rejected')}
-                        className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-orange-100 transition-colors"
-                      >
-                        Reject
-                      </button>
+                    {provider.status === 'pending' && (
+                      <>
+                        <button 
+                          onClick={() => handleStatusChange(provider.id, 'verified')}
+                          className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-green-100 transition-colors"
+                        >
+                          Accept
+                        </button>
+                        <button 
+                          onClick={() => handleStatusChange(provider.id, 'rejected')}
+                          className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-orange-100 transition-colors"
+                        >
+                          Reject
+                        </button>
+                      </>
                     )}
                     <button 
                       onClick={() => handleDelete(provider.id)}

@@ -5,7 +5,11 @@ import 'package:image_picker/image_picker.dart';
 import '../../core/api_client.dart';
 
 class AuthService extends ChangeNotifier {
-  final ApiClient _apiClient = ApiClient();
+  late final ApiClient _apiClient;
+
+  AuthService() {
+    _apiClient = ApiClient(onUnauthorized: logout);
+  }
   bool _isAuthenticated = false;
   bool _isInitialized = false;
   String? _role;
@@ -49,10 +53,14 @@ class AuthService extends ChangeNotifier {
 
   Future<Map<String, dynamic>> login(String email, String password) async {
     try {
-      final response = await _apiClient.dio.post('/auth/login', data: {
-        'email': email,
-        'password': password,
-      });
+      final response = await _apiClient.dio.post(
+        '/auth/login', 
+        data: {
+          'email': email,
+          'password': password,
+        },
+        options: Options(extra: {'isLogin': true}),
+      );
 
       if (response.statusCode == 200) {
         final data = response.data;

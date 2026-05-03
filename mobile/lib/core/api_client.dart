@@ -1,16 +1,30 @@
+import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:fluttertoast/fluttertoast.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://localhost:5000/api'; // Use localhost for Web/Desktop, 10.0.2.2 for Android Emulator
+  static const String baseUrl = 'http://localhost:5000/api'; 
   
-  final Dio _dio = Dio(BaseOptions(
-    baseUrl: baseUrl,
-    connectTimeout: const Duration(seconds: 30),
-    receiveTimeout: const Duration(seconds: 30),
-  ));
+  static final ApiClient _instance = ApiClient._internal();
+  VoidCallback? onUnauthorized;
+  late final Dio _dio;
 
-  ApiClient() {
+  factory ApiClient({VoidCallback? onUnauthorized}) {
+    if (onUnauthorized != null) {
+      _instance.onUnauthorized = onUnauthorized;
+    }
+    return _instance;
+  }
+
+  ApiClient._internal() {
+    _dio = Dio(BaseOptions(
+      baseUrl: baseUrl,
+      connectTimeout: const Duration(seconds: 30),
+      receiveTimeout: const Duration(seconds: 30),
+    ));
+
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
         final prefs = await SharedPreferences.getInstance();
@@ -21,7 +35,30 @@ class ApiClient {
         return handler.next(options);
       },
       onError: (e, handler) {
-        // Handle global error codes like 401 (logout) or 500
+        if (e.response?.statusCode == 403) {
+          final message = e.response?.data['message'] ?? 'Your account has been suspended.';
+          
+          // Only show automatic toast if it's NOT a login attempt.
+          // LoginScreen handles its own error messages.
+          final isLogin = e.requestOptions.extra['isLogin'] == true;
+          if (!isLogin) {
+            Fluttertoast.showToast(
+              msg: message,
+              backgroundColor: Colors.red,
+              textColor: Colors.white,
+              gravity: ToastGravity.TOP,
+              timeInSecForIosWeb: 5,
+            );
+          }
+          
+          if (onUnauthorized != null) {
+            onUnauthorized!();
+          }
+        } else if (e.response?.statusCode == 401) {
+          if (onUnauthorized != null) {
+            onUnauthorized!();
+          }
+        }
         return handler.next(e);
       },
     ));

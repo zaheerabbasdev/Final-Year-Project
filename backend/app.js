@@ -16,10 +16,12 @@ const reviewRoutes = require('./routes/reviewRoutes');
 
 const app = express();
 
-// Middleware
+const suspendedCheck = require('./middleware/suspendedCheck');
+
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
+app.use(suspendedCheck);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes

@@ -114,7 +114,7 @@ export default function UsersPage() {
                       user.status === 'rejected' ? 'text-red-600 bg-red-50' :
                       'text-gray-100 bg-gray-800'
                     }`}>
-                      {user.status || 'pending'}
+                      {user.status === 'blocked' ? 'suspended' : (user.status || 'pending')}
                     </span>
                   </td>
                   <td className="px-6 py-4 text-sm text-gray-500">
@@ -132,14 +132,14 @@ export default function UsersPage() {
                         onClick={() => handleStatusChange(user.id, 'verified')}
                         className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-green-100 transition-colors"
                       >
-                        Unblock
+                        Unsuspend
                       </button>
                     ) : (
                       <button 
                         onClick={() => handleStatusChange(user.id, 'blocked')}
                         className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition-colors"
                       >
-                        Block
+                        Suspend
                       </button>
                     )}
                     <button 
