@@ -1,5 +1,7 @@
 const db = require('../config/db');
 const Admin = require('../models/adminModel');
+const User = require('../models/userModel');
+const mailer = require('../utils/mailer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 
@@ -130,6 +132,14 @@ const updateUserStatus = async (req, res) => {
         }
         
         await db.execute('UPDATE users SET status = ?, status_reason = ? WHERE id = ?', [status, reason || null, id]);
+        
+        // Send email notification (Non-blocking)
+        User.findById(id).then(user => {
+            if (user && user.email) {
+                mailer.sendStatusNotification(user.email, status, reason);
+            }
+        }).catch(err => console.error('Email Notification Error:', err));
+
         res.json({ message: `User status updated to ${status}` });
     } catch (error) {
         console.error("ADMIN_DEBUG_ERROR:", error);
