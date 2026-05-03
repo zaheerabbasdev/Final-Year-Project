@@ -43,8 +43,6 @@ class _LoginScreenState extends State<LoginScreen> {
       if (backendMessage != null) {
         if (backendMessage.toLowerCase().contains('pending admin approval')) {
           errorMessage = 'Wait for admin approval';
-        } else if (backendMessage.toLowerCase().contains('rejected by the admin')) {
-          errorMessage = 'Admin Rejected you';
         } else {
           errorMessage = backendMessage;
         }

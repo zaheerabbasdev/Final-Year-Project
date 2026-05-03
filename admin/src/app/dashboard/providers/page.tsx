@@ -37,10 +37,10 @@ export default function ProvidersPage() {
     }
   };
 
-  const handleStatusChange = async (id: number, newStatus: string) => {
+  const handleStatusChange = async (id: number, newStatus: string, reason?: string) => {
     try {
       const token = localStorage.getItem('adminToken');
-      await api.put(`/admin/users/${id}/status`, { status: newStatus }, token || '');
+      await api.put(`/admin/users/${id}/status`, { status: newStatus, reason }, token || '');
       toast.success(`Provider status updated to ${newStatus}`);
       fetchProviders();
     } catch (err) {
@@ -130,12 +130,40 @@ export default function ProvidersPage() {
                           Accept
                         </button>
                         <button 
-                          onClick={() => handleStatusChange(provider.id, 'rejected')}
+                          onClick={() => {
+                            const reason = window.prompt('Enter rejection reason:');
+                            if (reason !== null) {
+                              handleStatusChange(provider.id, 'rejected', reason);
+                            }
+                          }}
                           className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-orange-100 transition-colors"
                         >
                           Reject
                         </button>
                       </>
+                    )}
+
+                    {provider.status === 'verified' && (
+                      <button 
+                        onClick={() => {
+                          const reason = window.prompt('Enter suspension reason (optional):');
+                          if (reason !== null) {
+                            handleStatusChange(provider.id, 'blocked', reason);
+                          }
+                        }}
+                        className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition-colors"
+                      >
+                        Suspend
+                      </button>
+                    )}
+
+                    {provider.status === 'blocked' && (
+                      <button 
+                        onClick={() => handleStatusChange(provider.id, 'verified')}
+                        className="text-emerald-600 bg-emerald-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-emerald-100 transition-colors"
+                      >
+                        Unsuspend
+                      </button>
                     )}
                     <button 
                       onClick={() => handleDelete(provider.id)}

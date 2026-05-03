@@ -117,10 +117,12 @@ const login = async (req, res) => {
             }
         }
         if (user.status === 'rejected') {
-            return res.status(403).json({ message: 'Your application has been rejected by the admin.' });
+            const reason = user.status_reason ? `: ${user.status_reason}` : '';
+            return res.status(403).json({ message: `Your application has been rejected by the admin${reason}` });
         }
         if (user.status === 'blocked') {
-            return res.status(403).json({ message: 'Your account has been blocked. Please contact support.' });
+            const reason = user.status_reason ? `: ${user.status_reason}` : '';
+            return res.status(403).json({ message: `Your account has been suspended. Please contact support${reason}` });
         }
 
         const payload = {

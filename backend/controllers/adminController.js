@@ -123,13 +123,13 @@ const getUserDetails = async (req, res) => {
 const updateUserStatus = async (req, res) => {
     try {
         const { id } = req.params;
-        const { status } = req.body;
+        const { status, reason } = req.body;
         
         if (!['pending', 'verified', 'rejected', 'blocked'].includes(status)) {
             return res.status(400).json({ message: 'Invalid status' });
         }
         
-        await db.execute('UPDATE users SET status = ? WHERE id = ?', [status, id]);
+        await db.execute('UPDATE users SET status = ?, status_reason = ? WHERE id = ?', [status, reason || null, id]);
         res.json({ message: `User status updated to ${status}` });
     } catch (error) {
         console.error("ADMIN_DEBUG_ERROR:", error);
