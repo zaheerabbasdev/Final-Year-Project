@@ -2,12 +2,17 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import UserModal from '@/components/UserModal';
+import ReasonModal from '@/components/ReasonModal';
 import { toast } from 'react-hot-toast';
 
 export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+  
+  // State for Reason Modal
+  const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+  const [pendingUserAction, setPendingUserAction] = useState<{ id: number; status: string } | null>(null);
 
   const fetchUsers = async () => {
     try {
@@ -137,10 +142,8 @@ export default function UsersPage() {
                     ) : (
                       <button 
                         onClick={() => {
-                          const reason = window.prompt('Enter suspension reason:');
-                          if (reason !== null) {
-                            handleStatusChange(user.id, 'blocked', reason);
-                          }
+                          setPendingUserAction({ id: user.id, status: 'blocked' });
+                          setIsReasonModalOpen(true);
                         }}
                         className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition-colors"
                       >
@@ -169,6 +172,23 @@ export default function UsersPage() {
           onRefresh={fetchUsers} 
         />
       )}
+
+      <ReasonModal
+        isOpen={isReasonModalOpen}
+        onClose={() => {
+          setIsReasonModalOpen(false);
+          setPendingUserAction(null);
+        }}
+        onSubmit={(reason) => {
+          if (pendingUserAction) {
+            handleStatusChange(pendingUserAction.id, pendingUserAction.status, reason);
+          }
+          setIsReasonModalOpen(false);
+          setPendingUserAction(null);
+        }}
+        title="Account Suspension"
+        submitText="Confirm Suspension"
+      />
     </div>
   );
 }

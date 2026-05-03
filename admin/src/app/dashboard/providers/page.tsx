@@ -2,12 +2,17 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import UserModal from '@/components/UserModal';
+import ReasonModal from '@/components/ReasonModal';
 import { toast } from 'react-hot-toast';
 
 export default function ProvidersPage() {
   const [providers, setProviders] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
+
+  // State for Reason Modal
+  const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
+  const [pendingProviderAction, setPendingProviderAction] = useState<{ id: number; status: string; title: string; button: string } | null>(null);
 
   const fetchProviders = async () => {
     try {
@@ -131,10 +136,13 @@ export default function ProvidersPage() {
                         </button>
                         <button 
                           onClick={() => {
-                            const reason = window.prompt('Enter rejection reason:');
-                            if (reason !== null) {
-                              handleStatusChange(provider.id, 'rejected', reason);
-                            }
+                            setPendingProviderAction({ 
+                              id: provider.id, 
+                              status: 'rejected', 
+                              title: 'Reject Application', 
+                              button: 'Confirm Rejection' 
+                            });
+                            setIsReasonModalOpen(true);
                           }}
                           className="text-orange-600 bg-orange-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-orange-100 transition-colors"
                         >
@@ -146,10 +154,13 @@ export default function ProvidersPage() {
                     {provider.status === 'verified' && (
                       <button 
                         onClick={() => {
-                          const reason = window.prompt('Enter suspension reason (optional):');
-                          if (reason !== null) {
-                            handleStatusChange(provider.id, 'blocked', reason);
-                          }
+                          setPendingProviderAction({ 
+                            id: provider.id, 
+                            status: 'blocked', 
+                            title: 'Suspend Provider', 
+                            button: 'Confirm Suspension' 
+                          });
+                          setIsReasonModalOpen(true);
                         }}
                         className="text-red-600 bg-red-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-red-100 transition-colors"
                       >
@@ -187,6 +198,23 @@ export default function ProvidersPage() {
           onRefresh={fetchProviders} 
         />
       )}
+
+      <ReasonModal
+        isOpen={isReasonModalOpen}
+        onClose={() => {
+          setIsReasonModalOpen(false);
+          setPendingProviderAction(null);
+        }}
+        onSubmit={(reason) => {
+          if (pendingProviderAction) {
+            handleStatusChange(pendingProviderAction.id, pendingProviderAction.status, reason);
+          }
+          setIsReasonModalOpen(false);
+          setPendingProviderAction(null);
+        }}
+        title={pendingProviderAction?.title || 'Provide Reason'}
+        submitText={pendingProviderAction?.button || 'Submit'}
+      />
     </div>
   );
 }
