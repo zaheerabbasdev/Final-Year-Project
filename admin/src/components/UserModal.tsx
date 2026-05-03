@@ -75,7 +75,7 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
                       user.status === 'rejected' ? 'bg-red-100 text-red-700' :
                       'bg-gray-800 text-white'
                     }`}>
-                      {user.status}
+                      {user.status === 'blocked' ? 'suspended' : user.status}
                     </span>
                   </div>
                 </div>
