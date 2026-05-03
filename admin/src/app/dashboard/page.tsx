@@ -38,11 +38,11 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-lg font-bold mb-6">User Growth</h3>
+          <h3 className="text-lg text-black font-bold mb-6">User Growth</h3>
           <div className="h-64 flex items-end justify-between gap-2 px-4">
-             {[40, 70, 45, 90, 65, 80, 55, 95, 70, 85, 45, 75].map((v, i) => (
-                <div key={i} className="bg-blue-100 w-full hover:bg-blue-500 transition-colors rounded-t-lg" style={{ height: `${v}%` }} />
-             ))}
+            {[40, 70, 45, 90, 65, 80, 55, 95, 70, 85, 45, 75].map((v, i) => (
+              <div key={i} className="bg-blue-100 w-full hover:bg-blue-500 transition-colors rounded-t-lg" style={{ height: `${v}%` }} />
+            ))}
           </div>
           <div className="flex justify-between mt-4 text-xs text-gray-400 px-2 uppercase tracking-tight">
             <span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
@@ -50,13 +50,13 @@ export default function DashboardPage() {
         </div>
 
         <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-            <h3 className="text-lg font-bold mb-6">Popular Categories</h3>
-            <div className="space-y-4">
-                <CategoryProgressBar label="Cleaning" percent={75} color="bg-blue-500" />
-                <CategoryProgressBar label="Plumbing" percent={45} color="bg-indigo-500" />
-                <CategoryProgressBar label="Electric" percent={90} color="bg-purple-500" />
-                <CategoryProgressBar label="Gardening" percent={30} color="bg-teal-500" />
-            </div>
+          <h3 className="text-lg text-black font-bold mb-6">Popular Categories</h3>
+          <div className="space-y-4">
+            <CategoryProgressBar label="Cleaning" percent={75} color="bg-blue-500" />
+            <CategoryProgressBar label="Plumbing" percent={45} color="bg-indigo-500" />
+            <CategoryProgressBar label="Electric" percent={90} color="bg-purple-500" />
+            <CategoryProgressBar label="Gardening" percent={30} color="bg-teal-500" />
+          </div>
         </div>
       </div>
     </div>
@@ -88,15 +88,15 @@ function StatCard({ title, value, change, icon, color }: any) {
 }
 
 function CategoryProgressBar({ label, percent, color }: any) {
-    return (
-        <div className="space-y-2">
-            <div className="flex justify-between text-sm">
-                <span className="font-medium text-gray-700">{label}</span>
-                <span className="text-gray-400 font-bold">{percent}%</span>
-            </div>
-            <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div className={`h-full ${color}`} style={{ width: `${percent}%` }} />
-            </div>
-        </div>
-    );
+  return (
+    <div className="space-y-2">
+      <div className="flex justify-between text-sm">
+        <span className="font-medium text-gray-700">{label}</span>
+        <span className="text-gray-400 font-bold">{percent}%</span>
+      </div>
+      <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+        <div className={`h-full ${color}`} style={{ width: `${percent}%` }} />
+      </div>
+    </div>
+  );
 }

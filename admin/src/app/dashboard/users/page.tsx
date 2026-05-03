@@ -9,7 +9,7 @@ export default function UsersPage() {
   const [users, setUsers] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
-  
+
   // State for Reason Modal
   const [isReasonModalOpen, setIsReasonModalOpen] = useState(false);
   const [pendingUserAction, setPendingUserAction] = useState<{ id: number; status: string } | null>(null);
@@ -58,10 +58,10 @@ export default function UsersPage() {
       <div className="flex justify-between items-center">
         <h2 className="text-2xl font-bold text-gray-900">Customer Management</h2>
         <div className="flex items-center gap-3">
-            <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
-                {users.length} Total Customers
-            </span>
-            <button className="bg-white border border-gray-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-gray-50 transition-colors">Export CSV</button>
+          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
+            {users.length} Total Customers
+          </span>
+          <button className="bg-white border border-gray-200 px-4 py-2 rounded-xl text-gray-400 text-sm font-medium hover:bg-gray-50 transition-colors">Export CSV</button>
         </div>
       </div>
 
@@ -85,9 +85,9 @@ export default function UsersPage() {
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {user.avatar ? (
-                        <img 
-                          src={`http://localhost:5000${user.avatar}`} 
-                          alt={user.full_name} 
+                        <img
+                          src={`http://localhost:5000${user.avatar}`}
+                          alt={user.full_name}
                           className="h-10 w-10 rounded-full object-cover border border-gray-200"
                           onError={(e) => {
                             // Fallback to initial if image fails to load
@@ -96,7 +96,7 @@ export default function UsersPage() {
                           }}
                         />
                       ) : null}
-                      <div 
+                      <div
                         className={`h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-700 ${user.avatar ? 'hidden' : 'flex'}`}
                       >
                         {user.full_name.charAt(0)}
@@ -113,12 +113,11 @@ export default function UsersPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-lg text-xs font-medium w-fit ${
-                      user.status === 'verified' ? 'text-green-600 bg-green-50' :
+                    <span className={`px-2 py-1 rounded-lg text-xs font-medium w-fit ${user.status === 'verified' ? 'text-green-600 bg-green-50' :
                       user.status === 'pending' ? 'text-yellow-600 bg-yellow-50' :
-                      user.status === 'rejected' ? 'text-red-600 bg-red-50' :
-                      'text-gray-100 bg-gray-800'
-                    }`}>
+                        user.status === 'rejected' ? 'text-red-600 bg-red-50' :
+                          'text-gray-100 bg-gray-800'
+                      }`}>
                       {user.status === 'blocked' ? 'suspended' : (user.status || 'pending')}
                     </span>
                   </td>
@@ -126,21 +125,21 @@ export default function UsersPage() {
                     {new Date(user.created_at).toLocaleDateString()}
                   </td>
                   <td className="px-6 py-4 text-right flex justify-end gap-2">
-                    <button 
+                    <button
                       onClick={() => setSelectedUserId(user.id)}
                       className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors"
                     >
                       View
                     </button>
                     {user.status === 'blocked' ? (
-                      <button 
+                      <button
                         onClick={() => handleStatusChange(user.id, 'verified')}
                         className="text-green-600 bg-green-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-green-100 transition-colors"
                       >
                         Unsuspend
                       </button>
                     ) : (
-                      <button 
+                      <button
                         onClick={() => {
                           setPendingUserAction({ id: user.id, status: 'blocked' });
                           setIsReasonModalOpen(true);
@@ -150,7 +149,7 @@ export default function UsersPage() {
                         Suspend
                       </button>
                     )}
-                    <button 
+                    <button
                       onClick={() => handleDelete(user.id)}
                       className="text-gray-400 hover:text-red-600 px-3 py-1.5 transition-colors"
                       title="Delete User"
@@ -166,10 +165,10 @@ export default function UsersPage() {
       </div>
 
       {selectedUserId && (
-        <UserModal 
-          userId={selectedUserId} 
-          onClose={() => setSelectedUserId(null)} 
-          onRefresh={fetchUsers} 
+        <UserModal
+          userId={selectedUserId}
+          onClose={() => setSelectedUserId(null)}
+          onRefresh={fetchUsers}
         />
       )}
 

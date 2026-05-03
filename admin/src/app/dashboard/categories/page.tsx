@@ -27,7 +27,7 @@ export default function CategoriesPage() {
   const handleAdd = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!newCategory.trim()) return;
-    
+
     setSubmitting(true);
     try {
       const token = localStorage.getItem('adminToken');
@@ -62,16 +62,16 @@ export default function CategoriesPage() {
       <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
         <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Add New Category</h3>
         <form onSubmit={handleAdd} className="flex gap-4">
-          <input 
-            type="text" 
+          <input
+            type="text"
             placeholder="e.g. Home Cleaning, Plumber, etc."
-            className="flex-1 px-4 py-3 rounded-xl border border-gray-200 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
+            className="flex-1 px-4 py-3 text-black rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             disabled={submitting}
           />
-          <button 
-            type="submit" 
+          <button
+            type="submit"
             disabled={submitting}
             className="bg-indigo-600 text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all disabled:opacity-50"
           >
@@ -103,7 +103,7 @@ export default function CategoriesPage() {
                     {cat.name}
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button 
+                    <button
                       onClick={() => handleDelete(cat.id)}
                       className="text-gray-400 hover:text-red-600 p-2 transition-colors"
                     >
