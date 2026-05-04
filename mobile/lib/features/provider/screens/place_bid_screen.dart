@@ -86,8 +86,6 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
           children: [
             _buildJobSummary(),
             const SizedBox(height: 24),
-            _buildSmartSuggestions(),
-            const SizedBox(height: 24),
             _buildBidForm(),
             const SizedBox(height: 24),
             _buildImportantNotes(),
@@ -192,36 +190,6 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
     );
   }
 
-  Widget _buildSmartSuggestions() {
-    return Container(
-      padding: const EdgeInsets.all(24),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-      ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Row(
-            children: const [
-              Icon(Icons.stars, color: Color(0xFFF59E0B), size: 18),
-              SizedBox(width: 8),
-              Text('Smart Suggestions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              _SuggestionCard(label: 'Recommended', amount: '\$135', onTap: () => _amountController.text = '135'),
-              const SizedBox(width: 16),
-              _SuggestionCard(label: 'Competitive', amount: '\$115', onTap: () => _amountController.text = '115'),
-            ],
-          ),
-        ],
-      ),
-    );
-  }
 
   Widget _buildBidForm() {
     return Container(
@@ -347,32 +315,3 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   }
 }
 
-class _SuggestionCard extends StatelessWidget {
-  final String label, amount;
-  final VoidCallback onTap;
-  const _SuggestionCard({required this.label, required this.amount, required this.onTap});
-
-  @override
-  Widget build(BuildContext context) {
-    return Expanded(
-      child: InkWell(
-        onTap: onTap,
-        child: Container(
-          padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 12),
-          decoration: BoxDecoration(
-            borderRadius: BorderRadius.circular(12),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
-              const SizedBox(height: 6),
-              Text(amount, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF1E293B))),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-}
