@@ -17,11 +17,16 @@ class ProviderProfileScreen extends StatefulWidget {
 class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   Map<String, dynamic>? _provider;
   bool _isLoading = true;
+  Future<List<dynamic>>? _reviewsFuture;
 
   @override
   void initState() {
     super.initState();
     _loadProvider();
+  }
+
+  void _loadReviews() {
+    _reviewsFuture = context.read<ReviewService>().fetchProviderReviews(widget.providerId, limit: 3);
   }
 
   Future<void> _loadProvider() async {
@@ -32,6 +37,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         _provider = provider;
         _isLoading = false;
       });
+      _loadReviews();
     }
   }
 
@@ -242,7 +248,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         ),
         const SizedBox(height: 8),
         FutureBuilder<List<dynamic>>(
-          future: context.read<ReviewService>().fetchProviderReviews(widget.providerId, limit: 3),
+          future: _reviewsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

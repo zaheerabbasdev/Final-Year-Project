@@ -4,7 +4,7 @@ const { submitReview, getProviderReviews, getBookingReview } = require('../contr
 const { authMiddleware } = require('../middleware/auth');
 
 router.post('/', authMiddleware, submitReview);
-router.get('/provider/:providerId', authMiddleware, getProviderReviews);
-router.get('/booking/:bookingId', authMiddleware, getBookingReview);
+router.get('/provider/:providerId', getProviderReviews);
+router.get('/booking/:bookingId', getBookingReview);
 
 module.exports = router;

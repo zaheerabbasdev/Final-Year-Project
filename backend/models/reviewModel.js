@@ -33,19 +33,20 @@ const Review = {
     },
 
     findByProvider: async (providerId, limit = null, offset = 0) => {
+        const pId = parseInt(providerId, 10);
         let sql = `SELECT r.*, u.full_name as customer_name, u.avatar as customer_avatar 
                    FROM reviews r 
                    JOIN users u ON r.customer_id = u.id 
                    WHERE r.provider_id = ? 
                    ORDER BY r.created_at DESC`;
-        const params = [providerId];
+        const params = [pId];
 
-        if (limit !== null) {
+        if (limit !== null && !isNaN(parseInt(limit))) {
             sql += ' LIMIT ? OFFSET ?';
-            params.push(parseInt(limit), parseInt(offset));
+            params.push(parseInt(limit, 10), parseInt(offset || 0, 10));
         }
 
-        const [rows] = await db.execute(sql, params);
+        const [rows] = await db.query(sql, params);
         return rows;
     },
 

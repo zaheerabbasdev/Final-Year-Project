@@ -42,6 +42,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   LatLng? _selectedLocationData;
   final LocationService _locationService = LocationService();
   bool _isLoading = false;
+  Future<List<dynamic>>? _reviewsFuture;
 
   @override
   void initState() {
@@ -101,6 +102,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             }
           }
           context.read<ProviderService>().fetchDashboardStats();
+          _reviewsFuture = context.read<ReviewService>().fetchProviderReviews(user!['id'], limit: 3);
         }
       });
     }
@@ -555,7 +557,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ),
         const SizedBox(height: 8),
         FutureBuilder<List<dynamic>>(
-          future: context.read<ReviewService>().fetchProviderReviews(providerId, limit: 3),
+          future: _reviewsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               return const Center(child: CircularProgressIndicator());

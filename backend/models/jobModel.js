@@ -27,7 +27,8 @@ const Job = {
         let selectClause = `j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar, 
                             b.status as booking_status, b.id as booking_id, b.provider_id,
                             up.full_name as provider_name, up.avatar as provider_avatar,
-                            r.id as review_id`;
+                            r.id as review_id,
+                            (SELECT COUNT(*) FROM bids WHERE job_id = j.id) as bid_count`;
         let proximityClause = '';
         const params = [];
 
@@ -86,7 +87,8 @@ const Job = {
             `SELECT j.*, c.name as category_name, u.full_name as customer_name, u.avatar as customer_avatar,
                     b.status as booking_status, b.id as booking_id, b.provider_id,
                     up.full_name as provider_name, up.avatar as provider_avatar,
-                    r.id as review_id
+                    r.id as review_id,
+                    (SELECT COUNT(*) FROM bids WHERE job_id = j.id) as bid_count
              FROM jobs j 
              LEFT JOIN categories c ON j.category_id = c.id 
              JOIN users u ON j.customer_id = u.id 
