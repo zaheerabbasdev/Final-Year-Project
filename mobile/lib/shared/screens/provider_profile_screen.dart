@@ -31,7 +31,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
   Future<void> _loadProvider() async {
     setState(() => _isLoading = true);
-    final provider = await context.read<ProviderService>().getProviderById(widget.providerId);
+    final provider = await context.read<ProviderService>().getUserById(widget.providerId);
     if (mounted) {
       setState(() {
         _provider = provider;

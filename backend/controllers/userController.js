@@ -102,43 +102,43 @@ const getProviders = async (req, res) => {
     }
 };
 
-const getProviderById = async (req, res) => {
+const getUserById = async (req, res) => {
     try {
         const { id } = req.params;
         const userId = parseInt(id, 10);
-        console.log(`DEBUG: Fetching provider details for ID: ${id} (Parsed: ${userId})`);
         
         if (isNaN(userId)) {
-            return res.status(400).json({ message: 'Invalid provider ID' });
+            return res.status(400).json({ message: 'Invalid user ID' });
         }
 
         const user = await User.findById(userId);
-        
         if (!user) {
-            console.log(`DEBUG: No user found with ID: ${userId}`);
-            return res.status(404).json({ message: 'Provider not found' });
-        }
-        
-        console.log(`DEBUG: User found: ${user.full_name}, Role: ${user.role}`);
-
-        if (user.role !== 'provider') {
-            console.log(`DEBUG: User with ID: ${userId} is not a provider (Role: ${user.role})`);
-            return res.status(404).json({ message: 'Provider not found' });
+            return res.status(404).json({ message: 'User not found' });
         }
 
-        const profile = await ProviderProfile.findByUserId(userId);
-        if (!profile) {
-            console.log(`DEBUG: No profile found for provider user ${userId}`);
-            // Still return the user info, maybe with an empty profile
-            return res.json({ ...user, profile: {} });
+        // Basic user info (exclude sensitive data)
+        const safeUser = {
+            id: user.id,
+            full_name: user.full_name,
+            email: user.email,
+            phone: user.phone,
+            role: user.role,
+            avatar: user.avatar,
+            location: user.location,
+            status: user.status,
+            created_at: user.created_at
+        };
+
+        if (user.role === 'provider') {
+            const profile = await ProviderProfile.findByUserId(userId);
+            safeUser.profile = profile || {};
         }
 
-        console.log(`DEBUG: Successfully fetched provider ${userId} with profile`);
-        res.json({ ...user, profile });
+        res.json(safeUser);
     } catch (error) {
-        console.error('DEBUG: Error in getProviderById:', error);
-        res.status(500).json({ message: 'Error fetching provider details' });
+        console.error('Error in getUserById:', error);
+        res.status(500).json({ message: 'Error fetching user details' });
     }
 };
 
-module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders, getProviderById };
+module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders, getUserById };

@@ -33,6 +33,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     if (mounted) {
       setState(() {
         _job = job;
+        print('DEBUG: Job data loaded: ${_job?['title']}, Customer ID: ${_job?['customer_id']}');
         _bids = bids;
         _isLoading = false;
       });
@@ -357,7 +358,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ),
           ),
           OutlinedButton(
-            onPressed: () {},
+            onPressed: () {
+              final cId = _job!['customer_id'];
+              print('DEBUG: Navigating to customer profile from ClientInfoCard. Customer ID: $cId');
+              if (cId != null) {
+                context.push('/customer-profile/$cId');
+              } else {
+                print('DEBUG: customer_id is NULL in ClientInfoCard!');
+              }
+            },
             style: OutlinedButton.styleFrom(
               side: const BorderSide(color: Color(0xFFE2E8F0)),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -726,6 +735,24 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ],
           ),
+          const Spacer(),
+          if (context.read<AuthService>().role == 'provider')
+            OutlinedButton(
+              onPressed: () {
+                final cId = _job!['customer_id'];
+                print('DEBUG: Navigating to customer profile. Customer ID: $cId');
+                if (cId != null) {
+                  context.push('/customer-profile/$cId');
+                } else {
+                  print('DEBUG: customer_id is NULL!');
+                }
+              },
+              style: OutlinedButton.styleFrom(
+                side: const BorderSide(color: Color(0xFFE2E8F0)),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              ),
+              child: const Text('View Profile', style: TextStyle(color: Color(0xFF1E293B), fontSize: 12)),
+            ),
         ],
       ),
     );

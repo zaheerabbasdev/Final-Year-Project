@@ -27,6 +27,7 @@ import 'shared/screens/job_detail_screen.dart';
 import 'shared/screens/navigation_screen.dart';
 import 'shared/screens/profile_screen.dart';
 import 'shared/screens/provider_profile_screen.dart';
+import 'shared/screens/customer_profile_screen.dart';
 import 'shared/screens/submit_review_screen.dart';
 import 'package:flutter_config/flutter_config.dart';
 
@@ -130,6 +131,12 @@ class ServiceHubApp extends StatelessWidget {
           path: '/provider-profile/:id',
           builder: (context, state) => ProviderProfileScreen(
             providerId: int.parse(state.pathParameters['id']!),
+          ),
+        ),
+        GoRoute(
+          path: '/customer-profile/:id',
+          builder: (context, state) => CustomerProfileScreen(
+            customerId: int.parse(state.pathParameters['id']!),
           ),
         ),
       ],

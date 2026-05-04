@@ -62,12 +62,12 @@ class ProviderService extends ChangeNotifier {
     }
   }
 
-  Future<Map<String, dynamic>?> getProviderById(int id) async {
+  Future<Map<String, dynamic>?> getUserById(int id) async {
     try {
-      final response = await _apiClient.dio.get('/users/providers/$id');
+      final response = await _apiClient.dio.get('/users/$id');
       return response.data;
     } catch (e) {
-      print('Error fetching provider by ID: $e');
+      print('Error fetching user by ID: $e');
       return null;
     }
   }
