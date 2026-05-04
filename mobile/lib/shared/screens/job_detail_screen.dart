@@ -742,8 +742,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       padding: const EdgeInsets.all(24),
       child: Column(
         children: [
-          ..._bids.map((bid) => _buildBidItem(
+          ..._bids.map((bid) {
+            final pId = bid['user_id'] ?? bid['provider_id'];
+            final int? providerId = pId is int ? pId : int.tryParse(pId?.toString() ?? '');
+            
+            return _buildBidItem(
                 id: bid['id'],
+                providerId: providerId,
                 name: bid['provider_name'] ?? 'Unknown Provider',
                 rating: double.tryParse(bid['provider_rating']?.toString() ?? '0.0') ?? 0.0,
                 reviews: int.tryParse(bid['review_count']?.toString() ?? '0') ?? 0,
@@ -753,7 +758,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 avatar: bid['provider_avatar'],
                 status: bid['status'],
                 hasAcceptedAny: hasAcceptedAny,
-              )).toList(),
+              );
+          }).toList(),
         ],
       ),
     );
@@ -761,6 +767,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Widget _buildBidItem({
     required int id,
+    required int? providerId,
     required String name,
     required double rating,
     required int reviews,
@@ -807,6 +814,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ],
               ),
               const Spacer(),
+              if (providerId != null)
+                TextButton(
+                  onPressed: () => context.push('/provider-profile/$providerId'),
+                  style: TextButton.styleFrom(
+                    foregroundColor: const Color(0xFF6366F1),
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                  ),
+                  child: const Text('View Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+                ),
               if (status != 'pending' || hasAcceptedAny)
                 Builder(builder: (context) {
                   String label = status.toUpperCase();
@@ -863,6 +879,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     backgroundColor: const Color(0xFF6366F1),
                     minimumSize: const Size(120, 48),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                   ),
                 ),
             ],

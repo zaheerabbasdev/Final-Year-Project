@@ -102,4 +102,43 @@ const getProviders = async (req, res) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders };
+const getProviderById = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = parseInt(id, 10);
+        console.log(`DEBUG: Fetching provider details for ID: ${id} (Parsed: ${userId})`);
+        
+        if (isNaN(userId)) {
+            return res.status(400).json({ message: 'Invalid provider ID' });
+        }
+
+        const user = await User.findById(userId);
+        
+        if (!user) {
+            console.log(`DEBUG: No user found with ID: ${userId}`);
+            return res.status(404).json({ message: 'Provider not found' });
+        }
+        
+        console.log(`DEBUG: User found: ${user.full_name}, Role: ${user.role}`);
+
+        if (user.role !== 'provider') {
+            console.log(`DEBUG: User with ID: ${userId} is not a provider (Role: ${user.role})`);
+            return res.status(404).json({ message: 'Provider not found' });
+        }
+
+        const profile = await ProviderProfile.findByUserId(userId);
+        if (!profile) {
+            console.log(`DEBUG: No profile found for provider user ${userId}`);
+            // Still return the user info, maybe with an empty profile
+            return res.json({ ...user, profile: {} });
+        }
+
+        console.log(`DEBUG: Successfully fetched provider ${userId} with profile`);
+        res.json({ ...user, profile });
+    } catch (error) {
+        console.error('DEBUG: Error in getProviderById:', error);
+        res.status(500).json({ message: 'Error fetching provider details' });
+    }
+};
+
+module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders, getProviderById };
