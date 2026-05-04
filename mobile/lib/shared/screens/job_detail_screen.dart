@@ -521,10 +521,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           const SizedBox(height: 16),
           _buildImageGallery(_job!['images']),
           const SizedBox(height: 24),
-          _buildInfoSectionTitle('Customer Information'),
-          const SizedBox(height: 16),
-          _buildCustomerCard(_job!['customer_name'], createdAt),
-          const SizedBox(height: 32),
+          if (role == 'provider') ...[
+            _buildInfoSectionTitle('Customer Information'),
+            const SizedBox(height: 16),
+            _buildCustomerCard(_job!['customer_name'], createdAt),
+            const SizedBox(height: 32),
+          ],
           if (role == 'provider')
             ElevatedButton(
               onPressed: () {},
