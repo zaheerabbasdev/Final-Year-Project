@@ -5,6 +5,7 @@ import '../../features/customer/job_service.dart';
 import '../../features/auth/auth_service.dart';
 import '../../../core/api_client.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../../shared/widgets/notification_bell.dart';
 
 class JobDetailScreen extends StatefulWidget {
   final int jobId;
@@ -66,23 +67,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
           ),
           actions: [
-            Stack(
-              children: [
-                IconButton(
-                  icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
-                  onPressed: () {},
-                ),
-                Positioned(
-                  right: 12,
-                  top: 12,
-                  child: Container(
-                    width: 8,
-                    height: 8,
-                    decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
-                  ),
-                ),
-              ],
-            ),
+            const NotificationBell(color: Color(0xFF1E293B)),
           ],
           bottom: TabBar(
             indicatorColor: const Color(0xFF6366F1),
@@ -139,23 +124,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 12,
-                top: 12,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
-                ),
-              ),
-            ],
-          ),
+          const NotificationBell(color: Color(0xFF1E293B)),
         ],
       ),
       body: SingleChildScrollView(
