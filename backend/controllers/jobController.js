@@ -1,5 +1,7 @@
 const Job = require('../models/jobModel');
 const User = require('../models/userModel');
+const ProviderProfile = require('../models/providerModel');
+const { createNotification } = require('../services/notificationService');
 
 // ... rest of imports if any ...
 
@@ -24,6 +26,27 @@ const createJob = async (req, res) => {
         }
         
         const jobId = await Job.create(jobData);
+
+        // Notify Providers in the same category
+        if (jobData.category_id) {
+            try {
+                const providers = await ProviderProfile.findByCategory(jobData.category_id);
+                console.log(`DEBUG: Found ${providers.length} providers for category ${jobData.category_id}. Providers:`, JSON.stringify(providers));
+                
+                for (const p of providers) {
+                    console.log(`DEBUG: Sending notification to provider user_id: ${p.user_id}`);
+                    await createNotification(
+                        p.user_id,
+                        'New Job Opportunity',
+                        `A new job matching your skill was posted: "${jobData.title}"`,
+                        'new_job_posted'
+                    );
+                }
+            } catch (notifError) {
+                console.error("Error notifying providers:", notifError);
+            }
+        }
+
         res.status(201).json({ message: 'Job posted successfully', jobId });
     } catch (error) {
         console.error("DEBUG createJob error:", error);

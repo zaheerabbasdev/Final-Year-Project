@@ -1,6 +1,7 @@
 const Bid = require('../models/bidModel');
 const Job = require('../models/jobModel');
 const Booking = require('../models/bookingModel');
+const { createNotification } = require('../services/notificationService');
 
 const placeBid = async (req, res) => {
     try {
@@ -22,6 +23,14 @@ const placeBid = async (req, res) => {
             estimated_time,
             cover_letter
         });
+
+        // Notify Customer
+        await createNotification(
+            job.customer_id,
+            'New Bid Received',
+            `A service provider has placed a bid of Rs. ${amount} on your job: ${job.title}`,
+            'new_bid'
+        );
 
         res.status(201).json({ message: 'Bid placed successfully', bidId });
     } catch (error) {
@@ -70,6 +79,14 @@ const acceptBid = async (req, res) => {
             customer_id: job.customer_id,
             provider_id: bid.provider_id
         });
+
+        // Notify Provider
+        await createNotification(
+            bid.provider_id,
+            'Bid Accepted!',
+            `Your bid on "${job.title}" has been accepted. You can now start working on the job.`,
+            'bid_accepted'
+        );
 
         res.json({ message: 'Bid accepted and booking created' });
     } catch (error) {

@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import '../../customer/job_service.dart';
 import '../../customer/category_service.dart';
 import '../../../core/services/location_service.dart';
+import '../../../shared/widgets/notification_bell.dart';
 
 class BrowseJobsScreen extends StatefulWidget {
   const BrowseJobsScreen({super.key});
@@ -116,23 +117,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
           style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 12,
-                top: 12,
-                child: Container(
-                  width: 8,
-                  height: 8,
-                  decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle),
-                ),
-              ),
-            ],
-          ),
+          const NotificationBell(color: Color(0xFF1E293B)),
         ],
       ),
       body: Column(

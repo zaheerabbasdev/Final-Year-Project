@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../job_service.dart';
 import '../../../shared/services/booking_service.dart';
 import '../../../features/auth/auth_service.dart';
+import '../../../shared/widgets/notification_bell.dart';
 
 class MyJobsScreen extends StatelessWidget {
   const MyJobsScreen({super.key});
@@ -26,10 +27,7 @@ class MyJobsScreen extends StatelessWidget {
             ),
           ),
           actions: [
-            IconButton(
-              icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
-              onPressed: () {},
-            ),
+            const NotificationBell(color: Color(0xFF1E293B)),
           ],
           bottom: const TabBar(
             isScrollable: true,

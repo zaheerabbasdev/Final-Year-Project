@@ -75,6 +75,16 @@ const ProviderProfile = {
 
         const [rows] = await db.execute(query, params);
         return rows;
+    },
+
+    findByCategory: async (categoryId) => {
+        console.log(`DEBUG: findByCategory called with categoryId: ${categoryId}`);
+        const [rows] = await db.execute(
+            'SELECT user_id FROM provider_profiles WHERE category_id = ?',
+            [categoryId]
+        );
+        console.log(`DEBUG: findByCategory results:`, JSON.stringify(rows));
+        return rows;
     }
 };
 

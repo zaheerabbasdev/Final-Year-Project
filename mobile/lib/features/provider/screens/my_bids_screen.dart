@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import '../../customer/job_service.dart';
 import '../../../shared/services/booking_service.dart';
 import '../../../core/api_client.dart';
+import '../../../shared/widgets/notification_bell.dart';
 
 class MyBidsScreen extends StatefulWidget {
   const MyBidsScreen({super.key});
@@ -71,6 +72,9 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
             'My Bids',
             style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 20),
           ),
+          actions: [
+            const NotificationBell(color: Color(0xFF1E293B)),
+          ],
           bottom: TabBar(
             isScrollable: true,
             indicatorColor: const Color(0xFF6366F1),

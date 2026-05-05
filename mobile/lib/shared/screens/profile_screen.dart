@@ -12,6 +12,7 @@ import '../../shared/widgets/review_card.dart';
 import '../../core/api_client.dart';
 import '../../core/services/location_service.dart';
 import 'map_picker_screen.dart';
+import '../../shared/widgets/notification_bell.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool initialEditMode;
@@ -162,18 +163,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         elevation: 0,
         title: const Text('Profile', style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold)),
         actions: [
-          Stack(
-            children: [
-              IconButton(
-                icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
-                onPressed: () {},
-              ),
-              Positioned(
-                right: 12, top: 12,
-                child: Container(width: 8, height: 8, decoration: const BoxDecoration(color: Color(0xFFEF4444), shape: BoxShape.circle)),
-              ),
-            ],
-          ),
+          const NotificationBell(color: Color(0xFF1E293B)),
         ],
       ),
       body: SingleChildScrollView(
@@ -288,7 +278,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 32),
           _buildMenuCard([
             _buildMenuItem(Icons.payment_outlined, 'Payment Methods', () {}),
-            _buildMenuItem(Icons.notifications_none, 'Notifications', () {}),
+            _buildMenuItem(Icons.notifications_none, 'Notifications', () => context.push('/notifications')),
             _buildMenuItem(Icons.settings_outlined, 'Settings', () {}),
             _buildMenuItem(Icons.help_outline, 'Help & Support', () {}),
           ]),

@@ -29,6 +29,10 @@ import 'shared/screens/profile_screen.dart';
 import 'shared/screens/provider_profile_screen.dart';
 import 'shared/screens/customer_profile_screen.dart';
 import 'shared/screens/submit_review_screen.dart';
+import 'features/notifications/notification_screen.dart';
+import 'features/notifications/notification_provider.dart';
+import 'core/services/socket_service.dart';
+import 'core/services/notification_service.dart';
 import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
@@ -47,6 +51,14 @@ void main() async {
         ChangeNotifierProvider(create: (_) => BookingService()),
         ChangeNotifierProvider(create: (_) => NavigationService()),
         ChangeNotifierProvider(create: (_) => ReviewService()),
+        ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        Provider(create: (_) => NotificationService()),
+        ProxyProvider2<NotificationService, NotificationProvider, SocketService>(
+          update: (context, notifService, notifProvider, socketService) {
+            notifService.setProvider(notifProvider);
+            return socketService ?? SocketService(notifService);
+          },
+        ),
       ],
       child: const ServiceHubApp(),
     ),
@@ -59,6 +71,16 @@ class ServiceHubApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
+    final notificationProvider = context.read<NotificationProvider>();
+    final socketService = context.read<SocketService>();
+
+    // Connect socket if authenticated
+    if (authService.isAuthenticated && authService.user != null) {
+      socketService.connect(authService.user!['id']);
+      notificationProvider.fetchUnreadCount();
+    } else {
+      socketService.disconnect();
+    }
 
     final router = GoRouter(
       initialLocation: '/splash',
@@ -138,6 +160,10 @@ class ServiceHubApp extends StatelessWidget {
           builder: (context, state) => CustomerProfileScreen(
             customerId: int.parse(state.pathParameters['id']!),
           ),
+        ),
+        GoRoute(
+          path: '/notifications',
+          builder: (context, state) => const NotificationScreen(),
         ),
       ],
     );

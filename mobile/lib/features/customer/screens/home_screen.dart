@@ -7,6 +7,8 @@ import '../../auth/auth_service.dart';
 import '../category_service.dart';
 import '../job_service.dart';
 import '../../provider/provider_service.dart';
+import '../../notifications/notification_provider.dart';
+import '../../../shared/widgets/notification_bell.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -123,12 +125,18 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             ),
           ],
         ),
-        CircleAvatar(
-          radius: 22,
-          backgroundImage: avatarUrl != null 
-            ? NetworkImage(avatarUrl)
-            : const NetworkImage('https://i.pravatar.cc/150?u=zubair'),
-          backgroundColor: const Color(0xFFF1F5F9),
+        Row(
+          children: [
+            const NotificationBell(),
+            const SizedBox(width: 8),
+            CircleAvatar(
+              radius: 22,
+              backgroundImage: avatarUrl != null 
+                ? NetworkImage(avatarUrl)
+                : const NetworkImage('https://i.pravatar.cc/150?u=zubair'),
+              backgroundColor: const Color(0xFFF1F5F9),
+            ),
+          ],
         ),
       ],
     );

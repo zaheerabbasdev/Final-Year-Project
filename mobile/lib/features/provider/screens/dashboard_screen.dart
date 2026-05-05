@@ -8,6 +8,8 @@ import '../../../shared/services/navigation_service.dart';
 
 import '../../provider/provider_service.dart';
 import '../../../core/services/location_service.dart';
+import '../../notifications/notification_provider.dart';
+import '../../../shared/widgets/notification_bell.dart';
 
 class ProviderDashboardScreen extends StatefulWidget {
   const ProviderDashboardScreen({super.key});
@@ -83,6 +85,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           ],
         ),
         actions: [
+          const NotificationBell(),
           Padding(
             padding: const EdgeInsets.only(right: 16.0),
             child: CircleAvatar(

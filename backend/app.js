@@ -13,11 +13,19 @@ const bidRoutes = require('./routes/bidRoutes');
 const bookingRoutes = require('./routes/bookingRoutes');
 const adminRoutes = require('./routes/adminRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
+const notificationRoutes = require('./routes/notificationRoutes');
+
+const http = require('http');
+const { initSocket } = require('./socketManager');
 
 const app = express();
+const server = http.createServer(app);
+
+// Initialize Socket.io
+initSocket(server);
 
 const suspendedCheck = require('./middleware/suspendedCheck');
-
+// ... (rest of middleware)
 app.use(cors());
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
@@ -25,6 +33,7 @@ app.use(suspendedCheck);
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // Routes
+// ... (routes)
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/categories', categoryRoutes);
@@ -33,6 +42,7 @@ app.use('/api/bids', bidRoutes);
 app.use('/api/bookings', bookingRoutes);
 app.use('/api/admin', adminRoutes);
 app.use('/api/reviews', reviewRoutes);
+app.use('/api/notifications', notificationRoutes);
 
 app.get('/', (req, res) => {
     res.json({ message: "Welcome to ServiceHub API" });
@@ -50,7 +60,7 @@ app.use((err, req, res, next) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+server.listen(PORT, () => {
     console.log(`Server is running on port ${PORT}`);
 });
 
