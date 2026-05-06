@@ -5,6 +5,7 @@ import '../../customer/job_service.dart';
 import '../../../core/api_client.dart';
 import '../../auth/auth_service.dart';
 import '../../../shared/services/navigation_service.dart';
+import '../../../shared/providers/sync_provider.dart';
 
 import '../../provider/provider_service.dart';
 import '../../../core/services/location_service.dart';
@@ -98,31 +99,35 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           ),
         ],
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.all(24),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            if (user != null && _shouldShowLocationWarning(user))
-              _buildLocationWarning(),
-            if (user != null && _shouldShowLocationWarning(user))
-              const SizedBox(height: 24),
-            _buildStatsGrid(),
-            const SizedBox(height: 32),
-            _buildSectionHeader('Quick Actions'),
-            const SizedBox(height: 16),
-            _buildQuickActions(),
-            const SizedBox(height: 32),
-            _buildEarningsCard(),
-            const SizedBox(height: 32),
-            _buildSectionHeader(
-              _isNearMeEnabled ? 'Jobs Near You (20km)' : 'New Job Opportunities', 
-              action: _isLocating ? 'Locating...' : (_isNearMeEnabled ? 'Show All' : 'Near Me'), 
-              onAction: _toggleNearMe
-            ),
-            const SizedBox(height: 16),
-            _buildOpportunitiesList(),
-          ],
+      body: RefreshIndicator(
+        onRefresh: () => context.read<SyncProvider>().syncAll(context),
+        child: SingleChildScrollView(
+          physics: const AlwaysScrollableScrollPhysics(),
+          padding: const EdgeInsets.all(24),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (user != null && _shouldShowLocationWarning(user))
+                _buildLocationWarning(),
+              if (user != null && _shouldShowLocationWarning(user))
+                const SizedBox(height: 24),
+              _buildStatsGrid(),
+              const SizedBox(height: 32),
+              _buildSectionHeader('Quick Actions'),
+              const SizedBox(height: 16),
+              _buildQuickActions(),
+              const SizedBox(height: 32),
+              _buildEarningsCard(),
+              const SizedBox(height: 32),
+              _buildSectionHeader(
+                _isNearMeEnabled ? 'Jobs Near You (20km)' : 'New Job Opportunities', 
+                action: _isLocating ? 'Locating...' : (_isNearMeEnabled ? 'Show All' : 'Near Me'), 
+                onAction: _toggleNearMe
+              ),
+              const SizedBox(height: 16),
+              _buildOpportunitiesList(),
+            ],
+          ),
         ),
       ),
     );

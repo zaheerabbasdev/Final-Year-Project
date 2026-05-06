@@ -1,12 +1,25 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../api_client.dart';
 import 'notification_service.dart';
+import '../../features/chat/providers/chat_provider.dart';
+import '../../features/chat/models/chat_message.dart';
+
 
 class SocketService {
   IO.Socket? _socket;
   final NotificationService _notificationService;
+  final ChatProvider _chatProvider;
 
-  SocketService(this._notificationService);
+  SocketService(this._notificationService, this._chatProvider) {
+    _chatProvider.onEmitTyping = (data) {
+      _socket?.emit('typing', data);
+    };
+    _chatProvider.onEmitStopTyping = (data) {
+      _socket?.emit('stop_typing', data);
+    };
+  }
+
+
 
   void connect(dynamic userId) {
     // Force to int if it's a double/number to avoid "user_1.0" room names
@@ -42,6 +55,24 @@ class SocketService {
       print('New notification received: $data');
       _notificationService.handleNewNotification(data);
     });
+
+    _socket!.on('new_message', (data) {
+      print('New message received: $data');
+      final message = ChatMessage.fromJson(data);
+      _chatProvider.receiveMessage(message);
+    });
+
+    _socket!.on('user_typing', (data) {
+      print('User typing: $data');
+      _chatProvider.setOtherTyping(true, data['jobId']);
+    });
+
+    _socket!.on('user_stop_typing', (data) {
+      print('User stop typing: $data');
+      _chatProvider.setOtherTyping(false, data['jobId']);
+    });
+
+
 
     _socket!.onDisconnect((_) {
       print('Socket disconnected');

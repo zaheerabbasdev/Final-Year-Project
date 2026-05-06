@@ -32,6 +32,12 @@ import 'shared/screens/submit_review_screen.dart';
 import 'features/notifications/notification_screen.dart';
 import 'features/notifications/notification_provider.dart';
 import 'core/services/socket_service.dart';
+import 'features/chat/providers/chat_provider.dart';
+import 'features/chat/screens/chat_list_screen.dart';
+import 'features/chat/screens/chat_room_screen.dart';
+import 'shared/providers/sync_provider.dart';
+
+
 import 'core/services/notification_service.dart';
 import 'package:flutter_config/flutter_config.dart';
 
@@ -52,35 +58,80 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NavigationService()),
         ChangeNotifierProvider(create: (_) => ReviewService()),
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
+        ChangeNotifierProvider(create: (_) => ChatProvider()),
+        ChangeNotifierProvider(create: (_) => SyncProvider()),
+
         Provider(create: (_) => NotificationService()),
-        ProxyProvider2<NotificationService, NotificationProvider, SocketService>(
-          update: (context, notifService, notifProvider, socketService) {
+        ProxyProvider3<NotificationService, NotificationProvider, ChatProvider, SocketService>(
+          update: (context, notifService, notifProvider, chatProvider, socketService) {
             notifService.setProvider(notifProvider);
-            return socketService ?? SocketService(notifService);
+            return socketService ?? SocketService(notifService, chatProvider);
           },
         ),
+
       ],
       child: const ServiceHubApp(),
     ),
   );
 }
 
-class ServiceHubApp extends StatelessWidget {
+class ServiceHubApp extends StatefulWidget {
   const ServiceHubApp({super.key});
+
+  @override
+  State<ServiceHubApp> createState() => _ServiceHubAppState();
+}
+
+class _ServiceHubAppState extends State<ServiceHubApp> with WidgetsBindingObserver {
+  bool? _wasAuthenticated;
+
+  @override
+
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Trigger global sync when app returns from background
+      final syncProvider = context.read<SyncProvider>();
+      syncProvider.syncAll(context);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
-    final notificationProvider = context.read<NotificationProvider>();
     final socketService = context.read<SocketService>();
+    final notificationProvider = context.read<NotificationProvider>();
+    final syncProvider = context.read<SyncProvider>();
+
+    // Initial sync and re-sync on login
+    if (authService.isAuthenticated && _wasAuthenticated != true) {
+      _wasAuthenticated = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        syncProvider.syncAll(context);
+      });
+    } else if (!authService.isAuthenticated) {
+      _wasAuthenticated = false;
+    }
 
     // Connect socket if authenticated
+
     if (authService.isAuthenticated && authService.user != null) {
       socketService.connect(authService.user!['id']);
-      notificationProvider.fetchUnreadCount();
     } else {
       socketService.disconnect();
     }
+
 
     final router = GoRouter(
       initialLocation: '/splash',
@@ -165,6 +216,23 @@ class ServiceHubApp extends StatelessWidget {
           path: '/notifications',
           builder: (context, state) => const NotificationScreen(),
         ),
+        GoRoute(
+          path: '/chat-list',
+          builder: (context, state) => const ChatListScreen(),
+        ),
+        GoRoute(
+          path: '/chat-room',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return ChatRoomScreen(
+              jobId: extra['jobId'],
+              otherUserId: extra['otherUserId'],
+              otherUserName: extra['otherUserName'],
+              otherUserAvatar: extra['otherUserAvatar'],
+            );
+          },
+        ),
+
       ],
     );
 

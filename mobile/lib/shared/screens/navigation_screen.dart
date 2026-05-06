@@ -8,6 +8,8 @@ import '../../features/provider/screens/dashboard_screen.dart';
 import '../../features/provider/screens/browse_jobs_screen.dart';
 import '../../features/provider/screens/my_bids_screen.dart';
 import 'profile_screen.dart';
+import '../../features/chat/screens/chat_list_screen.dart';
+
 
 class MainNavigationScreen extends StatelessWidget {
   const MainNavigationScreen({super.key});
@@ -21,16 +23,19 @@ class MainNavigationScreen extends StatelessWidget {
     final List<Widget> customerScreens = [
       const CustomerHomeScreen(),
       const MyJobsScreen(),
-      const Center(child: Text('Messages')),
+      const ChatListScreen(),
       const ProfileScreen(),
     ];
+
 
     final List<Widget> providerScreens = [
       const ProviderDashboardScreen(),
       const BrowseJobsScreen(),
       const MyBidsScreen(),
+      const ChatListScreen(),
       const ProfileScreen(),
     ];
+
 
     final screens = role == 'customer' ? customerScreens : providerScreens;
 
@@ -51,15 +56,19 @@ class MainNavigationScreen extends StatelessWidget {
           ? const [
               BottomNavigationBarItem(icon: Icon(Icons.home_outlined), activeIcon: Icon(Icons.home), label: 'Home'),
               BottomNavigationBarItem(icon: Icon(Icons.work_outline), activeIcon: Icon(Icons.work), label: 'My Jobs'),
-              BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Messages'),
+              BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Chat'),
               BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
+
             ]
           : const [
               BottomNavigationBarItem(icon: Icon(Icons.dashboard_outlined), activeIcon: Icon(Icons.dashboard), label: 'Dashboard'),
               BottomNavigationBarItem(icon: Icon(Icons.work_outline), activeIcon: Icon(Icons.work), label: 'Jobs'),
               BottomNavigationBarItem(icon: Icon(Icons.gavel_outlined), activeIcon: Icon(Icons.gavel), label: 'Bids'),
+              BottomNavigationBarItem(icon: Icon(Icons.chat_bubble_outline), activeIcon: Icon(Icons.chat_bubble), label: 'Chat'),
               BottomNavigationBarItem(icon: Icon(Icons.person_outline), activeIcon: Icon(Icons.person), label: 'Profile'),
+
             ],
+
       ),
     );
   }

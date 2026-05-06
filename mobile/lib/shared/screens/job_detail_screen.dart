@@ -342,6 +342,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ),
             child: const Text('View Profile', style: TextStyle(color: Color(0xFF1E293B), fontSize: 12)),
           ),
+          const SizedBox(width: 8),
+          IconButton(
+            icon: const Icon(Icons.chat_bubble_outline, color: Color(0xFF6366F1)),
+            onPressed: () {
+              context.push('/chat-room', extra: {
+                'jobId': widget.jobId,
+                'otherUserId': _job!['customer_id'],
+                'otherUserName': customerName,
+                'otherUserAvatar': avatarUrl,
+              });
+            },
+          ),
+
         ],
       ),
     );
@@ -821,6 +834,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ),
                   child: const Text('View Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
                 ),
+              IconButton(
+                icon: const Icon(Icons.chat_bubble_outline, color: Color(0xFF6366F1)),
+                onPressed: () {
+                  context.push('/chat-room', extra: {
+                    'jobId': widget.jobId,
+                    'otherUserId': providerId,
+                    'otherUserName': name,
+                    'otherUserAvatar': avatarUrl,
+                  });
+                },
+              ),
+
+
               if (status != 'pending' || hasAcceptedAny)
                 Builder(builder: (context) {
                   String label = status.toUpperCase();

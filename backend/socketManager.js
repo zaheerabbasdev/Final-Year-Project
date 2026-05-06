@@ -22,6 +22,19 @@ const initSocket = (server) => {
             console.log(`DEBUG: Socket ${socket.id} is now in rooms:`, Array.from(socket.rooms));
         });
 
+        socket.on('typing', (data) => {
+            const { jobId, receiverId, senderId } = data;
+            const roomName = `user_${receiverId}`;
+            socket.to(roomName).emit('user_typing', { jobId, senderId });
+        });
+
+        socket.on('stop_typing', (data) => {
+            const { jobId, receiverId, senderId } = data;
+            const roomName = `user_${receiverId}`;
+            socket.to(roomName).emit('user_stop_typing', { jobId, senderId });
+        });
+
+
         socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);
         });
