@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart' as dio;
+import 'package:image_picker/image_picker.dart';
 import '../../../core/api_client.dart';
+
 import '../models/chat_message.dart';
 
 
@@ -86,11 +88,18 @@ class ChatProvider extends ChangeNotifier {
 
   Future<void> sendImage(int jobId, int receiverId, String imagePath) async {
     try {
-      String fileName = imagePath.split('/').last;
+      // For cross-platform support (Web/Mobile), read bytes first
+      final XFile xFile = XFile(imagePath);
+      final bytes = await xFile.readAsBytes();
+      final fileName = xFile.name.isNotEmpty ? xFile.name : 'image.jpg';
+
       dio.FormData formData = dio.FormData.fromMap({
-        'job_id': jobId,
-        'receiver_id': receiverId,
-        'image': await dio.MultipartFile.fromFile(imagePath, filename: fileName),
+        'job_id': jobId.toString(),
+        'receiver_id': receiverId.toString(),
+        'image': dio.MultipartFile.fromBytes(
+          bytes,
+          filename: fileName,
+        ),
       });
 
       await _apiClient.dio.post('/messages/send', data: formData);
@@ -98,6 +107,7 @@ class ChatProvider extends ChangeNotifier {
       print('Error sending image: $e');
     }
   }
+
 
 
   void setOtherTyping(bool typing, int jobId) {

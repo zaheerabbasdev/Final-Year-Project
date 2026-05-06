@@ -70,6 +70,7 @@ class ApiClient {
     if (path == null || path.isEmpty) return null;
     if (path.startsWith('http')) return path;
     final serverUrl = baseUrl.replaceAll('/api', '');
-    return '$serverUrl$path';
+    return '$serverUrl/$path';
   }
 }
+

@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import '../providers/chat_provider.dart';
@@ -56,7 +58,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     super.dispose();
   }
 
-
   void _onTextChanged() {
     final auth = context.read<AuthService>();
     if (auth.user == null) return;
@@ -105,15 +106,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           onTap: () {},
           child: Row(
             children: [
-              CircleAvatar(
-                radius: 18,
-                backgroundImage: widget.otherUserAvatar != null
-                    ? NetworkImage(ApiClient.getImageUrl(widget.otherUserAvatar!)!)
-                    : null,
-                child: widget.otherUserAvatar == null ? const Icon(Icons.person, size: 20, color: Colors.white) : null,
-              ),
-
-              const SizedBox(width: 8),
+              _buildAppBarAvatar(),
+              const SizedBox(width: 10),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -158,6 +152,42 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
+  Widget _buildAppBarAvatar() {
+    final avatarUrl = ApiClient.getImageUrl(widget.otherUserAvatar);
+    return Container(
+      width: 40,
+      height: 40,
+      decoration: const BoxDecoration(
+        color: Color(0xFF6366F1), // Use a solid color instead of white24
+        shape: BoxShape.circle,
+      ),
+      child: ClipOval(
+        child: (avatarUrl != null && !avatarUrl.contains('/null') && !avatarUrl.endsWith('/'))
+            ? Image.network(
+                avatarUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => _buildAvatarPlaceholder(),
+                loadingBuilder: (context, child, loadingProgress) {
+                  if (loadingProgress == null) return child;
+                  return const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)));
+                },
+              )
+            : _buildAvatarPlaceholder(),
+      ),
+    );
+  }
+
+
+  Widget _buildAvatarPlaceholder() {
+    final initials = widget.otherUserName.isNotEmpty ? widget.otherUserName[0].toUpperCase() : '?';
+    return Center(
+      child: Text(
+        initials,
+        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+      ),
+    );
+  }
+
   Widget _buildMessageList(List<ChatMessage> messages, int currentUserId) {
     if (messages.isEmpty) return const SizedBox.shrink();
 
@@ -184,7 +214,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         return Column(
           children: [
             if (showDate) _buildDateHeader(message.createdAt),
-            _buildMessageBubble(message, isMe),
+            _buildMessageBubbleWithAvatar(message, isMe),
           ],
         );
       },
@@ -216,94 +246,138 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
+  Widget _buildMessageBubbleWithAvatar(ChatMessage message, bool isMe) {
+    return Row(
+      mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
+      crossAxisAlignment: CrossAxisAlignment.end,
+      children: [
+        if (!isMe) ...[
+          _buildMessageAvatar(message.senderAvatar, message.senderName),
+          const SizedBox(width: 4),
+        ],
+        _buildMessageBubble(message, isMe),
+      ],
+    );
+  }
+
+  Widget _buildMessageAvatar(String? avatar, String? name) {
+    final avatarUrl = ApiClient.getImageUrl(avatar);
+    return Container(
+      width: 28,
+      height: 28,
+      margin: const EdgeInsets.only(bottom: 4),
+      decoration: const BoxDecoration(
+        color: Color(0xFF6366F1),
+        shape: BoxShape.circle,
+      ),
+      child: ClipOval(
+        child: (avatarUrl != null && !avatarUrl.contains('/null') && !avatarUrl.endsWith('/'))
+            ? Image.network(
+                avatarUrl,
+                fit: BoxFit.cover,
+                errorBuilder: (context, error, stackTrace) => _buildSmallAvatarPlaceholder(name),
+              )
+            : _buildSmallAvatarPlaceholder(name),
+      ),
+    );
+  }
+
+
+  Widget _buildSmallAvatarPlaceholder(String? name) {
+    final initials = (name != null && name.isNotEmpty) ? name[0].toUpperCase() : '?';
+    return Center(
+      child: Text(
+        initials,
+        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+      ),
+    );
+  }
+
   Widget _buildMessageBubble(ChatMessage message, bool isMe) {
-    return Align(
-      alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 4),
-        padding: const EdgeInsets.all(4),
-        decoration: BoxDecoration(
-          color: isMe ? const Color(0xFFDCF8C6) : Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: const Radius.circular(12),
-            topRight: const Radius.circular(12),
-            bottomLeft: Radius.circular(isMe ? 12 : 0),
-            bottomRight: Radius.circular(isMe ? 0 : 12),
+    return Container(
+      margin: const EdgeInsets.only(bottom: 4),
+      padding: const EdgeInsets.all(4),
+      decoration: BoxDecoration(
+        color: isMe ? const Color(0xFFDCF8C6) : Colors.white,
+        borderRadius: BorderRadius.only(
+          topLeft: const Radius.circular(12),
+          topRight: const Radius.circular(12),
+          bottomLeft: Radius.circular(isMe ? 12 : 0),
+          bottomRight: Radius.circular(isMe ? 0 : 12),
+        ),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.05),
+            blurRadius: 1,
+            offset: const Offset(0, 1),
           ),
-          boxShadow: [
-            BoxShadow(
-              color: Colors.black.withOpacity(0.05),
-              blurRadius: 1,
-              offset: const Offset(0, 1),
+        ],
+      ),
+      constraints: BoxConstraints(
+        maxWidth: MediaQuery.of(context).size.width * 0.7,
+      ),
+      child: Stack(
+        children: [
+          Padding(
+            padding: EdgeInsets.only(
+              left: 8,
+              top: 4,
+              right: message.content.length < 20 ? 60 : 8,
+              bottom: 20,
             ),
-          ],
-        ),
-        constraints: BoxConstraints(
-          maxWidth: MediaQuery.of(context).size.width * 0.8,
-        ),
-        child: Stack(
-          children: [
-            Padding(
-              padding: EdgeInsets.only(
-                left: 8,
-                top: 4,
-                right: message.content.length < 20 ? 60 : 8,
-                bottom: 20,
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  if (message.imageUrl != null)
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 4),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(8),
-                        child: Image.network(
-                          ApiClient.getImageUrl(message.imageUrl!)!,
-                          fit: BoxFit.cover,
-                          loadingBuilder: (context, child, loadingProgress) {
-                            if (loadingProgress == null) return child;
-                            return Container(
-                              height: 200,
-                              width: double.infinity,
-                              color: Colors.grey[200],
-                              child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
-                            );
-                          },
-                        ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                if (message.imageUrl != null)
+                  Padding(
+                    padding: const EdgeInsets.only(bottom: 4),
+                    child: ClipRRect(
+                      borderRadius: BorderRadius.circular(8),
+                      child: Image.network(
+                        ApiClient.getImageUrl(message.imageUrl!)!,
+                        fit: BoxFit.cover,
+                        loadingBuilder: (context, child, loadingProgress) {
+                          if (loadingProgress == null) return child;
+                          return Container(
+                            height: 200,
+                            width: double.infinity,
+                            color: Colors.grey[200],
+                            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                          );
+                        },
                       ),
                     ),
-                  if (message.content.isNotEmpty)
-                    Text(
-                      message.content,
-                      style: const TextStyle(fontSize: 15, color: Color(0xFF111B21)),
-                    ),
-                ],
-              ),
-            ),
-            Positioned(
-              bottom: 4,
-              right: 8,
-              child: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  Text(
-                    DateFormat('hh:mm a').format(message.createdAt),
-                    style: TextStyle(color: Colors.grey[600], fontSize: 11),
                   ),
-                  if (isMe) ...[
-                    const SizedBox(width: 4),
-                    Icon(
-                      Icons.done_all,
-                      size: 16,
-                      color: message.isRead ? Colors.blue : Colors.grey,
-                    ),
-                  ],
-                ],
-              ),
+                if (message.content.isNotEmpty)
+                  Text(
+                    message.content,
+                    style: const TextStyle(fontSize: 15, color: Color(0xFF111B21)),
+                  ),
+              ],
             ),
-          ],
-        ),
+          ),
+          Positioned(
+            bottom: 4,
+            right: 8,
+            child: Row(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Text(
+                  DateFormat('hh:mm a').format(message.createdAt),
+                  style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                ),
+                if (isMe) ...[
+                  const SizedBox(width: 4),
+                  Icon(
+                    Icons.done_all,
+                    size: 16,
+                    color: message.isRead ? Colors.blue : Colors.grey,
+                  ),
+                ],
+              ],
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -327,18 +401,31 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       onPressed: () {},
                     ),
                     Expanded(
-                      child: TextField(
-                        controller: _messageController,
-                        decoration: const InputDecoration(
-                          hintText: 'Message',
-                          hintStyle: TextStyle(color: Color(0xFF8696A0)),
-                          border: InputBorder.none,
-                          contentPadding: EdgeInsets.symmetric(vertical: 10),
+                      child: RawKeyboardListener(
+                        focusNode: FocusNode(),
+                        onKey: (event) {
+                          if (event is RawKeyDownEvent && 
+                              event.logicalKey == LogicalKeyboardKey.enter && 
+                              !event.isShiftPressed) {
+                            _sendMessage();
+                          }
+                        },
+                        child: TextField(
+                          controller: _messageController,
+                          textInputAction: TextInputAction.send,
+                          onSubmitted: (_) => _sendMessage(),
+                          decoration: const InputDecoration(
+                            hintText: 'Message',
+                            hintStyle: TextStyle(color: Color(0xFF8696A0)),
+                            border: InputBorder.none,
+                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                          ),
+                          maxLines: 5,
+                          minLines: 1,
                         ),
-                        maxLines: 5,
-                        minLines: 1,
                       ),
                     ),
+
                     IconButton(
                       icon: const Icon(Icons.attach_file, color: Color(0xFF54656F)),
                       onPressed: _pickImage,

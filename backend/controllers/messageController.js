@@ -37,12 +37,13 @@ const sendMessage = async (req, res) => {
         }
 
         const messageId = await Message.create({
-            job_id,
+            job_id: parseInt(job_id),
             sender_id: req.user.id,
-            receiver_id,
+            receiver_id: parseInt(receiver_id),
             content: content || '',
             image_url
         });
+
 
         // Emit via Socket.io for real-time delivery to both parties
         const io = getIO();
