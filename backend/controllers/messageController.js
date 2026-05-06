@@ -1,5 +1,7 @@
 const Message = require('../models/messageModel');
 const { getIO } = require('../socketManager');
+const db = require('../config/db');
+
 
 
 const getMessages = async (req, res) => {
@@ -45,17 +47,24 @@ const sendMessage = async (req, res) => {
         });
 
 
+        // Fetch sender details for the socket payload
+        const [senderInfo] = await db.execute('SELECT full_name, avatar FROM users WHERE id = ?', [req.user.id]);
+        const sender = senderInfo[0];
+
         // Emit via Socket.io for real-time delivery to both parties
         const io = getIO();
         const payload = {
             id: messageId,
             job_id: parseInt(job_id),
             sender_id: req.user.id,
+            sender_name: sender.full_name,
+            sender_avatar: sender.avatar,
             receiver_id: parseInt(receiver_id),
             content: content || '',
             image_url,
             created_at: new Date()
         };
+
 
         io.to(`user_${receiver_id}`).emit('new_message', payload);
         io.to(`user_${req.user.id}`).emit('new_message', payload);
