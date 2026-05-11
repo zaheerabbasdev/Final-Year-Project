@@ -2,11 +2,10 @@ import 'package:flutter/foundation.dart' show kIsWeb;
 import 'package:flutter/material.dart' show debugPrint;
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
-import 'package:geocoding/geocoding.dart' as geocoding;
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
 /// All geocoding goes through our own backend proxy at /api/geocode
-/// This completely avoids CORS issues on Chrome/web.
+/// Now using Google Maps Platform APIs for 100% Google Maps functionality.
 const _kGeoProxyBase = 'http://localhost:5000/api/geocode';
 
 class LocationService {
@@ -48,7 +47,6 @@ class LocationService {
 
   // ─── Reverse geocode: lat/lng → human-readable address ────────────────────
   Future<String?> getAddressFromLatLng(double lat, double lng) async {
-    // 1) Try backend proxy (works on web + native, no CORS)
     try {
       final response = await _dio.get(
         '$_kGeoProxyBase/reverse',
@@ -56,77 +54,52 @@ class LocationService {
       );
 
       if (response.statusCode == 200 && response.data != null) {
-        final data = response.data as Map<String, dynamic>;
-        // display_name contains the full detailed address exactly as the user requested
-        final displayName = data['display_name'] as String?;
-        if (displayName != null && displayName.isNotEmpty) return displayName;
+        return response.data['display_name'] as String?;
       }
     } catch (e) {
-      debugPrint('Backend reverse geocode error: $e');
+      debugPrint('Google Reverse Geocode error: $e');
     }
-
-    // 2) Native-only fallback: platform geocoder
-    if (!kIsWeb) {
-      try {
-        final placemarks = await geocoding.placemarkFromCoordinates(lat, lng);
-        if (placemarks.isNotEmpty) {
-          final p = placemarks[0];
-          final parts = <String>[];
-          if ((p.street ?? '').isNotEmpty) parts.add(p.street!);
-          if ((p.subLocality ?? '').isNotEmpty) parts.add(p.subLocality!);
-          if ((p.locality ?? '').isNotEmpty) parts.add(p.locality!);
-          if ((p.administrativeArea ?? '').isNotEmpty) parts.add(p.administrativeArea!);
-          if ((p.country ?? '').isNotEmpty) parts.add(p.country!);
-          final seen = <String>{};
-          final unique = parts.where((e) => e.isNotEmpty && seen.add(e)).toList();
-          if (unique.isNotEmpty) return unique.join(', ');
-        }
-      } catch (e) {
-        debugPrint('Platform reverse geocode error: $e');
-      }
-    }
-
-    // Last resort: show coordinates
     return '${lat.toStringAsFixed(5)}, ${lng.toStringAsFixed(5)}';
   }
 
   // ─── Forward geocode: text query → LatLng ─────────────────────────────────
   Future<LatLng?> searchLocation(String query) async {
-    // 1) Try backend proxy (works on web + native, no CORS)
     try {
       final response = await _dio.get(
         '$_kGeoProxyBase/search',
-        queryParameters: {'q': query, 'limit': 1},
+        queryParameters: {'q': query},
+      );
+
+      if (response.statusCode == 200 && response.data != null) {
+        final data = response.data;
+        final lat = double.tryParse(data['lat'].toString());
+        final lng = double.tryParse(data['lng'].toString());
+        if (lat != null && lng != null) {
+          return LatLng(lat, lng);
+        }
+      }
+    } catch (e) {
+      debugPrint('Google Search error: $e');
+    }
+    return null;
+  }
+
+  // ─── Autocomplete suggestions as user types ───────────────────────────────
+  Future<List<Map<String, dynamic>>> getAutocomplete(String input) async {
+    if (input.isEmpty) return [];
+    try {
+      final response = await _dio.get(
+        '$_kGeoProxyBase/autocomplete',
+        queryParameters: {'input': input},
       );
 
       if (response.statusCode == 200 && response.data != null) {
         final results = response.data as List<dynamic>;
-        if (results.isNotEmpty) {
-          final first = results[0] as Map<String, dynamic>;
-          final lat = double.tryParse(first['lat'].toString());
-          final lng = double.tryParse(first['lon'].toString());
-          if (lat != null && lng != null) {
-            debugPrint('Geocode found: $lat, $lng for "$query"');
-            return LatLng(lat, lng);
-          }
-        }
+        return results.map((e) => e as Map<String, dynamic>).toList();
       }
     } catch (e) {
-      debugPrint('Backend search error: $e');
+      debugPrint('Google Autocomplete error: $e');
     }
-
-    // 2) Native-only fallback: platform geocoder
-    if (!kIsWeb) {
-      try {
-        final locations = await geocoding.locationFromAddress(query);
-        if (locations.isNotEmpty) {
-          return LatLng(locations[0].latitude, locations[0].longitude);
-        }
-      } catch (e) {
-        debugPrint('Platform search error: $e');
-      }
-    }
-
-    return null;
+    return [];
   }
 }

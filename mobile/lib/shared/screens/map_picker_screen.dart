@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../core/services/location_service.dart';
@@ -21,6 +22,8 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
   MapType _currentMapType = MapType.normal;
 
   final TextEditingController _searchController = TextEditingController();
+  List<Map<String, dynamic>> _suggestions = [];
+  Timer? _debounce;
   bool _isSearching = false;
 
   @override
@@ -30,21 +33,38 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
     if (_pickedLocation != null) {
       _fetchAddress(_pickedLocation!.latitude, _pickedLocation!.longitude);
     }
+    _searchController.addListener(_onSearchChanged);
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _mapController?.dispose();
+    _debounce?.cancel();
     super.dispose();
+  }
+
+  void _onSearchChanged() {
+    if (_debounce?.isActive ?? false) _debounce!.cancel();
+    _debounce = Timer(const Duration(milliseconds: 500), () {
+      if (_searchController.text.isNotEmpty) {
+        _getAutocomplete(_searchController.text);
+      } else {
+        setState(() => _suggestions = []);
+      }
+    });
+  }
+
+  Future<void> _getAutocomplete(String input) async {
+    final results = await _locationService.getAutocomplete(input);
+    if (mounted) {
+      setState(() => _suggestions = results);
+    }
   }
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
-    // Only auto-request location if no initial location was provided.
-    // On Chrome, we delay slightly so the map is fully ready before
-    // triggering the browser permission prompt — avoids a race condition
-    // where the prompt fires before the widget tree is stable.
     if (_pickedLocation == null) {
       Future.delayed(const Duration(milliseconds: 500), () {
         if (mounted) _getUserLocation();
@@ -57,7 +77,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
     final address = await _locationService.getAddressFromLatLng(lat, lng);
     if (mounted) {
       setState(() {
-        _currentAddress = address ?? '$lat, $lng';
+        _currentAddress = address;
         _isLoadingAddress = false;
       });
     }
@@ -69,19 +89,20 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
       final position = await _locationService.getCurrentLocation();
       if (position != null && mounted) {
         final newLoc = LatLng(position.latitude, position.longitude);
-        setState(() => _pickedLocation = newLoc);
+        setState(() {
+          _pickedLocation = newLoc;
+          _suggestions = [];
+        });
         _mapController?.animateCamera(CameraUpdate.newLatLngZoom(newLoc, 15));
         await _fetchAddress(newLoc.latitude, newLoc.longitude);
       }
     } catch (e) {
       if (mounted) {
-        final msg = e.toString().replaceFirst('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(msg),
+            content: Text(e.toString().replaceFirst('Exception: ', '')),
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
-            duration: const Duration(seconds: 5),
             action: SnackBarAction(
               label: 'Retry',
               textColor: Colors.white,
@@ -96,44 +117,43 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
   }
 
   Future<void> _onMapTapped(LatLng latLng) async {
-    setState(() => _pickedLocation = latLng);
+    setState(() {
+      _pickedLocation = latLng;
+      _suggestions = [];
+    });
     _mapController?.animateCamera(CameraUpdate.newLatLng(latLng));
     await _fetchAddress(latLng.latitude, latLng.longitude);
   }
 
-  Future<void> _searchLocation() async {
-    final query = _searchController.text.trim();
-    if (query.isEmpty) return;
-
-    setState(() => _isSearching = true);
+  Future<void> _selectSuggestion(Map<String, dynamic> suggestion) async {
+    final description = suggestion['description'] as String;
+    final lat = double.tryParse(suggestion['lat']?.toString() ?? '');
+    final lng = double.tryParse(suggestion['lng']?.toString() ?? '');
+    
+    _searchController.text = description;
+    setState(() {
+      _suggestions = [];
+    });
     FocusScope.of(context).unfocus();
 
-    try {
-      final result = await _locationService.searchLocation(query);
-      if (result != null && mounted) {
-        setState(() => _pickedLocation = result);
-        _mapController?.animateCamera(CameraUpdate.newLatLngZoom(result, 15));
-        await _fetchAddress(result.latitude, result.longitude);
-      } else if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Location not found. Try a different search term.'),
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
+    if (lat != null && lng != null) {
+      final newLoc = LatLng(lat, lng);
+      setState(() => _pickedLocation = newLoc);
+      _mapController?.animateCamera(CameraUpdate.newLatLngZoom(newLoc, 15));
+      await _fetchAddress(lat, lng);
+    } else {
+      // Fallback if coordinates are missing
+      setState(() => _isSearching = true);
+      try {
+        final result = await _locationService.searchLocation(description);
+        if (result != null && mounted) {
+          setState(() => _pickedLocation = result);
+          _mapController?.animateCamera(CameraUpdate.newLatLngZoom(result, 15));
+          await _fetchAddress(result.latitude, result.longitude);
+        }
+      } finally {
+        if (mounted) setState(() => _isSearching = false);
       }
-    } catch (e) {
-      if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('Search failed: ${e.toString()}'),
-            backgroundColor: Colors.red.shade600,
-            behavior: SnackBarBehavior.floating,
-          ),
-        );
-      }
-    } finally {
-      if (mounted) setState(() => _isSearching = false);
     }
   }
 
@@ -158,278 +178,293 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
         ),
         centerTitle: true,
       ),
-      body: Column(
+      body: Stack(
         children: [
-          // ─── Search Bar ───────────────────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-            child: Container(
-              decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(12),
-                border: Border.all(color: const Color(0xFF6366F1), width: 1.5),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withValues(alpha: 0.04),
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+          Column(
+            children: [
+              // ─── Search Bar ───────────────────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFF6366F1), width: 1.5),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.04),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      ),
+                    ],
                   ),
-                ],
-              ),
-              child: TextField(
-                controller: _searchController,
-                onSubmitted: (_) => _searchLocation(),
-                decoration: InputDecoration(
-                  hintText: 'Search',
-                  hintStyle: const TextStyle(
-                    color: Color(0xFF94A3B8),
-                    fontSize: 15,
-                  ),
-                  border: InputBorder.none,
-                  contentPadding: const EdgeInsets.symmetric(
-                    horizontal: 16,
-                    vertical: 14,
-                  ),
-                  suffixIcon: _isSearching
-                      ? const Padding(
-                          padding: EdgeInsets.all(12),
-                          child: SizedBox(
-                            width: 20,
-                            height: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2),
-                          ),
-                        )
-                      : IconButton(
-                          icon: const Icon(
-                            Icons.search,
-                            color: Color(0xFF64748B),
-                          ),
-                          onPressed: _searchLocation,
-                        ),
-                ),
-              ),
-            ),
-          ),
-
-          // ─── Use Current Location Link ────────────────────────────
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
-            child: Row(
-              children: [
-                GestureDetector(
-                  onTap: _isLoadingCurrentLocation ? null : _getUserLocation,
-                  child: Row(
-                    children: [
-                      _isLoadingCurrentLocation
-                          ? const SizedBox(
-                              width: 16,
-                              height: 16,
-                              child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1)),
+                  child: TextField(
+                    controller: _searchController,
+                    decoration: InputDecoration(
+                      hintText: 'Search for a place...',
+                      hintStyle: const TextStyle(
+                        color: Color(0xFF94A3B8),
+                        fontSize: 15,
+                      ),
+                      border: InputBorder.none,
+                      contentPadding: const EdgeInsets.symmetric(
+                        horizontal: 16,
+                        vertical: 14,
+                      ),
+                      suffixIcon: _isSearching
+                          ? const Padding(
+                              padding: EdgeInsets.all(12),
+                              child: SizedBox(
+                                width: 20,
+                                height: 20,
+                                child: CircularProgressIndicator(strokeWidth: 2),
+                              ),
                             )
                           : const Icon(
-                              Icons.my_location,
-                              size: 16,
-                              color: Color(0xFF6366F1),
+                              Icons.search,
+                              color: Color(0xFF64748B),
                             ),
-                      const SizedBox(width: 6),
+                    ),
+                  ),
+                ),
+              ),
+
+              // ─── Use Current Location Link ────────────────────────────
+              Padding(
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 0),
+                child: Row(
+                  children: [
+                    GestureDetector(
+                      onTap: _isLoadingCurrentLocation ? null : _getUserLocation,
+                      child: Row(
+                        children: [
+                          _isLoadingCurrentLocation
+                              ? const SizedBox(
+                                  width: 16,
+                                  height: 16,
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1)),
+                                )
+                              : const Icon(
+                                  Icons.my_location,
+                                  size: 16,
+                                  color: Color(0xFF6366F1),
+                                ),
+                          const SizedBox(width: 6),
+                          const Text(
+                            'Use Current Location',
+                            style: TextStyle(
+                              color: Color(0xFF6366F1),
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+
+              // ─── Address Display ──────────────────────────────────────
+              if (_pickedLocation != null)
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
                       const Text(
-                        'Use Current Location',
+                        'Address: ',
                         style: TextStyle(
-                          color: Color(0xFF6366F1),
-                          fontWeight: FontWeight.w600,
+                          fontWeight: FontWeight.bold,
                           fontSize: 14,
+                          color: Color(0xFF1E293B),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          _isLoadingAddress 
+                              ? 'Fetching address...' 
+                              : (_currentAddress ?? 'Determining location...'),
+                          style: const TextStyle(
+                            fontSize: 14,
+                            color: Color(0xFF475569),
+                            height: 1.4,
+                          ),
                         ),
                       ),
                     ],
                   ),
                 ),
-              ],
-            ),
+
+              const SizedBox(height: 10),
+
+              // ─── Map View ─────────────────────────────────────────────
+              Expanded(
+                child: Stack(
+                  children: [
+                    GoogleMap(
+                      initialCameraPosition: CameraPosition(
+                        target: _pickedLocation ?? const LatLng(33.6844, 73.0479),
+                        zoom: _pickedLocation != null ? 15 : 12,
+                      ),
+                      mapType: _currentMapType,
+                      onMapCreated: _onMapCreated,
+                      onTap: _onMapTapped,
+                      markers: _pickedLocation == null
+                          ? {}
+                          : {
+                              Marker(
+                                markerId: const MarkerId('picked'),
+                                position: _pickedLocation!,
+                                infoWindow: InfoWindow(
+                                  title: _currentAddress ?? 'Selected Location',
+                                ),
+                              ),
+                            },
+                      myLocationButtonEnabled: false,
+                      zoomControlsEnabled: false,
+                    ),
+
+                    // ─── Map / Satellite Toggle ───────────────────────
+                    Positioned(
+                      top: 12,
+                      left: 12,
+                      child: Container(
+                        decoration: BoxDecoration(
+                          color: Colors.white,
+                          borderRadius: BorderRadius.circular(8),
+                          boxShadow: [
+                            BoxShadow(
+                              color: Colors.black.withOpacity(0.12),
+                              blurRadius: 6,
+                              offset: const Offset(0, 2),
+                            ),
+                          ],
+                        ),
+                        child: Row(
+                          children: [
+                            _buildMapTypeButton('Map', MapType.normal),
+                            _buildMapTypeButton('Satellite', MapType.satellite),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                    // ─── My Location Button ────────────
+                    Positioned(
+                      bottom: 96,
+                      left: 16,
+                      child: GestureDetector(
+                        onTap: _isLoadingCurrentLocation ? null : _getUserLocation,
+                        child: Container(
+                          width: 48,
+                          height: 48,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            shape: BoxShape.circle,
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withOpacity(0.15),
+                                blurRadius: 8,
+                                offset: const Offset(0, 3),
+                              ),
+                            ],
+                          ),
+                          child: _isLoadingCurrentLocation
+                              ? const Padding(
+                                  padding: EdgeInsets.all(12),
+                                  child: CircularProgressIndicator(strokeWidth: 2),
+                                )
+                              : const Icon(
+                                  Icons.my_location,
+                                  color: Color(0xFF475569),
+                                  size: 24,
+                                ),
+                        ),
+                      ),
+                    ),
+
+                    // ─── Confirm Button ───────────────────
+                    Positioned(
+                      bottom: 24,
+                      right: 16,
+                      child: GestureDetector(
+                        onTap: _pickedLocation != null
+                            ? () => Navigator.pop(context, _pickedLocation)
+                            : null,
+                        child: AnimatedContainer(
+                          duration: const Duration(milliseconds: 200),
+                          width: 60,
+                          height: 60,
+                          decoration: BoxDecoration(
+                            color: _pickedLocation != null
+                                ? const Color(0xFF6366F1)
+                                : const Color(0xFFCBD5E1),
+                            shape: BoxShape.circle,
+                            boxShadow: _pickedLocation != null
+                                ? [
+                                    BoxShadow(
+                                      color: const Color(0xFF6366F1).withOpacity(0.4),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 6),
+                                    ),
+                                  ]
+                                : [],
+                          ),
+                          child: const Icon(
+                            Icons.done_all,
+                            color: Colors.white,
+                            size: 28,
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
           ),
 
-          // ─── Address Display ──────────────────────────────────────
-          if (_pickedLocation != null)
-            Padding(
-              padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
-              child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Text(
-                    'Address: ',
-                    style: TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
-                      color: Color(0xFF1E293B),
+          // ─── Autocomplete Suggestions Overlay ─────────────────────
+          if (_suggestions.isNotEmpty)
+            Positioned(
+              top: 65, // Below search bar
+              left: 16,
+              right: 16,
+              child: Container(
+                constraints: const BoxConstraints(maxHeight: 300),
+                decoration: BoxDecoration(
+                  color: Colors.white,
+                  borderRadius: BorderRadius.circular(12),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.15),
+                      blurRadius: 15,
+                      offset: const Offset(0, 8),
                     ),
-                  ),
-                  Expanded(
-                    child: Text(
-                        _isLoadingAddress 
-                            ? 'Fetching address...' 
-                            : (_currentAddress ?? '${_pickedLocation!.latitude.toStringAsFixed(5)}, ${_pickedLocation!.longitude.toStringAsFixed(5)}'),
-                        style: const TextStyle(
-                              fontSize: 14,
-                              color: Color(0xFF475569),
-                              height: 1.4,
-                            ),
-                          ),
-                  ),
-                ],
+                  ],
+                ),
+                child: ListView.separated(
+                  shrinkWrap: true,
+                  padding: EdgeInsets.zero,
+                  itemCount: _suggestions.length,
+                  separatorBuilder: (context, index) => const Divider(height: 1),
+                  itemBuilder: (context, index) {
+                    final suggestion = _suggestions[index];
+                    return ListTile(
+                      leading: const Icon(Icons.place, color: Color(0xFF64748B)),
+                      title: Text(
+                        suggestion['description'],
+                        style: const TextStyle(fontSize: 14),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      onTap: () => _selectSuggestion(suggestion),
+                    );
+                  },
+                ),
               ),
             ),
-
-          const SizedBox(height: 10),
-
-          // ─── Map View ─────────────────────────────────────────────
-          Expanded(
-            child: Stack(
-              children: [
-                GoogleMap(
-                  initialCameraPosition: CameraPosition(
-                    target: _pickedLocation ?? const LatLng(33.6844, 73.0479),
-                    zoom: _pickedLocation != null ? 15 : 12,
-                  ),
-                  mapType: _currentMapType,
-                  onMapCreated: _onMapCreated,
-                  onTap: _onMapTapped,
-                  markers: _pickedLocation == null
-                      ? {}
-                      : {
-                          Marker(
-                            markerId: const MarkerId('picked'),
-                            position: _pickedLocation!,
-                            infoWindow: InfoWindow(
-                              title: _currentAddress ?? 'Selected Location',
-                            ),
-                          ),
-                        },
-                  myLocationButtonEnabled: false,
-                  zoomControlsEnabled: false,
-                ),
-
-                // ─── Map / Satellite Toggle ───────────────────────
-                Positioned(
-                  top: 12,
-                  left: 12,
-                  child: Container(
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.12),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: Row(
-                      children: [
-                        _buildMapTypeButton('Map', MapType.normal),
-                        _buildMapTypeButton('Satellite', MapType.satellite),
-                      ],
-                    ),
-                  ),
-                ),
-
-                // ─── Expand icon (decorative) ─────────────────────
-                Positioned(
-                  top: 12,
-                  right: 12,
-                  child: Container(
-                    width: 36,
-                    height: 36,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withValues(alpha: 0.12),
-                          blurRadius: 6,
-                          offset: const Offset(0, 2),
-                        ),
-                      ],
-                    ),
-                    child: const Icon(
-                      Icons.fullscreen,
-                      size: 20,
-                      color: Color(0xFF475569),
-                    ),
-                  ),
-                ),
-
-                // ─── My Location Button (bottom-left) ────────────
-                Positioned(
-                  bottom: 96,
-                  left: 16,
-                  child: GestureDetector(
-                    onTap: _isLoadingCurrentLocation ? null : _getUserLocation,
-                    child: Container(
-                      width: 48,
-                      height: 48,
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        shape: BoxShape.circle,
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withValues(alpha: 0.15),
-                            blurRadius: 8,
-                            offset: const Offset(0, 3),
-                          ),
-                        ],
-                      ),
-                      child: _isLoadingCurrentLocation
-                          ? const Padding(
-                              padding: EdgeInsets.all(12),
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            )
-                          : const Icon(
-                              Icons.my_location,
-                              color: Color(0xFF475569),
-                              size: 24,
-                            ),
-                    ),
-                  ),
-                ),
-
-                // ─── Confirm FAB (bottom-right) ───────────────────
-                Positioned(
-                  bottom: 24,
-                  right: 16,
-                  child: GestureDetector(
-                    onTap: _pickedLocation != null
-                        ? () => Navigator.pop(context, _pickedLocation)
-                        : null,
-                    child: AnimatedContainer(
-                      duration: const Duration(milliseconds: 200),
-                      width: 60,
-                      height: 60,
-                      decoration: BoxDecoration(
-                        color: _pickedLocation != null
-                            ? const Color(0xFF6366F1)
-                            : const Color(0xFFCBD5E1),
-                        shape: BoxShape.circle,
-                        boxShadow: _pickedLocation != null
-                            ? [
-                                BoxShadow(
-                                  color: const Color(0xFF6366F1).withValues(alpha: 0.4),
-                                  blurRadius: 16,
-                                  offset: const Offset(0, 6),
-                                ),
-                              ]
-                            : [],
-                      ),
-                      child: const Icon(
-                        Icons.done_all,
-                        color: Colors.white,
-                        size: 28,
-                      ),
-                    ),
-                  ),
-                ),
-              ],
-            ),
-          ),
         ],
       ),
     );

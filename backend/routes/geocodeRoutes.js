@@ -6,35 +6,74 @@ const NOMINATIM = 'https://nominatim.openstreetmap.org';
 const HEADERS = {
   'User-Agent': 'ServiceHub-App/1.0 (contact@servicehub.com)',
   'Accept': 'application/json',
-  'Accept-Language': 'en-US,en;q=0.9',  // Force English results
+  'Accept-Language': 'en-US,en;q=0.9',
 };
 
-// ─── Forward search (text → lat/lng) ────────────────────────────────────────
+// ─── Autocomplete (Search as you type) ───────────────────────────────
+router.get('/autocomplete', async (req, res) => {
+  try {
+    const { input } = req.query;
+    if (!input) return res.status(400).json({ error: 'Missing input parameter' });
+
+    const { data } = await axios.get(`${NOMINATIM}/search`, {
+      headers: HEADERS,
+      params: {
+        q: input,
+        format: 'json',
+        addressdetails: 1,
+        limit: 5,
+        countrycodes: 'pk', // Bias to Pakistan
+      },
+    });
+
+    // Map Nominatim results to a common format
+    const predictions = data.map(item => ({
+      description: item.display_name,
+      place_id: item.place_id,
+      lat: item.lat,
+      lng: item.lon,
+    }));
+
+    res.json(predictions);
+  } catch (err) {
+    console.error('Autocomplete error:', err.message);
+    res.status(502).json({ error: 'Search service unavailable' });
+  }
+});
+
+// ─── Forward Search (Text → Lat/Lng) ─────────────────────────────
 router.get('/search', async (req, res) => {
   try {
-    const { q, limit = 5 } = req.query;
+    const { q } = req.query;
     if (!q) return res.status(400).json({ error: 'Missing query parameter q' });
 
     const { data } = await axios.get(`${NOMINATIM}/search`, {
       headers: HEADERS,
-      params: { 
-        q, 
-        format: 'json', 
-        addressdetails: 1, 
-        limit,
-        countrycodes: 'pk' // Bias results to Pakistan
+      params: {
+        q: q,
+        format: 'json',
+        limit: 1,
+        countrycodes: 'pk',
       },
-      timeout: 15000,
     });
 
-    res.json(data);
+    if (data && data.length > 0) {
+      const first = data[0];
+      res.json({
+        lat: first.lat,
+        lng: first.lon,
+        address: first.display_name,
+      });
+    } else {
+      res.status(404).json({ error: 'Location not found' });
+    }
   } catch (err) {
-    console.error('Geocode search error:', err.message);
-    res.status(502).json({ error: 'Geocoding service unavailable' });
+    console.error('Search error:', err.message);
+    res.status(502).json({ error: 'Search service unavailable' });
   }
 });
 
-// ─── Reverse geocode (lat/lng → address) ────────────────────────────────────
+// ─── Reverse Geocode (Lat/Lng → Address) ────────────────────────────────────
 router.get('/reverse', async (req, res) => {
   try {
     const { lat, lon } = req.query;
@@ -43,13 +82,18 @@ router.get('/reverse', async (req, res) => {
 
     const { data } = await axios.get(`${NOMINATIM}/reverse`, {
       headers: HEADERS,
-      params: { lat, lon, format: 'json', addressdetails: 1, zoom: 18 },
-      timeout: 15000,
+      params: { lat, lon, format: 'json', zoom: 18 },
     });
 
-    res.json(data);
+    if (data && data.display_name) {
+      res.json({
+        display_name: data.display_name,
+      });
+    } else {
+      res.status(404).json({ error: 'Address not found' });
+    }
   } catch (err) {
-    console.error('Reverse geocode error:', err.message);
+    console.error('Reverse Geocode error:', err.message);
     res.status(502).json({ error: 'Geocoding service unavailable' });
   }
 });
