@@ -41,8 +41,14 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
 
   void _onMapCreated(GoogleMapController controller) {
     _mapController = controller;
+    // Only auto-request location if no initial location was provided.
+    // On Chrome, we delay slightly so the map is fully ready before
+    // triggering the browser permission prompt — avoids a race condition
+    // where the prompt fires before the widget tree is stable.
     if (_pickedLocation == null) {
-      _getUserLocation();
+      Future.delayed(const Duration(milliseconds: 500), () {
+        if (mounted) _getUserLocation();
+      });
     }
   }
 
@@ -69,11 +75,18 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
       }
     } catch (e) {
       if (mounted) {
+        final msg = e.toString().replaceFirst('Exception: ', '');
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text(e.toString()),
+            content: Text(msg),
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
+            duration: const Duration(seconds: 5),
+            action: SnackBarAction(
+              label: 'Retry',
+              textColor: Colors.white,
+              onPressed: _getUserLocation,
+            ),
           ),
         );
       }
@@ -250,18 +263,11 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                     ),
                   ),
                   Expanded(
-                    child: _isLoadingAddress
-                        ? const Padding(
-                            padding: EdgeInsets.only(top: 2),
-                            child: SizedBox(
-                              height: 14,
-                              width: 14,
-                              child: CircularProgressIndicator(strokeWidth: 2),
-                            ),
-                          )
-                        : Text(
-                            _currentAddress ?? '${_pickedLocation!.latitude.toStringAsFixed(5)}, ${_pickedLocation!.longitude.toStringAsFixed(5)}',
-                            style: const TextStyle(
+                    child: Text(
+                        _isLoadingAddress 
+                            ? 'Fetching address...' 
+                            : (_currentAddress ?? '${_pickedLocation!.latitude.toStringAsFixed(5)}, ${_pickedLocation!.longitude.toStringAsFixed(5)}'),
+                        style: const TextStyle(
                               fontSize: 14,
                               color: Color(0xFF475569),
                               height: 1.4,

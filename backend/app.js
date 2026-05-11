@@ -15,6 +15,7 @@ const adminRoutes = require('./routes/adminRoutes');
 const reviewRoutes = require('./routes/reviewRoutes');
 const notificationRoutes = require('./routes/notificationRoutes');
 const messageRoutes = require('./routes/messageRoutes');
+const geocodeRoutes = require('./routes/geocodeRoutes');
 
 
 const http = require('http');
@@ -46,6 +47,7 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/reviews', reviewRoutes);
 app.use('/api/notifications', notificationRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/geocode', geocodeRoutes);
 
 
 app.get('/', (req, res) => {
