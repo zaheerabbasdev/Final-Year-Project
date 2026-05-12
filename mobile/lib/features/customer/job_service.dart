@@ -57,6 +57,8 @@ class JobService extends ChangeNotifier {
       return false;
     }
   }
+
+
   Future<Map<String, dynamic>?> getJobById(int id) async {
     try {
       final response = await _apiClient.dio.get('/jobs/$id');

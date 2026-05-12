@@ -273,17 +273,56 @@ class _SignupScreenState extends State<SignupScreen> {
                       _buildLabel('Service Category'),
                       Consumer<CategoryService>(
                         builder: (context, catService, _) {
+                          if (catService.isLoading) {
+                            return const Padding(
+                              padding: EdgeInsets.symmetric(vertical: 8.0),
+                              child: LinearProgressIndicator(
+                                backgroundColor: Color(0xFFF1F5F9),
+                                color: Color(0xFF6366F1),
+                              ),
+                            );
+                          }
+
+                          if (catService.categories.isEmpty) {
+                            return InkWell(
+                              onTap: () => catService.fetchCategories(),
+                              child: Container(
+                                padding: const EdgeInsets.all(16),
+                                decoration: BoxDecoration(
+                                  color: const Color(0xFFFEF2F2),
+                                  borderRadius: BorderRadius.circular(12),
+                                  border: Border.all(color: Colors.red.shade200),
+                                ),
+                                child: Row(
+                                  children: [
+                                    Icon(Icons.error_outline, color: Colors.red.shade600, size: 20),
+                                    const SizedBox(width: 12),
+                                    Expanded(
+                                      child: Text(
+                                        'No categories found. Tap to retry.',
+                                        style: TextStyle(color: Colors.red.shade800, fontSize: 13),
+                                      ),
+                                    ),
+                                    Icon(Icons.refresh, color: Colors.red.shade600, size: 20),
+                                  ],
+                                ),
+                              ),
+                            );
+                          }
+
                           return DropdownButtonFormField<int>(
                             value: _selectedCategoryId,
+                            isExpanded: true,
                             items: catService.categories.map((cat) {
                               return DropdownMenuItem<int>(
-                                value: cat['id'],
-                                child: Text(cat['name']),
+                                value: int.tryParse(cat['id'].toString()),
+                                child: Text(cat['name'].toString()),
                               );
                             }).toList(),
                             onChanged: (value) => setState(() => _selectedCategoryId = value),
                             decoration: const InputDecoration(
                               hintText: 'Select your service type',
+                              prefixIcon: Icon(Icons.category_outlined, size: 20),
                             ),
                             validator: (v) => _selectedRole == 'provider' && v == null ? 'Category is required' : null,
                           );

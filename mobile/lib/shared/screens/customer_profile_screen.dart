@@ -168,15 +168,19 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
             const Icon(Icons.verified, color: Color(0xFF10B981), size: 20),
             const SizedBox(width: 8),
             const Text(
-              'Verified Client',
+              'Verified',
               style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 16),
             const Icon(Icons.location_on, color: Color(0xFF94A3B8), size: 18),
             const SizedBox(width: 4),
-            Text(
-              _customer!['location'] ?? 'Location not set',
-              style: const TextStyle(color: Color(0xFF64748B)),
+            Expanded(
+              child: Text(
+                _customer!['location'] ?? 'Location not set',
+                style: const TextStyle(color: Color(0xFF64748B)),
+                overflow: TextOverflow.ellipsis,
+                maxLines: 1,
+              ),
             ),
           ],
         ),
@@ -240,8 +244,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     return Row(
       children: [
         Expanded(child: _buildStatCard('Jobs Posted', '5', Icons.post_add, const Color(0xFF6366F1))),
-        const SizedBox(width: 16),
-        Expanded(child: _buildStatCard('Hired Rate', '100%', Icons.handshake_outlined, const Color(0xFF10B981))),
       ],
     );
   }

@@ -29,7 +29,25 @@ initSocket(server);
 
 const suspendedCheck = require('./middleware/suspendedCheck');
 // ... (rest of middleware)
-app.use(cors());
+// Bulletproof CORS Middleware with Logging
+app.use((req, res, next) => {
+    const origin = req.headers.origin;
+    console.log(`[CORS] Request from Origin: ${origin}, Method: ${req.method}, Path: ${req.url}`);
+    
+    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization, Accept, Origin');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
+
+    // Handle Preflight
+    if (req.method === 'OPTIONS') {
+        console.log(`[CORS] Responding to Preflight for: ${req.url}`);
+        return res.status(200).end();
+    }
+    next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(suspendedCheck);

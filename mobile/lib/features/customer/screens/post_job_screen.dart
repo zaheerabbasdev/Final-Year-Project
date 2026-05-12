@@ -42,6 +42,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
     }
   }
 
+
+
   void _removeImage(int index) {
     setState(() {
       _images.removeAt(index);
@@ -105,7 +107,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
     if (result != null) {
       setState(() => _selectedLocationData = result);
-      // Try to get address
       final address = await _locationService.getAddressFromLatLng(result.latitude, result.longitude);
       if (address != null) {
         _locationController.text = address;
@@ -149,12 +150,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
           'Post a Job',
           style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold),
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.notifications_none, color: Color(0xFF1E293B)),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -166,6 +161,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
+                    const SizedBox(height: 8),
+
                     _buildSectionHeader('Job Title *'),
                     _buildTextField(_titleController, 'e.g., Fix Kitchen Sink Leak'),
                     const SizedBox(height: 24),
@@ -235,8 +232,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     _buildSectionHeader('Images (Optional)'),
                     _buildImageUpload(),
                     const SizedBox(height: 32),
-                    _buildTipsCard(),
-                    const SizedBox(height: 24),
                   ],
                 ),
               ),
@@ -278,6 +273,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     return DropdownButtonFormField<int>(
       value: _selectedCategoryId,
       decoration: const InputDecoration(hintText: 'Select a category'),
+      isExpanded: true,
       items: categories.map<DropdownMenuItem<int>>((cat) {
         return DropdownMenuItem<int>(value: cat['id'], child: Text(cat['name']));
       }).toList(),
@@ -379,41 +375,6 @@ class _PostJobScreenState extends State<PostJobScreen> {
     );
   }
 
-  Widget _buildTipsCard() {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: const Color(0xFFF0F9FF),
-        borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFBAE6FD)),
-      ),
-      child: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Container(
-            padding: const EdgeInsets.all(8),
-            decoration: const BoxDecoration(color: Color(0xFFE0F2FE), shape: BoxShape.circle),
-            child: const Icon(Icons.lightbulb_outline, color: Color(0xFF0EA5E9), size: 20),
-          ),
-          const SizedBox(width: 16),
-          Expanded(
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: const [
-                Text('Tips for better responses', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 14, color: Color(0xFF0C4A6E))),
-                SizedBox(height: 8),
-                Text('• Be specific about your requirements', style: TextStyle(fontSize: 12, color: Color(0xFF0C4A6E))),
-                Text('• Include relevant photos if possible', style: TextStyle(fontSize: 12, color: Color(0xFF0C4A6E))),
-                Text('• Set a realistic budget', style: TextStyle(fontSize: 12, color: Color(0xFF0C4A6E))),
-                Text('• Mention your preferred timeline', style: TextStyle(fontSize: 12, color: Color(0xFF0C4A6E))),
-              ],
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
   Widget _buildFooter() {
     return Container(
       padding: const EdgeInsets.all(24),
@@ -437,7 +398,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6366F1)),
-              child: _isLoading ? const CircularProgressIndicator(color: Colors.white) : const Text('Post Job'),
+              child: _isLoading 
+                ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)) 
+                : const Text('Post Job'),
             ),
           ),
         ],
