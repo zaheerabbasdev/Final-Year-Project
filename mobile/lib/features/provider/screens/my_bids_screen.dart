@@ -235,7 +235,8 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                       child: ElevatedButton.icon(
                         onPressed: () {
                           if (isTrackingThisJob) {
-                            trackingService.stopTracking();
+                            final socket = context.read<SocketService>();
+                            trackingService.stopTracking(socket: socket);
                           } else {
                             final socket = context.read<SocketService>();
                             final custId = bid['client_id'] ?? bid['customer_id'] ?? 0;
@@ -275,8 +276,9 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                       final messenger = ScaffoldMessenger.of(context);
                       // Stop location tracking if running for this job
                       final trackingService = context.read<LocationTrackingService>();
+                      final socket = context.read<SocketService>();
                       if (trackingService.isTracking && trackingService.activeJobId == bid['job_id']) {
-                        trackingService.stopTracking();
+                        trackingService.stopTracking(socket: socket);
                       }
                       final success = await context.read<BookingService>().markJobCompletedOrAwaiting(
                         bid['job_id'],

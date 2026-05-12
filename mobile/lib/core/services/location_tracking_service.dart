@@ -21,7 +21,10 @@ class LocationTrackingService extends ChangeNotifier {
     required int customerId,
     int intervalSeconds = 5,
   }) {
-    if (_isTracking) return;
+    if (_isTracking) {
+      debugPrint('[LocationTracking] Already tracking, returning');
+      return;
+    }
 
     _activeJobId = jobId;
     _activeCustomerId = customerId;
@@ -30,8 +33,10 @@ class LocationTrackingService extends ChangeNotifier {
 
     debugPrint('[LocationTracking] Started for job $jobId → customer $customerId');
 
-    // Emit immediately, then on a timer
+    // Emit immediately (socket should be ready at this point)
     _emitOnce(socket);
+    
+    // Then emit on a timer
     _timer = Timer.periodic(Duration(seconds: intervalSeconds), (_) {
       _emitOnce(socket);
     });
@@ -46,6 +51,10 @@ class LocationTrackingService extends ChangeNotifier {
         ),
       );
 
+      debugPrint(
+        '[LocationTracking] Emitting location: ${position.latitude}, ${position.longitude} for jobId: $_activeJobId, customerId: $_activeCustomerId',
+      );
+
       socket.emitLocationUpdate(
         jobId: _activeJobId!,
         customerId: _activeCustomerId!,
@@ -54,7 +63,7 @@ class LocationTrackingService extends ChangeNotifier {
       );
 
       debugPrint(
-        '[LocationTracking] Emitted: ${position.latitude}, ${position.longitude}',
+        '[LocationTracking] Emitted successfully',
       );
     } catch (e) {
       debugPrint('[LocationTracking] GPS error: $e');
@@ -62,7 +71,16 @@ class LocationTrackingService extends ChangeNotifier {
   }
 
   /// Stop streaming location.
-  void stopTracking() {
+  void stopTracking({SocketService? socket}) {
+    // Notify customer that location sharing has stopped
+    if (socket != null && _activeJobId != null && _activeCustomerId != null) {
+      socket.emitLocationStopped(
+        jobId: _activeJobId!,
+        customerId: _activeCustomerId!,
+      );
+      debugPrint('[LocationTracking] Sent location_stopped event to customer $_activeCustomerId');
+    }
+
     _timer?.cancel();
     _timer = null;
     _isTracking = false;

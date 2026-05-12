@@ -49,6 +49,16 @@ const initSocket = (server) => {
             console.log(`DEBUG: Location relayed to room ${room}`);
         });
 
+        socket.on('location_stopped', (data) => {
+            const { jobId, customerId } = data;
+            console.log(`DEBUG: location_stopped received. Job: ${jobId}, Customer: ${customerId}`);
+            const room = `user_${Math.floor(Number(customerId))}`;
+            io.to(room).emit('provider_location_stopped', {
+                jobId,
+            });
+            console.log(`DEBUG: Location stop signal relayed to room ${room}`);
+        });
+
         socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);
         });

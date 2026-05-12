@@ -10,6 +10,10 @@ class SocketService {
   final NotificationService _notificationService;
   final ChatProvider _chatProvider;
 
+  // Location tracking callbacks
+  Function(Map<String, dynamic>)? _onProviderLocation;
+  Function(Map<String, dynamic>)? _onProviderLocationStopped;
+
   SocketService(this._notificationService, this._chatProvider) {
     _chatProvider.onEmitTyping = (data) {
       _socket?.emit('typing', data);
@@ -72,7 +76,20 @@ class SocketService {
       _chatProvider.setOtherTyping(false, data['jobId']);
     });
 
+    // ─── Live Location Tracking Listeners ───────────────────────────────
+    _socket!.on('provider_location', (data) {
+      print('Provider location received: $data');
+      if (_onProviderLocation != null) {
+        _onProviderLocation!(data);
+      }
+    });
 
+    _socket!.on('provider_location_stopped', (data) {
+      print('Provider location stopped: $data');
+      if (_onProviderLocationStopped != null) {
+        _onProviderLocationStopped!(data);
+      }
+    });
 
     _socket!.onDisconnect((_) {
       print('Socket disconnected');
@@ -91,24 +108,47 @@ class SocketService {
     required double latitude,
     required double longitude,
   }) {
+    print('DEBUG: emitLocationUpdate - socket connected: ${_socket?.connected}');
+    print('DEBUG: emitLocationUpdate - jobId: $jobId, customerId: $customerId, lat: $latitude, lng: $longitude');
+    
     _socket?.emit('location_update', {
       'jobId': jobId,
       'customerId': customerId,
       'latitude': latitude,
       'longitude': longitude,
     });
+    
+    print('DEBUG: location_update event emitted');
+  }
+
+  /// Provider calls this to notify customer that location sharing has stopped.
+  void emitLocationStopped({
+    required int jobId,
+    required int customerId,
+  }) {
+    _socket?.emit('location_stopped', {
+      'jobId': jobId,
+      'customerId': customerId,
+    });
   }
 
   /// Customer calls this once to start listening for provider location.
   void listenProviderLocation(void Function(Map<String, dynamic>) onUpdate) {
-    _socket?.on('provider_location', (data) {
-      onUpdate(Map<String, dynamic>.from(data));
-    });
+    print('DEBUG: listenProviderLocation callback registered');
+    _onProviderLocation = onUpdate;
+  }
+
+  /// Customer calls this to listen for when provider stops sharing location.
+  void listenProviderLocationStopped(void Function(Map<String, dynamic>) onStop) {
+    print('DEBUG: listenProviderLocationStopped callback registered');
+    _onProviderLocationStopped = onStop;
   }
 
   /// Customer calls this to stop listening.
   void stopListeningProviderLocation() {
-    _socket?.off('provider_location');
+    print('DEBUG: stopListeningProviderLocation called');
+    _onProviderLocation = null;
+    _onProviderLocationStopped = null;
   }
 
   void disconnect() {

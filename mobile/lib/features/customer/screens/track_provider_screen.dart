@@ -27,6 +27,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
   GoogleMapController? _mapController;
   LatLng? _providerPosition;
   bool _isWaiting = true;
+  bool _locationStopped = false;
   late final AnimationController _pulseController;
 
   // Default center (will move to provider once first update arrives)
@@ -43,32 +44,69 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
     // Start listening for provider_location events
     final socket = context.read<SocketService>();
     socket.listenProviderLocation(_onLocationUpdate);
+    socket.listenProviderLocationStopped(_onLocationStopped);
   }
 
   void _onLocationUpdate(Map<String, dynamic> data) {
+    print('DEBUG: _onLocationUpdate called with data: $data');
+    
     final int? jobId = data['jobId'] is int
         ? data['jobId']
         : int.tryParse(data['jobId'].toString());
 
+    print('DEBUG: Parsed jobId: $jobId, Expected jobId: ${widget.jobId}');
+
     // Only process updates for THIS job
-    if (jobId != widget.jobId) return;
+    if (jobId != widget.jobId) {
+      print('DEBUG: JobId mismatch, ignoring update');
+      return;
+    }
 
     final double? lat = double.tryParse(data['latitude'].toString());
     final double? lng = double.tryParse(data['longitude'].toString());
 
-    if (lat == null || lng == null) return;
+    print('DEBUG: Parsed lat: $lat, lng: $lng');
+
+    if (lat == null || lng == null) {
+      print('DEBUG: Lat or lng is null, ignoring update');
+      return;
+    }
 
     final newPos = LatLng(lat, lng);
+
+    print('DEBUG: Updating UI with new position: ${newPos.latitude}, ${newPos.longitude}');
 
     setState(() {
       _providerPosition = newPos;
       _isWaiting = false;
+      _locationStopped = false;
     });
 
     // Animate camera to new position
     _mapController?.animateCamera(
       CameraUpdate.newLatLngZoom(newPos, 16),
     );
+  }
+
+  void _onLocationStopped(Map<String, dynamic> data) {
+    print('DEBUG: _onLocationStopped called with data: $data');
+    
+    final int? jobId = data['jobId'] is int
+        ? data['jobId']
+        : int.tryParse(data['jobId'].toString());
+
+    // Only process stops for THIS job
+    if (jobId != widget.jobId) {
+      print('DEBUG: JobId mismatch in _onLocationStopped, ignoring');
+      return;
+    }
+
+    print('DEBUG: Setting _locationStopped to true for jobId: $jobId');
+
+    setState(() {
+      _locationStopped = true;
+      _providerPosition = null;
+    });
   }
 
   @override
@@ -190,7 +228,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
           ),
 
           // ─── Waiting Overlay ────────────────────────────────────────────
-          if (_isWaiting)
+          if (_isWaiting || _locationStopped)
             Center(
               child: Container(
                 margin: const EdgeInsets.all(40),
@@ -209,41 +247,57 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
                   children: [
-                    AnimatedBuilder(
-                      animation: _pulseController,
-                      builder: (context, child) {
-                        return Transform.scale(
-                          scale: 1.0 + (_pulseController.value * 0.15),
-                          child: child,
-                        );
-                      },
-                      child: Container(
+                    if (!_locationStopped)
+                      AnimatedBuilder(
+                        animation: _pulseController,
+                        builder: (context, child) {
+                          return Transform.scale(
+                            scale: 1.0 + (_pulseController.value * 0.15),
+                            child: child,
+                          );
+                        },
+                        child: Container(
+                          padding: const EdgeInsets.all(20),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFF6366F1).withOpacity(0.1),
+                            shape: BoxShape.circle,
+                          ),
+                          child: const Icon(
+                            Icons.share_location,
+                            size: 40,
+                            color: Color(0xFF6366F1),
+                          ),
+                        ),
+                      )
+                    else
+                      Container(
                         padding: const EdgeInsets.all(20),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6366F1).withOpacity(0.1),
+                          color: const Color(0xFFEF4444).withOpacity(0.1),
                           shape: BoxShape.circle,
                         ),
                         child: const Icon(
-                          Icons.share_location,
+                          Icons.location_off,
                           size: 40,
-                          color: Color(0xFF6366F1),
+                          color: Color(0xFFEF4444),
                         ),
                       ),
-                    ),
                     const SizedBox(height: 24),
-                    const Text(
-                      'Waiting for Provider',
-                      style: TextStyle(
+                    Text(
+                      _locationStopped ? 'Location Sharing Stopped' : 'Waiting for Provider',
+                      style: const TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
                         color: Color(0xFF1E293B),
                       ),
                     ),
                     const SizedBox(height: 8),
-                    const Text(
-                      'The provider needs to enable\nlocation sharing from their app',
+                    Text(
+                      _locationStopped
+                          ? 'The provider has stopped\nsharing their location'
+                          : 'The provider needs to enable\nlocation sharing from their app',
                       textAlign: TextAlign.center,
-                      style: TextStyle(
+                      style: const TextStyle(
                         color: Color(0xFF64748B),
                         fontSize: 14,
                         height: 1.5,
