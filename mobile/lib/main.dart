@@ -39,6 +39,8 @@ import 'shared/providers/sync_provider.dart';
 
 
 import 'core/services/notification_service.dart';
+import 'core/services/location_tracking_service.dart';
+import 'features/customer/screens/track_provider_screen.dart';
 import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
@@ -60,6 +62,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => NotificationProvider()),
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
+        ChangeNotifierProvider(create: (_) => LocationTrackingService()),
 
         Provider(create: (_) => NotificationService()),
         ProxyProvider3<NotificationService, NotificationProvider, ChatProvider, SocketService>(
@@ -229,6 +232,18 @@ class _ServiceHubAppState extends State<ServiceHubApp> with WidgetsBindingObserv
               otherUserId: extra['otherUserId'],
               otherUserName: extra['otherUserName'],
               otherUserAvatar: extra['otherUserAvatar'],
+            );
+          },
+        ),
+        GoRoute(
+          path: '/track-provider',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return TrackProviderScreen(
+              jobId: extra['jobId'],
+              customerId: extra['customerId'],
+              providerId: extra['providerId'],
+              providerName: extra['providerName'],
             );
           },
         ),

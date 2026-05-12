@@ -82,6 +82,35 @@ class SocketService {
     _socket!.onError((err) => print('Socket Error: $err'));
   }
 
+  // ─── Live Location Tracking ─────────────────────────────────────────────
+
+  /// Provider calls this every N seconds while sharing location.
+  void emitLocationUpdate({
+    required int jobId,
+    required int customerId,
+    required double latitude,
+    required double longitude,
+  }) {
+    _socket?.emit('location_update', {
+      'jobId': jobId,
+      'customerId': customerId,
+      'latitude': latitude,
+      'longitude': longitude,
+    });
+  }
+
+  /// Customer calls this once to start listening for provider location.
+  void listenProviderLocation(void Function(Map<String, dynamic>) onUpdate) {
+    _socket?.on('provider_location', (data) {
+      onUpdate(Map<String, dynamic>.from(data));
+    });
+  }
+
+  /// Customer calls this to stop listening.
+  void stopListeningProviderLocation() {
+    _socket?.off('provider_location');
+  }
+
   void disconnect() {
     _socket?.disconnect();
     _socket = null;

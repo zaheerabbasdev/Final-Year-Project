@@ -5,6 +5,7 @@ import '../job_service.dart';
 import '../../../shared/services/booking_service.dart';
 import '../../../features/auth/auth_service.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../screens/track_provider_screen.dart';
 
 class MyJobsScreen extends StatelessWidget {
   const MyJobsScreen({super.key});
@@ -219,6 +220,36 @@ class _JobsListViewState extends State<_JobsListView> {
                         ),
                       ],
                     ),
+                    // ─── Track Live button for active jobs ─────────────────────
+                    if (status.toLowerCase() == 'active' && (job['booking_status'] as String?) != 'awaiting_confirmation') ...[
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        height: 48,
+                        child: ElevatedButton.icon(
+                          onPressed: () {
+                            final user = context.read<AuthService>().user;
+                            context.push('/track-provider', extra: {
+                              'jobId': job['id'],
+                              'customerId': user?['id'] ?? 0,
+                              'providerId': job['provider_id'] ?? 0,
+                              'providerName': job['provider_name'] ?? 'Service Provider',
+                            });
+                          },
+                          icon: const Icon(Icons.share_location, size: 18),
+                          label: const Text(
+                            'Track Live Location',
+                            style: TextStyle(fontWeight: FontWeight.bold, color: Colors.white),
+                          ),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFF6366F1),
+                            foregroundColor: Colors.white,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            elevation: 0,
+                          ),
+                        ),
+                      ),
+                    ],
                     if ((job['booking_status'] as String?) == 'awaiting_confirmation') ...[
                       const SizedBox(height: 16),
                       SizedBox(

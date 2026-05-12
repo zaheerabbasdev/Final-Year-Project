@@ -31,6 +31,7 @@ const Bid = {
                 b.*, 
                 j.title as job_title, 
                 j.status as job_status, 
+                j.customer_id as customer_id,
                 COALESCE(c.name, 'Other') as category_name 
              FROM bids b 
              JOIN jobs j ON b.job_id = j.id 

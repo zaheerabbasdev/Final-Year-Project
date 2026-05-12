@@ -101,7 +101,14 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     children: [
                       const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFF64748B)),
                       const SizedBox(width: 4),
-                      Text(_provider!['location'] ?? 'Location not specified', style: const TextStyle(color: Color(0xFF64748B), fontSize: 14)),
+                      Expanded(
+                        child: Text(
+                          _provider!['location'] ?? 'Location not specified',
+                          style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
                     ],
                   ),
                   const SizedBox(height: 32),

@@ -4,6 +4,8 @@ import '../../customer/job_service.dart';
 import '../../../shared/services/booking_service.dart';
 import '../../../core/api_client.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../../../core/services/socket_service.dart';
+import '../../../core/services/location_tracking_service.dart';
 
 class MyBidsScreen extends StatefulWidget {
   const MyBidsScreen({super.key});
@@ -223,12 +225,59 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
               ),
               if (status == 'accepted' && bid['job_status'] == 'active') ...[
                 const SizedBox(height: 20),
+                // ─── Share Location Toggle ───────────────────────────────
+                Consumer<LocationTrackingService>(
+                  builder: (context, trackingService, _) {
+                    final isTrackingThisJob = trackingService.isTracking && trackingService.activeJobId == bid['job_id'];
+                    return SizedBox(
+                      width: double.infinity,
+                      height: 48,
+                      child: ElevatedButton.icon(
+                        onPressed: () {
+                          if (isTrackingThisJob) {
+                            trackingService.stopTracking();
+                          } else {
+                            final socket = context.read<SocketService>();
+                            final custId = bid['client_id'] ?? bid['customer_id'] ?? 0;
+                            debugPrint('DEBUG: Starting location tracking for jobId: ${bid['job_id']}, customerId: $custId');
+                            trackingService.startTracking(
+                              socket,
+                              jobId: bid['job_id'],
+                              customerId: custId,
+                            );
+                          }
+                        },
+                        icon: Icon(
+                          isTrackingThisJob ? Icons.location_off : Icons.share_location,
+                          size: 18,
+                        ),
+                        label: Text(
+                          isTrackingThisJob ? 'Stop Sharing Location' : 'Share Live Location',
+                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 15),
+                        ),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: isTrackingThisJob ? const Color(0xFFEF4444) : const Color(0xFF6366F1),
+                          foregroundColor: Colors.white,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          elevation: 0,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+                const SizedBox(height: 12),
+                // ─── Mark Job as Done ────────────────────────────────────
                 SizedBox(
                   width: double.infinity,
                   height: 48,
                   child: ElevatedButton(
                     onPressed: () async {
                       final messenger = ScaffoldMessenger.of(context);
+                      // Stop location tracking if running for this job
+                      final trackingService = context.read<LocationTrackingService>();
+                      if (trackingService.isTracking && trackingService.activeJobId == bid['job_id']) {
+                        trackingService.stopTracking();
+                      }
                       final success = await context.read<BookingService>().markJobCompletedOrAwaiting(
                         bid['job_id'],
                         'awaiting_confirmation',

@@ -35,6 +35,20 @@ const initSocket = (server) => {
         });
 
 
+        // ─── Live Location Tracking ───────────────────────────────────────
+        // Provider emits location_update → backend relays to customer room
+        socket.on('location_update', (data) => {
+            const { jobId, customerId, latitude, longitude } = data;
+            console.log(`DEBUG: location_update received. Job: ${jobId}, Customer: ${customerId}, Lat: ${latitude}, Lng: ${longitude}`);
+            const room = `user_${Math.floor(Number(customerId))}`;
+            io.to(room).emit('provider_location', {
+                jobId,
+                latitude,
+                longitude,
+            });
+            console.log(`DEBUG: Location relayed to room ${room}`);
+        });
+
         socket.on('disconnect', () => {
             console.log('User disconnected:', socket.id);
         });
