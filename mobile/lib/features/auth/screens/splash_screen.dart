@@ -39,10 +39,15 @@ class _SplashScreenState extends State<SplashScreen> {
                   ),
                 ],
               ),
-              child: const Icon(
-                Icons.business_center_rounded,
-                size: 60,
-                color: Color(0xFF6366F1),
+              child: Image.asset(
+                'assets/images/Splash.png',
+                height: 80,
+                width: 80,
+                errorBuilder: (context, error, stackTrace) => const Icon(
+                  Icons.business_center_rounded,
+                  size: 60,
+                  color: Color(0xFF6366F1),
+                ),
               ),
             ),
             const SizedBox(height: 32),

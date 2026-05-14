@@ -12,11 +12,13 @@ class AuthService extends ChangeNotifier {
   }
   bool _isAuthenticated = false;
   bool _isInitialized = false;
+  bool _isFirstTime = true;
   String? _role;
   Map<String, dynamic>? _user;
 
   bool get isAuthenticated => _isAuthenticated;
   bool get isInitialized => _isInitialized;
+  bool get isFirstTime => _isFirstTime;
   String? get role => _role;
   Map<String, dynamic>? get user => _user;
 
@@ -24,6 +26,7 @@ class AuthService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
     final role = prefs.getString('role');
+    _isFirstTime = prefs.getBool('isFirstTime') ?? true;
     
     if (token != null) {
       _isAuthenticated = true;
@@ -199,6 +202,13 @@ class AuthService extends ChangeNotifier {
       print('Error updating profile: $e');
     }
     return false;
+  }
+
+  Future<void> completeOnboarding() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isFirstTime', false);
+    _isFirstTime = false;
+    notifyListeners();
   }
 
   Future<void> logout() async {

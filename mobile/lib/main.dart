@@ -142,6 +142,7 @@ class _ServiceHubAppState extends State<ServiceHubApp> with WidgetsBindingObserv
       redirect: (context, state) {
         final bool isInitialized = authService.isInitialized;
         final bool isAuthenticated = authService.isAuthenticated;
+        final bool isFirstTime = authService.isFirstTime;
         
         final bool isSplash = state.matchedLocation == '/splash';
         final bool isAuthRoute = state.matchedLocation == '/login' || 
@@ -152,13 +153,15 @@ class _ServiceHubAppState extends State<ServiceHubApp> with WidgetsBindingObserv
         if (!isInitialized && !isSplash) return '/splash';
 
         if (isSplash && isInitialized) {
-          return isAuthenticated ? '/main' : '/login';
+          if (isAuthenticated) return '/main';
+          if (isFirstTime) return '/onboarding';
+          return '/login';
         }
 
         if (isAuthenticated && isAuthRoute) return '/main';
 
         if (!isAuthenticated && !isAuthRoute && !isSplash && state.matchedLocation != '/forgot-password') {
-          return '/login';
+          return isFirstTime ? '/onboarding' : '/login';
         }
 
         return null;
