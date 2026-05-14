@@ -10,7 +10,11 @@ const placeBid = async (req, res) => {
         // check if job is open
         const job = await Job.findById(job_id);
         if (!job) return res.status(404).json({ message: 'Job not found' });
-        if (job.status !== 'open') return res.status(400).json({ message: 'This job is no longer open for bidding. A bid has already been accepted.' });
+        if (job.status !== 'open') return res.status(400).json({ message: 'This job is no longer open for bidding.' });
+
+        if (job.is_emergency) {
+            return res.status(400).json({ message: 'This is an emergency job. Please use the "Accept Instantly" option instead of bidding.' });
+        }
 
         // check if provider already placed a bid on this job
         const existingBid = await Bid.findByJobAndProvider(job_id, req.user.id);

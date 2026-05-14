@@ -22,6 +22,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   List<dynamic> _bids = [];
   bool _isLoading = true;
 
+  bool _checkIsEmergency(dynamic val) {
+    if (val == null) return false;
+    if (val is bool) return val;
+    if (val is int) return val == 1;
+    final str = val.toString().toLowerCase();
+    return str == '1' || str == 'true';
+  }
+
   @override
   void initState() {
     super.initState();
@@ -42,6 +50,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     }
 
     if (mounted) {
+      print('DEBUG: Job Detail Data: $job');
       setState(() {
         _job = job;
         _booking = booking;
@@ -118,6 +127,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       buttonText = 'Job No Longer Open';
       buttonColor = const Color(0xFF94A3B8);
       isButtonEnabled = false;
+    } else if (_checkIsEmergency(_job?['is_emergency'])) {
+      buttonText = 'Accept Instantly';
+      buttonColor = const Color(0xFFB91C1C);
+      isButtonEnabled = true;
     }
     return Scaffold(
       backgroundColor: const Color(0xFFF8FAFC),
@@ -171,6 +184,28 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           style: const TextStyle(color: Color(0xFF6366F1), fontSize: 10, fontWeight: FontWeight.bold),
                         ),
                       ),
+                      if (_checkIsEmergency(_job?['is_emergency'])) ...[
+                        const SizedBox(width: 8),
+                        Container(
+                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                          decoration: BoxDecoration(
+                            color: const Color(0xFFFEF2F2),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(color: const Color(0xFFFEE2E2)),
+                          ),
+                          child: const Row(
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              Icon(Icons.bolt, color: Color(0xFFB91C1C), size: 14),
+                              SizedBox(width: 4),
+                              Text(
+                                'EMERGENCY',
+                                style: TextStyle(color: Color(0xFFB91C1C), fontSize: 10, fontWeight: FontWeight.bold),
+                              ),
+                            ],
+                          ),
+                        ),
+                      ],
                     ],
                   ),
                   const SizedBox(height: 12),
@@ -229,6 +264,38 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ),
             const SizedBox(height: 24),
+            if (_checkIsEmergency(_job?['is_emergency']))
+              Container(
+                width: double.infinity,
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFFFEF2F2),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFFFEE2E2)),
+                ),
+                child: const Row(
+                  children: [
+                    Icon(Icons.bolt, color: Color(0xFFB91C1C), size: 32),
+                    SizedBox(width: 16),
+                    Expanded(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Text(
+                            'EMERGENCY REQUEST',
+                            style: TextStyle(color: Color(0xFFB91C1C), fontWeight: FontWeight.bold, fontSize: 16),
+                          ),
+                          Text(
+                            'This client needs help immediately. Accept this job to start right away without bidding.',
+                            style: TextStyle(color: Color(0xFF7F1D1D), fontSize: 13),
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
+                ),
+              ),
             if (_job?['latitude'] != null && _job?['longitude'] != null)
               _buildProviderDetailSection('Job Location', _buildMapCard(
                 double.parse(_job!['latitude'].toString()),
@@ -300,7 +367,37 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
-                onPressed: isButtonEnabled ? () => context.push('/place-bid/${widget.jobId}') : null,
+                onPressed: isButtonEnabled 
+                  ? () async {
+                      if (_checkIsEmergency(_job?['is_emergency'])) {
+                        final confirm = await showDialog<bool>(
+                          context: context,
+                          builder: (context) => AlertDialog(
+                            title: const Text('Accept Emergency Job?'),
+                            content: const Text('By accepting this emergency request, you agree to arrive at the customer\'s location as soon as possible.'),
+                            actions: [
+                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                              ElevatedButton(
+                                onPressed: () => Navigator.pop(context, true),
+                                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFB91C1C)),
+                                child: const Text('Accept Now'),
+                              ),
+                            ],
+                          ),
+                        );
+                        
+                        if (confirm == true) {
+                          final success = await context.read<JobService>().expressAccept(widget.jobId);
+                          if (success) {
+                            _loadData();
+                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('You have accepted the job!')));
+                          }
+                        }
+                      } else {
+                        context.push('/place-bid/${widget.jobId}');
+                      }
+                    }
+                  : null,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: isButtonEnabled ? buttonColor : const Color(0xFFE2E8F0),
                   foregroundColor: isButtonEnabled ? Colors.white : const Color(0xFF94A3B8),

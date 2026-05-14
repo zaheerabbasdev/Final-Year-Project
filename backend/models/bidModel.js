@@ -28,7 +28,7 @@ const Bid = {
     findByProviderId: async (providerId) => {
         const [rows] = await db.execute(
             `SELECT 
-                b.*, 
+                b.id, b.job_id, b.provider_id, b.amount, b.estimated_time, b.cover_letter, b.status, b.created_at,
                 j.title as job_title, 
                 j.status as job_status, 
                 j.customer_id as customer_id,
@@ -37,8 +37,22 @@ const Bid = {
              JOIN jobs j ON b.job_id = j.id 
              LEFT JOIN categories c ON j.category_id = c.id 
              WHERE b.provider_id = ? 
-             ORDER BY b.created_at DESC`,
-            [providerId]
+             
+             UNION ALL
+             
+             SELECT 
+                NULL as id, bk.job_id, bk.provider_id, j.budget as amount, 'Instant' as estimated_time, 'Emergency Express Hire' as cover_letter, 'accepted' as status, bk.created_at,
+                j.title as job_title, 
+                j.status as job_status, 
+                j.customer_id as customer_id,
+                COALESCE(c.name, 'Other') as category_name 
+             FROM bookings bk
+             JOIN jobs j ON bk.job_id = j.id 
+             LEFT JOIN categories c ON j.category_id = c.id 
+             WHERE bk.provider_id = ? AND bk.bid_id IS NULL
+             
+             ORDER BY created_at DESC`,
+            [providerId, providerId]
         );
         return rows;
     },

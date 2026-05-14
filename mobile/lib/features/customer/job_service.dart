@@ -114,4 +114,17 @@ class JobService extends ChangeNotifier {
       return false;
     }
   }
+
+  Future<bool> expressAccept(int jobId) async {
+    try {
+      final response = await _apiClient.dio.post('/jobs/$jobId/express-accept');
+      if (response.statusCode == 200) {
+        await fetchJobs();
+        return true;
+      }
+    } catch (e) {
+      print('Error in express hire: $e');
+    }
+    return false;
+  }
 }

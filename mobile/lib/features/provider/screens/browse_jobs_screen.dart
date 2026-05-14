@@ -23,6 +23,14 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   bool _isLocating = false;
   final LocationService _locationService = LocationService();
 
+  bool _checkIsEmergency(dynamic val) {
+    if (val == null) return false;
+    if (val is bool) return val;
+    if (val is int) return val == 1;
+    final str = val.toString().toLowerCase();
+    return str == '1' || str == 'true';
+  }
+
   void _onSearchChanged(String query) {
     if (_debounce?.isActive ?? false) _debounce!.cancel();
     _debounce = Timer(const Duration(milliseconds: 500), () {
@@ -338,9 +346,36 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            job['title'] ?? 'Job Title',
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Expanded(
+                child: Text(
+                  job['title'] ?? 'Job Title',
+                  style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                ),
+              ),
+              if (_checkIsEmergency(job['is_emergency']))
+                Container(
+                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: const Color(0xFFFEF2F2),
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: const Color(0xFFFEE2E2)),
+                  ),
+                  child: const Row(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      Icon(Icons.bolt, color: Color(0xFFB91C1C), size: 14),
+                      SizedBox(width: 4),
+                      Text(
+                        'EMERGENCY',
+                        style: TextStyle(color: Color(0xFFB91C1C), fontSize: 10, fontWeight: FontWeight.bold),
+                      ),
+                    ],
+                  ),
+                ),
+            ],
           ),
           const SizedBox(height: 8),
           Text(
@@ -416,10 +451,10 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
               ElevatedButton(
                 onPressed: () => context.push('/job-detail/${job['id']}'),
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
+                  backgroundColor: _checkIsEmergency(job['is_emergency']) ? const Color(0xFFB91C1C) : const Color(0xFF6366F1),
                   minimumSize: const Size(120, 48),
                 ),
-                child: const Text('Place Bid'),
+                child: Text(_checkIsEmergency(job['is_emergency']) ? 'Accept Instantly' : 'Place Bid'),
               ),
             ],
           ),

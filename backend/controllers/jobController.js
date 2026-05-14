@@ -1,6 +1,7 @@
 const Job = require('../models/jobModel');
 const User = require('../models/userModel');
 const ProviderProfile = require('../models/providerModel');
+const Booking = require('../models/bookingModel');
 const { createNotification } = require('../services/notificationService');
 
 // ... rest of imports if any ...
@@ -8,6 +9,7 @@ const { createNotification } = require('../services/notificationService');
 const createJob = async (req, res) => {
     try {
         const jobData = { ...req.body, customer_id: req.user.id };
+        console.log('DEBUG: Received jobData:', JSON.stringify(jobData, null, 2));
 
         // Sanitize formData string "null" values
         ['category_id', 'budget', 'location', 'preferred_date', 'preferred_time', 'latitude', 'longitude'].forEach(field => {
@@ -16,9 +18,14 @@ const createJob = async (req, res) => {
             }
         });
 
-        // Convert is_negotiable from string to boolean if it came from FormData
-        if (jobData.is_negotiable === 'true') jobData.is_negotiable = true;
-        if (jobData.is_negotiable === 'false') jobData.is_negotiable = false;
+        // Convert booleans from string or number if it came from FormData
+        ['is_negotiable', 'is_emergency'].forEach(field => {
+            if (jobData[field] === 'true' || jobData[field] === '1' || jobData[field] === 1) {
+                jobData[field] = true;
+            } else if (jobData[field] === 'false' || jobData[field] === '0' || jobData[field] === 0) {
+                jobData[field] = false;
+            }
+        });
 
         // If images were uploaded, add them to jobData
         if (req.files) {
@@ -37,9 +44,11 @@ const createJob = async (req, res) => {
                     console.log(`DEBUG: Sending notification to provider user_id: ${p.user_id}`);
                     await createNotification(
                         p.user_id,
-                        'New Job Opportunity',
-                        `A new job matching your skill was posted: "${jobData.title}"`,
-                        'new_job_posted'
+                        jobData.is_emergency ? '⚠️ EMERGENCY JOB' : 'New Job Opportunity',
+                        jobData.is_emergency 
+                            ? `URGENT: A new emergency job was posted: "${jobData.title}". Accept now!`
+                            : `A new job matching your skill was posted: "${jobData.title}"`,
+                        jobData.is_emergency ? 'emergency_job_posted' : 'new_job_posted'
                     );
                 }
             } catch (notifError) {
@@ -127,4 +136,46 @@ const getMyJobs = async (req, res) => {
     }
 };
 
-module.exports = { createJob, getJobs, getJobById, updateJob, deleteJob, getMyJobs };
+const expressAccept = async (req, res) => {
+    try {
+        const jobId = req.params.id;
+        const providerId = req.user.id;
+
+        const job = await Job.findById(jobId);
+        if (!job) return res.status(404).json({ message: 'Job not found' });
+        
+        if (!job.is_emergency) {
+            return res.status(400).json({ message: 'Only emergency jobs can be accepted instantly' });
+        }
+
+        if (job.status !== 'open') {
+            return res.status(400).json({ message: 'Job is already taken or closed' });
+        }
+
+        // Create Booking immediately
+        const bookingId = await Booking.create({
+            job_id: jobId,
+            provider_id: providerId,
+            customer_id: job.customer_id,
+            status: 'confirmed'
+        });
+
+        // Update Job Status
+        await Job.update(jobId, { status: 'active' });
+
+        // Notify Customer
+        await createNotification(
+            job.customer_id,
+            'Job Accepted Instantly!',
+            `A provider has accepted your emergency request: "${job.title}". They are on their way!`,
+            'emergency_job_accepted'
+        );
+
+        res.json({ message: 'You have accepted the emergency job!', bookingId });
+    } catch (error) {
+        console.error("DEBUG expressAccept error:", error);
+        res.status(500).json({ message: 'Error accepting job' });
+    }
+};
+
+module.exports = { createJob, getJobs, getJobById, updateJob, deleteJob, getMyJobs, expressAccept };

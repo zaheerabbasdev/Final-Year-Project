@@ -31,6 +31,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   final LocationService _locationService = LocationService();
   bool _isLoading = false;
   bool _isNegotiable = false;
+  bool _isEmergency = false;
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _pickImages() async {
@@ -57,7 +58,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     }
 
     setState(() => _isLoading = true);
-    final success = await context.read<JobService>().createJob({
+    final jobData = {
       'title': _titleController.text,
       'description': _descController.text,
       'category_id': _selectedCategoryId,
@@ -68,7 +69,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
       'preferred_date': _selectedDate != null ? DateFormat('yyyy-MM-dd').format(_selectedDate!) : null,
       'preferred_time': _selectedTime != null ? '${_selectedTime!.hour.toString().padLeft(2, '0')}:${_selectedTime!.minute.toString().padLeft(2, '0')}' : null,
       'is_negotiable': _isNegotiable,
-    }, _images);
+      'is_emergency': _isEmergency,
+    };
+    print('DEBUG: Sending Job Data: $jobData');
+    final success = await context.read<JobService>().createJob(jobData, _images);
     setState(() => _isLoading = false);
 
     if (success) {
@@ -181,6 +185,49 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       value: _isNegotiable,
                       activeColor: const Color(0xFF6366F1),
                       onChanged: (v) => setState(() => _isNegotiable = v),
+                    ),
+                    const SizedBox(height: 12),
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      decoration: BoxDecoration(
+                        color: _isEmergency ? const Color(0xFFFEF2F2) : const Color(0xFFF8FAFC),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: _isEmergency ? const Color(0xFFFEE2E2) : const Color(0xFFE2E8F0)),
+                      ),
+                      child: Column(
+                        children: [
+                          SwitchListTile(
+                            contentPadding: EdgeInsets.zero,
+                            title: const Text('EMERGENCY / EXPRESS HIRE', style: TextStyle(fontSize: 14, fontWeight: FontWeight.bold, color: Color(0xFFB91C1C))),
+                            subtitle: const Text('Skip bidding. The first provider to accept will be hired immediately.', style: TextStyle(fontSize: 12, color: Color(0xFF7F1D1D))),
+                            secondary: Icon(Icons.bolt, color: _isEmergency ? const Color(0xFFB91C1C) : const Color(0xFF94A3B8)),
+                            value: _isEmergency,
+                            activeColor: const Color(0xFFB91C1C),
+                            onChanged: (v) => setState(() => _isEmergency = v),
+                          ),
+                          if (_isEmergency)
+                            Container(
+                              padding: const EdgeInsets.all(12),
+                              margin: const EdgeInsets.only(top: 12),
+                              decoration: BoxDecoration(
+                                color: Colors.white.withOpacity(0.5),
+                                borderRadius: BorderRadius.circular(12),
+                              ),
+                              child: const Row(
+                                children: [
+                                  Icon(Icons.info_outline, size: 16, color: Color(0xFFB91C1C)),
+                                  SizedBox(width: 8),
+                                  Expanded(
+                                    child: Text(
+                                      'Bidding is skipped. First responder is hired!',
+                                      style: TextStyle(fontSize: 12, color: Color(0xFFB91C1C), fontWeight: FontWeight.bold),
+                                    ),
+                                  ),
+                                ],
+                              ),
+                            ),
+                        ],
+                      ),
                     ),
                     const SizedBox(height: 24),
                     _buildSectionHeader('Location *'),

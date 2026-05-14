@@ -2,9 +2,10 @@ const db = require('../config/db');
 
 const Job = {
     create: async (jobData) => {
-        const { customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images, latitude, longitude, is_negotiable } = jobData;
+        const { customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images, latitude, longitude, is_negotiable, is_emergency } = jobData;
+        console.log('DEBUG: Job.create - is_emergency value:', is_emergency, 'Type:', typeof is_emergency);
         const [result] = await db.execute(
-            'INSERT INTO jobs (customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images, latitude, longitude, is_negotiable) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            'INSERT INTO jobs (customer_id, title, description, category_id, budget, location, preferred_date, preferred_time, images, latitude, longitude, is_negotiable, is_emergency) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)',
             [
                 customer_id || null, 
                 title || null, 
@@ -17,7 +18,8 @@ const Job = {
                 JSON.stringify(images || []),
                 latitude || null,
                 longitude || null,
-                is_negotiable ? 1 : 0
+                is_negotiable ? 1 : 0,
+                is_emergency ? 1 : 0
             ]
         );
         return result.insertId;

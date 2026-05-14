@@ -3,9 +3,20 @@ const db = require('../config/db');
 const Booking = {
     create: async (bookingData) => {
         const { job_id, bid_id, customer_id, provider_id } = bookingData;
+        console.log('DEBUG: Booking.create - Values:', { job_id, bid_id, customer_id, provider_id });
+        
+        const params = [
+            job_id || null, 
+            bid_id || null, 
+            customer_id || null, 
+            provider_id || null
+        ];
+        
+        console.log('DEBUG: Booking.create - Params:', params);
+
         const [result] = await db.execute(
             'INSERT INTO bookings (job_id, bid_id, customer_id, provider_id) VALUES (?, ?, ?, ?)',
-            [job_id, bid_id, customer_id, provider_id]
+            params
         );
         return result.insertId;
     },
