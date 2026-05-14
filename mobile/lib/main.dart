@@ -29,6 +29,7 @@ import 'shared/screens/profile_screen.dart';
 import 'shared/screens/provider_profile_screen.dart';
 import 'shared/screens/customer_profile_screen.dart';
 import 'shared/screens/submit_review_screen.dart';
+import 'shared/screens/qr_handshake_screen.dart';
 import 'features/notifications/notification_screen.dart';
 import 'features/notifications/notification_provider.dart';
 import 'core/services/socket_service.dart';
@@ -40,6 +41,7 @@ import 'shared/providers/sync_provider.dart';
 
 import 'core/services/notification_service.dart';
 import 'core/services/location_tracking_service.dart';
+import 'core/services/handshake_service.dart';
 import 'features/customer/screens/track_provider_screen.dart';
 import 'package:flutter_config/flutter_config.dart';
 
@@ -63,6 +65,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => ChatProvider()),
         ChangeNotifierProvider(create: (_) => SyncProvider()),
         ChangeNotifierProvider(create: (_) => LocationTrackingService()),
+        ChangeNotifierProvider(create: (_) => HandshakeService()),
 
         Provider(create: (_) => NotificationService()),
         ProxyProvider3<NotificationService, NotificationProvider, ChatProvider, SocketService>(
@@ -250,7 +253,16 @@ class _ServiceHubAppState extends State<ServiceHubApp> with WidgetsBindingObserv
             );
           },
         ),
-
+        GoRoute(
+          path: '/handshake',
+          builder: (context, state) {
+            final extra = state.extra as Map<String, dynamic>;
+            return QrHandshakeScreen(
+              bookingId: extra['bookingId'],
+              isProvider: extra['isProvider'],
+            );
+          },
+        ),
       ],
     );
 

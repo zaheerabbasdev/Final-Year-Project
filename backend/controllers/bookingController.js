@@ -1,6 +1,7 @@
 const Booking = require('../models/bookingModel');
 const Job = require('../models/jobModel');
 const db = require('../config/db');
+const crypto = require('crypto');
 
 const getMyBookings = async (req, res) => {
     try {
@@ -66,4 +67,60 @@ const updateBookingStatusByJob = async (req, res) => {
     }
 };
 
-module.exports = { getMyBookings, updateBookingStatus, updateBookingStatusByJob, getBookingByJob };
+const generateHandshakeToken = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const booking = await Booking.findById(id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+        
+        // Ensure only the provider of this booking can generate the token
+        if (req.user.id !== booking.provider_id) {
+            return res.status(403).json({ message: 'Not authorized to generate token' });
+        }
+
+        // Generate a random 6-digit numeric PIN
+        const token = Math.floor(100000 + Math.random() * 900000).toString();
+        await Booking.updateVerificationToken(id, token);
+        
+        res.json({ token });
+    } catch (error) {
+        res.status(500).json({ message: 'Error generating handshake token' });
+    }
+};
+
+const verifyHandshakeToken = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const { token } = req.body;
+        
+        const booking = await Booking.findById(id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+        // Ensure only the customer of this booking can verify the token
+        if (req.user.id !== booking.customer_id) {
+            return res.status(403).json({ message: 'Not authorized to verify token' });
+        }
+
+        const isValid = await Booking.verifyToken(id, token);
+        if (!isValid) return res.status(400).json({ message: 'Invalid or expired token' });
+
+        // Update status to in_progress
+        await Booking.updateStatus(id, 'in_progress');
+        
+        // Optional: Clear token after verification to prevent reuse
+        await Booking.updateVerificationToken(id, null);
+
+        res.json({ message: 'Handshake successful! Job is now in progress.' });
+    } catch (error) {
+        res.status(500).json({ message: 'Error verifying handshake token' });
+    }
+};
+
+module.exports = { 
+    getMyBookings, 
+    updateBookingStatus, 
+    updateBookingStatusByJob, 
+    getBookingByJob,
+    generateHandshakeToken,
+    verifyHandshakeToken
+};

@@ -15,12 +15,14 @@ class AuthService extends ChangeNotifier {
   bool _isFirstTime = true;
   String? _role;
   Map<String, dynamic>? _user;
+  String? _token;
 
   bool get isAuthenticated => _isAuthenticated;
   bool get isInitialized => _isInitialized;
   bool get isFirstTime => _isFirstTime;
   String? get role => _role;
   Map<String, dynamic>? get user => _user;
+  String? get token => _token;
 
   Future<void> checkAuth() async {
     final prefs = await SharedPreferences.getInstance();
@@ -29,6 +31,7 @@ class AuthService extends ChangeNotifier {
     _isFirstTime = prefs.getBool('isFirstTime') ?? true;
     
     if (token != null) {
+      _token = token;
       _isAuthenticated = true;
       _role = role;
       _isInitialized = true;
@@ -68,7 +71,8 @@ class AuthService extends ChangeNotifier {
       if (response.statusCode == 200) {
         final data = response.data;
         final prefs = await SharedPreferences.getInstance();
-        await prefs.setString('token', data['token']);
+        _token = data['token'];
+        await prefs.setString('token', _token!);
         
         _isAuthenticated = true;
         _user = data['user'];
@@ -215,6 +219,7 @@ class AuthService extends ChangeNotifier {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
     await prefs.remove('role');
+    _token = null;
     _isAuthenticated = false;
     _role = null;
     _user = null;

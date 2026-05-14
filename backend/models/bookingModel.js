@@ -38,6 +38,16 @@ const Booking = {
     findByJobId: async (jobId) => {
         const [rows] = await db.execute('SELECT * FROM bookings WHERE job_id = ?', [jobId]);
         return rows[0] || null;
+    },
+
+    updateVerificationToken: async (id, token) => {
+        const [result] = await db.execute('UPDATE bookings SET verification_token = ? WHERE id = ?', [token, id]);
+        return result.affectedRows > 0;
+    },
+
+    verifyToken: async (id, token) => {
+        const [rows] = await db.execute('SELECT * FROM bookings WHERE id = ? AND verification_token = ?', [id, token]);
+        return rows.length > 0;
     }
 };
 

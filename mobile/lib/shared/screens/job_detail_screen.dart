@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../features/customer/job_service.dart';
 import '../../features/auth/auth_service.dart';
+import '../../shared/services/booking_service.dart';
 import '../../../core/api_client.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../shared/widgets/notification_bell.dart';
@@ -17,6 +18,7 @@ class JobDetailScreen extends StatefulWidget {
 
 class _JobDetailScreenState extends State<JobDetailScreen> {
   Map<String, dynamic>? _job;
+  Map<String, dynamic>? _booking;
   List<dynamic> _bids = [];
   bool _isLoading = true;
 
@@ -29,16 +31,23 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Future<void> _loadData() async {
     setState(() => _isLoading = true);
     final jobService = context.read<JobService>();
+    final bookingService = context.read<BookingService>();
+    
     final job = await jobService.getJobById(widget.jobId);
     final bids = await jobService.fetchJobBids(widget.jobId);
+    
+    Map<String, dynamic>? booking;
+    if (job != null && job['status'] != 'open') {
+      booking = await bookingService.getBookingByJobId(widget.jobId);
+    }
+
     if (mounted) {
       setState(() {
         _job = job;
-        print('DEBUG: Job data loaded: ${_job?['title']}, Customer ID: ${_job?['customer_id']}');
+        _booking = booking;
         _bids = bids;
         _isLoading = false;
       });
-      print('DEBUG: Loaded Job Details. Customer Avatar: ${_job?['customer_avatar']}');
     }
   }
   @override
@@ -246,6 +255,47 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             const SizedBox(height: 24),
             _buildProviderDetailSection('Bidding Competition', _buildCompetitionCard()),
             const SizedBox(height: 32),
+            if (_booking != null && _booking!['status'] == 'confirmed' && _booking!['provider_id'] == currentUserId) ...[
+              Container(
+                padding: const EdgeInsets.all(20),
+                margin: const EdgeInsets.only(bottom: 24),
+                decoration: BoxDecoration(
+                  color: const Color(0xFF6366F1).withOpacity(0.05),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
+                ),
+                child: Column(
+                  children: [
+                    const Text(
+                      'You are hired! Show this QR to the customer to start.',
+                      textAlign: TextAlign.center,
+                      style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.w600),
+                    ),
+                    const SizedBox(height: 16),
+                    SizedBox(
+                      width: double.infinity,
+                      child: ElevatedButton.icon(
+                        onPressed: () async {
+                          final result = await context.push('/handshake', extra: {
+                            'bookingId': _booking!['id'],
+                            'isProvider': true,
+                          });
+                          if (result == true) {
+                            _loadData();
+                          }
+                        },
+                        icon: const Icon(Icons.qr_code, color: Colors.white),
+                        label: const Text('Show Handshake QR', style: TextStyle(color: Colors.white)),
+                        style: ElevatedButton.styleFrom(
+                          backgroundColor: const Color(0xFF6366F1),
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            ],
             SizedBox(
               width: double.infinity,
               height: 56,
@@ -503,6 +553,50 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           const SizedBox(height: 16),
           _buildImageGallery(_job!['images']),
           const SizedBox(height: 24),
+          if (_booking != null && _booking!['status'] == 'confirmed') ...[
+            _buildInfoSectionTitle('Service Verification'),
+            const SizedBox(height: 16),
+            Container(
+              padding: const EdgeInsets.all(20),
+              decoration: BoxDecoration(
+                color: const Color(0xFF6366F1).withOpacity(0.05),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
+              ),
+              child: Column(
+                children: [
+                  const Text(
+                    'To start the job, please complete the secure handshake.',
+                    textAlign: TextAlign.center,
+                    style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.w600),
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton.icon(
+                      onPressed: () async {
+                        final result = await context.push('/handshake', extra: {
+                          'bookingId': _booking!['id'],
+                          'isProvider': role == 'provider',
+                        });
+                        if (result == true) {
+                          _loadData();
+                        }
+                      },
+                      icon: Icon(role == 'provider' ? Icons.qr_code : Icons.qr_code_scanner),
+                      label: Text(role == 'provider' ? 'Show Handshake QR' : 'Scan Handshake QR'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF6366F1),
+                        foregroundColor: Colors.white,
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
           if (role == 'provider') ...[
             _buildInfoSectionTitle('Customer Information'),
             const SizedBox(height: 16),
