@@ -92,7 +92,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           ),
                           const SizedBox(width: 12),
                           Text(
-                            'ServiceHub',
+                            'Kaarkun',
                             style: GoogleFonts.outfit(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,

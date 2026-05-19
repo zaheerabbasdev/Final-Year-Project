@@ -1,8 +1,8 @@
 'use client';
-import { useState } from 'react';
+import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 
-export default function LoginPage() {
+function LoginContent() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
@@ -43,13 +43,13 @@ export default function LoginPage() {
       <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-xl border border-gray-100">
         <div>
           <div className="mx-auto h-12 w-12 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">S</span>
+            <span className="text-white text-2xl font-bold">K</span>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Admin Console
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            ServiceHub Marketplace Management
+            Kaarkun Marketplace Management
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
@@ -70,7 +70,7 @@ export default function LoginPage() {
                 type="email"
                 required
                 className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="admin@servicehub.com"
+                placeholder="admin@kaarkun.com"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
               />
@@ -111,3 +111,16 @@ export default function LoginPage() {
     </div>
   );
 }
+
+export default function LoginPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-gray-500 font-medium">Loading login...</div>
+      </div>
+    }>
+      <LoginContent />
+    </Suspense>
+  );
+}
+

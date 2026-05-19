@@ -2,6 +2,7 @@ const Booking = require('../models/bookingModel');
 const Job = require('../models/jobModel');
 const db = require('../config/db');
 const crypto = require('crypto');
+const { createNotification } = require('../services/notificationService');
 
 const getMyBookings = async (req, res) => {
     try {
@@ -15,19 +16,35 @@ const getMyBookings = async (req, res) => {
 const updateBookingStatus = async (req, res) => {
     try {
         const { status } = req.body;
-        // Logic to verify if user is part of the booking
-        // ...
         await Booking.updateStatus(req.params.id, status);
 
-        if (status === 'completed') {
-            const booking = await Booking.findById(req.params.id);
-            if (booking) {
+        const booking = await Booking.findById(req.params.id);
+        if (booking) {
+            if (status === 'completed') {
                 await Job.update(booking.job_id, { status: 'completed' });
+                const [jobRows] = await db.execute('SELECT title FROM jobs WHERE id = ?', [booking.job_id]);
+                const jobTitle = jobRows[0] ? jobRows[0].title : 'your job';
+                await createNotification(
+                    booking.provider_id,
+                    'Job Completed',
+                    `The customer has confirmed completion for "${jobTitle}".`,
+                    'booking'
+                );
+            } else if (status === 'awaiting_confirmation') {
+                const [jobRows] = await db.execute('SELECT title FROM jobs WHERE id = ?', [booking.job_id]);
+                const jobTitle = jobRows[0] ? jobRows[0].title : 'your job';
+                await createNotification(
+                    booking.customer_id,
+                    'Job Done Request',
+                    `The provider has marked "${jobTitle}" as done. Please confirm.`,
+                    'booking'
+                );
             }
         }
 
         res.json({ message: 'Booking status updated' });
     } catch (error) {
+        console.error('Error updating booking status:', error);
         res.status(500).json({ message: 'Error updating booking' });
     }
 };
@@ -59,10 +76,28 @@ const updateBookingStatusByJob = async (req, res) => {
 
         if (status === 'completed') {
             await Job.update(booking.job_id, { status: 'completed' });
+            const [jobRows] = await db.execute('SELECT title FROM jobs WHERE id = ?', [booking.job_id]);
+            const jobTitle = jobRows[0] ? jobRows[0].title : 'your job';
+            await createNotification(
+                booking.provider_id,
+                'Job Completed',
+                `The customer has confirmed completion for "${jobTitle}".`,
+                'booking'
+            );
+        } else if (status === 'awaiting_confirmation') {
+            const [jobRows] = await db.execute('SELECT title FROM jobs WHERE id = ?', [booking.job_id]);
+            const jobTitle = jobRows[0] ? jobRows[0].title : 'your job';
+            await createNotification(
+                booking.customer_id,
+                'Job Done Request',
+                `The provider has marked "${jobTitle}" as done. Please confirm.`,
+                'booking'
+            );
         }
 
         res.json({ message: 'Booking status updated' });
     } catch (error) {
+        console.error('Error updating booking status by job:', error);
         res.status(500).json({ message: 'Error updating booking' });
     }
 };

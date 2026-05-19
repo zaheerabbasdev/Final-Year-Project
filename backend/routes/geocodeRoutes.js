@@ -4,7 +4,7 @@ const axios = require('axios');
 
 const NOMINATIM = 'https://nominatim.openstreetmap.org';
 const HEADERS = {
-  'User-Agent': 'ServiceHub-App/1.0 (contact@servicehub.com)',
+  'User-Agent': 'Kaarkun-App/1.0 (contact@kaarkun.com)',
   'Accept': 'application/json',
   'Accept-Language': 'en-US,en;q=0.9',
 };

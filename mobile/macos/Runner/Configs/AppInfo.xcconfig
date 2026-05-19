@@ -5,10 +5,10 @@
 // 'flutter create' template.
 
 // The application's name. By default this is also the title of the Flutter window.
-PRODUCT_NAME = mobile
+PRODUCT_NAME = kaarkun
 
 // The application's bundle identifier
-PRODUCT_BUNDLE_IDENTIFIER = com.servicehub.mobile
+PRODUCT_BUNDLE_IDENTIFIER = com.kaarkun.mobile
 
 // The copyright displayed in application information
-PRODUCT_COPYRIGHT = Copyright © 2026 com.servicehub. All rights reserved.
+PRODUCT_COPYRIGHT = Copyright © 2026 com.kaarkun. All rights reserved.

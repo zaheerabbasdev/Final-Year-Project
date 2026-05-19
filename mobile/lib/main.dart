@@ -76,19 +76,19 @@ void main() async {
         ),
 
       ],
-      child: const ServiceHubApp(),
+      child: const KaarkunApp(),
     ),
   );
 }
 
-class ServiceHubApp extends StatefulWidget {
-  const ServiceHubApp({super.key});
+class KaarkunApp extends StatefulWidget {
+  const KaarkunApp({super.key});
 
   @override
-  State<ServiceHubApp> createState() => _ServiceHubAppState();
+  State<KaarkunApp> createState() => _KaarkunAppState();
 }
 
-class _ServiceHubAppState extends State<ServiceHubApp> with WidgetsBindingObserver {
+class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
   bool? _wasAuthenticated;
 
   @override
@@ -268,7 +268,7 @@ class _ServiceHubAppState extends State<ServiceHubApp> with WidgetsBindingObserv
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
-      title: 'ServiceHub',
+      title: 'Kaarkun',
       theme: AppTheme.lightTheme,
       routerConfig: router,
     );

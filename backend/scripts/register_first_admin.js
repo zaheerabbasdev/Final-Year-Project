@@ -4,7 +4,7 @@ async function createAdmin() {
     try {
         const response = await axios.post('http://localhost:5000/api/admin/auth/register', {
             username: 'admin',
-            email: 'admin@servicehub.com',
+            email: 'admin@kaarkun.com',
             password: 'adminpassword123',
             full_name: 'System Administrator'
         });

@@ -1,6 +1,6 @@
-# ServiceHub: A Comprehensive Job Marketplace Platform
+# Kaarkun: A Comprehensive Job Marketplace Platform
 
-ServiceHub is a full-stack, multi-platform solution designed to bridge the gap between skilled service providers and customers in need of professional assistance. Whether it's plumbing, electrical work, or general cleaning, ServiceHub provides a seamless ecosystem for posting jobs, bidding, and managing bookings.
+Kaarkun is a full-stack, multi-platform solution designed to bridge the gap between skilled service providers and customers in need of professional assistance. Whether it's plumbing, electrical work, or general cleaning, Kaarkun provides a seamless ecosystem for posting jobs, bidding, and managing bookings.
 
 ## 🚀 Project Overview
 
@@ -110,4 +110,4 @@ This project was developed as a **Final Year Project**. All rights reserved.
 - **Zaheer Abbas** - Lead Developer
 
 ---
-*Created with ❤️ by the ServiceHub Team.*
+*Created with ❤️ by the Kaarkun Team.*

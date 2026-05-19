@@ -57,13 +57,13 @@ export default function SignupPage() {
       <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-xl border border-gray-100">
         <div>
           <div className="mx-auto h-12 w-12 bg-indigo-600 rounded-lg flex items-center justify-center">
-            <span className="text-white text-2xl font-bold">S</span>
+            <span className="text-white text-2xl font-bold">K</span>
           </div>
           <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
             Create Admin Account
           </h2>
           <p className="mt-2 text-center text-sm text-gray-600">
-            Join the ServiceHub Admin Team
+            Join the Kaarkun Admin Team
           </p>
         </div>
         <form className="mt-8 space-y-4" onSubmit={handleSignup}>
@@ -104,7 +104,7 @@ export default function SignupPage() {
                 type="email"
                 required
                 className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                placeholder="admin@servicehub.com"
+                placeholder="admin@kaarkun.com"
                 value={formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
               />

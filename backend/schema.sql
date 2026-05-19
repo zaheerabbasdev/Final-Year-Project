@@ -1,5 +1,5 @@
-CREATE DATABASE IF NOT EXISTS servicehub_db;
-USE servicehub_db;
+CREATE DATABASE IF NOT EXISTS kaarkun_db;
+USE kaarkun_db;
 
 -- Users table
 CREATE TABLE IF NOT EXISTS users (
@@ -14,6 +14,7 @@ CREATE TABLE IF NOT EXISTS users (
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
     status ENUM('pending', 'verified', 'rejected', 'blocked') DEFAULT 'pending',
+    status_reason VARCHAR(255) DEFAULT NULL,
     otp_code VARCHAR(10),
     otp_expiry TIMESTAMP,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
@@ -58,6 +59,8 @@ CREATE TABLE IF NOT EXISTS jobs (
     status ENUM('open', 'active', 'completed', 'cancelled') DEFAULT 'open',
     latitude DECIMAL(10, 8),
     longitude DECIMAL(11, 8),
+    is_negotiable BOOLEAN DEFAULT FALSE,
+    is_emergency BOOLEAN DEFAULT FALSE,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
@@ -81,10 +84,11 @@ CREATE TABLE IF NOT EXISTS bids (
 CREATE TABLE IF NOT EXISTS bookings (
     id INT AUTO_INCREMENT PRIMARY KEY,
     job_id INT NOT NULL,
-    bid_id INT NOT NULL,
+    bid_id INT DEFAULT NULL,
     customer_id INT NOT NULL,
     provider_id INT NOT NULL,
-    status ENUM('confirmed', 'in_progress', 'completed', 'cancelled') DEFAULT 'confirmed',
+    status ENUM('confirmed', 'in_progress', 'awaiting_confirmation', 'completed', 'cancelled') DEFAULT 'confirmed',
+    verification_token VARCHAR(255) DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
     FOREIGN KEY (bid_id) REFERENCES bids(id) ON DELETE CASCADE,
@@ -127,4 +131,41 @@ CREATE TABLE IF NOT EXISTS reviews (
     FOREIGN KEY (booking_id)  REFERENCES bookings(id)  ON DELETE CASCADE,
     FOREIGN KEY (customer_id) REFERENCES users(id)     ON DELETE CASCADE,
     FOREIGN KEY (provider_id) REFERENCES users(id)     ON DELETE CASCADE
+);
+
+-- Messages table
+CREATE TABLE IF NOT EXISTS messages (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    job_id INT NOT NULL,
+    sender_id INT NOT NULL,
+    receiver_id INT NOT NULL,
+    content TEXT,
+    image_url VARCHAR(255) DEFAULT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (job_id) REFERENCES jobs(id) ON DELETE CASCADE,
+    FOREIGN KEY (sender_id) REFERENCES users(id) ON DELETE CASCADE,
+    FOREIGN KEY (receiver_id) REFERENCES users(id) ON DELETE CASCADE
+);
+
+-- Admins table
+CREATE TABLE IF NOT EXISTS admins (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    username VARCHAR(191) NOT NULL UNIQUE,
+    email VARCHAR(191) NOT NULL UNIQUE,
+    password_hash VARCHAR(255) NOT NULL,
+    full_name VARCHAR(255) NOT NULL,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+);
+
+-- Notifications table
+CREATE TABLE IF NOT EXISTS notifications (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    user_id INT NOT NULL,
+    title VARCHAR(255) NOT NULL,
+    message TEXT NOT NULL,
+    type VARCHAR(50) NOT NULL,
+    is_read BOOLEAN DEFAULT FALSE,
+    created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 );

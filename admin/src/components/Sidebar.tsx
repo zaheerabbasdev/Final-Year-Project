@@ -14,8 +14,8 @@ export default function Sidebar() {
     <aside className="w-64 bg-white border-r border-gray-200 h-screen fixed left-0 top-0 overflow-y-auto">
       <div className="p-6">
         <Link href="/dashboard" className="flex items-center gap-2">
-          <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">S</div>
-          <span className="text-xl font-bold text-gray-900">ServiceHub</span>
+          <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center text-white font-bold">K</div>
+          <span className="text-xl font-bold text-gray-900">Kaarkun</span>
         </Link>
       </div>
 

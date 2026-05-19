@@ -1,17 +1,17 @@
-# ServiceHub Backend
+# Kaarkun Backend
 
-Node.js + Express + MySQL API for the ServiceHub marketplace.
+Node.js + Express + MySQL API for the Kaarkun marketplace.
 
 ## Prerequisites
 - Node.js installed
 - MySQL Server running
-- A database named `servicehub_db` created
+- A database named `kaarkun_db` created
 
 ## Setup
 1. `cd backend`
 2. `npm install`
 3. Configure `.env` with your DB credentials
-4. Run `mysql -u your_user -p servicehub_db < schema.sql` to setup tables
+4. Run `mysql -u your_user -p kaarkun_db < schema.sql` to setup tables
 5. `npm run dev` to start the server on port 5000
 
 ## Features

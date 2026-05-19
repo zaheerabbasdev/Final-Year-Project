@@ -184,7 +184,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Join ServiceHub today',
+                'Join Kaarkun today',
                 style: TextStyle(color: Colors.blueGrey.shade400, fontSize: 16),
               ),
               const SizedBox(height: 32),

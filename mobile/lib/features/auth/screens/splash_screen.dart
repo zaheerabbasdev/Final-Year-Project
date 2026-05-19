@@ -52,7 +52,7 @@ class _SplashScreenState extends State<SplashScreen> {
             ),
             const SizedBox(height: 32),
             Text(
-              'ServiceHub',
+              'Kaarkun',
               style: Theme.of(context).textTheme.headlineLarge?.copyWith(
                     color: Colors.white,
                     fontSize: 42,

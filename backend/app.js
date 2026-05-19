@@ -69,7 +69,7 @@ app.use('/api/geocode', geocodeRoutes);
 
 
 app.get('/', (req, res) => {
-    res.json({ message: "Welcome to ServiceHub API" });
+    res.json({ message: "Welcome to Kaarkun API" });
 });
 
 // Basic Error Handler

@@ -3,7 +3,7 @@ const db = require('../config/db');
 
 async function seedAdmin() {
     try {
-        const email = 'admin@servicehub.com';
+        const email = 'admin@kaarkun.com';
         const password = 'admin123';
         const fullName = 'System Administrator';
         const role = 'admin';
