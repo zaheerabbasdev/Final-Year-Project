@@ -44,6 +44,8 @@ import 'core/services/location_tracking_service.dart';
 import 'core/services/handshake_service.dart';
 import 'features/customer/screens/track_provider_screen.dart';
 
+final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
+
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
@@ -136,6 +138,7 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
 
 
     final router = GoRouter(
+      navigatorKey: navigatorKey,
       initialLocation: '/splash',
       refreshListenable: authService,
       redirect: (context, state) {

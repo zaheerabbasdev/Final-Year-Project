@@ -2,7 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../shared/services/navigation_service.dart';
+import '../../main.dart';
 
 class AuthService extends ChangeNotifier {
   late final ApiClient _apiClient;
