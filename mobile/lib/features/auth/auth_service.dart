@@ -223,6 +223,18 @@ class AuthService extends ChangeNotifier {
     _isAuthenticated = false;
     _role = null;
     _user = null;
+
+    // Reset navigation index to 0 on logout
+    try {
+      final navContext = navigatorKey.currentContext;
+      if (navContext != null) {
+        final navService = navContext.read<NavigationService>();
+        navService.setIndex(0);
+      }
+    } catch (e) {
+      // If context is not available, ignore
+    }
+
     notifyListeners();
   }
 }
