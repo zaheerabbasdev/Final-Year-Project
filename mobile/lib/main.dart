@@ -43,13 +43,9 @@ import 'core/services/notification_service.dart';
 import 'core/services/location_tracking_service.dart';
 import 'core/services/handshake_service.dart';
 import 'features/customer/screens/track_provider_screen.dart';
-import 'package:flutter_config/flutter_config.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  if (!kIsWeb) {
-    await FlutterConfig.loadEnvVariables();
-  }
   
   runApp(
     MultiProvider(

@@ -5,8 +5,6 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-apply(from = project(":flutter_config").projectDir.path + "/dotenv.gradle")
-
 android {
     namespace = "com.kaarkun.mobile"
     compileSdk = flutter.compileSdkVersion
@@ -30,6 +28,10 @@ android {
         targetSdk = flutter.targetSdkVersion
         versionCode = flutter.versionCode
         versionName = flutter.versionName
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {

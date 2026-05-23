@@ -164,7 +164,7 @@ class _SignupScreenState extends State<SignupScreen> {
                   ],
                 ),
                 child: Image.asset(
-                  'assets/images/Splash.png',
+                  'assets/images/icon.png',
                   height: 100,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => const Icon(

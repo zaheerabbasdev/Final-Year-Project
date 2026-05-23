@@ -55,7 +55,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ],
                 ),
                 child: Image.asset(
-                  'assets/images/Splash.png',
+                  'assets/images/icon.png',
                   height: 120,
                   fit: BoxFit.contain,
                   errorBuilder: (context, error, stackTrace) => const Icon(

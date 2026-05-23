@@ -157,7 +157,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     ],
                                   ),
                                   child: Image.asset(
-                                    'assets/images/Splash.png',
+                                    'assets/images/icon.png',
                                     height: 140,
                                     width: 140,
                                     fit: BoxFit.contain,

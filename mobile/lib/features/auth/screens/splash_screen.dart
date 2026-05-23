@@ -40,7 +40,7 @@ class _SplashScreenState extends State<SplashScreen> {
                 ],
               ),
               child: Image.asset(
-                'assets/images/Splash.png',
+                'assets/images/icon.png',
                 height: 80,
                 width: 80,
                 errorBuilder: (context, error, stackTrace) => const Icon(
