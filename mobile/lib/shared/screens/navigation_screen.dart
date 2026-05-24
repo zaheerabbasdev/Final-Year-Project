@@ -73,7 +73,7 @@ class MainNavigationScreen extends StatelessWidget {
             ),
           ),
           
-          // Floating Pill Bottom Navigation Bar
+          // Floating Pill Bottom Navigation Bar with glassmorphism
           Positioned(
             left: 16,
             right: 16,
@@ -82,21 +82,28 @@ class MainNavigationScreen extends StatelessWidget {
               child: Container(
                 height: 72,
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.92),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.6), width: 1.5),
+                  gradient: LinearGradient(
+                    colors: [
+                      Colors.white.withOpacity(0.92),
+                      Colors.white.withOpacity(0.78),
+                    ],
+                    begin: Alignment.topLeft,
+                    end: Alignment.bottomRight,
+                  ),
+                  borderRadius: BorderRadius.circular(28),
+                  border: Border.all(color: Colors.white.withOpacity(0.70), width: 1.5),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF003B95).withOpacity(0.08),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+                      color: const Color(0xFF003B95).withOpacity(0.16),
+                      blurRadius: 32,
+                      offset: const Offset(0, 14),
                     ),
                   ],
                 ),
                 child: ClipRRect(
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(28),
                   child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 12, sigmaY: 12),
+                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
                     child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Row(
