@@ -12,6 +12,7 @@ import '../../../core/services/location_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
 import '../../../shared/widgets/wallet_bottom_sheet.dart';
+import '../../../core/theme.dart';
 
 class ProviderDashboardScreen extends StatefulWidget {
   const ProviderDashboardScreen({super.key});
@@ -265,14 +266,14 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppTheme.surfaceColor,
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: const Color(0xFFE2E8F0)),
           boxShadow: [
             BoxShadow(
-              color: Colors.black.withOpacity(0.01),
-              blurRadius: 8,
-              offset: const Offset(0, 4),
+              color: AppTheme.textColor.withOpacity(0.03),
+              blurRadius: 12,
+              offset: const Offset(0, 6),
             ),
           ],
         ),
@@ -326,7 +327,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
             children: [
               Text(
                 "This Month's Earnings",
-                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9)),
+                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.92)),
               ),
               ElevatedButton(
                 onPressed: () {
@@ -429,14 +430,14 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(26),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.01),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppTheme.textColor.withOpacity(0.04),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -511,10 +512,10 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                     ElevatedButton(
                       onPressed: () => context.push('/job-detail/${job['id']}'),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF003B95),
-                        foregroundColor: Colors.white,
-                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
-                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      backgroundColor: AppTheme.primaryColor,
+                      foregroundColor: Colors.white,
+                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(
                         'Bid Console',

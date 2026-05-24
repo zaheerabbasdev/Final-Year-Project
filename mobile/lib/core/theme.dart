@@ -30,12 +30,23 @@ class AppTheme {
       bodyLarge: GoogleFonts.outfit(color: textColor),
       bodyMedium: GoogleFonts.outfit(color: subtextColor),
     ),
+    appBarTheme: const AppBarTheme(
+      backgroundColor: surfaceColor,
+      elevation: 0,
+      iconTheme: IconThemeData(color: textColor),
+      titleTextStyle: TextStyle(color: textColor, fontFamily: 'Outfit', fontWeight: FontWeight.bold, fontSize: 20),
+    ),
+    cardTheme: CardThemeData(
+      color: surfaceColor,
+      elevation: 0,
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(22)),
+    ),
     elevatedButtonTheme: ElevatedButtonThemeData(
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
         padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
         elevation: 0,
         textStyle: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 16),
       ),

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/api_client.dart';
+import '../../../core/theme.dart';
 import '../../auth/auth_service.dart';
 import '../category_service.dart';
 import '../job_service.dart';
@@ -57,7 +58,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
           color: const Color(0xFF003B95),
@@ -169,16 +170,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Widget _buildSearchBar() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(20),
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(22),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.02),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppTheme.textColor.withOpacity(0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -217,16 +218,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF003B95).withOpacity(0.25),
-            blurRadius: 16,
-            offset: const Offset(0, 8),
+            color: const Color(0xFF003B95).withOpacity(0.22),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(22),
       child: Column(
         children: [
           Row(
@@ -371,22 +372,20 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFF1E293B),
-        image: const DecorationImage(
-          image: NetworkImage('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80'),
-          fit: BoxFit.cover,
-          opacity: 0.15,
+        gradient: const LinearGradient(
+          colors: [Color(0xFF003B95), Color(0xFF0A84FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
         ),
-        borderRadius: BorderRadius.circular(24),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF1E293B).withOpacity(0.15),
-            blurRadius: 20,
-            offset: const Offset(0, 10),
+            color: const Color(0xFF003B95).withOpacity(0.22),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
-      ),
-      child: Column(
+      ),      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
@@ -608,14 +607,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(26),
         border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.01),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
+            color: AppTheme.textColor.withOpacity(0.04),
+            blurRadius: 18,
+            offset: const Offset(0, 8),
           ),
         ],
       ),
@@ -759,16 +758,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               return Container(
                 width: 150,
                 margin: const EdgeInsets.only(right: 16, bottom: 8),
-                padding: const EdgeInsets.all(16),
+                padding: const EdgeInsets.all(18),
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
+                  color: AppTheme.surfaceColor,
+                  borderRadius: BorderRadius.circular(26),
                   border: Border.all(color: const Color(0xFFE2E8F0)),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.01),
-                      blurRadius: 8,
-                      offset: const Offset(0, 4),
+                      color: AppTheme.textColor.withOpacity(0.03),
+                      blurRadius: 12,
+                      offset: const Offset(0, 6),
                     ),
                   ],
                 ),

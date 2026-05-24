@@ -194,17 +194,16 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       child: Container(
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(20),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.textColor.withOpacity(0.02),
-              blurRadius: 15,
-              offset: const Offset(0, 5),
+              color: AppTheme.textColor.withOpacity(0.04),
+              blurRadius: 18,
+              offset: const Offset(0, 8),
             ),
           ],
-        ),
-        child: TextField(
+        ),        child: TextField(
           controller: _searchController,
           onChanged: _onSearchChanged,
           style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
@@ -251,12 +250,12 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   Widget _buildFilterButton({required String label, required VoidCallback onTap}) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(18),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
         decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(16),
+          color: AppTheme.surfaceColor,
+          borderRadius: BorderRadius.circular(18),
           border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
         child: Row(
@@ -407,13 +406,13 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
+        color: AppTheme.surfaceColor,
+        borderRadius: BorderRadius.circular(26),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.03),
+            color: AppTheme.textColor.withOpacity(0.05),
             blurRadius: 20,
-            offset: const Offset(0, 8),
+            offset: const Offset(0, 10),
           ),
         ],
       ),

@@ -141,13 +141,13 @@ class _JobsListViewState extends State<_JobsListView> {
             return Container(
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: Colors.white,
-                borderRadius: BorderRadius.circular(24),
+                color: AppTheme.surfaceColor,
+                borderRadius: BorderRadius.circular(26),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.textColor.withOpacity(0.03),
+                    color: AppTheme.textColor.withOpacity(0.06),
                     blurRadius: 20,
-                    offset: const Offset(0, 8),
+                    offset: const Offset(0, 10),
                   ),
                 ],
               ),
