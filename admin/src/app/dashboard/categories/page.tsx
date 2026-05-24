@@ -59,8 +59,8 @@ export default function CategoriesPage() {
       </div>
 
       {/* Add Category Form */}
-      <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-        <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest mb-4">Add New Category</h3>
+      <div className="app-card p-6">
+        <h3 className="text-sm font-bold text-[var(--subtext)] uppercase tracking-widest mb-4">Add New Category</h3>
         <form onSubmit={handleAdd} className="flex gap-4">
           <input
             type="text"
@@ -81,7 +81,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories List */}
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      <div className="app-card overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>

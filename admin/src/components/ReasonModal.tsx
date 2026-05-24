@@ -15,17 +15,17 @@ export default function ReasonModal({ isOpen, onClose, onSubmit, title, submitTe
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm animate-in fade-in duration-200">
-      <div className="bg-white rounded-3xl shadow-2xl w-full max-w-md overflow-hidden animate-in zoom-in-95 duration-200">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/40 backdrop-blur-sm animate-in fade-in duration-200">
+      <div className="bg-[var(--surface)] rounded-[28px] shadow-[0_35px_60px_rgba(15,23,42,0.16)] w-full max-w-lg overflow-hidden animate-in zoom-in-95 duration-200">
         <div className="p-6">
           <div className="flex justify-between items-center mb-4">
-            <h3 className="text-xl font-bold text-gray-900">{title}</h3>
-            <button onClick={onClose} className="text-gray-400 hover:text-gray-600 transition-colors">
+            <h3 className="text-xl font-bold text-[var(--text)]">{title}</h3>
+            <button onClick={onClose} className="text-[var(--subtext)] hover:text-[var(--text)] transition-colors">
               <span className="text-2xl">&times;</span>
             </button>
           </div>
 
-          <p className="text-sm text-gray-500 mb-4">
+          <p className="text-sm text-[var(--subtext)] mb-4">
             Please provide a brief explanation for this action. This will be visible to the user.
           </p>
 
@@ -34,13 +34,13 @@ export default function ReasonModal({ isOpen, onClose, onSubmit, title, submitTe
             value={reason}
             onChange={(e) => setReason(e.target.value)}
             placeholder="Type your reason here..."
-            className="w-full h-32 p-4 text-black bg-gray-50 border border-gray-100 rounded-2xl text-sm focus:ring-2 focus:ring-indigo-500 focus:bg-white outline-none transition-all resize-none"
+            className="w-full h-32 p-4 text-[var(--text)] bg-slate-50 border border-slate-200 rounded-[18px] text-sm focus:ring-2 focus:ring-[var(--primary)] focus:bg-white outline-none transition-all resize-none"
           />
 
           <div className="mt-6 flex gap-3">
             <button
               onClick={onClose}
-              className="flex-1 px-4 py-3 rounded-2xl text-sm font-bold text-gray-500 hover:bg-gray-100 transition-colors"
+              className="flex-1 px-4 py-3 rounded-[18px] text-sm font-bold text-[var(--subtext)] hover:bg-slate-100 transition-colors"
             >
               Cancel
             </button>
@@ -49,7 +49,7 @@ export default function ReasonModal({ isOpen, onClose, onSubmit, title, submitTe
                 onSubmit(reason);
                 setReason('');
               }}
-              className={`flex-1 px-4 py-3 rounded-2xl text-sm font-bold text-white transition-all ${reason.trim() ? 'bg-indigo-600 hover:bg-indigo-700 shadow-lg shadow-indigo-200' : 'bg-gray-300 cursor-not-allowed'
+              className={`flex-1 px-4 py-3 rounded-[18px] text-sm font-bold text-white transition-all ${reason.trim() ? 'bg-[var(--primary)] hover:bg-[#002f77] shadow-[0_20px_40px_rgba(0,59,149,0.18)]' : 'bg-slate-300 cursor-not-allowed'
                 }`}
               disabled={!reason.trim()}
             >

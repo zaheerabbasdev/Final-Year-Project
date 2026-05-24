@@ -37,8 +37,8 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-lg text-black font-bold mb-6">User Growth</h3>
+      <div className="app-card p-6">
+        <h3 className="text-lg text-[var(--text)] font-bold mb-6">User Growth</h3>
           <div className="h-64 flex items-end justify-between gap-2 px-4">
             {[40, 70, 45, 90, 65, 80, 55, 95, 70, 85, 45, 75].map((v, i) => (
               <div key={i} className="bg-blue-100 w-full hover:bg-blue-500 transition-colors rounded-t-lg" style={{ height: `${v}%` }} />
@@ -49,8 +49,8 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100">
-          <h3 className="text-lg text-black font-bold mb-6">Popular Categories</h3>
+        <div className="app-card p-6">
+          <h3 className="text-lg text-[var(--text)] font-bold mb-6">Popular Categories</h3>
           <div className="space-y-4">
             <CategoryProgressBar label="Cleaning" percent={75} color="bg-blue-500" />
             <CategoryProgressBar label="Plumbing" percent={45} color="bg-indigo-500" />
@@ -72,7 +72,7 @@ function StatCard({ title, value, change, icon, color }: any) {
   };
 
   return (
-    <div className="bg-white p-6 rounded-2xl shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
+    <div className="app-card p-6 hover:shadow-md transition-shadow">
       <div className="flex justify-between items-start mb-4">
         <div className={`p-3 rounded-xl ${colors[color]}`}>
           <span className="text-2xl">{icon}</span>
@@ -80,8 +80,8 @@ function StatCard({ title, value, change, icon, color }: any) {
         <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">{change}</span>
       </div>
       <div>
-        <p className="text-sm text-gray-500 font-medium">{title}</p>
-        <p className="text-3xl font-bold text-gray-900 mt-1">{value?.toLocaleString()}</p>
+        <p className="text-sm text-slate-500 font-medium">{title}</p>
+        <p className="text-3xl font-bold text-[var(--text)] mt-1">{value?.toLocaleString()}</p>
       </div>
     </div>
   );

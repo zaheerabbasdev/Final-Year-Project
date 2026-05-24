@@ -17,22 +17,22 @@ export default function DashboardLayout({
   }, []);
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-[var(--background)]">
       <Sidebar />
-      <main className="pl-64">
-        <header className="h-16 bg-white border-b border-gray-200 flex items-center justify-between px-8 sticky top-0 z-10">
-          <h1 className="text-lg font-bold text-gray-800 uppercase tracking-wider">Management Console</h1>
+      <main className="pl-72 min-h-screen bg-[var(--background)]">
+        <header className="h-16 bg-[var(--surface)] border-b border-slate-200 flex items-center justify-between px-8 sticky top-0 z-10 shadow-sm">
+          <h1 className="text-lg font-bold text-[var(--text)] uppercase tracking-[0.12em]">Management Console</h1>
           <div className="flex items-center gap-4">
             <div className="text-right">
-              <p className="text-sm font-bold text-gray-900">{user?.full_name || 'Admin User'}</p>
-              <p className="text-xs text-gray-500">{user?.email || 'Administrator'}</p>
+              <p className="text-sm font-bold text-[var(--text)]">{user?.full_name || 'Admin User'}</p>
+              <p className="text-xs text-[var(--subtext)]">{user?.email || 'Administrator'}</p>
             </div>
-            <div className="h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-700 font-bold border-2 border-white shadow-sm">
+            <div className="h-10 w-10 bg-[var(--primary)]/10 rounded-full flex items-center justify-center text-[var(--primary)] font-bold border border-white shadow-sm">
               {user?.full_name?.charAt(0) || 'A'}
             </div>
           </div>
         </header>
-        <div className="p-8">
+        <div className="p-8 max-w-[1480px] mx-auto">
           {children}
         </div>
       </main>

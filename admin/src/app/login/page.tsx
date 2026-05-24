@@ -39,16 +39,16 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 px-4">
-      <div className="max-w-md w-full space-y-8 p-10 bg-white rounded-2xl shadow-xl border border-gray-100">
+    <div className="min-h-screen flex items-center justify-center bg-[var(--background)] px-4">
+      <div className="max-w-md w-full space-y-8 p-10 app-card border border-slate-200">
         <div>
-          <div className="mx-auto h-12 w-12 bg-indigo-600 rounded-lg flex items-center justify-center">
+          <div className="mx-auto h-12 w-12 bg-[var(--primary)]/100 rounded-2xl flex items-center justify-center shadow-lg shadow-[rgba(0,59,149,0.2)]">
             <span className="text-white text-2xl font-bold">K</span>
           </div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-gray-900">
+          <h2 className="mt-6 text-center text-3xl font-extrabold text-[var(--text)]">
             Admin Console
           </h2>
-          <p className="mt-2 text-center text-sm text-gray-600">
+          <p className="mt-2 text-center text-sm text-[var(--subtext)]">
             Kaarkun Marketplace Management
           </p>
         </div>
@@ -92,7 +92,7 @@ function LoginContent() {
             <button
               type="submit"
               disabled={loading}
-              className="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-xl text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all disabled:opacity-50"
+              className="group relative w-full flex justify-center app-button-primary transition-all disabled:opacity-50"
             >
               {loading ? 'Authenticating...' : 'Sign In'}
             </button>
