@@ -1,12 +1,22 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type SyntheticEvent } from 'react';
 import { api } from '@/lib/api';
 import UserModal from '@/components/UserModal';
 import ReasonModal from '@/components/ReasonModal';
 import { toast } from 'react-hot-toast';
 
+type User = {
+  id: number;
+  full_name: string;
+  email: string;
+  avatar?: string;
+  role: string;
+  status: string;
+  created_at: string;
+};
+
 export default function UsersPage() {
-  const [users, setUsers] = useState<any[]>([]);
+  const [users, setUsers] = useState<User[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
@@ -19,8 +29,8 @@ export default function UsersPage() {
       const token = localStorage.getItem('adminToken');
       const data = await api.get('/admin/users?role=customer', token || '');
       setUsers(data);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error('Failed to fetch users');
     } finally {
       setLoading(false);
     }
@@ -37,7 +47,7 @@ export default function UsersPage() {
       await api.delete(`/admin/users/${id}`, token || '');
       toast.success('User deleted successfully');
       fetchUsers();
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete user');
     }
   };
@@ -48,24 +58,29 @@ export default function UsersPage() {
       await api.put(`/admin/users/${id}/status`, { status: newStatus, reason }, token || '');
       toast.success(`User status updated to ${newStatus}`);
       fetchUsers();
-    } catch (err) {
+    } catch {
       toast.error('Failed to update status');
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Customer Management</h2>
-        <div className="flex items-center gap-3">
-          <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Customer Management</h2>
+          <p className="text-sm text-slate-500 mt-1">Manage customer accounts, approvals and suspensions.</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-3">
+          <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">
             {users.length} Total Customers
           </span>
-          <button className="bg-white border border-gray-200 px-4 py-2 rounded-xl text-gray-400 text-sm font-medium hover:bg-gray-50 transition-colors">Export CSV</button>
+          <button className="app-button-secondary border border-slate-200 text-slate-500 px-4 py-2 rounded-2xl text-sm font-medium hover:bg-slate-50 transition-all">
+            Export CSV
+          </button>
         </div>
       </div>
 
-      <div className="app-card overflow-hidden">
+      <div className="app-card app-table overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
@@ -81,18 +96,21 @@ export default function UsersPage() {
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
             ) : (
               users.map((user) => (
-                <tr key={user.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={user.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {user.avatar ? (
+                        // eslint-disable-next-line @next/next/no-img-element
                         <img
                           src={`http://localhost:5000${user.avatar}`}
                           alt={user.full_name}
                           className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                          onError={(e) => {
+                          onError={(e: SyntheticEvent<HTMLImageElement>) => {
                             // Fallback to initial if image fails to load
-                            (e.target as any).style.display = 'none';
-                            (e.target as any).nextElementSibling.style.display = 'flex';
+                            const target = e.currentTarget;
+                            target.style.display = 'none';
+                            const next = target.nextElementSibling as HTMLElement | null;
+                            if (next) next.style.display = 'flex';
                           }}
                         />
                       ) : null}
@@ -127,7 +145,7 @@ export default function UsersPage() {
                   <td className="px-6 py-4 text-right flex justify-end gap-2">
                     <button
                       onClick={() => setSelectedUserId(user.id)}
-                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors"
+                      className="app-button-secondary px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
                     >
                       View
                     </button>

@@ -29,7 +29,7 @@ export default function DashboardPage() {
 
   return (
     <div className="space-y-8">
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
         <StatCard title="Total Users" value={stats?.users || 0} change="+12%" icon="👥" color="blue" />
         <StatCard title="Active Jobs" value={stats?.activeJobs || 0} change="+5%" icon="💼" color="green" />
         <StatCard title="Total Bids" value={stats?.bids || 0} change="+18%" icon="⚖️" color="orange" />
@@ -37,22 +37,22 @@ export default function DashboardPage() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-      <div className="app-card p-6">
-        <h3 className="text-lg text-[var(--text)] font-bold mb-6">User Growth</h3>
+        <div className="app-card p-6 hover:shadow-xl transition-shadow">
+          <h3 className="text-lg text-(--text) font-bold mb-6">User Growth</h3>
           <div className="h-64 flex items-end justify-between gap-2 px-4">
             {[40, 70, 45, 90, 65, 80, 55, 95, 70, 85, 45, 75].map((v, i) => (
-              <div key={i} className="bg-blue-100 w-full hover:bg-blue-500 transition-colors rounded-t-lg" style={{ height: `${v}%` }} />
+              <div key={i} className="w-full rounded-t-3xl transition-all duration-300" style={{ height: `${v}%`, background: i % 2 === 0 ? 'rgba(3, 105, 252, 0.16)' : 'rgba(10, 132, 255, 0.24)' }} />
             ))}
           </div>
-          <div className="flex justify-between mt-4 text-xs text-gray-400 px-2 uppercase tracking-tight">
+          <div className="flex justify-between mt-4 text-xs text-(--subtext) px-2 uppercase tracking-[0.2em]">
             <span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
           </div>
         </div>
 
-        <div className="app-card p-6">
-          <h3 className="text-lg text-[var(--text)] font-bold mb-6">Popular Categories</h3>
+        <div className="app-card p-6 hover:shadow-xl transition-shadow">
+          <h3 className="text-lg text-(--text) font-bold mb-6">Popular Categories</h3>
           <div className="space-y-4">
-            <CategoryProgressBar label="Cleaning" percent={75} color="bg-blue-500" />
+            <CategoryProgressBar label="Cleaning" percent={75} color="bg-[var(--primary)]" />
             <CategoryProgressBar label="Plumbing" percent={45} color="bg-indigo-500" />
             <CategoryProgressBar label="Electric" percent={90} color="bg-purple-500" />
             <CategoryProgressBar label="Gardening" percent={30} color="bg-teal-500" />
@@ -81,7 +81,7 @@ function StatCard({ title, value, change, icon, color }: any) {
       </div>
       <div>
         <p className="text-sm text-slate-500 font-medium">{title}</p>
-        <p className="text-3xl font-bold text-[var(--text)] mt-1">{value?.toLocaleString()}</p>
+        <p className="text-3xl font-bold text-(--text) mt-1">{value?.toLocaleString()}</p>
       </div>
     </div>
   );

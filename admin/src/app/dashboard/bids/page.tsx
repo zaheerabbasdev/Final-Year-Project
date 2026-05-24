@@ -2,8 +2,17 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
+type Bid = {
+  id: number;
+  provider_name: string;
+  job_title: string;
+  amount: number;
+  status: string;
+  created_at: string;
+};
+
 export default function BidsPage() {
-  const [bids, setBids] = useState<any[]>([]);
+  const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchBids = async () => {
@@ -24,14 +33,17 @@ export default function BidsPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Marketplace Bids</h2>
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Marketplace Bids</h2>
+          <p className="text-sm text-slate-500 mt-1">Track your bid activity and vendor responses.</p>
+        </div>
+        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">
             {bids.length} Total Bids
         </span>
       </div>
 
-      <div className="app-card overflow-hidden">
+      <div className="app-card app-table overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
@@ -47,7 +59,7 @@ export default function BidsPage() {
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
             ) : (
               bids.map((bid) => (
-                <tr key={bid.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={bid.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <p className="text-sm font-bold text-gray-900">{bid.provider_name}</p>
                   </td>
@@ -58,9 +70,9 @@ export default function BidsPage() {
                     ${bid.amount}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                      bid.status === 'accepted' ? 'bg-green-50 text-green-600' : 
-                      bid.status === 'pending' ? 'bg-blue-50 text-blue-600' : 'bg-red-50 text-red-600'
+                    <span className={`app-badge ${
+                      bid.status === 'accepted' ? 'app-badge-success' : 
+                      bid.status === 'pending' ? 'app-badge-info' : 'app-badge-danger'
                     }`}>
                       {bid.status}
                     </span>

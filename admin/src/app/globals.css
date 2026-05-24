@@ -21,7 +21,8 @@
 }
 
 body {
-  background: var(--background);
+  background: radial-gradient(circle at top left, rgba(10, 132, 255, 0.10), transparent 35%),
+              linear-gradient(180deg, #F8FBFF 0%, #EFF3F9 100%);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
@@ -35,10 +36,48 @@ select {
 }
 
 .app-card {
-  background: var(--surface);
-  border: 1px solid rgba(148, 163, 184, 0.15);
+  background: rgba(255, 255, 255, 0.95);
+  border: 1px solid rgba(148, 163, 184, 0.14);
   border-radius: var(--radius);
-  box-shadow: 0 24px 50px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 28px 65px rgba(15, 23, 42, 0.08);
+  backdrop-filter: blur(14px);
+}
+
+.app-panel {
+  background: rgba(255, 255, 255, 0.94);
+  border: 1px solid rgba(148, 163, 184, 0.12);
+  border-radius: 28px;
+  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.06);
+  backdrop-filter: blur(12px);
+}
+
+.app-table thead {
+  background: rgba(248, 250, 252, 0.92);
+}
+
+.app-table th,
+.app-table td {
+  border-color: rgba(148, 163, 184, 0.14);
+}
+
+.app-badge-success {
+  background: rgba(46, 204, 113, 0.12);
+  color: #059669;
+}
+
+.app-badge-warning {
+  background: rgba(249, 115, 22, 0.12);
+  color: #c2410c;
+}
+
+.app-badge-danger {
+  background: rgba(239, 68, 68, 0.12);
+  color: #b91c1c;
+}
+
+.app-badge-info {
+  background: rgba(59, 130, 246, 0.12);
+  color: #1d4ed8;
 }
 
 .app-card-sm {

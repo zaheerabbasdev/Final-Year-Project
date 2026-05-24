@@ -61,11 +61,11 @@ export default function CategoriesPage() {
       {/* Add Category Form */}
       <div className="app-card p-6">
         <h3 className="text-sm font-bold text-[var(--subtext)] uppercase tracking-widest mb-4">Add New Category</h3>
-        <form onSubmit={handleAdd} className="flex gap-4">
+        <form onSubmit={handleAdd} className="flex flex-col gap-4 sm:flex-row">
           <input
             type="text"
             placeholder="e.g. Home Cleaning, Plumber, etc."
-            className="flex-1 px-4 py-3 text-black rounded-xl border border-gray-300 focus:outline-none focus:ring-2 focus:ring-indigo-500 transition-all text-sm"
+            className="flex-1 px-4 py-3 text-[var(--text)] rounded-2xl border border-slate-300 focus:outline-none focus:ring-2 focus:ring-[var(--primary)] transition-all text-sm bg-[var(--surface)]"
             value={newCategory}
             onChange={(e) => setNewCategory(e.target.value)}
             disabled={submitting}
@@ -73,7 +73,7 @@ export default function CategoriesPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="bg-indigo-600 text-white px-8 py-3 rounded-xl text-sm font-bold hover:bg-indigo-700 transition-all disabled:opacity-50"
+            className="app-button-primary w-full sm:w-auto disabled:opacity-50"
           >
             {submitting ? 'Adding...' : 'Add Category'}
           </button>
@@ -81,7 +81,7 @@ export default function CategoriesPage() {
       </div>
 
       {/* Categories List */}
-      <div className="app-card overflow-hidden">
+      <div className="app-card app-table overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
@@ -95,7 +95,7 @@ export default function CategoriesPage() {
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={3} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
             ) : (
               categories.map((cat) => (
-                <tr key={cat.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={cat.id} className="hover:bg-[var(--background)]/80 transition-colors">
                   <td className="px-6 py-4 text-sm text-gray-500 font-mono">
                     #{cat.id}
                   </td>

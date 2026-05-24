@@ -2,8 +2,18 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 
+type Job = {
+  id: number;
+  title: string;
+  location: string;
+  category_name: string;
+  budget: number;
+  status: string;
+  created_at: string;
+};
+
 export default function JobsPage() {
-  const [jobs, setJobs] = useState<any[]>([]);
+  const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
 
   const fetchJobs = async () => {
@@ -11,8 +21,8 @@ export default function JobsPage() {
       const token = localStorage.getItem('adminToken');
       const data = await api.get('/admin/jobs', token || '');
       setJobs(data);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error('Failed to fetch jobs');
     } finally {
       setLoading(false);
     }
@@ -28,21 +38,24 @@ export default function JobsPage() {
       const token = localStorage.getItem('adminToken');
       await api.delete(`/admin/jobs/${id}`, token || '');
       fetchJobs();
-    } catch (err) {
+    } catch {
       alert('Failed to delete job');
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Job Listings</h2>
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Job Listings</h2>
+          <p className="text-sm text-slate-500 mt-1">Monitor all active and completed job requests in one place.</p>
+        </div>
+        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">
             {jobs.length} Total Jobs
         </span>
       </div>
 
-      <div className="app-card overflow-hidden">
+      <div className="app-card app-table overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
@@ -58,7 +71,7 @@ export default function JobsPage() {
                [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8 bg-gray-50 h-16" /></tr>)
             ) : (
               jobs.map((job) => (
-                <tr key={job.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={job.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <p className="text-sm font-bold text-gray-900">{job.title}</p>
                     <p className="text-xs text-gray-500 line-clamp-1">{job.location}</p>
@@ -72,9 +85,9 @@ export default function JobsPage() {
                     ${job.budget}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2.5 py-1 rounded-full text-xs font-bold uppercase ${
-                      job.status === 'open' ? 'bg-blue-50 text-blue-600' : 
-                      job.status === 'completed' ? 'bg-green-50 text-green-600' : 'bg-orange-50 text-orange-600'
+                    <span className={`app-badge ${
+                      job.status === 'open' ? 'app-badge-info' : 
+                      job.status === 'completed' ? 'app-badge-success' : 'app-badge-warning'
                     }`}>
                       {job.status}
                     </span>

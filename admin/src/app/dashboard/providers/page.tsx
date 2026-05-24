@@ -1,12 +1,21 @@
 'use client';
-import { useEffect, useState } from 'react';
+import { useEffect, useState, type SyntheticEvent } from 'react';
 import { api } from '@/lib/api';
 import UserModal from '@/components/UserModal';
 import ReasonModal from '@/components/ReasonModal';
 import { toast } from 'react-hot-toast';
 
+type Provider = {
+  id: number;
+  full_name: string;
+  email: string;
+  avatar?: string;
+  status: string;
+  created_at: string;
+};
+
 export default function ProvidersPage() {
-  const [providers, setProviders] = useState<any[]>([]);
+  const [providers, setProviders] = useState<Provider[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedUserId, setSelectedUserId] = useState<number | null>(null);
 
@@ -19,8 +28,8 @@ export default function ProvidersPage() {
       const token = localStorage.getItem('adminToken');
       const data = await api.get('/admin/users?role=provider', token || '');
       setProviders(data);
-    } catch (err) {
-      console.error(err);
+    } catch {
+      console.error('Failed to fetch providers');
     } finally {
       setLoading(false);
     }
@@ -37,7 +46,7 @@ export default function ProvidersPage() {
       await api.delete(`/admin/users/${id}`, token || '');
       toast.success('Provider deleted successfully');
       fetchProviders();
-    } catch (err) {
+    } catch {
       toast.error('Failed to delete provider');
     }
   };
@@ -48,21 +57,24 @@ export default function ProvidersPage() {
       await api.put(`/admin/users/${id}/status`, { status: newStatus, reason }, token || '');
       toast.success(`Provider status updated to ${newStatus}`);
       fetchProviders();
-    } catch (err) {
+    } catch {
       toast.error('Failed to update status');
     }
   };
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Service Providers</h2>
-        <span className="text-xs font-bold text-gray-400 uppercase tracking-widest bg-gray-100 px-3 py-1 rounded-full">
+      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+        <div>
+          <h2 className="text-2xl font-bold text-slate-900">Service Providers</h2>
+          <p className="text-sm text-slate-500 mt-1">Review and manage provider accounts with confidence.</p>
+        </div>
+        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">
             {providers.length} Total Providers
         </span>
       </div>
 
-      <div className="app-card overflow-hidden">
+      <div className="app-card app-table overflow-hidden">
         <table className="w-full text-left">
           <thead className="bg-gray-50 border-b border-gray-100">
             <tr>
@@ -78,17 +90,20 @@ export default function ProvidersPage() {
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
             ) : (
               providers.map((provider) => (
-                <tr key={provider.id} className="hover:bg-gray-50/50 transition-colors">
+                <tr key={provider.id} className="hover:bg-slate-50 transition-colors">
                   <td className="px-6 py-4">
                     <div className="flex items-center gap-3">
                       {provider.avatar ? (
-                        <img 
+                        // eslint-disable-next-line @next/next/no-img-element
+                      <img 
                           src={`http://localhost:5000${provider.avatar}`} 
                           alt={provider.full_name} 
                           className="h-10 w-10 rounded-full object-cover border border-gray-200"
-                          onError={(e) => {
-                            (e.target as any).style.display = 'none';
-                            (e.target as any).nextElementSibling.style.display = 'flex';
+                          onError={(e: SyntheticEvent<HTMLImageElement>) => {
+                            const target = e.currentTarget;
+                            target.style.display = 'none';
+                            const next = target.nextElementSibling as HTMLElement | null;
+                            if (next) next.style.display = 'flex';
                           }}
                         />
                       ) : null}
@@ -107,11 +122,11 @@ export default function ProvidersPage() {
                     {provider.email}
                   </td>
                   <td className="px-6 py-4">
-                    <span className={`px-2 py-1 rounded-lg text-xs font-medium w-fit ${
-                      provider.status === 'verified' ? 'text-green-600 bg-green-50' :
-                      provider.status === 'pending' ? 'text-yellow-600 bg-yellow-50' :
-                      provider.status === 'rejected' ? 'text-red-600 bg-red-50' :
-                      'text-gray-100 bg-gray-800'
+                    <span className={`app-badge ${
+                      provider.status === 'verified' ? 'app-badge-success' :
+                      provider.status === 'pending' ? 'app-badge-warning' :
+                      provider.status === 'rejected' ? 'app-badge-danger' :
+                      'bg-slate-900 text-white'
                     }`}>
                       {provider.status === 'blocked' ? 'suspended' : (provider.status || 'pending')}
                     </span>
@@ -122,7 +137,7 @@ export default function ProvidersPage() {
                   <td className="px-6 py-4 text-right flex justify-end gap-2">
                     <button 
                       onClick={() => setSelectedUserId(provider.id)}
-                      className="text-indigo-600 bg-indigo-50 px-3 py-1.5 rounded-lg text-xs font-bold uppercase tracking-wider hover:bg-indigo-100 transition-colors"
+                      className="app-button-secondary px-3 py-1.5 text-xs font-semibold uppercase tracking-wider"
                     >
                       View
                     </button>
