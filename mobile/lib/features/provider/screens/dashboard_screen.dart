@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../customer/job_service.dart';
 import '../../../core/api_client.dart';
 import '../../auth/auth_service.dart';
 import '../../../shared/services/navigation_service.dart';
 import '../../../shared/providers/sync_provider.dart';
-
 import '../../provider/provider_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../../../shared/widgets/wallet_bottom_sheet.dart';
 
 class ProviderDashboardScreen extends StatefulWidget {
   const ProviderDashboardScreen({super.key});
@@ -63,47 +64,63 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthService>().user;
-    final String firstName = user?['full_name']?.split(' ').first ?? 'Mike';
+    final String fullName = user?['full_name'] ?? 'Provider';
+    final String firstName = fullName.split(' ').first;
     final avatarPath = user?['avatar'];
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF5F7FB),
         elevation: 0,
+        scrolledUnderElevation: 0,
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Provider Dashboard',
-              style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
+            Text(
+              'Provider Console',
+              style: GoogleFonts.outfit(color: const Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
             ),
             Text(
               'Welcome back, $firstName!',
-              style: const TextStyle(color: Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.normal),
+              style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ],
         ),
         actions: [
-          const NotificationBell(),
+          const NotificationBell(color: Color(0xFF1E293B)),
           Padding(
-            padding: const EdgeInsets.only(right: 16.0),
-            child: CircleAvatar(
-              radius: 18,
-              backgroundImage: avatarUrl != null 
-                ? NetworkImage(avatarUrl)
-                : const NetworkImage('https://i.pravatar.cc/150?u=mike'),
-              backgroundColor: const Color(0xFFF1F5F9),
+            padding: const EdgeInsets.only(right: 16.0, left: 8.0),
+            child: Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 18,
+                backgroundImage: avatarUrl != null 
+                  ? NetworkImage(avatarUrl)
+                  : const NetworkImage('https://i.pravatar.cc/150?u=mike'),
+                backgroundColor: const Color(0xFFF1F5F9),
+              ),
             ),
           ),
         ],
       ),
       body: RefreshIndicator(
+        color: const Color(0xFF003B95),
         onRefresh: () => context.read<SyncProvider>().syncAll(context),
         child: SingleChildScrollView(
           physics: const AlwaysScrollableScrollPhysics(),
-          padding: const EdgeInsets.all(24),
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
@@ -113,11 +130,11 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 const SizedBox(height: 24),
               _buildStatsGrid(),
               const SizedBox(height: 32),
-              _buildSectionHeader('Quick Actions'),
+              _buildSectionHeader('Quick Console'),
               const SizedBox(height: 16),
               _buildQuickActions(),
               const SizedBox(height: 32),
-              _buildEarningsCard(),
+              _buildEarningsCard(fullName),
               const SizedBox(height: 32),
               _buildSectionHeader(
                 _isNearMeEnabled ? 'Jobs Near You (20km)' : 'New Job Opportunities', 
@@ -126,6 +143,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
               ),
               const SizedBox(height: 16),
               _buildOpportunitiesList(),
+              const SizedBox(height: 24),
             ],
           ),
         ),
@@ -139,14 +157,14 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+          style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
         ),
         if (action != null)
           TextButton(
             onPressed: onAction,
             child: Text(
               action,
-              style: const TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.w600),
+              style: GoogleFonts.outfit(color: const Color(0xFF0A84FF), fontWeight: FontWeight.bold, fontSize: 13),
             ),
           ),
       ],
@@ -177,12 +195,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           crossAxisCount: 2,
           crossAxisSpacing: 16,
           mainAxisSpacing: 16,
-          childAspectRatio: 1.1,
+          childAspectRatio: 1.15,
           children: [
-            _buildStatCard('Active Jobs', activeJobsCount.toString(), Icons.work_outline, const Color(0xFF6366F1)),
-            _buildStatCard('Rating', (stats?['rating'] ?? '0.0').toString(), Icons.star_outline, const Color(0xFF10B981)),
-            _buildStatCard('Jobs Done', completedJobsCount.toString(), Icons.check_circle_outline, const Color(0xFFF59E0B)),
-            _buildStatCard('Experience', '${stats?['experience_years'] ?? '0'} Yrs', Icons.access_time, const Color(0xFF6366F1).withOpacity(0.7)),
+            _buildStatCard('Active Jobs', activeJobsCount.toString(), Icons.assignment_rounded, const Color(0xFF0A84FF)),
+            _buildStatCard('Rating', (stats?['rating'] ?? '5.0').toString(), Icons.star_rounded, const Color(0xFFFFB020)),
+            _buildStatCard('Jobs Done', completedJobsCount.toString(), Icons.check_circle_rounded, const Color(0xFF2ECC71)),
+            _buildStatCard('Experience', '${stats?['experience_years'] ?? '0'} Yrs', Icons.military_tech_rounded, const Color(0xFF003B95)),
           ],
         );
       },
@@ -191,32 +209,39 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
 
   Widget _buildStatCard(String label, String value, IconData icon, Color color) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.01),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Container(
-            padding: const EdgeInsets.all(10),
+            padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: color.withOpacity(0.1),
+              color: color.withOpacity(0.08),
               borderRadius: BorderRadius.circular(12),
             ),
-            child: Icon(icon, color: color, size: 24),
+            child: Icon(icon, color: color, size: 22),
           ),
           const Spacer(),
           Text(
             value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
           ),
-          const SizedBox(height: 4),
+          const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(fontSize: 12, color: Color(0xFF94A3B8)),
+            style: GoogleFonts.outfit(fontSize: 11, color: const Color(0xFF64748B), fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -226,9 +251,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   Widget _buildQuickActions() {
     return Row(
       children: [
-        Expanded(child: _buildActionItem(Icons.business_center_outlined, 'Browse Jobs', () => context.push('/browse-jobs'))),
+        Expanded(child: _buildActionItem(Icons.search_rounded, 'Browse Opportunities', () => context.push('/browse-jobs'))),
         const SizedBox(width: 16),
-        Expanded(child: _buildActionItem(Icons.trending_up, 'My Bids', () => context.read<NavigationService>().setIndex(2))),
+        Expanded(child: _buildActionItem(Icons.gavel_rounded, 'My Bids Console', () => context.read<NavigationService>().setIndex(2))),
       ],
     );
   }
@@ -236,21 +261,38 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   Widget _buildActionItem(IconData icon, String label, VoidCallback onTap) {
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(20),
+      borderRadius: BorderRadius.circular(24),
       child: Container(
-        padding: const EdgeInsets.symmetric(vertical: 20),
+        padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFF1F5F9)),
+          borderRadius: BorderRadius.circular(24),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black.withOpacity(0.01),
+              blurRadius: 8,
+              offset: const Offset(0, 4),
+            ),
+          ],
         ),
         child: Column(
           children: [
-            Icon(icon, color: const Color(0xFF64748B), size: 24),
+            Container(
+              padding: const EdgeInsets.all(10),
+              decoration: BoxDecoration(
+                color: const Color(0xFF003B95).withOpacity(0.06),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(icon, color: const Color(0xFF003B95), size: 24),
+            ),
             const SizedBox(height: 12),
             Text(
               label,
-              style: const TextStyle(fontSize: 14, fontWeight: FontWeight.w600, color: Color(0xFF1E293B)),
+              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+              textAlign: TextAlign.center,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
             ),
           ],
         ),
@@ -258,13 +300,23 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     );
   }
 
-  Widget _buildEarningsCard() {
+  Widget _buildEarningsCard(String fullName) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        gradient: const LinearGradient(
+          colors: [Color(0xFF003B95), Color(0xFF0A84FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(28),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF003B95).withOpacity(0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -272,22 +324,44 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              const Text(
+              Text(
                 "This Month's Earnings",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white.withValues(alpha: 0.9)),
               ),
-              TextButton(
-                onPressed: () {},
-                child: const Text('View All', style: TextStyle(color: Color(0xFF64748B), fontSize: 12)),
+              ElevatedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => WalletBottomSheet(userName: fullName),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF003B95),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Wallet Console',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 12),
+                ),
               ),
             ],
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 4),
           Text(
-            '\$${context.watch<ProviderService>().dashboardStats?['total_earnings'] ?? '0'}',
-            style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+            'PKR ${context.watch<ProviderService>().dashboardStats?['total_earnings'] ?? '0'}',
+            style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 0.5),
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: 24),
+          Text(
+            'Weekly Performance Stats',
+            style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
+          ),
+          const SizedBox(height: 16),
           _buildWeeklyChart(),
         ],
       ),
@@ -305,15 +379,18 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
         return Column(
           children: [
             Container(
-              width: 12,
-              height: 100 * heights[index],
+              width: 14,
+              height: 80 * heights[index],
               decoration: BoxDecoration(
-                color: const Color(0xFFF1F5F9),
+                color: Colors.white.withOpacity(0.25),
                 borderRadius: BorderRadius.circular(4),
               ),
             ),
-            const SizedBox(height: 12),
-            Text(days[index], style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+            const SizedBox(height: 8),
+            Text(
+              days[index], 
+              style: GoogleFonts.outfit(color: Colors.white70, fontSize: 10, fontWeight: FontWeight.w500),
+            ),
           ],
         );
       }),
@@ -324,7 +401,23 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     return Consumer<JobService>(
       builder: (context, service, _) {
         final openJobs = service.jobs.take(3).toList();
-        if (openJobs.isEmpty) return const Center(child: Text('No new opportunities.'));
+        if (openJobs.isEmpty) {
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Center(
+              child: Text(
+                'No new opportunities available right now.',
+                style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 14),
+              ),
+            ),
+          );
+        }
         return Column(
           children: openJobs.map((job) => _buildOpportunityCard(job)).toList(),
         );
@@ -335,86 +428,103 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   Widget _buildOpportunityCard(Map<String, dynamic> job) {
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
-      padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.01),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Expanded(
-                child: Text(
-                  job['title'] ?? 'Job Title',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+          Padding(
+            padding: const EdgeInsets.all(18),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Expanded(
+                      child: Text(
+                        job['title'] ?? 'Job Title',
+                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF2ECC71).withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        job['category_name']?.toUpperCase() ?? 'CAT',
+                        style: GoogleFonts.outfit(color: const Color(0xFF2ECC71), fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  job['description'] ?? 'No description provided.',
+                  style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 13, height: 1.4),
+                  maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: const Color(0xFF10B981).withOpacity(0.1),
-                  borderRadius: BorderRadius.circular(12),
+                const SizedBox(height: 20),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
+                    const SizedBox(width: 4),
+                    Expanded(
+                      child: Text(
+                        '${job['location'] ?? 'Downtown'}${job['distance'] != null ? ' (${double.parse(job['distance'].toString()).toStringAsFixed(1)} km away)' : ''}',
+                        style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF94A3B8)),
+                    const SizedBox(width: 4),
+                    Text(
+                      job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
+                      style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                    ),
+                  ],
                 ),
-                child: Text(
-                  job['category_name']?.toUpperCase() ?? 'CAT',
-                  style: const TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold),
+                const SizedBox(height: 20),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text(
+                      'PKR ${(double.tryParse(job['budget'].toString()) ?? 150.0).toStringAsFixed(0)}',
+                      style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF003B95)),
+                    ),
+                    ElevatedButton(
+                      onPressed: () => context.push('/job-detail/${job['id']}'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF003B95),
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                      ),
+                      child: Text(
+                        'Bid Console',
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13),
+                      ),
+                    ),
+                  ],
                 ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 8),
-          Text(
-            job['description'] ?? 'No description provided.',
-            style: const TextStyle(color: Color(0xFF64748B), fontSize: 13),
-            maxLines: 2,
-            overflow: TextOverflow.ellipsis,
-          ),
-          const SizedBox(height: 20),
-          Row(
-            children: [
-              const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  '${job['location'] ?? 'Downtown'}${job['distance'] != null ? ' (${double.parse(job['distance'].toString()).toStringAsFixed(1)} km away)' : ''}',
-                  style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
-                  overflow: TextOverflow.ellipsis,
-                ),
-              ),
-              const SizedBox(width: 16),
-              const Icon(Icons.access_time, size: 14, color: Color(0xFF94A3B8)),
-              const SizedBox(width: 4),
-              Text(
-                job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
-                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
-              ),
-            ],
-          ),
-          const SizedBox(height: 20),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                '\$${job['budget'] ?? '150'}',
-                style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
-              ),
-              ElevatedButton.icon(
-                onPressed: () => context.push('/job-detail/${job['id']}'),
-                icon: const Icon(Icons.chevron_right, size: 16),
-                label: const Text('Place Bid'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  foregroundColor: Colors.white,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                ),
-              ),
-            ],
+              ],
+            ),
           ),
         ],
       ),
@@ -426,7 +536,6 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     final lat = user['latitude'];
     final lng = user['longitude'];
     
-    // Show warning if coordinates are missing, null, or exactly zero
     if (lat == null || lng == null) return true;
     
     final dLat = double.tryParse(lat.toString()) ?? 0.0;
@@ -440,31 +549,40 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
         color: const Color(0xFFFEF2F2),
-        borderRadius: BorderRadius.circular(16),
-        border: Border.all(color: const Color(0xFFFECACA)),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFFECACA), width: 1.5),
       ),
       child: Row(
         children: [
-          const Icon(Icons.location_off_outlined, color: Color(0xFFEF4444)),
+          const Icon(Icons.location_off_outlined, color: Color(0xFFEF4444), size: 24),
           const SizedBox(width: 12),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const Text(
-                  'Service Area Not Set',
-                  style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF991B1B)),
-                ),
                 Text(
-                  'Set your location in profile to see jobs near you automatically.',
-                  style: TextStyle(fontSize: 12, color: const Color(0xFF991B1B).withOpacity(0.8)),
+                  'Service Area Not Configured',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: const Color(0xFF991B1B), fontSize: 14),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Configure your default coordinates to find matching customer jobs around you.',
+                  style: GoogleFonts.outfit(fontSize: 12, color: const Color(0xFF991B1B).withOpacity(0.85), height: 1.3),
                 ),
               ],
             ),
           ),
-          TextButton(
-            onPressed: () => context.push('/profile', extra: true), // Open profile in edit mode
-            child: const Text('Set Now', style: TextStyle(color: Color(0xFFEF4444), fontWeight: FontWeight.bold)),
+          const SizedBox(width: 8),
+          ElevatedButton(
+            onPressed: () => context.push('/profile', extra: true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: const Color(0xFFEF4444),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
+              elevation: 0,
+            ),
+            child: Text('Set Now', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 11)),
           ),
         ],
       ),

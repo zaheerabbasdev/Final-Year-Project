@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/api_client.dart';
 import '../../auth/auth_service.dart';
 import '../category_service.dart';
@@ -9,6 +10,7 @@ import '../job_service.dart';
 import '../../provider/provider_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../../../shared/widgets/wallet_bottom_sheet.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -50,13 +52,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final userName = context.watch<AuthService>().user?['full_name'] ?? 'User';
     final avatarPath = context.watch<AuthService>().user?['avatar'];
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: const Color(0xFFF5F7FB),
       body: SafeArea(
         child: RefreshIndicator(
+          color: const Color(0xFF003B95),
           onRefresh: () async {
             await Future.wait([
               context.read<CategoryService>().fetchCategories(),
@@ -70,7 +74,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                const SizedBox(height: 16),
+                const SizedBox(height: 20),
                 _buildHeader(avatarUrl),
                 const SizedBox(height: 20),
                 _buildSearchBar(),
@@ -80,6 +84,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   const SizedBox(height: 16),
                   _buildSearchResults(),
                 ] else ...[
+                  _buildWalletCard(userName),
+                  const SizedBox(height: 24),
                   _buildPromoCard(context),
                   const SizedBox(height: 32),
                   _buildSectionHeader('Browse Categories', 'See All', () {}),
@@ -105,36 +111,55 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   Widget _buildHeader(String? avatarUrl) {
     final userName = context.watch<AuthService>().user?['full_name'] ?? 'User';
+    final firstName = userName.split(' ').first;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Customer Dashboard',
-              style: TextStyle(
-                fontSize: 22,
-                fontWeight: FontWeight.bold,
-                color: Color(0xFF1E293B),
+            Text(
+              'Welcome Back,',
+              style: GoogleFonts.outfit(
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+                color: const Color(0xFF64748B),
               ),
             ),
+            const SizedBox(height: 2),
             Text(
-              'Welcome back, $userName!',
-              style: const TextStyle(fontSize: 14, color: Color(0xFF64748B)),
+              '$firstName 👋',
+              style: GoogleFonts.outfit(
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+                color: const Color(0xFF1E293B),
+              ),
             ),
           ],
         ),
         Row(
           children: [
-            const NotificationBell(),
-            const SizedBox(width: 8),
-            CircleAvatar(
-              radius: 22,
-              backgroundImage: avatarUrl != null 
-                ? NetworkImage(avatarUrl)
-                : const NetworkImage('https://i.pravatar.cc/150?u=zubair'),
-              backgroundColor: const Color(0xFFF1F5F9),
+            const NotificationBell(color: Color(0xFF1E293B)),
+            const SizedBox(width: 12),
+            Container(
+              decoration: BoxDecoration(
+                shape: BoxShape.circle,
+                border: Border.all(color: Colors.white, width: 2),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.05),
+                    blurRadius: 8,
+                    offset: const Offset(0, 4),
+                  ),
+                ],
+              ),
+              child: CircleAvatar(
+                radius: 22,
+                backgroundImage: avatarUrl != null 
+                  ? NetworkImage(avatarUrl)
+                  : const NetworkImage('https://i.pravatar.cc/150?u=zubair'),
+                backgroundColor: const Color(0xFFF1F5F9),
+              ),
             ),
           ],
         ),
@@ -147,10 +172,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 16),
       decoration: BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(20),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
         boxShadow: [
           BoxShadow(
-            color: Colors.black.withOpacity(0.04),
+            color: Colors.black.withOpacity(0.02),
             blurRadius: 10,
             offset: const Offset(0, 4),
           ),
@@ -161,11 +187,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         onChanged: _onSearchChanged,
         decoration: InputDecoration(
           hintText: 'Search services or providers...',
-          hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 16),
-          prefixIcon: const Icon(Icons.search, color: Color(0xFF94A3B8)),
+          hintStyle: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 15),
+          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8)),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear, color: Color(0xFF94A3B8)),
+                  icon: const Icon(Icons.clear_rounded, color: Color(0xFF94A3B8)),
                   onPressed: () {
                     _searchController.clear();
                     _onSearchChanged('');
@@ -173,8 +199,120 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 )
               : null,
           border: InputBorder.none,
+          enabledBorder: InputBorder.none,
+          focusedBorder: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
+        style: GoogleFonts.outfit(fontSize: 15, color: const Color(0xFF1E293B)),
+      ),
+    );
+  }
+
+  Widget _buildWalletCard(String userName) {
+    return Container(
+      width: double.infinity,
+      decoration: BoxDecoration(
+        gradient: const LinearGradient(
+          colors: [Color(0xFF003B95), Color(0xFF0A84FF)],
+          begin: Alignment.topLeft,
+          end: Alignment.bottomRight,
+        ),
+        borderRadius: BorderRadius.circular(24),
+        boxShadow: [
+          BoxShadow(
+            color: const Color(0xFF003B95).withOpacity(0.25),
+            blurRadius: 16,
+            offset: const Offset(0, 8),
+          ),
+        ],
+      ),
+      padding: const EdgeInsets.all(20),
+      child: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              Row(
+                children: [
+                  Container(
+                    padding: const EdgeInsets.all(8),
+                    decoration: BoxDecoration(
+                      color: Colors.white.withOpacity(0.12),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 20),
+                  ),
+                  const SizedBox(width: 12),
+                  Text(
+                    'Kaarkun Wallet',
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w600,
+                    ),
+                  ),
+                ],
+              ),
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                decoration: BoxDecoration(
+                  color: Colors.white.withOpacity(0.15),
+                  borderRadius: BorderRadius.circular(12),
+                ),
+                child: Text(
+                  'ACTIVE',
+                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                ),
+              ),
+            ],
+          ),
+          const SizedBox(height: 24),
+          Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            crossAxisAlignment: CrossAxisAlignment.end,
+            children: [
+              Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    'Available Balance',
+                    style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    'PKR 12,500.00',
+                    style: GoogleFonts.outfit(
+                      color: Colors.white,
+                      fontSize: 26,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ],
+              ),
+              ElevatedButton(
+                onPressed: () {
+                  showModalBottomSheet(
+                    context: context,
+                    isScrollControlled: true,
+                    backgroundColor: Colors.transparent,
+                    builder: (context) => WalletBottomSheet(userName: userName),
+                  );
+                },
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: Colors.white,
+                  foregroundColor: const Color(0xFF003B95),
+                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Manage',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
@@ -193,23 +331,34 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           itemBuilder: (context, index) {
             final provider = service.searchResults[index];
             final avatarUrl = ApiClient.getImageUrl(provider['avatar']);
-            return ListTile(
-              contentPadding: const EdgeInsets.symmetric(vertical: 8),
-              leading: CircleAvatar(
-                backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                child: avatarUrl == null ? Text(provider['full_name']?[0] ?? 'P') : null,
+            return Container(
+              margin: const EdgeInsets.only(bottom: 12),
+              decoration: BoxDecoration(
+                color: Colors.white,
+                borderRadius: BorderRadius.circular(18),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
               ),
-              title: Text(provider['full_name'] ?? 'Unknown Provider', style: const TextStyle(fontWeight: FontWeight.bold)),
-              subtitle: Text(provider['bio'] ?? 'No bio provided', maxLines: 1, overflow: TextOverflow.ellipsis),
-              trailing: Row(
-                mainAxisSize: MainAxisSize.min,
-                children: [
-                  const Icon(Icons.star, color: Colors.amber, size: 16),
-                  const SizedBox(width: 4),
-                  Text((provider['rating'] ?? 5.0).toString()),
-                ],
+              child: ListTile(
+                contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                leading: CircleAvatar(
+                  backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                  child: avatarUrl == null ? Text(provider['full_name']?[0] ?? 'P') : null,
+                ),
+                title: Text(provider['full_name'] ?? 'Unknown Provider', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+                subtitle: Text(provider['bio'] ?? 'No bio provided', maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.outfit()),
+                trailing: Row(
+                  mainAxisSize: MainAxisSize.min,
+                  children: [
+                    const Icon(Icons.star_rounded, color: Colors.amber, size: 18),
+                    const SizedBox(width: 4),
+                    Text(
+                      (provider['rating'] ?? 5.0).toString(),
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
+                    ),
+                  ],
+                ),
+                onTap: () {},
               ),
-              onTap: () {}, // Navigate to provider profile if exists
             );
           },
         );
@@ -222,15 +371,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       width: double.infinity,
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF10B981)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
+        color: const Color(0xFF1E293B),
+        image: const DecorationImage(
+          image: NetworkImage('https://images.unsplash.com/photo-1621905251189-08b45d6a269e?auto=format&fit=crop&w=600&q=80'),
+          fit: BoxFit.cover,
+          opacity: 0.15,
         ),
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.3),
+            color: const Color(0xFF1E293B).withOpacity(0.15),
             blurRadius: 20,
             offset: const Offset(0, 10),
           ),
@@ -239,33 +389,33 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text(
+          Text(
             'Need a Service?',
-            style: TextStyle(
+            style: GoogleFonts.outfit(
               color: Colors.white,
               fontSize: 22,
               fontWeight: FontWeight.bold,
             ),
           ),
           const SizedBox(height: 8),
-          const SizedBox(
-            width: 200,
+          SizedBox(
+            width: 220,
             child: Text(
-              'Post your job and get bids from qualified providers',
-              style: TextStyle(color: Colors.white70, fontSize: 14),
+              'Post your job request instantly and receive bids from pre-verified professional workers.',
+              style: GoogleFonts.outfit(color: Colors.white70, fontSize: 13, height: 1.4),
             ),
           ),
-          const SizedBox(height: 20),
+          const SizedBox(height: 24),
           ElevatedButton.icon(
             onPressed: () => context.push('/post-job'),
-            icon: const Icon(Icons.add, size: 18),
-            label: const Text('Post a Job'),
+            icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
+            label: const Text('Post a Job Request'),
             style: ElevatedButton.styleFrom(
-              backgroundColor: Colors.white,
-              foregroundColor: const Color(0xFF6366F1),
-              minimumSize: const Size(120, 44),
+              backgroundColor: const Color(0xFF003B95),
+              foregroundColor: Colors.white,
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(14),
               ),
             ),
           ),
@@ -280,22 +430,24 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       children: [
         Text(
           title,
-          style: const TextStyle(
+          style: GoogleFonts.outfit(
             fontSize: 18,
             fontWeight: FontWeight.bold,
-            color: Color(0xFF1E293B),
+            color: const Color(0xFF1E293B),
           ),
         ),
-        GestureDetector(
-          onTap: onAction,
-          child: Text(
-            action,
-            style: const TextStyle(
-              color: Color(0xFF6366F1),
-              fontWeight: FontWeight.w600,
+        if (action.isNotEmpty)
+          GestureDetector(
+            onTap: onAction,
+            child: Text(
+              action,
+              style: GoogleFonts.outfit(
+                color: const Color(0xFF0A84FF),
+                fontWeight: FontWeight.bold,
+                fontSize: 13,
+              ),
             ),
           ),
-        ),
       ],
     );
   }
@@ -318,30 +470,55 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
             crossAxisCount: 4,
             mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 0.8,
+            crossAxisSpacing: 12,
+            childAspectRatio: 0.82,
           ),
           itemCount: categories.length,
           itemBuilder: (context, index) {
             final cat = categories[index];
             final iconData = _getIconData(cat['icon']);
+            
+            // Premium colored containers for categories
+            final List<Color> bgColors = [
+              const Color(0xFF003B95).withOpacity(0.06),
+              const Color(0xFF0A84FF).withOpacity(0.06),
+              const Color(0xFF2ECC71).withOpacity(0.06),
+              const Color(0xFFFFB020).withOpacity(0.06),
+            ];
+            
+            final List<Color> iconColors = [
+              const Color(0xFF003B95),
+              const Color(0xFF0A84FF),
+              const Color(0xFF2ECC71),
+              const Color(0xFFFFB020),
+            ];
+            
+            final colorIdx = index % 4;
+
             return InkWell(
               onTap: () {},
-              borderRadius: BorderRadius.circular(16),
+              borderRadius: BorderRadius.circular(20),
               child: Column(
                 children: [
                   Container(
-                    padding: const EdgeInsets.all(16),
+                    width: 60,
+                    height: 60,
                     decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(16),
+                      color: bgColors[colorIdx],
+                      borderRadius: BorderRadius.circular(20),
+                      border: Border.all(color: iconColors[colorIdx].withOpacity(0.12), width: 1.5),
                     ),
-                    child: Icon(iconData, color: const Color(0xFF6366F1)),
+                    alignment: Alignment.center,
+                    child: Icon(iconData, color: iconColors[colorIdx], size: 26),
                   ),
                   const SizedBox(height: 8),
                   Text(
                     cat['name'] as String,
-                    style: const TextStyle(fontSize: 12, fontWeight: FontWeight.w500, color: Color(0xFF475569)),
+                    style: GoogleFonts.outfit(
+                      fontSize: 11, 
+                      fontWeight: FontWeight.w600, 
+                      color: const Color(0xFF1E293B),
+                    ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
                     overflow: TextOverflow.ellipsis,
@@ -357,15 +534,15 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   IconData _getIconData(String? iconName) {
     switch (iconName) {
-      case 'plumber_icon': return Icons.build_outlined;
-      case 'electrician_icon': return Icons.bolt_outlined;
-      case 'carpenter_icon': return Icons.handyman_outlined;
-      case 'painter_icon': return Icons.format_paint_outlined;
-      case 'cleaner_icon': return Icons.cleaning_services_outlined;
-      case 'gardener_icon': return Icons.eco_outlined;
-      case 'ac_repair_icon': return Icons.ac_unit_outlined;
-      case 'appliance_repair_icon': return Icons.electrical_services_outlined;
-      default: return Icons.home_repair_service_outlined;
+      case 'plumber_icon': return Icons.plumbing_rounded;
+      case 'electrician_icon': return Icons.electrical_services_rounded;
+      case 'carpenter_icon': return Icons.handyman_rounded;
+      case 'painter_icon': return Icons.format_paint_rounded;
+      case 'cleaner_icon': return Icons.cleaning_services_rounded;
+      case 'gardener_icon': return Icons.yard_rounded;
+      case 'ac_repair_icon': return Icons.ac_unit_rounded;
+      case 'appliance_repair_icon': return Icons.kitchen_rounded;
+      default: return Icons.home_repair_service_rounded;
     }
   }
 
@@ -374,10 +551,19 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       builder: (context, service, _) {
         if (service.isLoading) return const Center(child: CircularProgressIndicator());
         if (service.jobs.isEmpty) {
-          return const Center(
-            child: Padding(
-              padding: EdgeInsets.all(20),
-              child: Text('No recent jobs found.', style: TextStyle(color: Color(0xFF94A3B8))),
+          return Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+              border: Border.all(color: const Color(0xFFE2E8F0)),
+            ),
+            child: Center(
+              child: Text(
+                'No jobs posted yet. Create one to begin!',
+                style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 14),
+              ),
             ),
           );
         }
@@ -409,102 +595,142 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     required bool isNegotiable,
     required bool isEmergency,
   }) {
-    return InkWell(
-      onTap: () => context.push('/job-detail/$id'),
-      borderRadius: BorderRadius.circular(20),
-      child: Container(
-        margin: const EdgeInsets.only(bottom: 16),
-        padding: const EdgeInsets.all(16),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          borderRadius: BorderRadius.circular(20),
-          border: Border.all(color: const Color(0xFFF1F5F9)),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Expanded(
-                  child: Text(
-                    title,
-                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+    Color statusBgColor = const Color(0xFF0A84FF).withOpacity(0.08);
+    Color statusTextColor = const Color(0xFF0A84FF);
+    if (status.toLowerCase() == 'completed') {
+      statusBgColor = const Color(0xFF2ECC71).withOpacity(0.08);
+      statusTextColor = const Color(0xFF2ECC71);
+    } else if (status.toLowerCase() == 'active') {
+      statusBgColor = const Color(0xFFFFB020).withOpacity(0.08);
+      statusTextColor = const Color(0xFFFFB020);
+    }
+
+    return Container(
+      margin: const EdgeInsets.only(bottom: 16),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        borderRadius: BorderRadius.circular(24),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withOpacity(0.01),
+            blurRadius: 10,
+            offset: const Offset(0, 4),
+          ),
+        ],
+      ),
+      child: InkWell(
+        onTap: () => context.push('/job-detail/$id'),
+        borderRadius: BorderRadius.circular(24),
+        child: Padding(
+          padding: const EdgeInsets.all(18),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: GoogleFonts.outfit(
+                        fontSize: 16, 
+                        fontWeight: FontWeight.bold, 
+                        color: const Color(0xFF1E293B),
+                      ),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
                   ),
-                ),
-                const SizedBox(width: 8),
-                Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: const Color(0xFF6366F1).withOpacity(0.1),
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    status.toUpperCase(),
-                    style: const TextStyle(color: Color(0xFF6366F1), fontSize: 10, fontWeight: FontWeight.bold),
-                  ),
-                ),
-                if (isEmergency) ...[
                   const SizedBox(width: 8),
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFFFEF2F2),
+                      color: statusBgColor,
                       borderRadius: BorderRadius.circular(12),
                     ),
-                    child: const Icon(Icons.bolt, color: Color(0xFFB91C1C), size: 12),
-                  ),
-                ],
-              ],
-            ),
-            const SizedBox(height: 8),
-            Text(
-              description,
-              style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
-              maxLines: 2,
-              overflow: TextOverflow.ellipsis,
-            ),
-            const SizedBox(height: 16),
-            Row(
-              children: [
-                Text(
-                  '\$$price',
-                  style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
-                ),
-                if (isNegotiable) ...[
-                  const SizedBox(width: 8),
-                  Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                    decoration: BoxDecoration(
-                      color: const Color(0xFF6366F1).withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(4),
-                    ),
-                    child: const Text(
-                      'NEGOTIABLE',
-                      style: TextStyle(color: Color(0xFF6366F1), fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                    child: Text(
+                      status.toUpperCase(),
+                      style: GoogleFonts.outfit(
+                        color: statusTextColor, 
+                        fontSize: 10, 
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 0.5,
+                      ),
                     ),
                   ),
+                  if (isEmergency) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.all(4),
+                      decoration: const BoxDecoration(
+                        color: Color(0xFFFEF2F2),
+                        shape: BoxShape.circle,
+                      ),
+                      child: const Icon(Icons.flash_on_rounded, color: Color(0xFFEF4444), size: 14),
+                    ),
+                  ],
                 ],
-                const SizedBox(width: 16),
-                const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
-                const SizedBox(width: 4),
-                Flexible(
-                  child: Text(
-                    location,
-                    style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
-                    maxLines: 1,
-                    overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                description,
+                style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 13, height: 1.4),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
+              ),
+              const SizedBox(height: 16),
+              Row(
+                children: [
+                  Text(
+                    'PKR ${price.toStringAsFixed(0)}',
+                    style: GoogleFonts.outfit(
+                      fontSize: 16, 
+                      fontWeight: FontWeight.bold, 
+                      color: const Color(0xFF003B95),
+                    ),
                   ),
-                ),
-                const Spacer(),
-                const Icon(Icons.trending_up, size: 14, color: Color(0xFF94A3B8)),
-                const SizedBox(width: 4),
-                Text('$bids bids', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
-              ],
-            ),
-          ],
+                  if (isNegotiable) ...[
+                    const SizedBox(width: 8),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFF003B95).withOpacity(0.08),
+                        borderRadius: BorderRadius.circular(6),
+                      ),
+                      child: Text(
+                        'NEGOTIABLE',
+                        style: GoogleFonts.outfit(
+                          color: const Color(0xFF003B95), 
+                          fontSize: 9, 
+                          fontWeight: FontWeight.bold, 
+                          letterSpacing: 0.5,
+                        ),
+                      ),
+                    ),
+                  ],
+                  const Spacer(),
+                  const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
+                  const SizedBox(width: 4),
+                  Flexible(
+                    child: Text(
+                      location,
+                      style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                      maxLines: 1,
+                      overflow: TextOverflow.ellipsis,
+                    ),
+                  ),
+                  const SizedBox(width: 12),
+                  const Icon(Icons.trending_up_rounded, size: 14, color: Color(0xFF2ECC71)),
+                  const SizedBox(width: 4),
+                  Text(
+                    '$bids bids', 
+                    style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -523,7 +749,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         }
 
         return SizedBox(
-          height: 170,
+          height: 180,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
             itemCount: providers.length,
@@ -531,42 +757,61 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               final provider = providers[index];
               final avatarUrl = ApiClient.getImageUrl(provider['avatar']);
               return Container(
-                width: 160,
-                margin: const EdgeInsets.only(right: 16),
+                width: 150,
+                margin: const EdgeInsets.only(right: 16, bottom: 8),
                 padding: const EdgeInsets.all(16),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  border: Border.all(color: const Color(0xFFF1F5F9)),
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFFE2E8F0)),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.01),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
                 ),
                 child: Column(
                   children: [
-                    CircleAvatar(
-                      radius: 30,
-                      backgroundImage: avatarUrl != null 
-                        ? NetworkImage(avatarUrl)
-                        : const NetworkImage('https://i.pravatar.cc/150?u=provider'),
-                      backgroundColor: const Color(0xFFF1F5F9),
+                    Container(
+                      decoration: BoxDecoration(
+                        shape: BoxShape.circle,
+                        border: Border.all(color: const Color(0xFF0A84FF).withOpacity(0.2), width: 2),
+                      ),
+                      child: CircleAvatar(
+                        radius: 28,
+                        backgroundImage: avatarUrl != null 
+                          ? NetworkImage(avatarUrl)
+                          : const NetworkImage('https://i.pravatar.cc/150?u=provider'),
+                        backgroundColor: const Color(0xFFF1F5F9),
+                      ),
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     Text(
                       provider['full_name'] as String,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF1E293B)),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
-                    const SizedBox(height: 8),
-                    Row(
-                      mainAxisAlignment: MainAxisAlignment.center,
-                      children: [
-                        const Icon(Icons.star, color: Colors.amber, size: 14),
-                        const SizedBox(width: 4),
-                        Text(
-                          (provider['rating'] ?? 0.0).toString(),
-                          style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12),
-                        ),
-                      ],
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFFFB020).withOpacity(0.1),
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      child: Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          const Icon(Icons.star_rounded, color: Color(0xFFFFB020), size: 14),
+                          const SizedBox(width: 4),
+                          Text(
+                            (provider['rating'] ?? 5.0).toString(),
+                            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 11, color: const Color(0xFFB45309)),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),

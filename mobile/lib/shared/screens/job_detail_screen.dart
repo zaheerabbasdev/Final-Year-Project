@@ -6,7 +6,9 @@ import '../../features/auth/auth_service.dart';
 import '../../shared/services/booking_service.dart';
 import '../../../core/api_client.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../shared/widgets/notification_bell.dart';
+import '../../core/theme.dart';
 
 class JobDetailScreen extends StatefulWidget {
   final int jobId;
@@ -72,27 +74,28 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: const Color(0xFFF8FAFC),
+        backgroundColor: AppTheme.backgroundColor,
         appBar: AppBar(
           backgroundColor: Colors.white,
           elevation: 0,
+          scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back, color: Color(0xFF1E293B)),
+            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textColor, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
-          title: const Text(
+          title: Text(
             'Job Details',
-            style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
+            style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           actions: [
-            const NotificationBell(color: Color(0xFF1E293B)),
+            const NotificationBell(color: AppTheme.textColor),
           ],
           bottom: TabBar(
-            indicatorColor: const Color(0xFF6366F1),
+            indicatorColor: AppTheme.primaryColor,
             indicatorWeight: 3,
-            labelColor: const Color(0xFF6366F1),
-            unselectedLabelColor: const Color(0xFF64748B),
-            labelStyle: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+            labelColor: AppTheme.primaryColor,
+            unselectedLabelColor: AppTheme.subtextColor,
+            labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
             tabs: [
               const Tab(text: 'Details'),
               Tab(text: 'Bids (${_bids.length})'),
@@ -133,20 +136,21 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       isButtonEnabled = true;
     }
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E293B)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textColor, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Job Details',
-          style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
-          const NotificationBell(color: Color(0xFF1E293B)),
+          const NotificationBell(color: AppTheme.textColor),
         ],
       ),
       body: SingleChildScrollView(
@@ -159,7 +163,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.textColor.withOpacity(0.02),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -170,18 +181,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       Expanded(
                         child: Text(
                           _job?['title'] ?? 'No Title',
-                          style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                          style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.textColor),
                         ),
                       ),
                       Container(
                         padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6366F1).withOpacity(0.1),
+                          color: AppTheme.primaryColor.withOpacity(0.08),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: Text(
                           (_job?['status'] ?? 'OPEN').toUpperCase(),
-                          style: const TextStyle(color: Color(0xFF6366F1), fontSize: 10, fontWeight: FontWeight.bold),
+                          style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 10, fontWeight: FontWeight.bold),
                         ),
                       ),
                       if (_checkIsEmergency(_job?['is_emergency'])) ...[
@@ -189,18 +200,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         Container(
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           decoration: BoxDecoration(
-                            color: const Color(0xFFFEF2F2),
+                            color: AppTheme.errorColor.withOpacity(0.08),
                             borderRadius: BorderRadius.circular(12),
-                            border: Border.all(color: const Color(0xFFFEE2E2)),
+                            border: Border.all(color: AppTheme.errorColor.withOpacity(0.2)),
                           ),
-                          child: const Row(
+                          child: Row(
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              Icon(Icons.bolt, color: Color(0xFFB91C1C), size: 14),
-                              SizedBox(width: 4),
+                              const Icon(Icons.bolt_rounded, color: AppTheme.errorColor, size: 14),
+                              const SizedBox(width: 4),
                               Text(
                                 'EMERGENCY',
-                                style: TextStyle(color: Color(0xFFB91C1C), fontSize: 10, fontWeight: FontWeight.bold),
+                                style: GoogleFonts.outfit(color: AppTheme.errorColor, fontSize: 10, fontWeight: FontWeight.bold),
                               ),
                             ],
                           ),
@@ -212,43 +223,43 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   Container(
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
-                      color: const Color(0xFF10B981).withOpacity(0.1),
+                      color: AppTheme.successColor.withOpacity(0.08),
                       borderRadius: BorderRadius.circular(12),
                     ),
                     child: Text(
                       (_job?['category_name'] ?? 'General').toUpperCase(),
-                      style: const TextStyle(color: Color(0xFF10B981), fontSize: 10, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.outfit(color: AppTheme.successColor, fontSize: 10, fontWeight: FontWeight.bold),
                     ),
                   ),
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.access_time, size: 16, color: Color(0xFF94A3B8)),
+                      const Icon(Icons.access_time_rounded, size: 16, color: AppTheme.subtextColor),
                       const SizedBox(width: 8),
                       Text(
                         'Posted ${_job?['created_at']?.toString().split('T').first ?? 'Unknown'}',
-                        style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 13),
+                        style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Divider(color: Color(0xFFF1F5F9)),
+                  const Divider(color: Color(0xFFE2E8F0)),
                   const SizedBox(height: 24),
                   Container(
-                    padding: const EdgeInsets.all(32),
+                    padding: const EdgeInsets.all(28),
                     width: double.infinity,
                     decoration: BoxDecoration(
-                      color: const Color(0xFFF5F7FF),
-                      borderRadius: BorderRadius.circular(24),
+                      color: AppTheme.primaryColor.withOpacity(0.04),
+                      borderRadius: BorderRadius.circular(20),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        const Text('Client Budget', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
-                        const SizedBox(height: 8),
+                        Text('Client Budget', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
+                        const SizedBox(height: 6),
                         Text(
                           '\$${_job?['budget'] ?? '0'}',
-                          style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)),
+                          style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
                         ),
                       ],
                     ),
@@ -257,7 +268,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   Row(
                     children: [
                       Expanded(child: _buildSimpleStat(Icons.location_on_outlined, 'Location', _job?['location'] ?? 'Not specified')),
-                      Expanded(child: _buildSimpleStat(Icons.people_outline, 'Total Bids', '${_bids.length} bids')),
+                      Expanded(child: _buildSimpleStat(Icons.people_outline_rounded, 'Total Bids', '${_bids.length} bids')),
                     ],
                   ),
                 ],
@@ -270,25 +281,25 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 padding: const EdgeInsets.all(20),
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFFEF2F2),
+                  color: AppTheme.errorColor.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFFFEE2E2)),
+                  border: Border.all(color: AppTheme.errorColor.withOpacity(0.2)),
                 ),
-                child: const Row(
+                child: Row(
                   children: [
-                    Icon(Icons.bolt, color: Color(0xFFB91C1C), size: 32),
-                    SizedBox(width: 16),
+                    const Icon(Icons.bolt_rounded, color: AppTheme.errorColor, size: 32),
+                    const SizedBox(width: 16),
                     Expanded(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
                             'EMERGENCY REQUEST',
-                            style: TextStyle(color: Color(0xFFB91C1C), fontWeight: FontWeight.bold, fontSize: 16),
+                            style: GoogleFonts.outfit(color: AppTheme.errorColor, fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           Text(
                             'This client needs help immediately. Accept this job to start right away without bidding.',
-                            style: TextStyle(color: Color(0xFF7F1D1D), fontSize: 13),
+                            style: GoogleFonts.outfit(color: AppTheme.errorColor.withOpacity(0.9), fontSize: 13),
                           ),
                         ],
                       ),
@@ -308,11 +319,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               decoration: BoxDecoration(
                 color: Colors.white,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFF1F5F9)),
+                border: Border.all(color: const Color(0xFFE2E8F0)),
+                boxShadow: [
+                  BoxShadow(
+                    color: AppTheme.textColor.withOpacity(0.02),
+                    blurRadius: 15,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
               ),
               child: Text(
                 _job?['description'] ?? 'No description provided.',
-                style: const TextStyle(color: Color(0xFF64748B), height: 1.6, fontSize: 14),
+                style: GoogleFonts.outfit(color: AppTheme.textColor.withOpacity(0.8), height: 1.6, fontSize: 14),
               ),
             )),
             const SizedBox(height: 24),
@@ -327,16 +345,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 padding: const EdgeInsets.all(20),
                 margin: const EdgeInsets.only(bottom: 24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1).withOpacity(0.05),
+                  color: AppTheme.primaryColor.withOpacity(0.05),
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
+                  border: Border.all(color: AppTheme.primaryColor.withOpacity(0.2)),
                 ),
                 child: Column(
                   children: [
-                    const Text(
+                    Text(
                       'You are hired! Show this QR to the customer to start.',
                       textAlign: TextAlign.center,
-                      style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.w600),
+                      style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.w600),
                     ),
                     const SizedBox(height: 16),
                     SizedBox(
@@ -351,10 +369,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             _loadData();
                           }
                         },
-                        icon: const Icon(Icons.qr_code, color: Colors.white),
-                        label: const Text('Show Handshake QR', style: TextStyle(color: Colors.white)),
+                        icon: const Icon(Icons.qr_code_rounded, color: Colors.white),
+                        label: Text('Show Handshake QR', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFF6366F1),
+                          backgroundColor: AppTheme.primaryColor,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                         ),
                       ),
@@ -373,14 +391,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         final confirm = await showDialog<bool>(
                           context: context,
                           builder: (context) => AlertDialog(
-                            title: const Text('Accept Emergency Job?'),
-                            content: const Text('By accepting this emergency request, you agree to arrive at the customer\'s location as soon as possible.'),
+                            backgroundColor: Colors.white,
+                            surfaceTintColor: Colors.transparent,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                            title: Text('Accept Emergency Job?', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.textColor)),
+                            content: Text('By accepting this emergency request, you agree to arrive at the customer\'s location as soon as possible.', style: GoogleFonts.outfit(color: AppTheme.subtextColor)),
                             actions: [
-                              TextButton(onPressed: () => Navigator.pop(context, false), child: const Text('Cancel')),
+                              TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontWeight: FontWeight.bold))),
                               ElevatedButton(
                                 onPressed: () => Navigator.pop(context, true),
-                                style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFFB91C1C)),
-                                child: const Text('Accept Now'),
+                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                                child: Text('Accept Now', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
                               ),
                             ],
                           ),
@@ -390,7 +411,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           final success = await context.read<JobService>().expressAccept(widget.jobId);
                           if (success) {
                             _loadData();
-                            ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('You have accepted the job!')));
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('You have accepted the job!', style: GoogleFonts.outfit(color: Colors.white)),
+                                backgroundColor: AppTheme.successColor,
+                                behavior: SnackBarBehavior.floating,
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                margin: const EdgeInsets.all(12),
+                              ),
+                            );
                           }
                         }
                       } else {
@@ -404,7 +433,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
-                child: Text(buttonText, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                child: Text(buttonText, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold)),
               ),
             ),
             const SizedBox(height: 16),
@@ -417,7 +446,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   side: const BorderSide(color: Color(0xFFE2E8F0)),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: const Text('Save for Later', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                child: Text('Save for Later', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
               ),
             ),
             const SizedBox(height: 24),
@@ -433,7 +462,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+        Text(title, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
         const SizedBox(height: 16),
         content,
       ],
@@ -450,16 +479,24 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textColor.withOpacity(0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Row(
+        crossAxisAlignment: CrossAxisAlignment.center,
         children: [
           CircleAvatar(
             radius: 30,
-            backgroundColor: const Color(0xFF6366F1).withOpacity(0.1),
+            backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
             backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
             child: avatarUrl == null 
-                ? Text(initials, style: const TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold, fontSize: 20)) 
+                ? Text(initials, style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 20)) 
                 : null,
           ),
           const SizedBox(width: 16),
@@ -467,41 +504,68 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(customerName, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 18, color: Color(0xFF1E293B))),
+                Text(
+                  customerName,
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textColor),
+                ),
                 const SizedBox(height: 4),
-                const Text('Verified Client', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13)),
+                Text('Verified Client', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    InkWell(
+                      onTap: () {
+                        final cId = _job!['customer_id'];
+                        print('DEBUG: Navigating to customer profile from ClientInfoCard. Customer ID: $cId');
+                        if (cId != null) {
+                          context.push('/customer-profile/$cId');
+                        } else {
+                          print('DEBUG: customer_id is NULL in ClientInfoCard!');
+                        }
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.person_outline_rounded, size: 14, color: AppTheme.primaryColor),
+                            const SizedBox(width: 4),
+                            Text(
+                              'View Profile',
+                              style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    InkWell(
+                      onTap: () {
+                        context.push('/chat-room', extra: {
+                          'jobId': widget.jobId,
+                          'otherUserId': _job!['customer_id'],
+                          'otherUserName': customerName,
+                          'otherUserAvatar': avatarUrl,
+                        });
+                      },
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 4),
+                        child: Row(
+                          children: [
+                            const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: AppTheme.primaryColor),
+                            const SizedBox(width: 4),
+                            Text(
+                              'Chat',
+                              style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
               ],
             ),
           ),
-          OutlinedButton(
-            onPressed: () {
-              final cId = _job!['customer_id'];
-              print('DEBUG: Navigating to customer profile from ClientInfoCard. Customer ID: $cId');
-              if (cId != null) {
-                context.push('/customer-profile/$cId');
-              } else {
-                print('DEBUG: customer_id is NULL in ClientInfoCard!');
-              }
-            },
-            style: OutlinedButton.styleFrom(
-              side: const BorderSide(color: Color(0xFFE2E8F0)),
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-            ),
-            child: const Text('View Profile', style: TextStyle(color: Color(0xFF1E293B), fontSize: 12)),
-          ),
-          const SizedBox(width: 8),
-          IconButton(
-            icon: const Icon(Icons.chat_bubble_outline, color: Color(0xFF6366F1)),
-            onPressed: () {
-              context.push('/chat-room', extra: {
-                'jobId': widget.jobId,
-                'otherUserId': _job!['customer_id'],
-                'otherUserName': customerName,
-                'otherUserAvatar': avatarUrl,
-              });
-            },
-          ),
-
         ],
       ),
     );
@@ -513,13 +577,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textColor.withOpacity(0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         children: [
           _buildCompetitionRow('Total Bids', '${_bids.length}'),
           const SizedBox(height: 16),
-          _buildCompetitionRow('Your Status', (_job?['status'] ?? 'Open').toUpperCase(), valueColor: const Color(0xFF10B981)),
+          _buildCompetitionRow('Your Status', (_job?['status'] ?? 'Open').toUpperCase(), valueColor: AppTheme.successColor),
           const SizedBox(height: 16),
           _buildCompetitionRow('Category', _job?['category_name'] ?? 'N/A'),
         ],
@@ -531,8 +602,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14)),
-        Text(value, style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: valueColor ?? const Color(0xFF1E293B))),
+        Text(label, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(value, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: valueColor ?? AppTheme.textColor)),
       ],
     );
   }
@@ -541,17 +612,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: const Color(0xFFEEF2FF),
+        color: AppTheme.primaryColor.withOpacity(0.04),
         borderRadius: BorderRadius.circular(24),
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
-            children: const [
-              Icon(Icons.lightbulb_outline, color: Color(0xFF6366F1), size: 24),
-              SizedBox(width: 12),
-              Text('Bidding Tips', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            children: [
+              const Icon(Icons.lightbulb_outline_rounded, color: AppTheme.primaryColor, size: 24),
+              const SizedBox(width: 12),
+              Text('Bidding Tips', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
             ],
           ),
           const SizedBox(height: 16),
@@ -570,8 +641,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Text('• ', style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold)),
-          Expanded(child: Text(tip, style: const TextStyle(color: Color(0xFF64748B), fontSize: 13))),
+          Text('• ', style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)),
+          Expanded(child: Text(tip, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500))),
         ],
       ),
     );
@@ -580,24 +651,24 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Widget _buildSectionHeader(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor),
     );
   }
 
   Widget _buildSimpleStat(IconData icon, String label, String value) {
     return Row(
       children: [
-        Icon(icon, size: 20, color: const Color(0xFF6366F1)),
+        Icon(icon, size: 20, color: AppTheme.primaryColor),
         const SizedBox(width: 12),
         Expanded(
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+              Text(label, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 11, fontWeight: FontWeight.w500)),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E293B)),
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -609,8 +680,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildDetailsTab(String? role) {
-    if (_isLoading) return const Center(child: CircularProgressIndicator());
-    if (_job == null) return const Center(child: Text('Job not found'));
+    if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
+    if (_job == null) return Center(child: Text('Job not found', style: GoogleFonts.outfit(color: AppTheme.subtextColor)));
 
     final title = _job!['title'] ?? 'No Title';
     final category = _job!['category_name'] ?? 'General';
@@ -656,16 +727,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
-                color: const Color(0xFF6366F1).withOpacity(0.05),
+                color: AppTheme.primaryColor.withOpacity(0.05),
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFF6366F1).withOpacity(0.2)),
+                border: Border.all(color: AppTheme.primaryColor.withOpacity(0.2)),
               ),
               child: Column(
                 children: [
-                  const Text(
+                  Text(
                     'To start the job, please complete the secure handshake.',
                     textAlign: TextAlign.center,
-                    style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.w600),
+                    style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.w600),
                   ),
                   const SizedBox(height: 16),
                   SizedBox(
@@ -680,10 +751,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           _loadData();
                         }
                       },
-                      icon: Icon(role == 'provider' ? Icons.qr_code : Icons.qr_code_scanner),
-                      label: Text(role == 'provider' ? 'Show Handshake QR' : 'Scan Handshake QR'),
+                      icon: Icon(role == 'provider' ? Icons.qr_code_rounded : Icons.qr_code_scanner_rounded, color: Colors.white),
+                      label: Text(role == 'provider' ? 'Show Handshake QR' : 'Scan Handshake QR', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
+                        backgroundColor: AppTheme.primaryColor,
                         foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                       ),
@@ -700,12 +771,6 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             _buildCustomerCard(_job!['customer_name'], createdAt),
             const SizedBox(height: 32),
           ],
-          if (role == 'provider')
-            ElevatedButton(
-              onPressed: () {},
-              style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6366F1)),
-              child: const Text('Place Your Bid'),
-            ),
         ],
       ),
     );
@@ -717,7 +782,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textColor.withOpacity(0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -728,18 +800,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Expanded(
                 child: Text(
                   title,
-                  style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                  style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textColor),
                 ),
               ),
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1).withOpacity(0.1),
+                  color: AppTheme.primaryColor.withOpacity(0.08),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: Text(
                   status.toUpperCase(),
-                  style: const TextStyle(color: Color(0xFF6366F1), fontSize: 10, fontWeight: FontWeight.bold),
+                  style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 10, fontWeight: FontWeight.bold),
                 ),
               ),
             ],
@@ -748,16 +820,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
             decoration: BoxDecoration(
-              color: const Color(0xFF10B981).withOpacity(0.1),
+              color: AppTheme.successColor.withOpacity(0.08),
               borderRadius: BorderRadius.circular(12),
             ),
             child: Text(
               category,
-              style: const TextStyle(color: Color(0xFF10B981), fontSize: 12, fontWeight: FontWeight.bold),
+              style: GoogleFonts.outfit(color: AppTheme.successColor, fontSize: 12, fontWeight: FontWeight.bold),
             ),
           ),
           const SizedBox(height: 20),
-          const Divider(color: Color(0xFFF1F5F9)),
+          const Divider(color: Color(0xFFE2E8F0)),
         ],
       ),
     );
@@ -771,7 +843,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         const SizedBox(height: 12),
         Text(
           content,
-          style: const TextStyle(color: Color(0xFF64748B), height: 1.6, fontSize: 14),
+          style: GoogleFonts.outfit(color: AppTheme.textColor.withOpacity(0.8), height: 1.6, fontSize: 14),
         ),
       ],
     );
@@ -780,7 +852,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   Widget _buildInfoSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor),
     );
   }
 
@@ -793,10 +865,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       crossAxisSpacing: 16,
       childAspectRatio: 2.2,
       children: [
-        _buildStatItem(Icons.attach_money, 'Budget', '\$$budget'),
+        _buildStatItem(Icons.attach_money_rounded, 'Budget', '\$$budget'),
         _buildStatItem(Icons.location_on_outlined, 'Location', location),
         _buildStatItem(Icons.calendar_today_outlined, 'Posted', date),
-        _buildStatItem(Icons.people_outline, 'Bids', '$bidsCount received'),
+        _buildStatItem(Icons.people_outline_rounded, 'Bids', '$bidsCount received'),
       ],
     );
   }
@@ -806,8 +878,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       children: [
         Container(
           padding: const EdgeInsets.all(8),
-          decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12)),
-          child: Icon(icon, size: 20, color: const Color(0xFF6366F1)),
+          decoration: BoxDecoration(
+            color: AppTheme.primaryColor.withOpacity(0.04),
+            borderRadius: BorderRadius.circular(12),
+          ),
+          child: Icon(icon, size: 20, color: AppTheme.primaryColor),
         ),
         const SizedBox(width: 12),
         Expanded(
@@ -815,10 +890,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+              Text(label, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 11, fontWeight: FontWeight.w500)),
               Text(
                 value,
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 13, color: Color(0xFF1E293B)),
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textColor),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -837,9 +912,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFF1F5F9)),
+          border: Border.all(color: const Color(0xFFE2E8F0)),
         ),
-        child: const Text('No images provided.', style: TextStyle(color: Color(0xFF94A3B8))),
+        child: Text('No images provided.', style: GoogleFonts.outfit(color: AppTheme.subtextColor)),
       );
     }
 
@@ -848,7 +923,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       padding: const EdgeInsets.all(16),
       child: ListView.builder(
@@ -883,34 +958,35 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: Row(
         children: [
           CircleAvatar(
             radius: 24,
-            backgroundColor: const Color(0xFF6366F1).withOpacity(0.1),
+            backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
             backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
             child: avatarUrl == null 
-                ? Text(initials, style: const TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold)) 
+                ? Text(initials, style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)) 
                 : null,
           ),
           const SizedBox(width: 16),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Text(
-                name ?? 'Unknown',
-                style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: Color(0xFF1E293B)),
-              ),
-              const SizedBox(height: 4),
-              Text(
-                'Job posted on $date',
-                style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
-              ),
-            ],
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  name ?? 'Unknown',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textColor),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Job posted on $date',
+                  style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                ),
+              ],
+            ),
           ),
-          const Spacer(),
           if (context.read<AuthService>().role == 'provider')
             OutlinedButton(
               onPressed: () {
@@ -926,7 +1002,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 side: const BorderSide(color: Color(0xFFE2E8F0)),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: const Text('View Profile', style: TextStyle(color: Color(0xFF1E293B), fontSize: 12)),
+              child: Text('View Profile', style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold)),
             ),
         ],
       ),
@@ -935,7 +1011,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Widget _buildBidsTab() {
     if (_bids.isEmpty) {
-      return const Center(child: Text('No bids yet.'));
+      return Center(child: Text('No bids yet.', style: GoogleFonts.outfit(color: AppTheme.subtextColor)));
     }
 
     final bool hasAcceptedAny = _bids.any((b) => b['status'] == 'accepted');
@@ -981,18 +1057,50 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     required bool hasAcceptedAny,
   }) {
     final avatarUrl = ApiClient.getImageUrl(avatar);
+    
+    Widget? statusTag;
+    if (status != 'pending' || hasAcceptedAny) {
+      String label = status.toUpperCase();
+      Color color = status == 'accepted' ? AppTheme.successColor : AppTheme.errorColor;
+      
+      if (hasAcceptedAny && status != 'accepted') {
+        label = 'SERVICE AVAILED';
+        color = AppTheme.warningColor;
+      }
+      
+      statusTag = Container(
+        padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+        decoration: BoxDecoration(
+          color: color.withOpacity(0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Text(
+          label,
+          style: GoogleFonts.outfit(color: color, fontSize: 10, fontWeight: FontWeight.bold),
+        ),
+      );
+    }
+
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textColor.withOpacity(0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Row(
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
               CircleAvatar(
                 radius: 22,
@@ -1001,71 +1109,88 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   : const NetworkImage('https://i.pravatar.cc/150?u=provider'),
               ),
               const SizedBox(width: 12),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(name, style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16)),
-                  Row(
-                    children: [
-                      const Icon(Icons.star, color: Color(0xFFF59E0B), size: 14),
-                      const SizedBox(width: 4),
-                      Text(rating.toString(), style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 12)),
-                      Text(' ($reviews reviews)', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
-                    ],
-                  ),
-                ],
-              ),
-              const Spacer(),
-              if (providerId != null)
-                TextButton(
-                  onPressed: () => context.push('/provider-profile/$providerId'),
-                  style: TextButton.styleFrom(
-                    foregroundColor: const Color(0xFF6366F1),
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                  ),
-                  child: const Text('View Details', style: TextStyle(fontWeight: FontWeight.bold, fontSize: 13)),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      name,
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textColor),
+                    ),
+                    const SizedBox(height: 2),
+                    Row(
+                      children: [
+                        const Icon(Icons.star_rounded, color: AppTheme.warningColor, size: 16),
+                        const SizedBox(width: 4),
+                        Text(rating.toString(), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 12, color: AppTheme.textColor)),
+                        Text(' ($reviews reviews)', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
+                      ],
+                    ),
+                    const SizedBox(height: 8),
+                    Wrap(
+                      spacing: 16,
+                      runSpacing: 4,
+                      children: [
+                        if (providerId != null)
+                          InkWell(
+                            onTap: () => context.push('/provider-profile/$providerId'),
+                            child: Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 4),
+                              child: Row(
+                                mainAxisSize: MainAxisSize.min,
+                                children: [
+                                  const Icon(Icons.info_outline, size: 14, color: AppTheme.primaryColor),
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'View Details',
+                                    style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
+                                  ),
+                                ],
+                              ),
+                            ),
+                          ),
+                        InkWell(
+                          onTap: () {
+                            context.push('/chat-room', extra: {
+                              'jobId': widget.jobId,
+                              'otherUserId': providerId,
+                              'otherUserName': name,
+                              'otherUserAvatar': avatarUrl,
+                            });
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 4),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: AppTheme.primaryColor),
+                                const SizedBox(width: 4),
+                                Text(
+                                  'Chat',
+                                  style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
-              IconButton(
-                icon: const Icon(Icons.chat_bubble_outline, color: Color(0xFF6366F1)),
-                onPressed: () {
-                  context.push('/chat-room', extra: {
-                    'jobId': widget.jobId,
-                    'otherUserId': providerId,
-                    'otherUserName': name,
-                    'otherUserAvatar': avatarUrl,
-                  });
-                },
               ),
-
-
-              if (status != 'pending' || hasAcceptedAny)
-                Builder(builder: (context) {
-                  String label = status.toUpperCase();
-                  Color color = status == 'accepted' ? Colors.green : Colors.red;
-                  
-                  if (hasAcceptedAny && status != 'accepted') {
-                    label = 'SERVICE AVAILED';
-                    color = Colors.orange;
-                  }
-                  
-                  return Container(
-                    padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                    decoration: BoxDecoration(
-                      color: color.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Text(
-                      label,
-                      style: TextStyle(color: color, fontSize: 10, fontWeight: FontWeight.bold),
-                    ),
-                  );
-                }),
+              if (statusTag != null) ...[
+                const SizedBox(width: 8),
+                statusTag,
+              ],
             ],
           ),
           const SizedBox(height: 16),
-          Text(proposal, style: const TextStyle(color: Color(0xFF475569), fontSize: 14, height: 1.5)),
+          Text(
+            proposal,
+            style: GoogleFonts.outfit(color: AppTheme.textColor.withOpacity(0.8), fontSize: 14, height: 1.5),
+          ),
           const SizedBox(height: 16),
-          const Divider(color: Color(0xFFF1F5F9)),
+          const Divider(color: Color(0xFFE2E8F0)),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1073,8 +1198,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('\$$price', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF6366F1))),
-                  Text('Est. $time', style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+                  Text('\$$price', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+                  Text('Est. $time', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
                 ],
               ),
               if (status == 'pending' && context.read<AuthService>().role == 'customer')
@@ -1084,14 +1209,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     if (success) {
                       _loadData();
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Bid accepted successfully!')),
+                        SnackBar(
+                          content: Text('Bid accepted successfully!', style: GoogleFonts.outfit(color: Colors.white)),
+                          backgroundColor: AppTheme.successColor,
+                          behavior: SnackBarBehavior.floating,
+                          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                          margin: const EdgeInsets.all(12),
+                        ),
                       );
                     }
                   },
-                  icon: const Icon(Icons.check_circle_outline, size: 16),
-                  label: const Text('Accept Bid'),
+                  icon: const Icon(Icons.check_circle_outline_rounded, size: 16, color: Colors.white),
+                  label: Text('Accept Bid', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: AppTheme.primaryColor,
                     minimumSize: const Size(120, 48),
                     padding: const EdgeInsets.symmetric(horizontal: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1111,7 +1242,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),

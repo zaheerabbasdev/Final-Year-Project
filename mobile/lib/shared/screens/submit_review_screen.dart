@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../services/review_service.dart';
 import '../../core/api_client.dart';
-import 'package:go_router/go_router.dart';
+import '../../core/theme.dart';
 
 class SubmitReviewScreen extends StatefulWidget {
   final int bookingId;
@@ -31,7 +33,16 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
   Future<void> _submitReview() async {
     if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a rating')),
+        SnackBar(
+          content: Text(
+            'Please select a rating',
+            style: GoogleFonts.outfit(),
+          ),
+          backgroundColor: AppTheme.errorColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(12),
+        ),
       );
       return;
     }
@@ -48,8 +59,8 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Review submitted successfully!'),
-            backgroundColor: const Color(0xFF10B981),
+            content: Text('Review submitted successfully!', style: GoogleFonts.outfit(color: Colors.white)),
+            backgroundColor: AppTheme.successColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: const EdgeInsets.all(12),
@@ -59,14 +70,31 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: const Text('Failed to submit review'),
-            backgroundColor: const Color(0xFFEF4444),
+            content: Text('Failed to submit review', style: GoogleFonts.outfit(color: Colors.white)),
+            backgroundColor: AppTheme.errorColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: const EdgeInsets.all(12),
           ),
         );
       }
+    }
+  }
+
+  String _getRatingLabel(int rating) {
+    switch (rating) {
+      case 1:
+        return 'Terrible';
+      case 2:
+        return 'Bad';
+      case 3:
+        return 'Good';
+      case 4:
+        return 'Very Good';
+      case 5:
+        return 'Excellent!';
+      default:
+        return 'Tap stars to rate';
     }
   }
 
@@ -86,13 +114,18 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close, color: Color(0xFF1E293B)),
+          icon: const Icon(Icons.close_rounded, color: AppTheme.textColor),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Leave a Review',
-          style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.outfit(
+            color: AppTheme.textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
       ),
       body: SingleChildScrollView(
@@ -101,23 +134,38 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
           children: [
             CircleAvatar(
               radius: 40,
-              backgroundColor: const Color(0xFFF1F5F9),
+              backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
               backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
               child: avatarUrl == null
-                  ? Text(widget.providerName[0].toUpperCase(), style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)))
+                  ? Text(
+                      widget.providerName[0].toUpperCase(),
+                      style: GoogleFonts.outfit(
+                        fontSize: 32,
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.primaryColor,
+                      ),
+                    )
                   : null,
             ),
             const SizedBox(height: 16),
             Text(
               'How was your experience with',
-              style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
+              style: GoogleFonts.outfit(
+                color: AppTheme.subtextColor,
+                fontSize: 15,
+                fontWeight: FontWeight.w500,
+              ),
             ),
             const SizedBox(height: 4),
             Text(
               widget.providerName,
-              style: const TextStyle(color: Color(0xFF1E293B), fontSize: 24, fontWeight: FontWeight.bold),
+              style: GoogleFonts.outfit(
+                color: AppTheme.textColor,
+                fontSize: 24,
+                fontWeight: FontWeight.bold,
+              ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: List.generate(5, (index) {
@@ -126,46 +174,68 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                   child: Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 8),
                     child: Icon(
-                      index < _rating ? Icons.star : Icons.star_border,
-                      color: index < _rating ? const Color(0xFFF59E0B) : const Color(0xFFE2E8F0),
-                      size: 48,
+                      index < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                      color: index < _rating ? AppTheme.warningColor : const Color(0xFFE2E8F0),
+                      size: 52,
                     ),
                   ),
                 );
               }),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 12),
+            Text(
+              _getRatingLabel(_rating),
+              style: GoogleFonts.outfit(
+                fontSize: 16,
+                color: _rating > 0 ? AppTheme.secondaryColor : AppTheme.subtextColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 32),
             TextField(
               controller: _commentController,
               maxLines: 5,
+              style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
               decoration: InputDecoration(
                 hintText: 'Share details of your experience...',
-                hintStyle: const TextStyle(color: Color(0xFF94A3B8)),
+                hintStyle: GoogleFonts.outfit(color: const Color(0xFF94A3B8)),
                 filled: true,
                 fillColor: const Color(0xFFF8FAFC),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide.none,
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: AppTheme.secondaryColor, width: 2),
                 ),
                 contentPadding: const EdgeInsets.all(20),
               ),
             ),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             SizedBox(
               width: double.infinity,
               height: 56,
               child: ElevatedButton(
                 onPressed: isSubmitting ? null : _submitReview,
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
+                  backgroundColor: AppTheme.primaryColor,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   elevation: 0,
                 ),
                 child: isSubmitting
                     ? const CircularProgressIndicator(color: Colors.white)
-                    : const Text(
+                    : Text(
                         'Submit Review',
-                        style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Colors.white),
+                        style: GoogleFonts.outfit(
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
                       ),
               ),
             ),

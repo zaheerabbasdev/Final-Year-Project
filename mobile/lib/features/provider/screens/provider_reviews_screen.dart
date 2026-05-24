@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/services/review_service.dart';
 import '../../../shared/widgets/review_card.dart';
+import '../../../core/theme.dart';
 
 class ProviderReviewsScreen extends StatefulWidget {
   final int providerId;
@@ -65,39 +67,88 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E293B)),
+          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textColor, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'All Reviews',
-          style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold),
+          style: GoogleFonts.outfit(
+            color: AppTheme.textColor,
+            fontWeight: FontWeight.bold,
+            fontSize: 18,
+          ),
         ),
       ),
       body: _reviews.isEmpty && _isLoading
-          ? const Center(child: CircularProgressIndicator())
+          ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
           : _reviews.isEmpty
-              ? const Center(child: Text('No reviews yet', style: TextStyle(color: Color(0xFF94A3B8))))
+              ? _buildEmptyState()
               : ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(24),
+                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 20),
                   itemCount: _reviews.length + (_hasMore ? 1 : 0),
                   itemBuilder: (context, index) {
                     if (index == _reviews.length) {
                       return const Center(
                         child: Padding(
                           padding: EdgeInsets.all(16.0),
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(color: AppTheme.primaryColor),
                         ),
                       );
                     }
                     return ReviewCard(review: _reviews[index]);
                   },
                 ),
+    );
+  }
+
+  Widget _buildEmptyState() {
+    return Center(
+      child: Padding(
+        padding: const EdgeInsets.all(32.0),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(24),
+              decoration: BoxDecoration(
+                color: AppTheme.primaryColor.withOpacity(0.05),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(
+                Icons.rate_review_outlined,
+                size: 64,
+                color: AppTheme.primaryColor.withOpacity(0.8),
+              ),
+            ),
+            const SizedBox(height: 24),
+            Text(
+              'No reviews yet',
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                color: AppTheme.textColor,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Text(
+              'Reviews from customers will appear here.',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                color: AppTheme.subtextColor,
+                fontSize: 14,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

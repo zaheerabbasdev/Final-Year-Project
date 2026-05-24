@@ -2,7 +2,9 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../auth_service.dart';
+import '../../../core/theme.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -30,7 +32,7 @@ class _LoginScreenState extends State<LoginScreen> {
       if (response['role'] == 'provider') {
         Fluttertoast.showToast(
           msg: 'Approval accepted',
-          backgroundColor: Colors.green,
+          backgroundColor: AppTheme.successColor,
           textColor: Colors.white,
           webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
         );
@@ -50,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
       Fluttertoast.showToast(
         msg: errorMessage,
-        backgroundColor: Colors.red,
+        backgroundColor: AppTheme.errorColor,
         textColor: Colors.white,
         webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
       );
@@ -60,61 +62,72 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color(0xFFF9FAFB),
+      backgroundColor: AppTheme.backgroundColor,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(24.0),
+          padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
           child: Column(
             children: [
-              const SizedBox(height: 20),
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(20),
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
-                      blurRadius: 10,
-                      offset: const Offset(0, 4),
+              const SizedBox(height: 24),
+              // App Logo Container with soft gradient background glow
+              Center(
+                child: Container(
+                  padding: const EdgeInsets.all(20),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(28),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.primaryColor.withOpacity(0.08),
+                        blurRadius: 24,
+                        offset: const Offset(0, 8),
+                      ),
+                    ],
+                  ),
+                  child: Image.asset(
+                    'assets/images/icon.png',
+                    height: 80,
+                    width: 80,
+                    fit: BoxFit.contain,
+                    errorBuilder: (context, error, stackTrace) => const Icon(
+                      Icons.business_center_rounded,
+                      size: 60,
+                      color: AppTheme.primaryColor,
                     ),
-                  ],
-                ),
-                child: Image.asset(
-                  'assets/images/icon.png',
-                  height: 100,
-                  fit: BoxFit.contain,
-                  errorBuilder: (context, error, stackTrace) => const Icon(
-                    Icons.business_center_rounded,
-                    size: 60,
-                    color: Color(0xFF6366F1),
                   ),
                 ),
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: 28),
               Text(
                 'Welcome Back',
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1F2937),
+                style: GoogleFonts.outfit(
+                  fontSize: 32,
+                  fontWeight: FontWeight.w800,
+                  color: AppTheme.textColor,
+                  letterSpacing: -0.5,
                 ),
               ),
               const SizedBox(height: 8),
               Text(
-                'Sign in to continue',
-                style: TextStyle(color: Colors.blueGrey.shade400, fontSize: 16),
+                'Sign in to continue to your dashboard',
+                style: GoogleFonts.outfit(
+                  color: AppTheme.subtextColor,
+                  fontSize: 16,
+                  fontWeight: FontWeight.w500,
+                ),
               ),
-              const SizedBox(height: 40),
+              const SizedBox(height: 36),
+              // Form Card
               Container(
-                padding: const EdgeInsets.all(24),
+                padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
                   color: Colors.white,
-                  borderRadius: BorderRadius.circular(24),
+                  borderRadius: BorderRadius.circular(32),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.03),
-                      blurRadius: 20,
-                      offset: const Offset(0, 10),
+                      color: AppTheme.textColor.withOpacity(0.04),
+                      blurRadius: 30,
+                      offset: const Offset(0, 15),
                     ),
                   ],
                 ),
@@ -125,23 +138,26 @@ class _LoginScreenState extends State<LoginScreen> {
                     TextField(
                       controller: _emailController,
                       textInputAction: TextInputAction.next,
+                      keyboardType: TextInputType.emailAddress,
+                      style: GoogleFonts.outfit(color: AppTheme.textColor),
                       decoration: const InputDecoration(
                         hintText: 'Enter your email',
                       ),
                     ),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 24),
                     _buildLabel('Password'),
                     TextField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
                       textInputAction: TextInputAction.done,
                       onSubmitted: (_) => _login(),
+                      style: GoogleFonts.outfit(color: AppTheme.textColor),
                       decoration: InputDecoration(
                         hintText: 'Enter your password',
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                            color: Colors.blueGrey.shade300,
+                            color: AppTheme.subtextColor.withOpacity(0.7),
                           ),
                           onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                         ),
@@ -158,41 +174,79 @@ class _LoginScreenState extends State<LoginScreen> {
                               width: 24,
                               child: Checkbox(
                                 value: _rememberMe,
+                                activeColor: AppTheme.primaryColor,
                                 onChanged: (value) => setState(() => _rememberMe = value!),
-                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(4)),
+                                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(6)),
                               ),
                             ),
                             const SizedBox(width: 8),
-                            const Text('Remember me', style: TextStyle(color: Color(0xFF374151), fontWeight: FontWeight.w500)),
+                            Text(
+                              'Remember me',
+                              style: GoogleFonts.outfit(
+                                color: AppTheme.textColor,
+                                fontWeight: FontWeight.w500,
+                                fontSize: 14,
+                              ),
+                            ),
                           ],
                         ),
                         TextButton(
                           onPressed: () => context.push('/forgot-password'),
-                          child: const Text('Forgot Password?', style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.w600)),
+                          style: TextButton.styleFrom(
+                            padding: EdgeInsets.zero,
+                            minimumSize: Size.zero,
+                            tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                          ),
+                          child: Text(
+                            'Forgot Password?',
+                            style: GoogleFonts.outfit(
+                              color: AppTheme.secondaryColor,
+                              fontWeight: FontWeight.w600,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 24),
+                    const SizedBox(height: 28),
                     ElevatedButton(
                       onPressed: _isLoading ? null : _login,
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(0xFF6366F1),
+                        backgroundColor: AppTheme.primaryColor,
+                        foregroundColor: Colors.white,
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         padding: const EdgeInsets.symmetric(vertical: 18),
                       ),
                       child: _isLoading 
-                        ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2))
-                        : const Text('Sign In', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+                        ? const SizedBox(
+                            height: 24,
+                            width: 24,
+                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
+                          )
+                        : Text(
+                            'Sign In',
+                            style: GoogleFonts.outfit(
+                              fontSize: 18,
+                              fontWeight: FontWeight.w700,
+                            ),
+                          ),
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: 28),
                     Row(
                       children: [
-                        Expanded(child: Divider(color: Colors.grey.shade200)),
+                        Expanded(child: Divider(color: const Color(0xFFE2E8F0), thickness: 1)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
-                          child: Text('Or continue with', style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 13)),
+                          child: Text(
+                            'Or continue with',
+                            style: GoogleFonts.outfit(
+                              color: AppTheme.subtextColor,
+                              fontSize: 14,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
                         ),
-                        Expanded(child: Divider(color: Colors.grey.shade200)),
+                        Expanded(child: Divider(color: const Color(0xFFE2E8F0), thickness: 1)),
                       ],
                     ),
                     const SizedBox(height: 24),
@@ -206,23 +260,47 @@ class _LoginScreenState extends State<LoginScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 36),
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  Text("Don't have an account? ", style: TextStyle(color: Colors.blueGrey.shade600)),
+                  Text(
+                    "Don't have an account? ",
+                    style: GoogleFonts.outfit(
+                      color: AppTheme.subtextColor,
+                      fontSize: 15,
+                      fontWeight: FontWeight.w500,
+                    ),
+                  ),
                   TextButton(
                     onPressed: () => context.push('/signup'),
-                    child: const Text('Sign Up', style: TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold)),
+                    style: TextButton.styleFrom(
+                      padding: EdgeInsets.zero,
+                      minimumSize: Size.zero,
+                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+                    ),
+                    child: Text(
+                      'Sign Up',
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.primaryColor,
+                        fontWeight: FontWeight.bold,
+                        fontSize: 15,
+                      ),
+                    ),
                   ),
                 ],
               ),
               const SizedBox(height: 24),
               Text(
                 'Demo: Use customer@test.com, provider@test.com, or admin@test.com',
-                style: TextStyle(color: Colors.blueGrey.shade300, fontSize: 12),
+                style: GoogleFonts.outfit(
+                  color: AppTheme.subtextColor.withOpacity(0.8),
+                  fontSize: 12,
+                  fontWeight: FontWeight.w500,
+                ),
                 textAlign: TextAlign.center,
               ),
+              const SizedBox(height: 16),
             ],
           ),
         ),
@@ -235,10 +313,10 @@ class _LoginScreenState extends State<LoginScreen> {
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
         text,
-        style: const TextStyle(
+        style: GoogleFonts.outfit(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: Color(0xFF374151),
+          color: AppTheme.textColor,
         ),
       ),
     );
@@ -249,15 +327,27 @@ class _LoginScreenState extends State<LoginScreen> {
       onPressed: () {},
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-        side: BorderSide(color: Colors.grey.shade200),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+        side: const BorderSide(color: Color(0xFFE2E8F0)),
+        backgroundColor: Colors.white,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Icon(icon, size: 24, color: label == 'Google' ? Colors.red : Colors.blue),
+          Icon(
+            icon,
+            size: 24,
+            color: label == 'Google' ? Colors.red.shade600 : Colors.blue.shade700,
+          ),
           const SizedBox(width: 8),
-          Text(label, style: const TextStyle(color: Color(0xFF1F2937), fontWeight: FontWeight.w600)),
+          Text(
+            label,
+            style: GoogleFonts.outfit(
+              color: AppTheme.textColor,
+              fontWeight: FontWeight.w600,
+              fontSize: 15,
+            ),
+          ),
         ],
       ),
     );

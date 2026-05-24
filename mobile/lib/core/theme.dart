@@ -2,14 +2,15 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
-  static const Color primaryColor = Color(0xFF6366F1);
-  static const Color secondaryColor = Color(0xFF10B981);
-  static const Color backgroundColor = Colors.white;
-  static const Color surfaceColor = Color(0xFFF9FAFB);
+  static const Color primaryColor = Color(0xFF003B95);
+  static const Color secondaryColor = Color(0xFF0A84FF);
+  static const Color backgroundColor = Color(0xFFF5F7FB);
+  static const Color surfaceColor = Colors.white;
   static const Color errorColor = Color(0xFFEF4444);
-  static const Color successColor = Color(0xFF10B981);
-  static const Color textColor = Color(0xFF1F2937);
-  static const Color subtextColor = Color(0xFF6B7280);
+  static const Color successColor = Color(0xFF2ECC71);
+  static const Color warningColor = Color(0xFFFFB020);
+  static const Color textColor = Color(0xFF1E293B);
+  static const Color subtextColor = Color(0xFF64748B);
 
   static ThemeData lightTheme = ThemeData(
     useMaterial3: true,
@@ -19,6 +20,7 @@ class AppTheme {
       secondary: secondaryColor,
       surface: surfaceColor,
       onSurface: textColor,
+      background: backgroundColor,
     ),
     scaffoldBackgroundColor: backgroundColor,
     textTheme: GoogleFonts.outfitTextTheme().copyWith(
@@ -32,29 +34,29 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: primaryColor,
         foregroundColor: Colors.white,
-        padding: const EdgeInsets.symmetric(vertical: 16),
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+        padding: const EdgeInsets.symmetric(vertical: 16, horizontal: 24),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
         elevation: 0,
         textStyle: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 16),
       ),
     ),
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
-      fillColor: const Color(0xFFF9FAFB),
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      fillColor: Colors.white,
+      contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 18),
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
       ),
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: BorderSide.none,
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
       ),
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: primaryColor, width: 2),
+        borderRadius: BorderRadius.circular(16),
+        borderSide: const BorderSide(color: secondaryColor, width: 2),
       ),
-      hintStyle: GoogleFonts.outfit(color: const Color(0xFF9CA3AF)),
+      hintStyle: GoogleFonts.outfit(color: const Color(0xFF94A3B8)),
     ),
   );
 }

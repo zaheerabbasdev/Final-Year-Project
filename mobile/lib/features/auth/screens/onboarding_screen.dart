@@ -27,13 +27,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'title': 'Real-time Tracking\n& Live Updates',
       'description': 'Track your service provider in real-time and get instant updates on your booking status.',
       'icon': Icons.location_on_rounded,
-      'themeColor': const Color(0xFF10B981),
+      'themeColor': AppTheme.secondaryColor,
     },
     {
       'title': 'Secure Payments\n& Quality Work',
       'description': 'Pay securely through the app and only when the job is done to your satisfaction.',
       'icon': Icons.verified_user_rounded,
-      'themeColor': const Color(0xFFF59E0B),
+      'themeColor': AppTheme.warningColor,
     },
   ];
 
@@ -123,79 +123,82 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     itemCount: _pages.length,
                     onPageChanged: (index) => setState(() => _currentPage = index),
                     itemBuilder: (context, index) {
-                      return Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 40),
-                        child: Column(
-                          mainAxisAlignment: MainAxisAlignment.center,
-                          children: [
-                            // Logo Container
-                            Stack(
-                              alignment: Alignment.center,
-                              children: [
-                                // Background Decorative Icon
-                                AnimatedSwitcher(
-                                  duration: const Duration(milliseconds: 600),
-                                  child: Icon(
-                                    _pages[index]['icon'],
-                                    key: ValueKey('icon_$index'),
-                                    size: 280,
-                                    color: _pages[index]['themeColor'].withOpacity(0.05),
-                                  ),
-                                ),
-                                // Main Logo
-                                Container(
-                                  padding: const EdgeInsets.all(30),
-                                  decoration: BoxDecoration(
-                                    color: Colors.white,
-                                    shape: BoxShape.circle,
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: _pages[index]['themeColor'].withOpacity(0.15),
-                                        blurRadius: 40,
-                                        spreadRadius: 5,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Image.asset(
-                                    'assets/images/icon.png',
-                                    height: 140,
-                                    width: 140,
-                                    fit: BoxFit.contain,
-                                  ),
-                                ),
-                              ],
-                            ),
-                            const SizedBox(height: 60),
-                            // Text Content
-                            AnimatedSwitcher(
-                              duration: const Duration(milliseconds: 400),
-                              child: Column(
-                                key: ValueKey('content_$index'),
+                      return Center(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
+                          child: Column(
+                            mainAxisSize: MainAxisSize.min,
+                            mainAxisAlignment: MainAxisAlignment.center,
+                            children: [
+                              // Logo Container
+                              Stack(
+                                alignment: Alignment.center,
                                 children: [
-                                  Text(
-                                    _pages[index]['title']!,
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.outfit(
-                                      fontSize: 32,
-                                      fontWeight: FontWeight.w800,
-                                      color: AppTheme.textColor,
-                                      height: 1.2,
+                                  // Background Decorative Icon
+                                  AnimatedSwitcher(
+                                    duration: const Duration(milliseconds: 600),
+                                    child: Icon(
+                                      _pages[index]['icon'],
+                                      key: ValueKey('icon_$index'),
+                                      size: 200,
+                                      color: _pages[index]['themeColor'].withOpacity(0.05),
                                     ),
                                   ),
-                                  const SizedBox(height: 16),
-                                  Text(
-                                    _pages[index]['description']!,
-                                    textAlign: TextAlign.center,
-                                    style: GoogleFonts.outfit(
-                                      fontSize: 16,
-                                      color: AppTheme.subtextColor,
-                                      height: 1.6,
+                                  // Main Logo
+                                  Container(
+                                    padding: const EdgeInsets.all(30),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white,
+                                      shape: BoxShape.circle,
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: _pages[index]['themeColor'].withOpacity(0.15),
+                                          blurRadius: 40,
+                                          spreadRadius: 5,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Image.asset(
+                                      'assets/images/icon.png',
+                                      height: 140,
+                                      width: 140,
+                                      fit: BoxFit.contain,
                                     ),
                                   ),
                                 ],
                               ),
-                            ),
-                          ],
+                              const SizedBox(height: 32),
+                              // Text Content
+                              AnimatedSwitcher(
+                                duration: const Duration(milliseconds: 400),
+                                child: Column(
+                                  key: ValueKey('content_$index'),
+                                  children: [
+                                    Text(
+                                      _pages[index]['title']!,
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 32,
+                                        fontWeight: FontWeight.w800,
+                                        color: AppTheme.textColor,
+                                        height: 1.2,
+                                      ),
+                                    ),
+                                    const SizedBox(height: 16),
+                                    Text(
+                                      _pages[index]['description']!,
+                                      textAlign: TextAlign.center,
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 16,
+                                        color: AppTheme.subtextColor,
+                                        height: 1.6,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       );
                     },

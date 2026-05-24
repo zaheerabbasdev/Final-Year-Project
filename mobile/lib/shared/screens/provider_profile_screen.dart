@@ -192,14 +192,14 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         const SizedBox(width: 12),
         Expanded(child: _buildStatCard(Icons.work_outline, (profile?['jobs_completed'] ?? '0').toString(), 'Jobs Done', const Color(0xFF6366F1))),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard(Icons.access_time, '${profile?['experience_years']?.toString() ?? '0'} Yrs', 'Experience', const Color(0xFFF59E0B))),
+        Expanded(child: _buildStatCard(Icons.access_time, profile?['experience_years']?.toString() ?? '0', 'Years Exp.', const Color(0xFFF59E0B))),
       ],
     );
   }
 
   Widget _buildStatCard(IconData icon, String value, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
@@ -209,9 +209,19 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         children: [
           Icon(icon, color: color, size: 20),
           const SizedBox(height: 8),
-          Text(value, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           const SizedBox(height: 2),
-          Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10)),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );

@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../features/auth/auth_service.dart';
 import '../../features/customer/job_service.dart';
 import '../../features/provider/provider_service.dart';
@@ -13,6 +14,7 @@ import '../../core/api_client.dart';
 import '../../core/services/location_service.dart';
 import 'map_picker_screen.dart';
 import '../../shared/widgets/notification_bell.dart';
+import '../../shared/widgets/wallet_bottom_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool initialEditMode;
@@ -157,11 +159,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: const Color(0xFFF5F7FB),
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: const Color(0xFFF5F7FB),
         elevation: 0,
-        title: const Text('Profile', style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold)),
+        scrolledUnderElevation: 0,
+        title: Text('Profile', style: GoogleFonts.outfit(color: const Color(0xFF1E293B), fontWeight: FontWeight.bold)),
         actions: [
           const NotificationBell(color: Color(0xFF1E293B)),
         ],
@@ -193,7 +196,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
               height: 140,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF6366F1), Color(0xFF10B981)],
+                  colors: [Color(0xFF003B95), Color(0xFF0A84FF)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -226,7 +229,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 4),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
+                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))],
                   ),
                   child: CircleAvatar(
                     radius: 50,
@@ -247,11 +250,11 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     child: Container(
                       padding: const EdgeInsets.all(8),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1),
+                        color: const Color(0xFF003B95),
                         shape: BoxShape.circle,
                         border: Border.all(color: Colors.white, width: 3),
                       ),
-                      child: const Icon(Icons.edit, size: 14, color: Colors.white),
+                      child: const Icon(Icons.edit_rounded, size: 14, color: Colors.white),
                     ),
                   ),
               ],
@@ -268,19 +271,27 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          Text(user?['full_name'] ?? 'No Name', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text(user?['full_name'] ?? 'No Name', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
           const SizedBox(height: 8),
-          Text(user?['email'] ?? 'No Email', style: const TextStyle(color: Color(0xFF64748B), fontSize: 14)),
+          Text(user?['email'] ?? 'No Email', style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 14)),
           const SizedBox(height: 24),
           _buildEditButton(),
           const SizedBox(height: 32),
           _buildCustomerStats(),
           const SizedBox(height: 32),
           _buildMenuCard([
+            _buildMenuItem(Icons.account_balance_wallet_outlined, 'My Wallet Balance', () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => WalletBottomSheet(userName: user?['full_name'] ?? 'User'),
+              );
+            }),
             _buildMenuItem(Icons.payment_outlined, 'Payment Methods', () {}),
-            _buildMenuItem(Icons.notifications_none, 'Notifications', () => context.push('/notifications')),
+            _buildMenuItem(Icons.notifications_none_rounded, 'Notifications', () => context.push('/notifications')),
             _buildMenuItem(Icons.settings_outlined, 'Settings', () {}),
-            _buildMenuItem(Icons.help_outline, 'Help & Support', () {}),
+            _buildMenuItem(Icons.help_outline_rounded, 'Help & Support', () {}),
           ]),
           const SizedBox(height: 32),
           _buildLogoutButton(authService),
@@ -297,17 +308,30 @@ class _ProfileScreenState extends State<ProfileScreen> {
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          Text(user?['full_name'] ?? 'No Name', style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text(user?['full_name'] ?? 'No Name', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
-            decoration: BoxDecoration(color: const Color(0xFF10B981), borderRadius: BorderRadius.circular(20)),
-            child: Text(categoryName, style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
+            decoration: BoxDecoration(color: const Color(0xFF2ECC71), borderRadius: BorderRadius.circular(20)),
+            child: Text(categoryName, style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 12)),
           ),
           const SizedBox(height: 32),
           _buildEditButton(),
           const SizedBox(height: 32),
           _buildProviderStats(),
+          const SizedBox(height: 32),
+          _buildMenuCard([
+            _buildMenuItem(Icons.account_balance_wallet_outlined, 'My Wallet Console', () {
+              showModalBottomSheet(
+                context: context,
+                isScrollControlled: true,
+                backgroundColor: Colors.transparent,
+                builder: (context) => WalletBottomSheet(userName: user?['full_name'] ?? 'Provider'),
+              );
+            }),
+            _buildMenuItem(Icons.notifications_none_rounded, 'Notifications', () => context.push('/notifications')),
+            _buildMenuItem(Icons.settings_outlined, 'Settings', () {}),
+          ]),
           const SizedBox(height: 32),
           _buildProviderReviews(user?['id']),
           const SizedBox(height: 40),
@@ -499,7 +523,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
             const SizedBox(width: 12),
             Expanded(child: _buildStatCard(Icons.stars_outlined, (stats?['rating'] ?? '5.0').toString(), 'Rating', const Color(0xFF10B981))),
             const SizedBox(width: 12),
-            Expanded(child: _buildStatCard(Icons.access_time, '${stats?['experience_years']?.toString() ?? '0'} Yrs', 'Experience', const Color(0xFFF59E0B))),
+            Expanded(child: _buildStatCard(Icons.access_time, stats?['experience_years']?.toString() ?? '0', 'Years Exp.', const Color(0xFFF59E0B))),
           ],
         );
       },
@@ -508,7 +532,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildStatCard(IconData icon, String value, String label, Color color) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(24),
@@ -518,9 +542,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
         children: [
           Icon(icon, color: color, size: 24),
           const SizedBox(height: 16),
-          Text(value, style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text(
+            value,
+            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
           const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11)),
+          Text(
+            label,
+            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ],
       ),
     );

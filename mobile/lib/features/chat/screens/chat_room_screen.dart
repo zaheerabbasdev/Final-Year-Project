@@ -2,13 +2,14 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-
+import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:image_picker/image_picker.dart';
 import '../providers/chat_provider.dart';
 import '../../../features/auth/auth_service.dart';
 import '../../../core/api_client.dart';
 import '../models/chat_message.dart';
+import '../../../core/theme.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   final int jobId;
@@ -97,35 +98,49 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
     return Scaffold(
-      backgroundColor: const Color(0xFFE5DDD5),
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        backgroundColor: const Color(0xFF075E54),
-        iconTheme: const IconThemeData(color: Colors.white),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        scrolledUnderElevation: 0,
+        iconTheme: const IconThemeData(color: AppTheme.textColor),
         titleSpacing: 0,
         title: InkWell(
           onTap: () {},
           child: Row(
             children: [
               _buildAppBarAvatar(),
-              const SizedBox(width: 10),
+              const SizedBox(width: 12),
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
                       widget.otherUserName,
-                      style: const TextStyle(fontSize: 16, color: Colors.white, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.outfit(
+                        fontSize: 16,
+                        color: AppTheme.textColor,
+                        fontWeight: FontWeight.bold,
+                      ),
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (chatProvider.isOtherTyping && chatProvider.typingJobId == widget.jobId)
-                      const Text(
+                      Text(
                         'typing...',
-                        style: TextStyle(fontSize: 12, color: Colors.white70, fontStyle: FontStyle.italic),
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          color: AppTheme.secondaryColor,
+                          fontWeight: FontWeight.w600,
+                        ),
                       )
                     else
-                      const Text(
+                      Text(
                         'Online',
-                        style: TextStyle(fontSize: 12, color: Colors.white70),
+                        style: GoogleFonts.outfit(
+                          fontSize: 12,
+                          color: AppTheme.subtextColor,
+                          fontWeight: FontWeight.w500,
+                        ),
                       ),
                   ],
                 ),
@@ -134,16 +149,25 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           ),
         ),
         actions: [
-          IconButton(icon: const Icon(Icons.videocam, color: Colors.white), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.call, color: Colors.white), onPressed: () {}),
-          IconButton(icon: const Icon(Icons.more_vert, color: Colors.white), onPressed: () {}),
+          IconButton(
+            icon: const Icon(Icons.videocam_outlined, color: AppTheme.textColor),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.call_outlined, color: AppTheme.textColor),
+            onPressed: () {},
+          ),
+          IconButton(
+            icon: const Icon(Icons.more_vert_rounded, color: AppTheme.textColor),
+            onPressed: () {},
+          ),
         ],
       ),
       body: Column(
         children: [
           Expanded(
             child: chatProvider.isLoading && chatProvider.messages.isEmpty
-                ? const Center(child: CircularProgressIndicator(color: Color(0xFF075E54)))
+                ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
                 : _buildMessageList(chatProvider.messages, currentUserId),
           ),
           _buildMessageInput(),
@@ -157,8 +181,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     return Container(
       width: 40,
       height: 40,
-      decoration: const BoxDecoration(
-        color: Color(0xFF6366F1), // Use a solid color instead of white24
+      decoration: BoxDecoration(
+        color: AppTheme.primaryColor.withOpacity(0.1),
         shape: BoxShape.circle,
       ),
       child: ClipOval(
@@ -169,7 +193,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 errorBuilder: (context, error, stackTrace) => _buildAvatarPlaceholder(),
                 loadingBuilder: (context, child, loadingProgress) {
                   if (loadingProgress == null) return child;
-                  return const Center(child: SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white)));
+                  return const Center(
+                    child: SizedBox(
+                      width: 20,
+                      height: 20,
+                      child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.primaryColor),
+                    ),
+                  );
                 },
               )
             : _buildAvatarPlaceholder(),
@@ -177,13 +207,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
-
   Widget _buildAvatarPlaceholder() {
     final initials = widget.otherUserName.isNotEmpty ? widget.otherUserName[0].toUpperCase() : '?';
     return Center(
       child: Text(
         initials,
-        style: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold, fontSize: 18),
+        style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 18),
       ),
     );
   }
@@ -234,14 +263,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
     return Container(
       margin: const EdgeInsets.symmetric(vertical: 16),
-      padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
       decoration: BoxDecoration(
-        color: const Color(0xFFD1E4F5),
-        borderRadius: BorderRadius.circular(8),
+        color: AppTheme.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(12),
       ),
       child: Text(
         dateStr,
-        style: const TextStyle(fontSize: 12, color: Color(0xFF54656F), fontWeight: FontWeight.w500),
+        style: GoogleFonts.outfit(
+          fontSize: 12,
+          color: AppTheme.primaryColor,
+          fontWeight: FontWeight.w600,
+        ),
       ),
     );
   }
@@ -266,8 +299,8 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
       width: 28,
       height: 28,
       margin: const EdgeInsets.only(bottom: 4),
-      decoration: const BoxDecoration(
-        color: Color(0xFF6366F1),
+      decoration: BoxDecoration(
+        color: AppTheme.primaryColor.withOpacity(0.1),
         shape: BoxShape.circle,
       ),
       child: ClipOval(
@@ -282,39 +315,40 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     );
   }
 
-
   Widget _buildSmallAvatarPlaceholder(String? name) {
     final initials = (name != null && name.isNotEmpty) ? name[0].toUpperCase() : '?';
     return Center(
       child: Text(
         initials,
-        style: const TextStyle(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold),
+        style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 12, fontWeight: FontWeight.bold),
       ),
     );
   }
 
   Widget _buildMessageBubble(ChatMessage message, bool isMe) {
     return Container(
-      margin: const EdgeInsets.only(bottom: 4),
-      padding: const EdgeInsets.all(4),
+      margin: const EdgeInsets.only(bottom: 6),
+      padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: isMe ? const Color(0xFFDCF8C6) : Colors.white,
+        color: isMe ? AppTheme.primaryColor : Colors.white,
         borderRadius: BorderRadius.only(
-          topLeft: const Radius.circular(12),
-          topRight: const Radius.circular(12),
-          bottomLeft: Radius.circular(isMe ? 12 : 0),
-          bottomRight: Radius.circular(isMe ? 0 : 12),
+          topLeft: const Radius.circular(16),
+          topRight: const Radius.circular(16),
+          bottomLeft: Radius.circular(isMe ? 16 : 4),
+          bottomRight: Radius.circular(isMe ? 4 : 16),
         ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.05),
-            blurRadius: 1,
-            offset: const Offset(0, 1),
-          ),
-        ],
+        boxShadow: isMe
+            ? null
+            : [
+                BoxShadow(
+                  color: AppTheme.textColor.withOpacity(0.04),
+                  blurRadius: 10,
+                  offset: const Offset(0, 4),
+                ),
+              ],
       ),
       constraints: BoxConstraints(
-        maxWidth: MediaQuery.of(context).size.width * 0.7,
+        maxWidth: MediaQuery.of(context).size.width * 0.72,
       ),
       child: Stack(
         children: [
@@ -322,17 +356,17 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             padding: EdgeInsets.only(
               left: 8,
               top: 4,
-              right: message.content.length < 20 ? 60 : 8,
-              bottom: 20,
+              right: message.content.length < 20 ? 64 : 8,
+              bottom: 22,
             ),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 if (message.imageUrl != null)
                   Padding(
-                    padding: const EdgeInsets.only(bottom: 4),
+                    padding: const EdgeInsets.only(bottom: 6),
                     child: ClipRRect(
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(12),
                       child: Image.network(
                         ApiClient.getImageUrl(message.imageUrl!)!,
                         fit: BoxFit.cover,
@@ -341,8 +375,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           return Container(
                             height: 200,
                             width: double.infinity,
-                            color: Colors.grey[200],
-                            child: const Center(child: CircularProgressIndicator(strokeWidth: 2)),
+                            color: Colors.grey[100],
+                            child: const Center(
+                              child: CircularProgressIndicator(
+                                strokeWidth: 2,
+                                color: AppTheme.primaryColor,
+                              ),
+                            ),
                           );
                         },
                       ),
@@ -351,7 +390,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 if (message.content.isNotEmpty)
                   Text(
                     message.content,
-                    style: const TextStyle(fontSize: 15, color: Color(0xFF111B21)),
+                    style: GoogleFonts.outfit(
+                      fontSize: 15,
+                      color: isMe ? Colors.white : AppTheme.textColor,
+                      fontWeight: FontWeight.w400,
+                      height: 1.3,
+                    ),
                   ),
               ],
             ),
@@ -364,14 +408,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
               children: [
                 Text(
                   DateFormat('hh:mm a').format(message.createdAt),
-                  style: TextStyle(color: Colors.grey[600], fontSize: 11),
+                  style: GoogleFonts.outfit(
+                    color: isMe ? Colors.white.withOpacity(0.7) : AppTheme.subtextColor,
+                    fontSize: 10,
+                    fontWeight: FontWeight.w500,
+                  ),
                 ),
                 if (isMe) ...[
                   const SizedBox(width: 4),
                   Icon(
-                    Icons.done_all,
-                    size: 16,
-                    color: message.isRead ? Colors.blue : Colors.grey,
+                    Icons.done_all_rounded,
+                    size: 15,
+                    color: message.isRead ? AppTheme.secondaryColor : Colors.white60,
                   ),
                 ],
               ],
@@ -384,20 +432,31 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   Widget _buildMessageInput() {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
+      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+      decoration: BoxDecoration(
+        color: Colors.white,
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textColor.withOpacity(0.04),
+            blurRadius: 10,
+            offset: const Offset(0, -4),
+          ),
+        ],
+      ),
       child: SafeArea(
         child: Row(
           children: [
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white,
-                  borderRadius: BorderRadius.circular(25),
+                  color: AppTheme.backgroundColor,
+                  borderRadius: BorderRadius.circular(24),
+                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
                 ),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.emoji_emotions_outlined, color: Color(0xFF54656F)),
+                      icon: const Icon(Icons.sentiment_satisfied_alt_outlined, color: AppTheme.subtextColor),
                       onPressed: () {},
                     ),
                     Expanded(
@@ -414,41 +473,50 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           controller: _messageController,
                           textInputAction: TextInputAction.send,
                           onSubmitted: (_) => _sendMessage(),
-                          decoration: const InputDecoration(
-                            hintText: 'Message',
-                            hintStyle: TextStyle(color: Color(0xFF8696A0)),
+                          style: GoogleFonts.outfit(
+                            color: AppTheme.textColor,
+                            fontSize: 15,
+                          ),
+                          decoration: InputDecoration(
+                            hintText: 'Type a message...',
+                            hintStyle: GoogleFonts.outfit(color: AppTheme.subtextColor),
                             border: InputBorder.none,
-                            contentPadding: EdgeInsets.symmetric(vertical: 10),
+                            enabledBorder: InputBorder.none,
+                            focusedBorder: InputBorder.none,
+                            contentPadding: const EdgeInsets.symmetric(vertical: 10, horizontal: 4),
                           ),
                           maxLines: 5,
                           minLines: 1,
                         ),
                       ),
                     ),
-
                     IconButton(
-                      icon: const Icon(Icons.attach_file, color: Color(0xFF54656F)),
+                      icon: const Icon(Icons.attach_file_rounded, color: AppTheme.subtextColor),
                       onPressed: _pickImage,
                     ),
                     if (_messageController.text.isEmpty)
                       IconButton(
-                        icon: const Icon(Icons.camera_alt, color: Color(0xFF54656F)),
+                        icon: const Icon(Icons.camera_alt_outlined, color: AppTheme.subtextColor),
                         onPressed: () => _pickImage(source: ImageSource.camera),
                       ),
                   ],
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: 12),
             GestureDetector(
               onTap: _sendMessage,
-              child: CircleAvatar(
-                radius: 24,
-                backgroundColor: const Color(0xFF00A884), // WhatsApp Brand Green
+              child: Container(
+                width: 48,
+                height: 48,
+                decoration: const BoxDecoration(
+                  color: AppTheme.primaryColor,
+                  shape: BoxShape.circle,
+                ),
                 child: Icon(
-                  _messageController.text.isEmpty ? Icons.mic : Icons.send,
+                  _messageController.text.isEmpty ? Icons.mic_none_rounded : Icons.send_rounded,
                   color: Colors.white,
-                  size: 24,
+                  size: 22,
                 ),
               ),
             ),

@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../../core/api_client.dart';
+import '../../../core/theme.dart';
 
 class ReviewCard extends StatelessWidget {
   final Map<String, dynamic> review;
@@ -25,7 +27,14 @@ class ReviewCard extends StatelessWidget {
       decoration: BoxDecoration(
         color: Colors.white,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: const Color(0xFFE2E8F0)),
+        boxShadow: [
+          BoxShadow(
+            color: AppTheme.textColor.withOpacity(0.02),
+            blurRadius: 15,
+            offset: const Offset(0, 5),
+          ),
+        ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -34,10 +43,16 @@ class ReviewCard extends StatelessWidget {
             children: [
               CircleAvatar(
                 radius: 20,
-                backgroundColor: const Color(0xFF6366F1).withOpacity(0.1),
+                backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
                 backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
                 child: avatarUrl == null
-                    ? Text(initial, style: const TextStyle(color: Color(0xFF6366F1), fontWeight: FontWeight.bold))
+                    ? Text(
+                        initial,
+                        style: GoogleFonts.outfit(
+                          color: AppTheme.primaryColor,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      )
                     : null,
               ),
               const SizedBox(width: 12),
@@ -47,12 +62,20 @@ class ReviewCard extends StatelessWidget {
                   children: [
                     Text(
                       customerName,
-                      style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        color: AppTheme.textColor,
+                        fontSize: 15,
+                      ),
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: 2),
                     Text(
                       dateStr,
-                      style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12),
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.subtextColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.w500,
+                      ),
                     ),
                   ],
                 ),
@@ -60,19 +83,23 @@ class ReviewCard extends StatelessWidget {
               Row(
                 children: List.generate(5, (index) {
                   return Icon(
-                    index < rating ? Icons.star : Icons.star_border,
-                    color: index < rating ? const Color(0xFFF59E0B) : const Color(0xFFE2E8F0),
-                    size: 16,
+                    index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
+                    color: index < rating ? AppTheme.warningColor : const Color(0xFFE2E8F0),
+                    size: 18,
                   );
                 }),
               ),
             ],
           ),
           if (review['comment'] != null && review['comment'].isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: 14),
             Text(
               review['comment'],
-              style: const TextStyle(color: Color(0xFF64748B), fontSize: 14, height: 1.5),
+              style: GoogleFonts.outfit(
+                color: AppTheme.textColor.withOpacity(0.8),
+                fontSize: 14,
+                height: 1.4,
+              ),
             ),
           ],
         ],

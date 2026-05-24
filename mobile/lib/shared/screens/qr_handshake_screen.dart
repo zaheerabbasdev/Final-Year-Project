@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
+import 'package:google_fonts/google_fonts.dart';
 import '../../core/services/handshake_service.dart';
-import '../../features/auth/auth_service.dart';
 import '../../features/customer/job_service.dart';
+import '../../core/theme.dart';
 
 class QrHandshakeScreen extends StatefulWidget {
   final int bookingId;
@@ -56,12 +57,24 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
     if (success && mounted) {
       context.read<JobService>().fetchJobs(); // Refresh jobs
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Handshake Successful! Job started.')),
+        SnackBar(
+          content: Text('Handshake Successful! Job started.', style: GoogleFonts.outfit(color: Colors.white)),
+          backgroundColor: AppTheme.successColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(12),
+        ),
       );
       Navigator.of(context).pop(true);
     } else if (mounted) {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Invalid QR Code. Please try again.')),
+        SnackBar(
+          content: Text('Invalid QR Code. Please try again.', style: GoogleFonts.outfit(color: Colors.white)),
+          backgroundColor: AppTheme.errorColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(12),
+        ),
       );
       setState(() => _isVerifying = false);
     }
@@ -70,11 +83,16 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppTheme.backgroundColor,
       appBar: AppBar(
-        title: Text(widget.isProvider ? 'Show QR Code' : 'Scan QR Code'),
+        title: Text(
+          widget.isProvider ? 'Show QR Code' : 'Scan QR Code',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.textColor, fontSize: 18),
+        ),
         backgroundColor: Colors.white,
-        foregroundColor: Colors.black,
+        iconTheme: const IconThemeData(color: AppTheme.textColor),
         elevation: 0,
+        scrolledUnderElevation: 0,
       ),
       body: widget.isProvider ? _buildProviderView() : _buildCustomerView(),
     );
@@ -89,14 +107,14 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            const Text(
+            Text(
               'Ask the customer to scan this code\nto start the job.',
               textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 16, color: Colors.grey),
+              style: GoogleFonts.outfit(fontSize: 16, color: AppTheme.subtextColor, fontWeight: FontWeight.w500),
             ),
             const SizedBox(height: 40),
             if (handshakeService.isLoading)
-              const CircularProgressIndicator()
+              const CircularProgressIndicator(color: AppTheme.primaryColor)
             else if (_handshakeToken != null) ...[
               Container(
                 padding: const EdgeInsets.all(20),
@@ -105,7 +123,7 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
-                      color: Colors.black.withOpacity(0.05),
+                      color: AppTheme.textColor.withOpacity(0.04),
                       blurRadius: 20,
                       offset: const Offset(0, 10),
                     ),
@@ -114,26 +132,40 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
                 child: QrImageView(
                   data: _handshakeToken!,
                   version: QrVersions.auto,
-                  size: 250.0,
+                  size: 240.0,
+                  eyeStyle: const QrEyeStyle(
+                    eyeShape: QrEyeShape.square,
+                    color: AppTheme.primaryColor,
+                  ),
+                  dataModuleStyle: const QrDataModuleStyle(
+                    dataModuleShape: QrDataModuleShape.square,
+                    color: AppTheme.primaryColor,
+                  ),
                 ),
               ),
               const SizedBox(height: 32),
-              const Text(
+              Text(
                 'OFFLINE PIN FALLBACK',
-                style: TextStyle(fontSize: 12, fontWeight: FontWeight.bold, color: Colors.grey, letterSpacing: 1.2),
+                style: GoogleFonts.outfit(fontSize: 12, fontWeight: FontWeight.bold, color: AppTheme.subtextColor, letterSpacing: 1.5),
               ),
               const SizedBox(height: 8),
               Text(
                 _handshakeToken!,
-                style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8, color: Color(0xFF6366F1)),
+                style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8, color: AppTheme.primaryColor),
               ),
             ] else
-              const Text('Failed to generate token.'),
+              Text(
+                'Failed to generate token.',
+                style: GoogleFonts.outfit(color: AppTheme.errorColor, fontWeight: FontWeight.w500),
+              ),
             const SizedBox(height: 40),
             TextButton.icon(
               onPressed: _fetchToken,
-              icon: const Icon(Icons.refresh),
-              label: const Text('Refresh Code'),
+              icon: const Icon(Icons.refresh_rounded, color: AppTheme.primaryColor),
+              label: Text(
+                'Refresh Code',
+                style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
+              ),
             ),
           ],
         ),
@@ -144,12 +176,12 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
   Widget _buildCustomerView() {
     return Column(
       children: [
-        const Padding(
-          padding: EdgeInsets.all(20.0),
+        Padding(
+          padding: const EdgeInsets.all(20.0),
           child: Text(
             'Scan the provider\'s QR code\nto verify their arrival and start the job.',
             textAlign: TextAlign.center,
-            style: TextStyle(fontSize: 16),
+            style: GoogleFonts.outfit(fontSize: 15, color: AppTheme.subtextColor, fontWeight: FontWeight.w500),
           ),
         ),
         Expanded(
@@ -167,13 +199,20 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
                   }
                 },
               ),
-              // Custom scanning overlay
+              // Custom scanning overlay with modern glowing border
               Container(
                 width: 250,
                 height: 250,
                 decoration: BoxDecoration(
-                  border: Border.all(color: Colors.white, width: 2),
+                  border: Border.all(color: AppTheme.secondaryColor, width: 3),
                   borderRadius: BorderRadius.circular(24),
+                  boxShadow: [
+                    BoxShadow(
+                      color: AppTheme.secondaryColor.withOpacity(0.2),
+                      blurRadius: 15,
+                      spreadRadius: 2,
+                    ),
+                  ],
                 ),
               ),
               if (_isVerifying)
@@ -185,10 +224,17 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
           padding: const EdgeInsets.all(32.0),
           child: Column(
             children: [
-              const Text('Problems scanning?', style: TextStyle(color: Colors.grey)),
+              Text(
+                'Problems scanning?',
+                style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 4),
               TextButton(
                 onPressed: () => _showPinEntryDialog(),
-                child: const Text('Enter PIN Manually', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF6366F1))),
+                child: Text(
+                  'Enter PIN Manually',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.primaryColor, fontSize: 16),
+                ),
               ),
             ],
           ),
@@ -202,12 +248,20 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
     showDialog(
       context: context,
       builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20)),
-        title: const Text('Enter Handshake PIN'),
+        backgroundColor: Colors.white,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Enter Handshake PIN',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.textColor),
+        ),
         content: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const Text('Enter the 6-digit code shown on the provider\'s device.'),
+            Text(
+              'Enter the 6-digit code shown on the provider\'s device.',
+              style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 14),
+            ),
             const SizedBox(height: 24),
             TextField(
               controller: pinController,
@@ -215,19 +269,38 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
               maxLength: 6,
               textAlign: TextAlign.center,
               autofocus: true,
-              style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8, color: Color(0xFF6366F1)),
+              style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, letterSpacing: 8, color: AppTheme.primaryColor),
               decoration: InputDecoration(
                 hintText: '000000',
+                hintStyle: GoogleFonts.outfit(color: AppTheme.subtextColor.withOpacity(0.4)),
                 counterText: '',
                 filled: true,
-                fillColor: Colors.grey[100],
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
+                fillColor: AppTheme.backgroundColor,
+                contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                ),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(16),
+                  borderSide: const BorderSide(color: AppTheme.secondaryColor, width: 2),
+                ),
               ),
             ),
           ],
         ),
         actions: [
-          TextButton(onPressed: () => Navigator.pop(context), child: const Text('Cancel')),
+          TextButton(
+            onPressed: () => Navigator.pop(context),
+            child: Text(
+              'Cancel',
+              style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontWeight: FontWeight.bold),
+            ),
+          ),
           ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
@@ -235,8 +308,16 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
                 _handleScan(pinController.text);
               }
             },
-            style: ElevatedButton.styleFrom(backgroundColor: const Color(0xFF6366F1), shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-            child: const Text('Verify PIN', style: TextStyle(color: Colors.white)),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.primaryColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+              padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+              elevation: 0,
+            ),
+            child: Text(
+              'Verify PIN',
+              style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold),
+            ),
           ),
         ],
       ),
