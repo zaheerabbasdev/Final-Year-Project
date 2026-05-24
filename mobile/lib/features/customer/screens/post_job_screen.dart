@@ -422,12 +422,16 @@ class _PostJobScreenState extends State<PostJobScreen> {
           children: [
             Icon(icon, size: 20, color: AppTheme.subtextColor),
             const SizedBox(width: 12),
-            Text(
-              value,
-              style: GoogleFonts.outfit(
-                color: hasVal ? AppTheme.textColor : AppTheme.subtextColor,
-                fontSize: 15,
-                fontWeight: hasVal ? FontWeight.w500 : FontWeight.normal,
+            Expanded(
+              child: Text(
+                value,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: GoogleFonts.outfit(
+                  color: hasVal ? AppTheme.textColor : AppTheme.subtextColor,
+                  fontSize: 15,
+                  fontWeight: hasVal ? FontWeight.w500 : FontWeight.normal,
+                ),
               ),
             ),
           ],

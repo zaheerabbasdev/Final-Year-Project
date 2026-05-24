@@ -176,11 +176,14 @@ class _NotificationScreenState extends State<NotificationScreen> {
                             ),
                           )
                         : null,
-                    onTap: () {
+                    onTap: () async {
+                      await showDialog(
+                        context: context,
+                        builder: (ctx) => _buildNotificationModal(notification),
+                      );
                       if (!isRead) {
                         provider.markAsRead(notification['id']);
                       }
-                      // Handle navigation based on type if needed
                     },
                   ),
                 );
@@ -188,6 +191,95 @@ class _NotificationScreenState extends State<NotificationScreen> {
             ),
           );
         },
+      ),
+    );
+  }
+
+  Widget _buildNotificationModal(Map<String, dynamic> notification) {
+    final typeColor = _getTypeColor(notification['type']);
+    final typeIcon = _getTypeIcon(notification['type']);
+
+    return Dialog(
+      insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
+      child: Padding(
+        padding: const EdgeInsets.all(24),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Handle bar
+            Container(
+              width: 44,
+              height: 4,
+              decoration: BoxDecoration(
+                color: const Color(0xFFE2E8F0),
+                borderRadius: BorderRadius.circular(2),
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Icon
+            Container(
+              width: 64,
+              height: 64,
+              decoration: BoxDecoration(
+                color: typeColor.withOpacity(0.1),
+                shape: BoxShape.circle,
+              ),
+              child: Icon(typeIcon, color: typeColor, size: 30),
+            ),
+            const SizedBox(height: 20),
+            // Title
+            Text(
+              notification['title'] ?? 'Notification',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: AppTheme.textColor,
+              ),
+            ),
+            const SizedBox(height: 12),
+            // Message
+            Text(
+              notification['message'] ?? '',
+              textAlign: TextAlign.center,
+              style: GoogleFonts.outfit(
+                fontSize: 15,
+                color: AppTheme.subtextColor,
+                height: 1.6,
+              ),
+            ),
+            const SizedBox(height: 16),
+            // Date
+            Text(
+              _formatDate(notification['created_at'] ?? ''),
+              style: GoogleFonts.outfit(
+                fontSize: 12,
+                color: AppTheme.subtextColor.withOpacity(0.7),
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+            const SizedBox(height: 24),
+            // Close button
+            SizedBox(
+              width: double.infinity,
+              height: 50,
+              child: ElevatedButton(
+                onPressed: () => Navigator.pop(context),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.primaryColor,
+                  foregroundColor: Colors.white,
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  elevation: 0,
+                ),
+                child: Text(
+                  'Close',
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }
