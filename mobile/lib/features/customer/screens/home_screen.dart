@@ -112,29 +112,35 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(
-              'Welcome Back,',
-              style: GoogleFonts.outfit(
-                fontSize: 14,
-                fontWeight: FontWeight.w500,
-                color: const Color(0xFF64748B),
+        Expanded(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Text(
+                'Welcome Back,',
+                style: GoogleFonts.outfit(
+                  fontSize: 14,
+                  fontWeight: FontWeight.w500,
+                  color: const Color(0xFF64748B),
+                ),
               ),
-            ),
-            const SizedBox(height: 2),
-            Text(
-              '$firstName 👋',
-              style: GoogleFonts.outfit(
-                fontSize: 24,
-                fontWeight: FontWeight.bold,
-                color: const Color(0xFF1E293B),
+              const SizedBox(height: 2),
+              Text(
+                '$firstName 👋',
+                style: GoogleFonts.outfit(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: const Color(0xFF1E293B),
+                ),
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
               ),
-            ),
-          ],
+            ],
+          ),
         ),
+        const SizedBox(width: 8),
         Row(
+          mainAxisSize: MainAxisSize.min,
           children: [
             const NotificationBell(color: Color(0xFF1E293B)),
             const SizedBox(width: 12),
@@ -314,15 +320,20 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: GoogleFonts.outfit(
-            fontSize: 18,
-            fontWeight: FontWeight.bold,
-            color: const Color(0xFF1E293B),
+        Expanded(
+          child: Text(
+            title,
+            style: GoogleFonts.outfit(
+              fontSize: 18,
+              fontWeight: FontWeight.bold,
+              color: const Color(0xFF1E293B),
+            ),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
           ),
         ),
-        if (action.isNotEmpty)
+        if (action.isNotEmpty) ...[
+          const SizedBox(width: 8),
           GestureDetector(
             onTap: onAction,
             child: Text(
@@ -334,6 +345,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ),
             ),
           ),
+        ],
       ],
     );
   }
@@ -568,50 +580,68 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               const SizedBox(height: 16),
               Row(
                 children: [
-                  Text(
-                    'PKR ${price.toStringAsFixed(0)}',
-                    style: GoogleFonts.outfit(
-                      fontSize: 16, 
-                      fontWeight: FontWeight.bold, 
-                      color: const Color(0xFF003B95),
-                    ),
-                  ),
-                  if (isNegotiable) ...[
-                    const SizedBox(width: 8),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFF003B95).withOpacity(0.08),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        'NEGOTIABLE',
-                        style: GoogleFonts.outfit(
-                          color: const Color(0xFF003B95), 
-                          fontSize: 9, 
-                          fontWeight: FontWeight.bold, 
-                          letterSpacing: 0.5,
+                  Expanded(
+                    flex: 4,
+                    child: Row(
+                      children: [
+                        Flexible(
+                          child: Text(
+                            'PKR ${price.toInt()}',
+                            style: GoogleFonts.outfit(
+                              fontSize: 16, 
+                              fontWeight: FontWeight.bold, 
+                              color: const Color(0xFF003B95),
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
                         ),
-                      ),
-                    ),
-                  ],
-                  const Spacer(),
-                  const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
-                  const SizedBox(width: 4),
-                  Flexible(
-                    child: Text(
-                      location,
-                      style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
+                        if (isNegotiable) ...[
+                          const SizedBox(width: 4),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: const Color(0xFF003B95).withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'NEG',
+                              style: GoogleFonts.outfit(
+                                color: const Color(0xFF003B95), 
+                                fontSize: 9, 
+                                fontWeight: FontWeight.bold, 
+                                letterSpacing: 0.5,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                   ),
-                  const SizedBox(width: 12),
-                  const Icon(Icons.trending_up_rounded, size: 14, color: Color(0xFF2ECC71)),
                   const SizedBox(width: 4),
-                  Text(
-                    '$bids bids', 
-                    style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w600),
+                  Expanded(
+                    flex: 5,
+                    child: Row(
+                      mainAxisAlignment: MainAxisAlignment.end,
+                      children: [
+                        const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
+                        const SizedBox(width: 2),
+                        Flexible(
+                          child: Text(
+                            location,
+                            style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        const SizedBox(width: 8),
+                        const Icon(Icons.trending_up_rounded, size: 14, color: Color(0xFF2ECC71)),
+                        const SizedBox(width: 2),
+                        Text(
+                          '$bids bids', 
+                          style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w600),
+                        ),
+                      ],
+                    ),
                   ),
                 ],
               ),

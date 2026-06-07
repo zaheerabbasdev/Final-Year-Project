@@ -258,7 +258,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         Text('Client Budget', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
                         const SizedBox(height: 6),
                         Text(
-                          '\$${_job?['budget'] ?? '0'}',
+                          'PKR ${(double.tryParse(_job?['budget']?.toString() ?? '0') ?? 0).toInt()}',
                           style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
                         ),
                       ],
@@ -865,7 +865,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       crossAxisSpacing: 16,
       childAspectRatio: 2.2,
       children: [
-        _buildStatItem(Icons.attach_money_rounded, 'Budget', '\$$budget'),
+        _buildStatItem(Icons.attach_money_rounded, 'Budget', 'PKR ${(double.tryParse(budget.toString()) ?? 0).toInt()}'),
         _buildStatItem(Icons.location_on_outlined, 'Location', location),
         _buildStatItem(Icons.calendar_today_outlined, 'Posted', date),
         _buildStatItem(Icons.people_outline_rounded, 'Bids', '$bidsCount received'),
@@ -1198,7 +1198,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text('\$$price', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+                   Text('PKR ${(double.tryParse(price.toString()) ?? 0).toInt()}', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
                   Text('Est. $time', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
                 ],
               ),

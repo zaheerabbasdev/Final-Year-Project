@@ -202,7 +202,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                       children: [
                         Flexible(
                           child: Text(
-                            '\$${_job!['budget'] ?? '0'}',
+                            'PKR ${(double.tryParse(_job!['budget']?.toString() ?? '0') ?? 0).toInt()}',
                             style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -270,12 +270,12 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInputLabel('Your Bid Amount (USD) *'),
+          _buildInputLabel('Your Bid Amount (PKR) *'),
           const SizedBox(height: 12),
           _buildTextField(
             controller: _amountController,
             hint: 'Enter your bid',
-            prefixIcon: Icons.attach_money,
+            prefixIcon: Icons.payments_outlined,
             keyboardType: TextInputType.number,
           ),
           if (_suggestion != null) ...[
@@ -293,7 +293,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Suggested competitive bid: \$${_suggestion!['suggestedMin']} - \$${_suggestion!['suggestedMax']} (Average: \$${_suggestion!['averagePrice']})',
+                      'Suggested competitive bid: PKR ${(double.tryParse(_suggestion!["suggestedMin"].toString()) ?? 0).toInt()} - PKR ${(double.tryParse(_suggestion!["suggestedMax"].toString()) ?? 0).toInt()} (Average: PKR ${(double.tryParse(_suggestion!["averagePrice"].toString()) ?? 0).toInt()})',
                       style: GoogleFonts.outfit(
                         color: AppTheme.secondaryColor,
                         fontSize: 12,

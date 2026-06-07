@@ -236,7 +236,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          '\$${bid['amount']}',
+                          'PKR ${(double.tryParse(bid['amount']?.toString() ?? '0') ?? 0).toInt()}',
                           style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
                         ),
                       ],

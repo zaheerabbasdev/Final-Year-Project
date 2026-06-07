@@ -233,33 +233,43 @@ class _JobsListViewState extends State<_JobsListView> {
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
-                            Row(
-                              children: [
-                                Text(
-                                  '\$${job['budget']}',
-                                  style: GoogleFonts.outfit(
-                                    fontSize: 20,
-                                    fontWeight: FontWeight.w800,
-                                    color: AppTheme.primaryColor,
+                            Flexible(
+                              child: Row(
+                                children: [
+                                  Flexible(
+                                    child: Text(
+                                      'PKR ${(double.tryParse(job['budget']?.toString() ?? '0') ?? 0).toInt()}',
+                                      style: GoogleFonts.outfit(
+                                        fontSize: 20,
+                                        fontWeight: FontWeight.w800,
+                                        color: AppTheme.primaryColor,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                    ),
                                   ),
-                                ),
-                                const SizedBox(width: 4),
-                                Text(
-                                  'Budget',
-                                  style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500),
-                                ),
-                              ],
+                                  const SizedBox(width: 4),
+                                  Text(
+                                    'Budget',
+                                    style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500),
+                                  ),
+                                ],
+                              ),
                             ),
+                            const SizedBox(width: 8),
                             Row(
+                              mainAxisSize: MainAxisSize.min,
                               children: [
                                 const Icon(Icons.trending_up, size: 16, color: AppTheme.secondaryColor),
                                 const SizedBox(width: 4),
-                                Text(
-                                  'View Details',
-                                  style: GoogleFonts.outfit(
-                                    color: AppTheme.secondaryColor,
-                                    fontWeight: FontWeight.w700,
-                                    fontSize: 14,
+                                Flexible(
+                                  child: Text(
+                                    'View Details',
+                                    style: GoogleFonts.outfit(
+                                      color: AppTheme.secondaryColor,
+                                      fontWeight: FontWeight.w700,
+                                      fontSize: 14,
+                                    ),
+                                    overflow: TextOverflow.ellipsis,
                                   ),
                                 ),
                               ],

@@ -155,11 +155,16 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(
-          title,
-          style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+        Expanded(
+          child: Text(
+            title,
+            style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+            maxLines: 1,
+            overflow: TextOverflow.ellipsis,
+          ),
         ),
-        if (action != null)
+        if (action != null) ...[
+          const SizedBox(width: 8),
           TextButton(
             onPressed: onAction,
             child: Text(
@@ -167,6 +172,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
               style: GoogleFonts.outfit(color: const Color(0xFF0A84FF), fontWeight: FontWeight.bold, fontSize: 13),
             ),
           ),
+        ],
       ],
     );
   }
@@ -327,7 +333,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'PKR ${context.watch<ProviderService>().dashboardStats?['total_earnings'] ?? '0'}',
+            'PKR ${(double.tryParse(context.watch<ProviderService>().dashboardStats?['total_earnings']?.toString() ?? '0') ?? 0).toInt()}',
             style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 0.5),
           ),
           const SizedBox(height: 24),
@@ -456,21 +462,39 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 const SizedBox(height: 20),
                 Row(
                   children: [
-                    const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
-                    const SizedBox(width: 4),
                     Expanded(
-                      child: Text(
-                        '${job['location'] ?? 'Downtown'}${job['distance'] != null ? ' (${double.parse(job['distance'].toString()).toStringAsFixed(1)} km away)' : ''}',
-                        style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
-                        overflow: TextOverflow.ellipsis,
+                      flex: 5,
+                      child: Row(
+                        children: [
+                          const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              '${job['location'] ?? 'Downtown'}${job['distance'] != null ? ' (${double.parse(job['distance'].toString()).toStringAsFixed(1)} km away)' : ''}',
+                              style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF94A3B8)),
-                    const SizedBox(width: 4),
-                    Text(
-                      job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
-                      style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                    const SizedBox(width: 8),
+                    Expanded(
+                      flex: 4,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.end,
+                        children: [
+                          const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF94A3B8)),
+                          const SizedBox(width: 4),
+                          Flexible(
+                            child: Text(
+                              job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
+                              style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                              overflow: TextOverflow.ellipsis,
+                            ),
+                          ),
+                        ],
+                      ),
                     ),
                   ],
                 ),
@@ -478,10 +502,14 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text(
-                      'PKR ${(double.tryParse(job['budget'].toString()) ?? 150.0).toStringAsFixed(0)}',
-                      style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF003B95)),
+                    Flexible(
+                      child: Text(
+                        'PKR ${(double.tryParse(job['budget'].toString()) ?? 150.0).toInt()}',
+                        style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF003B95)),
+                        overflow: TextOverflow.ellipsis,
+                      ),
                     ),
+                    const SizedBox(width: 8),
                     ElevatedButton(
                       onPressed: () => context.push('/job-detail/${job['id']}'),
                       style: ElevatedButton.styleFrom(

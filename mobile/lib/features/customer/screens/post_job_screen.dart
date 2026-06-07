@@ -37,11 +37,23 @@ class _PostJobScreenState extends State<PostJobScreen> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _autocompleteDescription() async {
-    final text = _descController.text.trim();
-    if (text.length < 5) {
+    final title = _titleController.text.trim();
+    final desc = _descController.text.trim();
+
+    String inputText = '';
+    if (title.isNotEmpty) {
+      inputText = title;
+      if (desc.isNotEmpty && desc != title) {
+        inputText = "$title - $desc";
+      }
+    } else {
+      inputText = desc;
+    }
+
+    if (inputText.length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please type a few words (e.g. "leak in sink") so AI can auto-complete.', style: GoogleFonts.outfit()),
+          content: Text('Please enter a Job Title or description first so AI can generate details.', style: GoogleFonts.outfit()),
           backgroundColor: AppTheme.textColor,
         ),
       );
@@ -49,7 +61,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     }
 
     setState(() => _isLoading = true);
-    final suggestion = await context.read<JobService>().getAutocompleteSuggestions(text);
+    final suggestion = await context.read<JobService>().getAutocompleteSuggestions(inputText);
     setState(() => _isLoading = false);
 
     if (suggestion != null) {
@@ -290,7 +302,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     _buildSectionHeader('Category *'),
                     _buildDropdownField(categories),
                     const SizedBox(height: 20),
-                    _buildSectionHeader('Budget (USD) *'),
+                    _buildSectionHeader('Budget (PKR) *'),
                     _buildTextField(
                       _budgetController,
                       'Enter your budget',

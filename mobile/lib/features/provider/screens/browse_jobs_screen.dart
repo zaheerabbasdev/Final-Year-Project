@@ -561,7 +561,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
-                            '\$${job['budget'] ?? '0'}',
+                            'PKR ${(double.tryParse(job['budget']?.toString() ?? '0') ?? 0).toInt()}',
                             style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
                           ),
                           if (job['is_negotiable'].toString() == '1' || job['is_negotiable'] == true || job['is_negotiable'].toString() == 'true')
