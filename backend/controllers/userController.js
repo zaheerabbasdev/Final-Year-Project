@@ -141,4 +141,26 @@ const getUserById = async (req, res) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders, getUserById };
+const updateOnlineStatus = async (req, res) => {
+    try {
+        const { is_online } = req.body;
+        if (req.user.role !== 'provider') {
+            return res.status(403).json({ message: 'Only providers can update online status' });
+        }
+
+        const profile = await ProviderProfile.findByUserId(req.user.id);
+        if (!profile) {
+            // Auto-create missing profile
+            await ProviderProfile.create(req.user.id, { is_online: !!is_online });
+        } else {
+            await ProviderProfile.update(req.user.id, { is_online: !!is_online });
+        }
+
+        res.json({ message: 'Online status updated successfully', is_online: !!is_online });
+    } catch (error) {
+        console.error('Error updating online status:', error);
+        res.status(500).json({ message: 'Error updating online status' });
+    }
+};
+
+module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders, getUserById, updateOnlineStatus };

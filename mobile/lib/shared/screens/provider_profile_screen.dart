@@ -138,6 +138,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   }
 
   Widget _buildHeader(String? avatarUrl, String categoryName) {
+    final isOnline = _provider?['profile']?['is_online'] == true || _provider?['profile']?['is_online'] == 1 || _provider?['profile']?['is_online'] == 'true';
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -158,19 +159,42 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         ),
         Positioned(
           top: 80,
-          child: Container(
-            decoration: BoxDecoration(
-              shape: BoxShape.circle,
-              border: Border.all(color: Colors.white, width: 4),
-              boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
-            ),
-            child: CircleAvatar(
-              radius: 50,
-              backgroundImage: avatarUrl != null 
-                ? NetworkImage(avatarUrl) as ImageProvider
-                : const NetworkImage('https://i.pravatar.cc/150?u=mike'),
-              backgroundColor: const Color(0xFFF1F5F9),
-            ),
+          child: Stack(
+            children: [
+              Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 4),
+                  boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.1), blurRadius: 10, offset: const Offset(0, 4))],
+                ),
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundImage: avatarUrl != null 
+                    ? NetworkImage(avatarUrl) as ImageProvider
+                    : const NetworkImage('https://i.pravatar.cc/150?u=mike'),
+                  backgroundColor: const Color(0xFFF1F5F9),
+                ),
+              ),
+              Positioned(
+                bottom: 2,
+                right: 2,
+                child: Container(
+                  width: 24,
+                  height: 24,
+                  decoration: BoxDecoration(
+                    color: isOnline ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
+                    shape: BoxShape.circle,
+                    border: Border.all(color: Colors.white, width: 3),
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withOpacity(0.1),
+                        blurRadius: 4,
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
         ),
         Positioned(

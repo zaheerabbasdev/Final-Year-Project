@@ -308,6 +308,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
           const SizedBox(height: 32),
           _buildEditButton(),
+          const SizedBox(height: 16),
+          _buildOnlineOfflineToggleCard(),
           const SizedBox(height: 32),
           _buildProviderStats(),
           const SizedBox(height: 32),
@@ -322,6 +324,94 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildLogoutButton(authService),
         ],
       ),
+    );
+  }
+
+  Widget _buildOnlineOfflineToggleCard() {
+    return Consumer<ProviderService>(
+      builder: (context, providerService, child) {
+        final isOnline = providerService.isOnline;
+        return Container(
+          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.circular(24),
+            border: Border.all(color: const Color(0xFFF1F5F9)),
+            boxShadow: [
+              BoxShadow(
+                color: isOnline 
+                  ? const Color(0xFF10B981).withOpacity(0.06) 
+                  : Colors.black.withOpacity(0.02),
+                blurRadius: 16,
+                offset: const Offset(0, 4),
+              ),
+            ],
+          ),
+          child: Row(
+            children: [
+              Container(
+                padding: const EdgeInsets.all(12),
+                decoration: BoxDecoration(
+                  color: isOnline 
+                    ? const Color(0xFF10B981).withOpacity(0.1) 
+                    : const Color(0xFF94A3B8).withOpacity(0.1),
+                  shape: BoxShape.circle,
+                ),
+                child: Icon(
+                  isOnline ? Icons.wifi_rounded : Icons.wifi_off_rounded,
+                  color: isOnline ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
+                  size: 24,
+                ),
+              ),
+              const SizedBox(width: 16),
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      isOnline ? 'Online Availability' : 'Offline Mode',
+                      style: GoogleFonts.outfit(
+                        fontWeight: FontWeight.bold,
+                        color: const Color(0xFF1E293B),
+                        fontSize: 16,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      isOnline 
+                        ? 'You are active & receiving jobs' 
+                        : 'Tap to switch back online',
+                      style: GoogleFonts.outfit(
+                        color: const Color(0xFF64748B),
+                        fontSize: 12,
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+              Switch.adaptive(
+                value: isOnline,
+                activeColor: const Color(0xFF10B981),
+                activeTrackColor: const Color(0xFF10B981).withOpacity(0.3),
+                inactiveThumbColor: const Color(0xFF94A3B8),
+                inactiveTrackColor: const Color(0xFFE2E8F0),
+                onChanged: (value) async {
+                  setState(() => _isLoading = true);
+                  final success = await providerService.toggleOnlineStatus(value);
+                  if (mounted) {
+                    setState(() => _isLoading = false);
+                    if (!success) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Failed to update availability status')),
+                      );
+                    }
+                  }
+                },
+              ),
+            ],
+          ),
+        );
+      },
     );
   }
 

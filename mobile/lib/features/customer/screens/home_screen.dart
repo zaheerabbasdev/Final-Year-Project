@@ -225,6 +225,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           itemBuilder: (context, index) {
             final provider = service.searchResults[index];
             final avatarUrl = ApiClient.getImageUrl(provider['avatar']);
+            final isOnline = provider['is_online'] == true || provider['is_online'] == 1 || provider['is_online'] == 'true';
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
@@ -234,9 +235,26 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ),
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-                leading: CircleAvatar(
-                  backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-                  child: avatarUrl == null ? Text(provider['full_name']?[0] ?? 'P') : null,
+                leading: Stack(
+                  children: [
+                    CircleAvatar(
+                      backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
+                      child: avatarUrl == null ? Text(provider['full_name']?[0] ?? 'P') : null,
+                    ),
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: Container(
+                        width: 12,
+                        height: 12,
+                        decoration: BoxDecoration(
+                          color: isOnline ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
+                          shape: BoxShape.circle,
+                          border: Border.all(color: Colors.white, width: 1.5),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
                 title: Text(provider['full_name'] ?? 'Unknown Provider', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
                 subtitle: Text(provider['bio'] ?? 'No bio provided', maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.outfit()),
@@ -251,7 +269,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     ),
                   ],
                 ),
-                onTap: () {},
+                onTap: () => context.push('/provider-profile/${provider['id']}'),
               ),
             );
           },
@@ -672,64 +690,90 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             itemBuilder: (context, index) {
               final provider = providers[index];
               final avatarUrl = ApiClient.getImageUrl(provider['avatar']);
-              return Container(
-                width: 150,
-                margin: const EdgeInsets.only(right: 16, bottom: 8),
-                padding: const EdgeInsets.all(18),
-                decoration: BoxDecoration(
-                  color: AppTheme.surfaceColor,
-                  borderRadius: BorderRadius.circular(26),
-                  border: Border.all(color: const Color(0xFFE2E8F0)),
-                  boxShadow: [
-                    BoxShadow(
-                      color: AppTheme.textColor.withOpacity(0.03),
-                      blurRadius: 12,
-                      offset: const Offset(0, 6),
-                    ),
-                  ],
-                ),
-                child: Column(
-                  children: [
-                    Container(
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        border: Border.all(color: const Color(0xFF0A84FF).withOpacity(0.2), width: 2),
+              final isOnline = provider['is_online'] == true || provider['is_online'] == 1 || provider['is_online'] == 'true';
+              return GestureDetector(
+                onTap: () => context.push('/provider-profile/${provider['id']}'),
+                child: Container(
+                  width: 150,
+                  margin: const EdgeInsets.only(right: 16, bottom: 8),
+                  padding: const EdgeInsets.all(18),
+                  decoration: BoxDecoration(
+                    color: AppTheme.surfaceColor,
+                    borderRadius: BorderRadius.circular(26),
+                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    boxShadow: [
+                      BoxShadow(
+                        color: AppTheme.textColor.withOpacity(0.03),
+                        blurRadius: 12,
+                        offset: const Offset(0, 6),
                       ),
-                      child: CircleAvatar(
-                        radius: 28,
-                        backgroundImage: avatarUrl != null 
-                          ? NetworkImage(avatarUrl)
-                          : const NetworkImage('https://i.pravatar.cc/150?u=provider'),
-                        backgroundColor: const Color(0xFFF1F5F9),
-                      ),
-                    ),
-                    const SizedBox(height: 10),
-                    Text(
-                      provider['full_name'] as String,
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF1E293B)),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: const Color(0xFFFFB020).withOpacity(0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
+                    ],
+                  ),
+                  child: Column(
+                    children: [
+                      Stack(
                         children: [
-                          const Icon(Icons.star_rounded, color: Color(0xFFFFB020), size: 14),
-                          const SizedBox(width: 4),
-                          Text(
-                            (provider['rating'] ?? 5.0).toString(),
-                            style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 11, color: const Color(0xFFB45309)),
+                          Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: isOnline 
+                                    ? const Color(0xFF10B981).withOpacity(0.4) 
+                                    : const Color(0xFF0A84FF).withOpacity(0.2), 
+                                width: 2,
+                              ),
+                            ),
+                            child: CircleAvatar(
+                              radius: 28,
+                              backgroundImage: avatarUrl != null 
+                                ? NetworkImage(avatarUrl)
+                                : const NetworkImage('https://i.pravatar.cc/150?u=provider'),
+                              backgroundColor: const Color(0xFFF1F5F9),
+                            ),
+                          ),
+                          Positioned(
+                            bottom: 0,
+                            right: 0,
+                            child: Container(
+                              width: 14,
+                              height: 14,
+                              decoration: BoxDecoration(
+                                color: isOnline ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
+                                shape: BoxShape.circle,
+                                border: Border.all(color: Colors.white, width: 2),
+                              ),
+                            ),
                           ),
                         ],
                       ),
-                    ),
-                  ],
+                      const SizedBox(height: 10),
+                      Text(
+                        provider['full_name'] as String,
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF1E293B)),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const Spacer(),
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: const Color(0xFFFFB020).withOpacity(0.1),
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            const Icon(Icons.star_rounded, color: Color(0xFFFFB020), size: 14),
+                            const SizedBox(width: 4),
+                            Text(
+                              (provider['rating'] ?? 5.0).toString(),
+                              style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 11, color: const Color(0xFFB45309)),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ],
+                  ),
                 ),
               );
             },

@@ -33,6 +33,7 @@ CREATE TABLE IF NOT EXISTS provider_profiles (
     category_id INT,
     cnic_url VARCHAR(255),
     certificates_url VARCHAR(255),
+    is_online BOOLEAN DEFAULT FALSE,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );

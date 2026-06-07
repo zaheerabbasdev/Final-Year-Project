@@ -9,11 +9,12 @@ const ProviderProfile = {
             availability = true, 
             category_id = null,
             cnic_url = null,
-            certificates_url = null
+            certificates_url = null,
+            is_online = false
         } = data;
         const [result] = await db.execute(
-            'INSERT INTO provider_profiles (user_id, bio, experience_years, skills, availability, category_id, cnic_url, certificates_url) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [userId, bio, experience_years, JSON.stringify(skills), availability, category_id, cnic_url, certificates_url]
+            'INSERT INTO provider_profiles (user_id, bio, experience_years, skills, availability, category_id, cnic_url, certificates_url, is_online) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)',
+            [userId, bio, experience_years, JSON.stringify(skills), availability, category_id, cnic_url, certificates_url, is_online]
         );
         return result.affectedRows > 0;
     },
@@ -49,7 +50,7 @@ const ProviderProfile = {
     findTopProviders: async (limit = 5) => {
         const parsedLimit = parseInt(limit, 10) || 5;
         const [rows] = await db.execute(
-            `SELECT u.id, u.full_name, u.avatar, p.bio, p.rating, p.total_jobs, c.name as category_name
+            `SELECT u.id, u.full_name, u.avatar, p.bio, p.rating, p.total_jobs, p.is_online, c.name as category_name
              FROM users u 
              JOIN provider_profiles p ON u.id = p.user_id 
              LEFT JOIN categories c ON p.category_id = c.id
@@ -61,7 +62,7 @@ const ProviderProfile = {
     },
 
     findAll: async (filters = {}) => {
-        let query = `SELECT u.id, u.full_name, u.avatar, p.bio, p.rating, p.total_jobs, c.name as category_name
+        let query = `SELECT u.id, u.full_name, u.avatar, p.bio, p.rating, p.total_jobs, p.is_online, c.name as category_name
                      FROM users u 
                      JOIN provider_profiles p ON u.id = p.user_id 
                      LEFT JOIN categories c ON p.category_id = c.id
