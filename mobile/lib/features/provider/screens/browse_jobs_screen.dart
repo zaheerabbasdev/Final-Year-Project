@@ -19,7 +19,7 @@ class BrowseJobsScreen extends StatefulWidget {
 class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   final _searchController = TextEditingController();
   String selectedCategory = 'All Categories';
-  String selectedSort = 'Most Recent';
+  String selectedSort = 'AI Recommended';
   Timer? _debounce;
   bool _isNearMeEnabled = false;
   bool _isLocating = false;
@@ -42,6 +42,9 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
         final categories = context.read<CategoryService>().categories;
         final cat = categories.firstWhere((c) => c['name'] == selectedCategory, orElse: () => null);
         if (cat != null) filters['category_id'] = cat['id'];
+      }
+      if (selectedSort == 'AI Recommended') {
+        filters['recommended'] = true;
       }
       if (_isNearMeEnabled) {
         _performNearMeSearch(filters);
@@ -116,7 +119,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   void initState() {
     super.initState();
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<JobService>().fetchJobs(filters: {'status': 'open'});
+      context.read<JobService>().fetchJobs(filters: {'status': 'open', 'recommended': true});
       context.read<CategoryService>().fetchCategories();
     });
   }
@@ -173,11 +176,34 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                     ),
                   );
                 }
+
+                // Copy and sort jobs list locally
+                final jobsList = List<dynamic>.from(service.jobs);
+                if (selectedSort == 'Highest Budget') {
+                  jobsList.sort((a, b) {
+                    final budgetA = double.tryParse(a['budget']?.toString() ?? '0') ?? 0.0;
+                    final budgetB = double.tryParse(b['budget']?.toString() ?? '0') ?? 0.0;
+                    return budgetB.compareTo(budgetA);
+                  });
+                } else if (selectedSort == 'Lowest Budget') {
+                  jobsList.sort((a, b) {
+                    final budgetA = double.tryParse(a['budget']?.toString() ?? '0') ?? 0.0;
+                    final budgetB = double.tryParse(b['budget']?.toString() ?? '0') ?? 0.0;
+                    return budgetA.compareTo(budgetB);
+                  });
+                } else if (selectedSort == 'Most Recent') {
+                  jobsList.sort((a, b) {
+                    final dateA = DateTime.tryParse(a['created_at']?.toString() ?? '') ?? DateTime(1970);
+                    final dateB = DateTime.tryParse(b['created_at']?.toString() ?? '') ?? DateTime(1970);
+                    return dateB.compareTo(dateA);
+                  });
+                }
+
                 return ListView.builder(
                   padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
-                  itemCount: service.jobs.length,
+                  itemCount: jobsList.length,
                   itemBuilder: (context, index) {
-                    final job = service.jobs[index];
+                    final job = jobsList[index];
                     return _buildJobCard(job);
                   },
                 );
@@ -281,7 +307,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
       backgroundColor: Colors.white,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (context) {
-        final options = ['Most Recent', 'Highest Budget', 'Lowest Budget'];
+        final options = ['AI Recommended', 'Most Recent', 'Highest Budget', 'Lowest Budget'];
         return SingleChildScrollView(
           padding: const EdgeInsets.all(28),
           child: Column(
@@ -310,6 +336,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 onTap: () {
                   setState(() => selectedSort = opt);
                   Navigator.pop(context);
+                  _onSearchChanged(_searchController.text);
                 },
               )),
               const SizedBox(height: 16),
@@ -403,6 +430,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
 
   Widget _buildJobCard(Map<String, dynamic> job) {
     final isEmergency = _checkIsEmergency(job['is_emergency']);
+    final int? matchScore = job['match_score'] != null ? int.tryParse(job['match_score'].toString()) : null;
     return Container(
       margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
@@ -430,8 +458,29 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                     style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
                   ),
                 ),
+                if (matchScore != null)
+                  Container(
+                    margin: const EdgeInsets.only(left: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withOpacity(0.1),
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Row(
+                      mainAxisSize: MainAxisSize.min,
+                      children: [
+                        const Icon(Icons.psychology, color: AppTheme.primaryColor, size: 14),
+                        const SizedBox(width: 4),
+                        Text(
+                          '${matchScore}% Match',
+                          style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 11, fontWeight: FontWeight.bold),
+                        ),
+                      ],
+                    ),
+                  ),
                 if (isEmergency)
                   Container(
+                    margin: const EdgeInsets.only(left: 8),
                     padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                     decoration: BoxDecoration(
                       color: const Color(0xFFFEF2F2),

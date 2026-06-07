@@ -14,7 +14,6 @@ import '../../core/api_client.dart';
 import '../../core/services/location_service.dart';
 import 'map_picker_screen.dart';
 import '../../shared/widgets/notification_bell.dart';
-import '../../shared/widgets/wallet_bottom_sheet.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool initialEditMode;
@@ -280,18 +279,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildCustomerStats(),
           const SizedBox(height: 32),
           _buildMenuCard([
-            _buildMenuItem(Icons.account_balance_wallet_outlined, 'My Wallet Balance', () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => WalletBottomSheet(userName: user?['full_name'] ?? 'User'),
-              );
-            }),
             _buildMenuItem(Icons.payment_outlined, 'Payment Methods', () {}),
             _buildMenuItem(Icons.notifications_none_rounded, 'Notifications', () => context.push('/notifications')),
             _buildMenuItem(Icons.settings_outlined, 'Settings', () {}),
-            _buildMenuItem(Icons.help_outline_rounded, 'Help & Support', () {}),
+            _buildMenuItem(Icons.psychology_outlined, 'AI Support Assistant', () => context.push('/support-chatbot')),
           ]),
           const SizedBox(height: 32),
           _buildLogoutButton(authService),
@@ -321,16 +312,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildProviderStats(),
           const SizedBox(height: 32),
           _buildMenuCard([
-            _buildMenuItem(Icons.account_balance_wallet_outlined, 'My Wallet Console', () {
-              showModalBottomSheet(
-                context: context,
-                isScrollControlled: true,
-                backgroundColor: Colors.transparent,
-                builder: (context) => WalletBottomSheet(userName: user?['full_name'] ?? 'Provider'),
-              );
-            }),
             _buildMenuItem(Icons.notifications_none_rounded, 'Notifications', () => context.push('/notifications')),
             _buildMenuItem(Icons.settings_outlined, 'Settings', () {}),
+            _buildMenuItem(Icons.psychology_outlined, 'AI Support Assistant', () => context.push('/support-chatbot')),
           ]),
           const SizedBox(height: 32),
           _buildProviderReviews(user?['id']),

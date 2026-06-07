@@ -11,7 +11,6 @@ import '../../provider/provider_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
-import '../../../shared/widgets/wallet_bottom_sheet.dart';
 import '../../../core/theme.dart';
 
 class ProviderDashboardScreen extends StatefulWidget {
@@ -322,35 +321,9 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                "This Month's Earnings",
-                style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.92)),
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => WalletBottomSheet(userName: fullName),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF003B95),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Wallet Console',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 12),
-                ),
-              ),
-            ],
+          Text(
+            "This Month's Earnings",
+            style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.w600, color: Colors.white.withOpacity(0.92)),
           ),
           const SizedBox(height: 4),
           Text(

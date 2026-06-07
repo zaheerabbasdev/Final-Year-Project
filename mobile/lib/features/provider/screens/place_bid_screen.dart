@@ -19,6 +19,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   final _timeController = TextEditingController();
   final _proposalController = TextEditingController();
   Map<String, dynamic>? _job;
+  Map<String, dynamic>? _suggestion;
   bool _isLoading = true;
 
   @override
@@ -29,9 +30,11 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
 
   Future<void> _loadJob() async {
     final job = await context.read<JobService>().getJobById(widget.jobId);
+    final suggestion = await context.read<JobService>().getSuggestedBidPrice(widget.jobId);
     if (mounted) {
       setState(() {
         _job = job;
+        _suggestion = suggestion;
         _isLoading = false;
       });
     }
@@ -185,51 +188,63 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Client Budget',
-                    style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 4),
-                  Row(
-                    children: [
-                      Text(
-                        '\$${_job!['budget'] ?? '0'}',
-                        style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
-                      ),
-                      if (_job!['is_negotiable'].toString() == '1' || _job!['is_negotiable'] == true || _job!['is_negotiable'].toString() == 'true') ...[
-                        const SizedBox(width: 8),
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
-                          decoration: BoxDecoration(
-                            color: AppTheme.primaryColor.withOpacity(0.08),
-                            borderRadius: BorderRadius.circular(6),
-                          ),
+              Flexible(
+                flex: 3,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(
+                      'Client Budget',
+                      style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 4),
+                    Row(
+                      children: [
+                        Flexible(
                           child: Text(
-                            'NEGOTIABLE',
-                            style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                            '\$${_job!['budget'] ?? '0'}',
+                            style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
+                            overflow: TextOverflow.ellipsis,
                           ),
                         ),
+                        if (_job!['is_negotiable'].toString() == '1' || _job!['is_negotiable'] == true || _job!['is_negotiable'].toString() == 'true') ...[
+                          const SizedBox(width: 8),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              'NEGOTIABLE',
+                              style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
+                            ),
+                          ),
+                        ],
                       ],
-                    ],
-                  ),
-                ],
+                    ),
+                  ],
+                ),
               ),
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.end,
-                children: [
-                  Text(
-                    'Category',
-                    style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    _job!['category_name'] ?? 'N/A',
-                    style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
-                  ),
-                ],
+              const SizedBox(width: 12),
+              Flexible(
+                flex: 2,
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.end,
+                  children: [
+                    Text(
+                      'Category',
+                      style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                    ),
+                    const SizedBox(height: 4),
+                    Text(
+                      _job!['category_name'] ?? 'N/A',
+                      style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+                      overflow: TextOverflow.ellipsis,
+                      textAlign: TextAlign.end,
+                    ),
+                  ],
+                ),
               ),
             ],
           ),
@@ -263,6 +278,33 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
             prefixIcon: Icons.attach_money,
             keyboardType: TextInputType.number,
           ),
+          if (_suggestion != null) ...[
+            const SizedBox(height: 10),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: AppTheme.secondaryColor.withOpacity(0.08),
+                borderRadius: BorderRadius.circular(12),
+                border: Border.all(color: AppTheme.secondaryColor.withOpacity(0.15)),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.psychology, color: AppTheme.secondaryColor, size: 18),
+                  const SizedBox(width: 8),
+                  Expanded(
+                    child: Text(
+                      'Suggested competitive bid: \$${_suggestion!['suggestedMin']} - \$${_suggestion!['suggestedMax']} (Average: \$${_suggestion!['averagePrice']})',
+                      style: GoogleFonts.outfit(
+                        color: AppTheme.secondaryColor,
+                        fontSize: 12,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ],
           const SizedBox(height: 16),
           const Divider(color: Color(0xFFF1F5F9), height: 1),
           const SizedBox(height: 16),

@@ -36,6 +36,7 @@ import 'core/services/socket_service.dart';
 import 'features/chat/providers/chat_provider.dart';
 import 'features/chat/screens/chat_list_screen.dart';
 import 'features/chat/screens/chat_room_screen.dart';
+import 'features/chat/screens/support_chatbot_screen.dart';
 import 'shared/providers/sync_provider.dart';
 
 
@@ -261,6 +262,10 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
               isProvider: extra['isProvider'],
             );
           },
+        ),
+        GoRoute(
+          path: '/support-chatbot',
+          builder: (context, state) => const SupportChatbotScreen(),
         ),
       ],
     );

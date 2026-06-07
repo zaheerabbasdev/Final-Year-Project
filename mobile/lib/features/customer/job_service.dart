@@ -18,11 +18,26 @@ class JobService extends ChangeNotifier {
     _isLoading = true;
     notifyListeners();
     try {
-      final response = await _apiClient.dio.get('/jobs', queryParameters: filters);
-      print('DEBUG: Jobs from API: ${response.data}'); // THIS WILL SHOW US THE DATA
-      _jobs = response.data;
+      Response response;
+      if (filters != null && filters['recommended'] == true) {
+        final cleanFilters = Map<String, dynamic>.from(filters)..remove('recommended');
+        try {
+          response = await _apiClient.dio.get('/ai/matching-jobs', queryParameters: cleanFilters);
+        } catch (aiError) {
+          // AI endpoint failed — fall back to standard job listing
+          print('AI matching endpoint failed, using standard fetch: $aiError');
+          final fallbackFilters = Map<String, dynamic>.from(cleanFilters);
+          fallbackFilters['status'] = 'open';
+          response = await _apiClient.dio.get('/jobs', queryParameters: fallbackFilters);
+        }
+      } else {
+        response = await _apiClient.dio.get('/jobs', queryParameters: filters);
+      }
+      print('DEBUG: Jobs from API: ${response.data}');
+      _jobs = response.data is List ? response.data : [];
     } catch (e) {
-      print(e);
+      print('fetchJobs error: $e');
+      _jobs = [];
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -126,5 +141,27 @@ class JobService extends ChangeNotifier {
       print('Error in express hire: $e');
     }
     return false;
+  }
+
+  Future<Map<String, dynamic>?> getSuggestedBidPrice(int jobId) async {
+    try {
+      final response = await _apiClient.dio.get('/ai/suggest-bid/$jobId');
+      return response.data;
+    } catch (e) {
+      print('Error fetching suggested bid price: $e');
+      return null;
+    }
+  }
+
+  Future<Map<String, dynamic>?> getAutocompleteSuggestions(String partialText) async {
+    try {
+      final response = await _apiClient.dio.post('/ai/autocomplete', data: {
+        'partialDescription': partialText,
+      });
+      return response.data;
+    } catch (e) {
+      print('Error getting autocomplete suggestion: $e');
+      return null;
+    }
   }
 }

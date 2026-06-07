@@ -94,11 +94,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                   _buildSectionTitle('Client Information'),
                   const SizedBox(height: 16),
                   _buildInfoCard(),
-                  const SizedBox(height: 32),
-                  _buildSectionTitle('Statistics'),
-                  const SizedBox(height: 16),
-                  _buildStatsGrid(),
-                  const SizedBox(height: 32),
                 ],
               ),
             ),
@@ -237,34 +232,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
           ],
         ),
       ],
-    );
-  }
-
-  Widget _buildStatsGrid() {
-    return Row(
-      children: [
-        Expanded(child: _buildStatCard('Jobs Posted', '5', Icons.post_add, const Color(0xFF6366F1))),
-      ],
-    );
-  }
-
-  Widget _buildStatCard(String label, String value, IconData icon, Color color) {
-    return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Colors.white,
-        borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
-      ),
-      child: Column(
-        children: [
-          Icon(icon, color: color, size: 28),
-          const SizedBox(height: 12),
-          Text(value, style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
-          const SizedBox(height: 4),
-          Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
-        ],
-      ),
     );
   }
 }

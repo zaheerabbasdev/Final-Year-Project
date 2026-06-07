@@ -11,7 +11,6 @@ import '../job_service.dart';
 import '../../provider/provider_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
-import '../../../shared/widgets/wallet_bottom_sheet.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -53,7 +52,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final userName = context.watch<AuthService>().user?['full_name'] ?? 'User';
     final avatarPath = context.watch<AuthService>().user?['avatar'];
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
 
@@ -85,8 +83,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   const SizedBox(height: 16),
                   _buildSearchResults(),
                 ] else ...[
-                  _buildWalletCard(userName),
-                  const SizedBox(height: 24),
                   _buildPromoCard(context),
                   const SizedBox(height: 32),
                   _buildSectionHeader('Browse Categories', 'See All', () {}),
@@ -205,115 +201,6 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
         style: GoogleFonts.outfit(fontSize: 15, color: const Color(0xFF1E293B)),
-      ),
-    );
-  }
-
-  Widget _buildWalletCard(String userName) {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          colors: [Color(0xFF003B95), Color(0xFF0A84FF)],
-          begin: Alignment.topLeft,
-          end: Alignment.bottomRight,
-        ),
-        borderRadius: BorderRadius.circular(28),
-        boxShadow: [
-          BoxShadow(
-            color: const Color(0xFF003B95).withOpacity(0.22),
-            blurRadius: 24,
-            offset: const Offset(0, 12),
-          ),
-        ],
-      ),
-      padding: const EdgeInsets.all(22),
-      child: Column(
-        children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Row(
-                children: [
-                  Container(
-                    padding: const EdgeInsets.all(8),
-                    decoration: BoxDecoration(
-                      color: Colors.white.withOpacity(0.12),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: const Icon(Icons.account_balance_wallet_rounded, color: Colors.white, size: 20),
-                  ),
-                  const SizedBox(width: 12),
-                  Text(
-                    'Kaarkun Wallet',
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 15,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.15),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-                child: Text(
-                  'ACTIVE',
-                  style: GoogleFonts.outfit(color: Colors.white, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 24),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            children: [
-              Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    'Available Balance',
-                    style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    'PKR 12,500.00',
-                    style: GoogleFonts.outfit(
-                      color: Colors.white,
-                      fontSize: 26,
-                      fontWeight: FontWeight.bold,
-                    ),
-                  ),
-                ],
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  showModalBottomSheet(
-                    context: context,
-                    isScrollControlled: true,
-                    backgroundColor: Colors.transparent,
-                    builder: (context) => WalletBottomSheet(userName: userName),
-                  );
-                },
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: const Color(0xFF003B95),
-                  padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 0,
-                ),
-                child: Text(
-                  'Manage',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13),
-                ),
-              ),
-            ],
-          ),
-        ],
       ),
     );
   }

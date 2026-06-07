@@ -36,6 +36,60 @@ class _PostJobScreenState extends State<PostJobScreen> {
   bool _isEmergency = false;
   final ImagePicker _picker = ImagePicker();
 
+  Future<void> _autocompleteDescription() async {
+    final text = _descController.text.trim();
+    if (text.length < 5) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Please type a few words (e.g. "leak in sink") so AI can auto-complete.', style: GoogleFonts.outfit()),
+          backgroundColor: AppTheme.textColor,
+        ),
+      );
+      return;
+    }
+
+    setState(() => _isLoading = true);
+    final suggestion = await context.read<JobService>().getAutocompleteSuggestions(text);
+    setState(() => _isLoading = false);
+
+    if (suggestion != null) {
+      setState(() {
+        if (suggestion['completion'] != null && suggestion['completion'].toString().isNotEmpty) {
+          _descController.text = suggestion['completion'];
+        }
+        
+        if (suggestion['category'] != null) {
+          final categories = context.read<CategoryService>().categories;
+          final matchedCat = categories.firstWhere(
+            (c) => c['name'].toString().toLowerCase() == suggestion['category'].toString().toLowerCase(),
+            orElse: () => null,
+          );
+          if (matchedCat != null) {
+            _selectedCategoryId = matchedCat['id'];
+          }
+        }
+        
+        if (suggestion['suggestedBudget'] != null) {
+          _budgetController.text = suggestion['suggestedBudget'].toString();
+        }
+      });
+      
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('AI auto-filled details based on your input!', style: GoogleFonts.outfit()),
+          backgroundColor: AppTheme.successColor,
+        ),
+      );
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Failed to generate suggestions. Please fill manually.', style: GoogleFonts.outfit()),
+          backgroundColor: AppTheme.errorColor,
+        ),
+      );
+    }
+  }
+
   Future<void> _pickImages() async {
     final List<XFile> pickedImages = await _picker.pickMultiImage();
     if (pickedImages.isNotEmpty) {
@@ -220,7 +274,19 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     const SizedBox(height: 20),
                     _buildSectionHeader('Description *'),
                     _buildTextField(_descController, 'Describe your job in detail...', maxLines: 5),
-                    const SizedBox(height: 20),
+                    const SizedBox(height: 4),
+                    Align(
+                      alignment: Alignment.centerRight,
+                      child: TextButton.icon(
+                        onPressed: _autocompleteDescription,
+                        icon: const Icon(Icons.psychology, size: 18, color: AppTheme.secondaryColor),
+                        label: Text(
+                          'AI Auto-Fill Description & Category',
+                          style: GoogleFonts.outfit(color: AppTheme.secondaryColor, fontWeight: FontWeight.bold, fontSize: 13),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 12),
                     _buildSectionHeader('Category *'),
                     _buildDropdownField(categories),
                     const SizedBox(height: 20),

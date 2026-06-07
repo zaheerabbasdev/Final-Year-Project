@@ -172,11 +172,11 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                 return GestureDetector(
                   onTap: () => setState(() => _rating = index + 1),
                   child: Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 8),
+                    padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(
                       index < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
                       color: index < _rating ? AppTheme.warningColor : const Color(0xFFE2E8F0),
-                      size: 52,
+                      size: 44,
                     ),
                   ),
                 );
