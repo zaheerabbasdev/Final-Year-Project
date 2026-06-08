@@ -49,7 +49,7 @@ const getAutocomplete = async (req, res) => {
 const supportChatbot = async (req, res) => {
     try {
         const { message, history } = req.body;
-        const responseText = await AIService.supportChatbot(message, history || []);
+        const responseText = await AIService.supportChatbot(message, history || [], req.user);
         res.json({ response: responseText });
     } catch (error) {
         console.error("Error in supportChatbot controller:", error);

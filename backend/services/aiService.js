@@ -311,14 +311,79 @@ Given a partial job description, return a complete, professional version of the 
     /**
      * General Support Chatbot API
      */
-    supportChatbot: async (message, history = []) => {
+    supportChatbot: async (message, history = [], user = null) => {
+        let statsContext = '';
+        let userContext = '';
+        try {
+            const [[{ onlineProviders }]] = await db.execute('SELECT COUNT(*) as onlineProviders FROM provider_profiles WHERE is_online = 1');
+            const [[{ totalCustomers }]] = await db.execute('SELECT COUNT(*) as totalCustomers FROM users WHERE role = "customer"');
+            const [[{ availableJobs }]] = await db.execute('SELECT COUNT(*) as availableJobs FROM jobs WHERE status = "open"');
+            
+            const [categories] = await db.execute(`
+                SELECT c.name, COUNT(p.user_id) as count 
+                FROM categories c 
+                JOIN provider_profiles p ON c.id = p.category_id 
+                GROUP BY c.id
+            `);
+            const categoryBreakdown = categories.map(c => `${c.name}s: ${c.count}`).join(', ');
+
+            // Fetch Top 5 providers
+            const [topProviders] = await db.execute(`
+                SELECT u.full_name, p.rating, c.name as category 
+                FROM provider_profiles p 
+                JOIN users u ON p.user_id = u.id 
+                LEFT JOIN categories c ON p.category_id = c.id 
+                ORDER BY p.rating DESC LIMIT 5
+            `);
+            const topProvidersStr = topProviders.map(p => `- ${p.full_name} (${p.category || 'No Category'}, Rating: ${p.rating})`).join('\n');
+
+            statsContext = `\nReal-time App Statistics:
+- Online Providers: ${onlineProviders}
+- Registered Customers: ${totalCustomers}
+- Available Open Jobs: ${availableJobs}
+- Provider Breakdown: ${categoryBreakdown}
+- Top Rated Providers:\n${topProvidersStr}`;
+
+            if (user && user.id) {
+                const [userData] = await db.execute('SELECT full_name, email, role FROM users WHERE id = ?', [user.id]);
+                if (userData.length > 0) {
+                    const u = userData[0];
+                    userContext = `\n\nInformation about the current user you are chatting with:
+- Name: ${u.full_name}
+- Email: ${u.email}
+- Role: ${u.role}`;
+
+                    if (u.role === 'provider') {
+                        const [profileData] = await db.execute(`
+                            SELECT p.rating, p.total_jobs, c.name as category, p.is_online
+                            FROM provider_profiles p
+                            LEFT JOIN categories c ON p.category_id = c.id
+                            WHERE p.user_id = ?
+                        `, [user.id]);
+                        if (profileData.length > 0) {
+                            const p = profileData[0];
+                            userContext += `\n- Category: ${p.category || 'Not set'}
+- Rating: ${p.rating}
+- Total Jobs Done: ${p.total_jobs}
+- Currently Online: ${p.is_online ? 'Yes' : 'No'}`;
+                        }
+                    } else if (u.role === 'customer') {
+                        const [[{ jobsPosted }]] = await db.execute('SELECT COUNT(*) as jobsPosted FROM jobs WHERE customer_id = ?', [user.id]);
+                        userContext += `\n- Total Jobs Posted: ${jobsPosted}`;
+                    }
+                }
+            }
+        } catch (error) {
+            console.error('Error fetching stats for AI:', error);
+        }
+
         const systemPrompt = `You are Kaarkun Support AI, a friendly customer helper for the Kaarkun app.
 Kaarkun is a mobile marketplace matching customers with local service providers (Plumbers, Electricians, Carpenters, Painters, etc.).
 - Customers post jobs with details and budgets.
 - Providers place bids on jobs with price estimates.
 - Once accepted, a Booking is formed.
 - Users verify booking completion and write reviews.
-- Accounts are marked "pending" until admin approves CNIC and certificates.
+- Accounts are marked "pending" until admin approves CNIC and certificates.${statsContext}${userContext}
 Keep your answers brief, friendly, helpful and directly related to Kaarkun. Maximum 3 sentences. Do NOT use markdown, bullet points or asterisks.`;
 
         // Only send last 6 messages to avoid huge prompts
