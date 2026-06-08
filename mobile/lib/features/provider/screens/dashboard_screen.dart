@@ -92,24 +92,46 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           const NotificationBell(color: Color(0xFF1E293B)),
           Padding(
             padding: const EdgeInsets.only(right: 16.0, left: 8.0),
-            child: Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
+            child: GestureDetector(
+              onTap: () => context.push('/profile'),
+              child: Stack(
+                children: [
+                  Container(
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      border: Border.all(color: Colors.white, width: 2),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.black.withOpacity(0.05),
+                          blurRadius: 8,
+                          offset: const Offset(0, 4),
+                        ),
+                      ],
+                    ),
+                    child: CircleAvatar(
+                      radius: 18,
+                      backgroundImage: avatarUrl != null 
+                        ? NetworkImage(avatarUrl)
+                        : const NetworkImage('https://i.pravatar.cc/150?u=mike'),
+                      backgroundColor: const Color(0xFFF1F5F9),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 0,
+                    right: 0,
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: context.watch<ProviderService>().isOnline
+                            ? const Color(0xFF10B981) 
+                            : const Color(0xFF94A3B8),
+                        shape: BoxShape.circle,
+                        border: Border.all(color: Colors.white, width: 1.5),
+                      ),
+                    ),
                   ),
                 ],
-              ),
-              child: CircleAvatar(
-                radius: 18,
-                backgroundImage: avatarUrl != null 
-                  ? NetworkImage(avatarUrl)
-                  : const NetworkImage('https://i.pravatar.cc/150?u=mike'),
-                backgroundColor: const Color(0xFFF1F5F9),
               ),
             ),
           ),

@@ -144,24 +144,27 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           children: [
             const NotificationBell(color: Color(0xFF1E293B)),
             const SizedBox(width: 12),
-            Container(
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                border: Border.all(color: Colors.white, width: 2),
-                boxShadow: [
-                  BoxShadow(
-                    color: Colors.black.withOpacity(0.05),
-                    blurRadius: 8,
-                    offset: const Offset(0, 4),
-                  ),
-                ],
-              ),
-              child: CircleAvatar(
-                radius: 22,
-                backgroundImage: avatarUrl != null 
-                  ? NetworkImage(avatarUrl)
-                  : const NetworkImage('https://i.pravatar.cc/150?u=zubair'),
-                backgroundColor: const Color(0xFFF1F5F9),
+            GestureDetector(
+              onTap: () => context.push('/profile'),
+              child: Container(
+                decoration: BoxDecoration(
+                  shape: BoxShape.circle,
+                  border: Border.all(color: Colors.white, width: 2),
+                  boxShadow: [
+                    BoxShadow(
+                      color: Colors.black.withOpacity(0.05),
+                      blurRadius: 8,
+                      offset: const Offset(0, 4),
+                    ),
+                  ],
+                ),
+                child: CircleAvatar(
+                  radius: 22,
+                  backgroundImage: avatarUrl != null 
+                    ? NetworkImage(avatarUrl)
+                    : const NetworkImage('https://i.pravatar.cc/150?u=zubair'),
+                  backgroundColor: const Color(0xFFF1F5F9),
+                ),
               ),
             ),
           ],
