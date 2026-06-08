@@ -35,6 +35,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   final ImagePicker _picker = ImagePicker();
   Timer? _typingTimer;
   bool _isTyping = false;
+  bool _wasEmpty = true;
 
   @override
   void initState() {
@@ -60,6 +61,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   void _onTextChanged() {
+    final isEmpty = _messageController.text.trim().isEmpty;
+    if (_wasEmpty != isEmpty) {
+      setState(() {
+        _wasEmpty = isEmpty;
+      });
+    }
+
     final auth = context.read<AuthService>();
     if (auth.user == null) return;
     final currentUserId = auth.user!['id'];
@@ -431,8 +439,9 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Widget _buildMessageInput() {
+    final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Container(
-      padding: const EdgeInsets.fromLTRB(16, 8, 16, 20),
+      padding: EdgeInsets.fromLTRB(16, 8, 16, bottomPadding > 0 ? bottomPadding : 20),
       decoration: BoxDecoration(
         color: Colors.white,
         boxShadow: [
@@ -443,8 +452,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
           ),
         ],
       ),
-      child: SafeArea(
-        child: Row(
+      child: Row(
           children: [
             Expanded(
               child: Container(
@@ -522,7 +530,6 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             ),
           ],
         ),
-      ),
     );
   }
 
