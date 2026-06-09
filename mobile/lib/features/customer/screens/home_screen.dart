@@ -56,7 +56,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: Theme.of(context).scaffoldBackgroundColor,
       body: SafeArea(
         child: RefreshIndicator(
           color: const Color(0xFF003B95),
@@ -121,7 +121,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 style: GoogleFonts.outfit(
                   fontSize: 14,
                   fontWeight: FontWeight.w500,
-                  color: const Color(0xFF64748B),
+                  color: Theme.of(context).appColors.subtext,
                 ),
               ),
               const SizedBox(height: 2),
@@ -130,7 +130,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 style: GoogleFonts.outfit(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
-                  color: const Color(0xFF1E293B),
+                  color: Theme.of(context).appColors.text,
                 ),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
@@ -142,7 +142,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         Row(
           mainAxisSize: MainAxisSize.min,
           children: [
-            const NotificationBell(color: Color(0xFF1E293B)),
+            NotificationBell(color: Theme.of(context).appColors.text),
             const SizedBox(width: 12),
             GestureDetector(
               onTap: () => context.push('/profile'),
@@ -174,15 +174,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   Widget _buildSearchBar() {
+    final colors = Theme.of(context).appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 18),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(22),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.04),
+            color: colors.text.withOpacity(0.04),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -193,11 +194,11 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
         onChanged: _onSearchChanged,
         decoration: InputDecoration(
           hintText: 'Search services or providers...',
-          hintStyle: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 15),
-          prefixIcon: const Icon(Icons.search_rounded, color: Color(0xFF94A3B8)),
+          hintStyle: GoogleFonts.outfit(color: colors.subtext, fontSize: 15),
+          prefixIcon: Icon(Icons.search_rounded, color: colors.subtext),
           suffixIcon: _searchController.text.isNotEmpty
               ? IconButton(
-                  icon: const Icon(Icons.clear_rounded, color: Color(0xFF94A3B8)),
+                  icon: Icon(Icons.clear_rounded, color: colors.subtext),
                   onPressed: () {
                     _searchController.clear();
                     _onSearchChanged('');
@@ -209,7 +210,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           focusedBorder: InputBorder.none,
           contentPadding: const EdgeInsets.symmetric(vertical: 16),
         ),
-        style: GoogleFonts.outfit(fontSize: 15, color: const Color(0xFF1E293B)),
+        style: GoogleFonts.outfit(fontSize: 15, color: colors.text),
       ),
     );
   }
@@ -232,9 +233,9 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             return Container(
               margin: const EdgeInsets.only(bottom: 12),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: Theme.of(context).appColors.surface,
                 borderRadius: BorderRadius.circular(18),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: Theme.of(context).appColors.border),
               ),
               child: ListTile(
                 contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
@@ -338,6 +339,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   }
 
   Widget _buildSectionHeader(String title, String action, VoidCallback onAction) {
+    final colors = Theme.of(context).appColors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
@@ -347,7 +349,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             style: GoogleFonts.outfit(
               fontSize: 18,
               fontWeight: FontWeight.bold,
-              color: const Color(0xFF1E293B),
+              color: colors.text,
             ),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
@@ -436,7 +438,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     style: GoogleFonts.outfit(
                       fontSize: 11, 
                       fontWeight: FontWeight.w600, 
-                      color: const Color(0xFF1E293B),
+                      color: Theme.of(context).appColors.text,
                     ),
                     textAlign: TextAlign.center,
                     maxLines: 1,
@@ -474,14 +476,14 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).appColors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: Theme.of(context).appColors.border),
             ),
             child: Center(
               child: Text(
                 'No jobs posted yet. Create one to begin!',
-                style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 14),
+                style: GoogleFonts.outfit(color: Theme.of(context).appColors.subtext, fontSize: 14),
               ),
             ),
           );
@@ -524,15 +526,16 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       statusTextColor = const Color(0xFFFFB020);
     }
 
+    final colors = Theme.of(context).appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.04),
+            color: colors.text.withOpacity(0.04),
             blurRadius: 18,
             offset: const Offset(0, 8),
           ),
@@ -555,7 +558,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                       style: GoogleFonts.outfit(
                         fontSize: 16, 
                         fontWeight: FontWeight.bold, 
-                        color: const Color(0xFF1E293B),
+                        color: colors.text,
                       ),
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
@@ -594,7 +597,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               const SizedBox(height: 8),
               Text(
                 description,
-                style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 13, height: 1.4),
+                style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, height: 1.4),
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -649,7 +652,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                         Flexible(
                           child: Text(
                             location,
-                            style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                            style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12),
                             maxLines: 1,
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -659,7 +662,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                         const SizedBox(width: 2),
                         Text(
                           '$bids bids', 
-                          style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 12, fontWeight: FontWeight.w600),
+                          style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w600),
                         ),
                       ],
                     ),
@@ -701,12 +704,12 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   margin: const EdgeInsets.only(right: 16, bottom: 8),
                   padding: const EdgeInsets.all(18),
                   decoration: BoxDecoration(
-                    color: AppTheme.surfaceColor,
+                    color: Theme.of(context).appColors.surface,
                     borderRadius: BorderRadius.circular(26),
-                    border: Border.all(color: const Color(0xFFE2E8F0)),
+                    border: Border.all(color: Theme.of(context).appColors.border),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.textColor.withOpacity(0.03),
+                        color: Theme.of(context).appColors.text.withOpacity(0.03),
                         blurRadius: 12,
                         offset: const Offset(0, 6),
                       ),
@@ -752,7 +755,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                       const SizedBox(height: 10),
                       Text(
                         provider['full_name'] as String,
-                        style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14, color: const Color(0xFF1E293B)),
+                        style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14, color: Theme.of(context).appColors.text),
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),

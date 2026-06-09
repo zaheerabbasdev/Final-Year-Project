@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
 import '../../../core/services/socket_service.dart';
+import '../../../core/theme.dart';
 
 /// Customer-facing screen showing the provider's live GPS position on a map.
 class TrackProviderScreen extends StatefulWidget {
@@ -120,17 +121,18 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: colors.background,
       extendBodyBehindAppBar: true,
       appBar: AppBar(
-        backgroundColor: Colors.white.withOpacity(0.92),
+        backgroundColor: colors.surface.withOpacity(0.92),
         elevation: 0,
         leading: IconButton(
           icon: Container(
             padding: const EdgeInsets.all(8),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colors.surface,
               shape: BoxShape.circle,
               boxShadow: [
                 BoxShadow(
@@ -140,25 +142,25 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                 ),
               ],
             ),
-            child: const Icon(Icons.arrow_back_ios_new, size: 16, color: Color(0xFF1E293B)),
+            child: Icon(Icons.arrow_back_ios_new, size: 16, color: colors.text),
           ),
           onPressed: () => Navigator.of(context).pop(),
         ),
         title: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
+            Text(
               'Live Tracking',
               style: TextStyle(
-                color: Color(0xFF1E293B),
+                color: colors.text,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
             Text(
               widget.providerName,
-              style: const TextStyle(
-                color: Color(0xFF64748B),
+              style: TextStyle(
+                color: colors.subtext,
                 fontSize: 13,
                 fontWeight: FontWeight.normal,
               ),
@@ -234,7 +236,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                 margin: const EdgeInsets.all(40),
                 padding: const EdgeInsets.all(32),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -285,10 +287,10 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                     const SizedBox(height: 24),
                     Text(
                       _locationStopped ? 'Location Sharing Stopped' : 'Waiting for Provider',
-                      style: const TextStyle(
+                      style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
-                        color: Color(0xFF1E293B),
+                        color: colors.text,
                       ),
                     ),
                     const SizedBox(height: 8),
@@ -297,8 +299,8 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                           ? 'The provider has stopped\nsharing their location'
                           : 'The provider needs to enable\nlocation sharing from their app',
                       textAlign: TextAlign.center,
-                      style: const TextStyle(
-                        color: Color(0xFF64748B),
+                      style: TextStyle(
+                        color: colors.subtext,
                         fontSize: 14,
                         height: 1.5,
                       ),
@@ -317,7 +319,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
               child: Container(
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(24),
                   boxShadow: [
                     BoxShadow(
@@ -349,10 +351,10 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                         children: [
                           Text(
                             widget.providerName,
-                            style: const TextStyle(
+                            style: TextStyle(
                               fontSize: 16,
                               fontWeight: FontWeight.bold,
-                              color: Color(0xFF1E293B),
+                              color: colors.text,
                             ),
                           ),
                           const SizedBox(height: 4),
@@ -381,8 +383,8 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                             const SizedBox(height: 4),
                             Text(
                               '${_providerPosition!.latitude.toStringAsFixed(5)}, ${_providerPosition!.longitude.toStringAsFixed(5)}',
-                              style: const TextStyle(
-                                color: Color(0xFF94A3B8),
+                              style: TextStyle(
+                                color: colors.subtext,
                                 fontSize: 11,
                               ),
                             ),

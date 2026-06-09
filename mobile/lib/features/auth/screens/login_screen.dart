@@ -61,8 +61,9 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24.0, vertical: 16.0),
@@ -74,7 +75,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(20),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(28),
                     boxShadow: [
                       BoxShadow(
@@ -103,7 +104,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 style: GoogleFonts.outfit(
                   fontSize: 32,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.textColor,
+                  color: colors.text,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -111,7 +112,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Text(
                 'Sign in to continue to your dashboard',
                 style: GoogleFonts.outfit(
-                  color: AppTheme.subtextColor,
+                  color: colors.subtext,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
@@ -121,11 +122,11 @@ class _LoginScreenState extends State<LoginScreen> {
               Container(
                 padding: const EdgeInsets.all(28),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(32),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.textColor.withOpacity(0.04),
+                      color: colors.text.withOpacity(0.04),
                       blurRadius: 30,
                       offset: const Offset(0, 15),
                     ),
@@ -134,30 +135,30 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildLabel('Email Address'),
+                    _buildLabel('Email Address', colors),
                     TextField(
                       controller: _emailController,
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.emailAddress,
-                      style: GoogleFonts.outfit(color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(color: colors.text),
                       decoration: const InputDecoration(
                         hintText: 'Enter your email',
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildLabel('Password'),
+                    _buildLabel('Password', colors),
                     TextField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
                       textInputAction: TextInputAction.done,
                       onSubmitted: (_) => _login(),
-                      style: GoogleFonts.outfit(color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(color: colors.text),
                       decoration: InputDecoration(
                         hintText: 'Enter your password',
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
-                            color: AppTheme.subtextColor.withOpacity(0.7),
+                            color: colors.subtext.withOpacity(0.7),
                           ),
                           onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
                         ),
@@ -183,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             Text(
                               'Remember me',
                               style: GoogleFonts.outfit(
-                                color: AppTheme.textColor,
+                                color: colors.text,
                                 fontWeight: FontWeight.w500,
                                 fontSize: 14,
                               ),
@@ -234,27 +235,27 @@ class _LoginScreenState extends State<LoginScreen> {
                     const SizedBox(height: 28),
                     Row(
                       children: [
-                        Expanded(child: Divider(color: const Color(0xFFE2E8F0), thickness: 1)),
+                        Expanded(child: Divider(color: colors.border, thickness: 1)),
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
                             'Or continue with',
                             style: GoogleFonts.outfit(
-                              color: AppTheme.subtextColor,
+                              color: colors.subtext,
                               fontSize: 14,
                               fontWeight: FontWeight.w500,
                             ),
                           ),
                         ),
-                        Expanded(child: Divider(color: const Color(0xFFE2E8F0), thickness: 1)),
+                        Expanded(child: Divider(color: colors.border, thickness: 1)),
                       ],
                     ),
                     const SizedBox(height: 24),
                     Row(
                       children: [
-                        Expanded(child: _buildSocialButton('Google', Icons.g_mobiledata)),
+                        Expanded(child: _buildSocialButton('Google', Icons.g_mobiledata, colors)),
                         const SizedBox(width: 16),
-                        Expanded(child: _buildSocialButton('Facebook', Icons.facebook)),
+                        Expanded(child: _buildSocialButton('Facebook', Icons.facebook, colors)),
                       ],
                     ),
                   ],
@@ -267,7 +268,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   Text(
                     "Don't have an account? ",
                     style: GoogleFonts.outfit(
-                      color: AppTheme.subtextColor,
+                      color: colors.subtext,
                       fontSize: 15,
                       fontWeight: FontWeight.w500,
                     ),
@@ -294,7 +295,7 @@ class _LoginScreenState extends State<LoginScreen> {
               Text(
                 'Demo: Use customer@test.com, provider@test.com, or admin@test.com',
                 style: GoogleFonts.outfit(
-                  color: AppTheme.subtextColor.withOpacity(0.8),
+                  color: colors.subtext.withOpacity(0.8),
                   fontSize: 12,
                   fontWeight: FontWeight.w500,
                 ),
@@ -308,7 +309,7 @@ class _LoginScreenState extends State<LoginScreen> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, AppColors colors) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
@@ -316,20 +317,20 @@ class _LoginScreenState extends State<LoginScreen> {
         style: GoogleFonts.outfit(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppTheme.textColor,
+          color: colors.text,
         ),
       ),
     );
   }
 
-  Widget _buildSocialButton(String label, IconData icon) {
+  Widget _buildSocialButton(String label, IconData icon, AppColors colors) {
     return OutlinedButton(
       onPressed: () {},
       style: OutlinedButton.styleFrom(
         padding: const EdgeInsets.symmetric(vertical: 14),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
-        backgroundColor: Colors.white,
+        side: BorderSide(color: colors.border),
+        backgroundColor: colors.surface,
       ),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -343,7 +344,7 @@ class _LoginScreenState extends State<LoginScreen> {
           Text(
             label,
             style: GoogleFonts.outfit(
-              color: AppTheme.textColor,
+              color: colors.text,
               fontWeight: FontWeight.w600,
               fontSize: 15,
             ),

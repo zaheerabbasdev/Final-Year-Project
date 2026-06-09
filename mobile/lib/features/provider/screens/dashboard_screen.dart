@@ -69,10 +69,11 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     final avatarPath = user?['avatar'];
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
 
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FB),
+        backgroundColor: colors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
         title: Column(
@@ -80,16 +81,16 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           children: [
             Text(
               'Provider Console',
-              style: GoogleFonts.outfit(color: const Color(0xFF1E293B), fontWeight: FontWeight.bold, fontSize: 18),
+              style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 18),
             ),
             Text(
               'Welcome back, $firstName!',
-              style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 13, fontWeight: FontWeight.w500),
+              style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ],
         ),
         actions: [
-          const NotificationBell(color: Color(0xFF1E293B)),
+          NotificationBell(color: colors.text),
           Padding(
             padding: const EdgeInsets.only(right: 16.0, left: 8.0),
             child: GestureDetector(
@@ -174,13 +175,14 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildSectionHeader(String title, {String? action, VoidCallback? onAction}) {
+    final colors = Theme.of(context).appColors;
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
         Expanded(
           child: Text(
             title,
-            style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+            style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -236,12 +238,13 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildStatCard(String label, String value, IconData icon, Color color) {
+    final colors = Theme.of(context).appColors;
     return Container(
       padding: const EdgeInsets.all(18),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
             color: Colors.black.withOpacity(0.01),
@@ -264,12 +267,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           const Spacer(),
           Text(
             value,
-            style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+            style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.bold, color: colors.text),
           ),
           const SizedBox(height: 2),
           Text(
             label,
-            style: GoogleFonts.outfit(fontSize: 11, color: const Color(0xFF64748B), fontWeight: FontWeight.w600),
+            style: GoogleFonts.outfit(fontSize: 11, color: colors.subtext, fontWeight: FontWeight.w600),
           ),
         ],
       ),
@@ -287,18 +290,19 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildActionItem(IconData icon, String label, VoidCallback onTap) {
+    final colors = Theme.of(context).appColors;
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(24),
       child: Container(
         padding: const EdgeInsets.symmetric(vertical: 20, horizontal: 12),
         decoration: BoxDecoration(
-          color: AppTheme.surfaceColor,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: colors.border),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.textColor.withOpacity(0.03),
+              color: colors.text.withOpacity(0.03),
               blurRadius: 12,
               offset: const Offset(0, 6),
             ),
@@ -317,7 +321,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
             const SizedBox(height: 12),
             Text(
               label,
-              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+              style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.bold, color: colors.text),
               textAlign: TextAlign.center,
               maxLines: 1,
               overflow: TextOverflow.ellipsis,
@@ -400,6 +404,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildOpportunitiesList() {
+    final colors = Theme.of(context).appColors;
     return Consumer<JobService>(
       builder: (context, service, _) {
         final openJobs = service.jobs.take(3).toList();
@@ -408,14 +413,14 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
             width: double.infinity,
             padding: const EdgeInsets.symmetric(vertical: 24, horizontal: 16),
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: colors.border),
             ),
             child: Center(
               child: Text(
                 'No new opportunities available right now.',
-                style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 14),
+                style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14),
               ),
             ),
           );
@@ -428,15 +433,16 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildOpportunityCard(Map<String, dynamic> job) {
+    final colors = Theme.of(context).appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
-        color: AppTheme.surfaceColor,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(26),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.04),
+            color: colors.text.withOpacity(0.04),
             blurRadius: 16,
             offset: const Offset(0, 8),
           ),
@@ -456,7 +462,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                     Expanded(
                       child: Text(
                         job['title'] ?? 'Job Title',
-                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B)),
+                        style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
@@ -477,7 +483,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 const SizedBox(height: 8),
                 Text(
                   job['description'] ?? 'No description provided.',
-                  style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 13, height: 1.4),
+                  style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, height: 1.4),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
@@ -488,12 +494,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       flex: 5,
                       child: Row(
                         children: [
-                          const Icon(Icons.location_on_outlined, size: 14, color: Color(0xFF94A3B8)),
+                          Icon(Icons.location_on_outlined, size: 14, color: colors.subtext),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
                               '${job['location'] ?? 'Downtown'}${job['distance'] != null ? ' (${double.parse(job['distance'].toString()).toStringAsFixed(1)} km away)' : ''}',
-                              style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                              style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),
@@ -506,12 +512,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.end,
                         children: [
-                          const Icon(Icons.access_time_rounded, size: 14, color: Color(0xFF94A3B8)),
+                          Icon(Icons.access_time_rounded, size: 14, color: colors.subtext),
                           const SizedBox(width: 4),
                           Flexible(
                             child: Text(
                               job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
-                              style: GoogleFonts.outfit(color: const Color(0xFF94A3B8), fontSize: 12),
+                              style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12),
                               overflow: TextOverflow.ellipsis,
                             ),
                           ),

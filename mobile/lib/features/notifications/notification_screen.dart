@@ -22,17 +22,18 @@ class _NotificationScreenState extends State<NotificationScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textColor),
+        iconTheme: IconThemeData(color: colors.text),
         title: Text(
           'Notifications',
           style: GoogleFonts.outfit(
-            color: AppTheme.textColor,
+            color: colors.text,
             fontWeight: FontWeight.bold,
             fontSize: 20,
           ),
@@ -77,7 +78,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       'No notifications yet',
                       style: GoogleFonts.outfit(
                         fontSize: 20,
-                        color: AppTheme.textColor,
+                        color: colors.text,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -86,7 +87,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       'Any alerts about your jobs or account will appear here.',
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
-                        color: AppTheme.subtextColor,
+                        color: colors.subtext,
                         fontSize: 14,
                         fontWeight: FontWeight.w500,
                       ),
@@ -110,11 +111,11 @@ class _NotificationScreenState extends State<NotificationScreen> {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 12),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(16),
                     boxShadow: [
                       BoxShadow(
-                        color: AppTheme.textColor.withOpacity(0.02),
+                        color: colors.text.withOpacity(0.02),
                         blurRadius: 15,
                         offset: const Offset(0, 5),
                       ),
@@ -139,7 +140,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                       notification['title'],
                       style: GoogleFonts.outfit(
                         fontWeight: isRead ? FontWeight.w500 : FontWeight.bold,
-                        color: AppTheme.textColor,
+                        color: colors.text,
                         fontSize: 15,
                       ),
                     ),
@@ -150,7 +151,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                         Text(
                           notification['message'],
                           style: GoogleFonts.outfit(
-                            color: AppTheme.subtextColor,
+                            color: colors.subtext,
                             fontSize: 13,
                             fontWeight: FontWeight.w400,
                           ),
@@ -160,7 +161,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                           _formatDate(notification['created_at']),
                           style: GoogleFonts.outfit(
                             fontSize: 11,
-                            color: AppTheme.subtextColor.withOpacity(0.8),
+                            color: colors.subtext.withOpacity(0.8),
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -199,7 +200,9 @@ class _NotificationScreenState extends State<NotificationScreen> {
     final typeColor = _getTypeColor(notification['type']);
     final typeIcon = _getTypeIcon(notification['type']);
 
+    final colors = Theme.of(context).appColors;
     return Dialog(
+      backgroundColor: colors.surface,
       insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 28),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(28)),
       child: Padding(
@@ -212,7 +215,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               width: 44,
               height: 4,
               decoration: BoxDecoration(
-                color: const Color(0xFFE2E8F0),
+                color: colors.border,
                 borderRadius: BorderRadius.circular(2),
               ),
             ),
@@ -245,7 +248,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
                 fontSize: 15,
-                color: AppTheme.subtextColor,
+                color: colors.subtext,
                 height: 1.6,
               ),
             ),
@@ -255,7 +258,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               _formatDate(notification['created_at'] ?? ''),
               style: GoogleFonts.outfit(
                 fontSize: 12,
-                color: AppTheme.subtextColor.withOpacity(0.7),
+                color: colors.subtext.withOpacity(0.7),
                 fontWeight: FontWeight.w500,
               ),
             ),

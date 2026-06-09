@@ -14,6 +14,8 @@ import '../../core/api_client.dart';
 import '../../core/services/location_service.dart';
 import 'map_picker_screen.dart';
 import '../../shared/widgets/notification_bell.dart';
+import '../../core/providers/theme_provider.dart';
+import '../../core/theme.dart';
 
 class ProfileScreen extends StatefulWidget {
   final bool initialEditMode;
@@ -156,22 +158,24 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final role = authService.role;
     final avatarPath = authService.user?['avatar'];
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
+    final colors = Theme.of(context).appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: const Color(0xFFF5F7FB),
+        backgroundColor: colors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: Text('Profile', style: GoogleFonts.outfit(color: const Color(0xFF1E293B), fontWeight: FontWeight.bold)),
+        title: Text('Profile', style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold)),
         actions: [
-          const NotificationBell(color: Color(0xFF1E293B)),
+          NotificationBell(color: colors.text),
         ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            _buildHeader(role, avatarUrl),
+            _buildHeader(role, avatarUrl, isDark),
             if (_isEditing) 
               _buildEditForm(role) 
             else if (role == 'provider') 
@@ -185,7 +189,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     );
   }
 
-  Widget _buildHeader(String? role, String? avatarUrl) {
+  Widget _buildHeader(String? role, String? avatarUrl, bool isDark) {
+    final colors = Theme.of(context).appColors;
+    final gradientColors = isDark
+        ? const [Color(0xFF111827), Color(0xFF1F2937)]
+        : const [Color(0xFF003B95), Color(0xFF0A84FF)];
+
     return Stack(
       alignment: Alignment.center,
       children: [
@@ -193,9 +202,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
           children: [
             Container(
               height: 140,
-              decoration: const BoxDecoration(
+              decoration: BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF003B95), Color(0xFF0A84FF)],
+                  colors: gradientColors,
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -228,7 +237,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
                     border: Border.all(color: Colors.white, width: 4),
-                    boxShadow: [BoxShadow(color: Colors.black.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))],
+                    boxShadow: [BoxShadow(color: Theme.of(context).appColors.text.withOpacity(0.08), blurRadius: 12, offset: const Offset(0, 4))],
                   ),
                   child: CircleAvatar(
                     radius: 50,
@@ -239,7 +248,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         : NetworkImage(role == 'provider' 
                           ? 'https://i.pravatar.cc/150?u=mike' 
                           : 'https://i.pravatar.cc/150?u=john')),
-                    backgroundColor: const Color(0xFFF1F5F9),
+                    backgroundColor: Theme.of(context).appColors.card,
                   ),
                 ),
                 if (_isEditing)
@@ -266,13 +275,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildCustomerView(AuthService authService) {
     final user = authService.user;
+    final colors = Theme.of(context).appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          Text(user?['full_name'] ?? 'No Name', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+          Text(user?['full_name'] ?? 'No Name', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: colors.text)),
           const SizedBox(height: 8),
-          Text(user?['email'] ?? 'No Email', style: GoogleFonts.outfit(color: const Color(0xFF64748B), fontSize: 14)),
+          Text(user?['email'] ?? 'No Email', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14)),
           const SizedBox(height: 24),
           _buildEditButton(),
           const SizedBox(height: 32),
@@ -281,7 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildMenuCard([
             _buildMenuItem(Icons.payment_outlined, 'Payment Methods', () {}),
             _buildMenuItem(Icons.notifications_none_rounded, 'Notifications', () => context.push('/notifications')),
-            _buildMenuItem(Icons.settings_outlined, 'Settings', () {}),
+            _buildDarkModeMenuItem(),
             _buildMenuItem(Icons.psychology_outlined, 'AI Support Assistant', () => context.push('/support-chatbot')),
           ]),
           const SizedBox(height: 32),
@@ -295,11 +305,12 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final user = authService.user;
     final profile = user?['profile'];
     final categoryName = profile?['category_name'] ?? user?['category_name'] ?? 'Provider';
+    final colors = Theme.of(context).appColors;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24),
       child: Column(
         children: [
-          Text(user?['full_name'] ?? 'No Name', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: const Color(0xFF1E293B))),
+          Text(user?['full_name'] ?? 'No Name', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: colors.text)),
           const SizedBox(height: 12),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
@@ -315,7 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 32),
           _buildMenuCard([
             _buildMenuItem(Icons.notifications_none_rounded, 'Notifications', () => context.push('/notifications')),
-            _buildMenuItem(Icons.settings_outlined, 'Settings', () {}),
+            _buildDarkModeMenuItem(),
             _buildMenuItem(Icons.psychology_outlined, 'AI Support Assistant', () => context.push('/support-chatbot')),
           ]),
           const SizedBox(height: 32),
@@ -328,20 +339,19 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildOnlineOfflineToggleCard() {
+    final colors = Theme.of(context).appColors;
     return Consumer<ProviderService>(
       builder: (context, providerService, child) {
         final isOnline = providerService.isOnline;
         return Container(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 16),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(24),
-            border: Border.all(color: const Color(0xFFF1F5F9)),
+            border: Border.all(color: colors.border),
             boxShadow: [
               BoxShadow(
-                color: isOnline 
-                  ? const Color(0xFF10B981).withOpacity(0.06) 
-                  : Colors.black.withOpacity(0.02),
+                color: colors.text.withOpacity(isOnline ? 0.06 : 0.02),
                 blurRadius: 16,
                 offset: const Offset(0, 4),
               ),
@@ -352,14 +362,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               Container(
                 padding: const EdgeInsets.all(12),
                 decoration: BoxDecoration(
-                  color: isOnline 
-                    ? const Color(0xFF10B981).withOpacity(0.1) 
-                    : const Color(0xFF94A3B8).withOpacity(0.1),
+                  color: isOnline
+                      ? const Color(0xFF10B981).withOpacity(0.1)
+                      : colors.border.withOpacity(0.15),
                   shape: BoxShape.circle,
                 ),
                 child: Icon(
                   isOnline ? Icons.wifi_rounded : Icons.wifi_off_rounded,
-                  color: isOnline ? const Color(0xFF10B981) : const Color(0xFF94A3B8),
+                  color: isOnline ? const Color(0xFF10B981) : colors.text,
                   size: 24,
                 ),
               ),
@@ -372,17 +382,17 @@ class _ProfileScreenState extends State<ProfileScreen> {
                       isOnline ? 'Online Availability' : 'Offline Mode',
                       style: GoogleFonts.outfit(
                         fontWeight: FontWeight.bold,
-                        color: const Color(0xFF1E293B),
+                        color: colors.text,
                         fontSize: 16,
                       ),
                     ),
                     const SizedBox(height: 4),
                     Text(
-                      isOnline 
-                        ? 'You are active & receiving jobs' 
-                        : 'Tap to switch back online',
+                      isOnline
+                          ? 'You are active & receiving jobs'
+                          : 'Tap to switch back online',
                       style: GoogleFonts.outfit(
-                        color: const Color(0xFF64748B),
+                        color: colors.subtext,
                         fontSize: 12,
                       ),
                     ),
@@ -393,8 +403,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
                 value: isOnline,
                 activeColor: const Color(0xFF10B981),
                 activeTrackColor: const Color(0xFF10B981).withOpacity(0.3),
-                inactiveThumbColor: const Color(0xFF94A3B8),
-                inactiveTrackColor: const Color(0xFFE2E8F0),
+                inactiveThumbColor: colors.subtext,
+                inactiveTrackColor: colors.border.withOpacity(0.2),
                 onChanged: (value) async {
                   setState(() => _isLoading = true);
                   final success = await providerService.toggleOnlineStatus(value);
@@ -416,6 +426,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildEditForm(String? role) {
+    final colors = Theme.of(context).appColors;
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
@@ -478,9 +489,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   style: OutlinedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                    side: const BorderSide(color: Color(0xFFE2E8F0)),
+                    side: BorderSide(color: colors.border),
                   ),
-                  child: const Text('Cancel', style: TextStyle(color: Color(0xFF64748B))),
+                  child: Text('Cancel', style: TextStyle(color: colors.subtext)),
                 ),
               ),
               const SizedBox(width: 16),
@@ -544,6 +555,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildEditButton() {
+    final colors = Theme.of(context).appColors;
     return OutlinedButton.icon(
       onPressed: () async {
         // Force refresh from server before showing edit form
@@ -555,8 +567,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
       icon: const Icon(Icons.edit_outlined, size: 18),
       label: const Text('Edit Profile'),
       style: OutlinedButton.styleFrom(
-        foregroundColor: const Color(0xFF1E293B),
-        side: const BorderSide(color: Color(0xFFE2E8F0)),
+        foregroundColor: colors.text,
+        side: BorderSide(color: colors.border),
         minimumSize: const Size(double.infinity, 56),
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
       ),
@@ -605,12 +617,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildStatCard(IconData icon, String value, String label, Color color) {
+    final colors = Theme.of(context).appColors;
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: colors.border),
       ),
       child: Column(
         children: [
@@ -618,14 +631,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 16),
           Text(
             value,
-            style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.text),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
           const SizedBox(height: 4),
           Text(
             label,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 11),
+            style: TextStyle(color: colors.subtext, fontSize: 11),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -636,6 +649,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildProviderReviews(int? providerId) {
     if (providerId == null) return const SizedBox.shrink();
+    final colors = Theme.of(context).appColors;
 
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -643,13 +657,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text(
+            Text(
               'My Reviews',
-              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+              style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
             ),
             TextButton(
               onPressed: () => context.push('/provider-reviews/$providerId'),
-              child: const Text('View All', style: TextStyle(color: Color(0xFF6366F1))),
+              child: Text('View All', style: TextStyle(color: AppTheme.primaryColor)),
             ),
           ],
         ),
@@ -665,13 +679,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
               return Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: colors.border),
                 ),
-                child: const Center(
+                child: Center(
                   child: Text(
                     'No reviews yet',
-                    style: TextStyle(color: Color(0xFF94A3B8)),
+                    style: TextStyle(color: colors.subtext),
                   ),
                 ),
               );
@@ -703,44 +718,74 @@ class _ProfileScreenState extends State<ProfileScreen> {
           ),
         ),
         const SizedBox(height: 16),
-        const Text('Version 1.0.0', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+        Text('Version 1.0.0', style: TextStyle(color: Theme.of(context).appColors.subtext, fontSize: 12)),
       ],
     );
   }
 
   Widget _buildMenuCard(List<Widget> items) {
+    final colors = Theme.of(context).appColors;
     return Container(
       padding: const EdgeInsets.all(8),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: colors.border),
       ),
       child: Column(children: items),
     );
   }
 
-  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+  Widget _buildDarkModeMenuItem() {
+    final themeProvider = context.watch<ThemeProvider>();
+    final colors = Theme.of(context).appColors;
+    final isDark = themeProvider.isDarkMode;
     return ListTile(
       leading: Container(
         padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(12)),
-        child: Icon(icon, color: const Color(0xFF1E293B), size: 20),
+        decoration: BoxDecoration(color: colors.card, borderRadius: BorderRadius.circular(12)),
+        child: Icon(
+          isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
+          color: isDark ? const Color(0xFF818CF8) : const Color(0xFFF59E0B),
+          size: 20,
+        ),
       ),
-      title: Text(title, style: const TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.w600, fontSize: 16)),
-      trailing: const Icon(Icons.chevron_right, size: 20, color: Color(0xFF94A3B8)),
+      title: Text(
+        'Dark Mode',
+        style: TextStyle(color: colors.text, fontWeight: FontWeight.w600, fontSize: 16),
+      ),
+      trailing: Switch.adaptive(
+        value: isDark,
+        activeColor: AppTheme.primaryColor,
+        onChanged: (val) => themeProvider.toggleTheme(val),
+      ),
+    );
+  }
+
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
+    final colors = Theme.of(context).appColors;
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: colors.card, borderRadius: BorderRadius.circular(12)),
+        child: Icon(icon, color: colors.text, size: 20),
+      ),
+      title: Text(title, style: TextStyle(color: colors.text, fontWeight: FontWeight.w600, fontSize: 16)),
+      trailing: Icon(Icons.chevron_right, size: 20, color: colors.subtext),
       onTap: onTap,
     );
   }
 
   Widget _buildFieldLabel(String label) {
+    final colors = Theme.of(context).appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
-      child: Text(label, style: const TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF334155), fontSize: 14)),
+      child: Text(label, style: TextStyle(fontWeight: FontWeight.bold, color: colors.text, fontSize: 14)),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, TextInputType keyboardType = TextInputType.text, bool readOnly = false, VoidCallback? onTap, Function(String)? onChanged}) {
+    final colors = Theme.of(context).appColors;
     return TextField(
       controller: controller,
       maxLines: maxLines,
@@ -750,9 +795,9 @@ class _ProfileScreenState extends State<ProfileScreen> {
       onChanged: onChanged,
       decoration: InputDecoration(
         hintText: hint,
-        hintStyle: const TextStyle(color: Color(0xFF94A3B8), fontSize: 14),
+        hintStyle: TextStyle(color: colors.subtext, fontSize: 14),
         filled: true,
-        fillColor: const Color(0xFFF8FAFC),
+        fillColor: colors.card,
         border: OutlineInputBorder(borderRadius: BorderRadius.circular(12), borderSide: BorderSide.none),
         contentPadding: const EdgeInsets.all(16),
       ),
@@ -760,17 +805,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildAvailabilityCard() {
+    final colors = Theme.of(context).appColors;
     return Container(
       padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(color: const Color(0xFFF8FAFC), borderRadius: BorderRadius.circular(24)),
+      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: colors.border)),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          const Text('Availability Status', style: TextStyle(fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+          Text('Availability Status', style: TextStyle(fontWeight: FontWeight.bold, color: colors.text)),
           Switch(
             value: _isAvailable,
             onChanged: (v) => setState(() => _isAvailable = v),
-            activeColor: const Color(0xFF6366F1),
+            activeColor: AppTheme.primaryColor,
           ),
         ],
       ),
@@ -778,20 +824,21 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildSection(String title, Widget content) {
+    final colors = Theme.of(context).appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text(title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            Text(title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
           ],
         ),
         const SizedBox(height: 16),
         Container(
           width: double.infinity,
           padding: const EdgeInsets.all(24),
-          decoration: BoxDecoration(color: Colors.white, borderRadius: BorderRadius.circular(24), border: Border.all(color: const Color(0xFFF1F5F9))),
+          decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(24), border: Border.all(color: colors.border)),
           child: content,
         ),
       ],
@@ -799,17 +846,18 @@ class _ProfileScreenState extends State<ProfileScreen> {
   }
 
   Widget _buildExperienceContent() {
+    final colors = Theme.of(context).appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        const Text('Years of Experience', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+        Text('Years of Experience', style: TextStyle(color: colors.subtext, fontSize: 12)),
         const SizedBox(height: 8),
-        Text('$_experienceYears years', style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+        Text('$_experienceYears years', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
         const SizedBox(height: 24),
-        const Text('Specialized Skills', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+        Text('Specialized Skills', style: TextStyle(color: colors.subtext, fontSize: 12)),
         const SizedBox(height: 12),
         if (_skills.isEmpty)
-          const Text('No skills listed', style: TextStyle(color: Color(0xFF94A3B8), fontSize: 13, fontStyle: FontStyle.italic))
+          Text('No skills listed', style: TextStyle(color: colors.subtext, fontSize: 13, fontStyle: FontStyle.italic))
         else
           Wrap(
             spacing: 8,

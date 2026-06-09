@@ -59,16 +59,17 @@ class _OtpScreenState extends State<OtpScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
         title: Text(
           'Verify Email',
-          style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold),
+          style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
         elevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textColor),
+        iconTheme: IconThemeData(color: colors.text),
       ),
       body: SingleChildScrollView(
         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
@@ -97,7 +98,7 @@ class _OtpScreenState extends State<OtpScreen> {
               style: GoogleFonts.outfit(
                 fontSize: 26,
                 fontWeight: FontWeight.w800,
-                color: AppTheme.textColor,
+                color: colors.text,
               ),
             ),
             const SizedBox(height: 12),
@@ -105,7 +106,7 @@ class _OtpScreenState extends State<OtpScreen> {
               'We sent a 6-digit code to\n${widget.email}',
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
-                color: AppTheme.subtextColor,
+                color: colors.subtext,
                 fontSize: 16,
                 height: 1.5,
                 fontWeight: FontWeight.w500,
@@ -116,11 +117,11 @@ class _OtpScreenState extends State<OtpScreen> {
             Container(
               padding: const EdgeInsets.all(28),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(32),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.textColor.withOpacity(0.03),
+                    color: colors.text.withOpacity(0.03),
                     blurRadius: 30,
                     offset: const Offset(0, 15),
                   ),
@@ -138,21 +139,21 @@ class _OtpScreenState extends State<OtpScreen> {
                       fontSize: 28,
                       letterSpacing: 10,
                       fontWeight: FontWeight.bold,
-                      color: AppTheme.textColor,
+                      color: colors.text,
                     ),
                     decoration: InputDecoration(
                       hintText: '000000',
                       counterText: '',
                       filled: true,
-                      fillColor: const Color(0xFFF9FAFB),
-                      hintStyle: GoogleFonts.outfit(color: const Color(0xFFCBD5E1), letterSpacing: 10),
+                      fillColor: colors.background,
+                      hintStyle: GoogleFonts.outfit(color: colors.subtext.withOpacity(0.5), letterSpacing: 10),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: BorderSide(color: colors.border),
                       ),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),
-                        borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                        borderSide: BorderSide(color: colors.border),
                       ),
                       focusedBorder: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(16),

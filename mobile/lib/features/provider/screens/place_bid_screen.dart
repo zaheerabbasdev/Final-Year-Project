@@ -85,19 +85,20 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         scrolledUnderElevation: 0,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textColor),
+          icon: Icon(Icons.arrow_back, color: colors.text),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Place Your Bid',
-          style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 20),
+          style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: SingleChildScrollView(
@@ -118,13 +119,13 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                     onPressed: () => Navigator.pop(context),
                     style: OutlinedButton.styleFrom(
                       padding: const EdgeInsets.symmetric(vertical: 16),
-                      side: const BorderSide(color: Color(0xFFE2E8F0)),
+                      side: BorderSide(color: colors.border),
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-                      backgroundColor: Colors.white,
+                      backgroundColor: colors.surface,
                     ),
                     child: Text(
                       'Cancel',
-                      style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontWeight: FontWeight.bold, fontSize: 16),
+                      style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
                 ),
@@ -164,14 +165,15 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
     if (_job == null) return Center(child: Text('Job not found', style: GoogleFonts.outfit()));
 
+    final colors = Theme.of(context).appColors;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.03),
+            color: colors.text.withOpacity(0.03),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -182,7 +184,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
         children: [
           Text(
             _job!['title'] ?? 'No Title',
-            style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+            style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
           ),
           const SizedBox(height: 20),
           Row(
@@ -195,7 +197,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                   children: [
                     Text(
                       'Client Budget',
-                      style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                      style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 4),
                     Row(
@@ -234,12 +236,12 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                   children: [
                     Text(
                       'Category',
-                      style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                      style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 4),
                     Text(
                       _job!['category_name'] ?? 'N/A',
-                      style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
                       overflow: TextOverflow.ellipsis,
                       textAlign: TextAlign.end,
                     ),
@@ -254,14 +256,15 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   }
 
   Widget _buildBidForm() {
+    final colors = Theme.of(context).appColors;
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.03),
+            color: colors.text.withOpacity(0.03),
             blurRadius: 20,
             offset: const Offset(0, 8),
           ),
@@ -270,7 +273,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInputLabel('Your Bid Amount (PKR) *'),
+          _buildInputLabel('Your Bid Amount (PKR) *', colors),
           const SizedBox(height: 12),
           _buildTextField(
             controller: _amountController,
@@ -306,9 +309,9 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
             ),
           ],
           const SizedBox(height: 16),
-          const Divider(color: Color(0xFFF1F5F9), height: 1),
+          Divider(color: colors.border, height: 1),
           const SizedBox(height: 16),
-          _buildInputLabel('Estimated Completion Time *'),
+          _buildInputLabel('Estimated Completion Time *', colors),
           const SizedBox(height: 12),
           _buildTextField(
             controller: _timeController,
@@ -316,26 +319,26 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
             prefixIcon: Icons.access_time,
           ),
           const SizedBox(height: 16),
-          const Divider(color: Color(0xFFF1F5F9), height: 1),
+          Divider(color: colors.border, height: 1),
           const SizedBox(height: 16),
-          _buildInputLabel('Cover Letter / Proposal *'),
+          _buildInputLabel('Cover Letter / Proposal *', colors),
           const SizedBox(height: 12),
           TextField(
             controller: _proposalController,
             maxLines: 5,
-            style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
+            style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
             decoration: InputDecoration(
               hintText: "Introduce yourself and explain why you're the best fit for this job...",
-              hintStyle: GoogleFonts.outfit(color: AppTheme.subtextColor.withOpacity(0.7), fontSize: 13),
+              hintStyle: GoogleFonts.outfit(color: colors.subtext.withOpacity(0.7), fontSize: 13),
               filled: true,
-              fillColor: const Color(0xFFF9FAFB),
+              fillColor: colors.background,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                borderSide: BorderSide(color: colors.border),
               ),
               enabledBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
-                borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                borderSide: BorderSide(color: colors.border),
               ),
               focusedBorder: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(16),
@@ -348,7 +351,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
             alignment: Alignment.centerRight,
             child: Text(
               '0/500 characters',
-              style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+              style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
             ),
           ),
         ],
@@ -356,10 +359,10 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
     );
   }
 
-  Widget _buildInputLabel(String label) {
+  Widget _buildInputLabel(String label, AppColors colors) {
     return Text(
       label,
-      style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.textColor),
+      style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: colors.text),
     );
   }
 
@@ -369,23 +372,24 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
     required IconData prefixIcon,
     TextInputType keyboardType = TextInputType.text,
   }) {
+    final colors = Theme.of(context).appColors;
     return TextField(
       controller: controller,
       keyboardType: keyboardType,
-      style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
+      style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
       decoration: InputDecoration(
-        prefixIcon: Icon(prefixIcon, color: AppTheme.subtextColor, size: 20),
+        prefixIcon: Icon(prefixIcon, color: colors.subtext, size: 20),
         hintText: hint,
-        hintStyle: GoogleFonts.outfit(color: AppTheme.subtextColor.withOpacity(0.7), fontSize: 14),
+        hintStyle: GoogleFonts.outfit(color: colors.subtext.withOpacity(0.7), fontSize: 14),
         filled: true,
-        fillColor: const Color(0xFFF9FAFB),
+        fillColor: colors.background,
         border: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: colors.border),
         ),
         enabledBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),
-          borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+          borderSide: BorderSide(color: colors.border),
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(16),

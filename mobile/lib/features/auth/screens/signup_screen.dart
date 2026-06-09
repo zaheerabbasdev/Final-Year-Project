@@ -138,8 +138,9 @@ class _SignupScreenState extends State<SignupScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
         automaticallyImplyLeading: false, // Remove back button
         backgroundColor: Colors.transparent,
@@ -157,7 +158,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 child: Container(
                   padding: const EdgeInsets.all(16),
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(24),
                     boxShadow: [
                       BoxShadow(
@@ -186,7 +187,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 style: GoogleFonts.outfit(
                   fontSize: 32,
                   fontWeight: FontWeight.w800,
-                  color: AppTheme.textColor,
+                  color: colors.text,
                   letterSpacing: -0.5,
                 ),
               ),
@@ -194,22 +195,21 @@ class _SignupScreenState extends State<SignupScreen> {
               Text(
                 'Join Kaarkun today',
                 style: GoogleFonts.outfit(
-                  color: AppTheme.subtextColor,
+                  color: colors.subtext,
                   fontSize: 16,
                   fontWeight: FontWeight.w500,
                 ),
               ),
               const SizedBox(height: 32),
               
-              // Form Card
               Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(32),
                   boxShadow: [
                     BoxShadow(
-                      color: AppTheme.textColor.withOpacity(0.03),
+                      color: colors.text.withOpacity(0.03),
                       blurRadius: 30,
                       offset: const Offset(0, 15),
                     ),
@@ -241,7 +241,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           child: Text(
                             'Registration Details',
                             style: GoogleFonts.outfit(
-                              color: AppTheme.textColor,
+                              color: colors.text,
                               fontWeight: FontWeight.w700,
                               fontSize: 14,
                             ),
@@ -252,16 +252,16 @@ class _SignupScreenState extends State<SignupScreen> {
                     const SizedBox(height: 12),
                     ClipRRect(
                       borderRadius: BorderRadius.circular(4),
-                      child: const LinearProgressIndicator(
+                      child: LinearProgressIndicator(
                         value: 0.5,
                         minHeight: 6,
-                        backgroundColor: Color(0xFFF1F5F9),
-                        valueColor: AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
+                        backgroundColor: colors.border,
+                        valueColor: const AlwaysStoppedAnimation<Color>(AppTheme.primaryColor),
                       ),
                     ),
                     const SizedBox(height: 28),
 
-                    _buildLabel('I want to'),
+                    _buildLabel('I want to', colors),
                     Row(
                       children: [
                         Expanded(
@@ -296,10 +296,10 @@ class _SignupScreenState extends State<SignupScreen> {
                               ),
                               child: CircleAvatar(
                                 radius: 45,
-                                backgroundColor: const Color(0xFFF1F5F9),
+                                backgroundColor: colors.border,
                                 backgroundImage: _avatarBytes != null ? MemoryImage(_avatarBytes!) : null,
                                 child: _avatarBytes == null 
-                                  ? const Icon(Icons.person, size: 45, color: Color(0xFFCBD5E1))
+                                  ? Icon(Icons.person, size: 45, color: colors.subtext)
                                   : null,
                               ),
                             ),
@@ -321,33 +321,33 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildLabel('Full Name'),
+                    _buildLabel('Full Name', colors),
                     TextFormField(
                       controller: _nameController,
-                      style: GoogleFonts.outfit(color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(color: colors.text),
                       decoration: const InputDecoration(hintText: 'Enter your full name'),
                       validator: (v) => v!.isEmpty ? 'Name is required' : null,
                     ),
                     const SizedBox(height: 20),
-                    _buildLabel('Email Address'),
+                    _buildLabel('Email Address', colors),
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
-                      style: GoogleFonts.outfit(color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(color: colors.text),
                       decoration: const InputDecoration(hintText: 'Enter your email'),
                       validator: (v) => v!.isEmpty ? 'Email is required' : null,
                     ),
                     const SizedBox(height: 20),
-                    _buildLabel('Phone Number'),
+                    _buildLabel('Phone Number', colors),
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
-                      style: GoogleFonts.outfit(color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(color: colors.text),
                       decoration: const InputDecoration(hintText: 'Enter your phone number'),
                     ),
                     if (_selectedRole == 'provider') ...[
                       const SizedBox(height: 20),
-                      _buildLabel('Service Category'),
+                      _buildLabel('Service Category', colors),
                       Consumer<CategoryService>(
                         builder: (context, catService, _) {
                           if (catService.isLoading) {
@@ -390,7 +390,7 @@ class _SignupScreenState extends State<SignupScreen> {
                           return DropdownButtonFormField<int>(
                             value: _selectedCategoryId,
                             isExpanded: true,
-                            style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
+                            style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
                             items: catService.categories.map((cat) {
                               return DropdownMenuItem<int>(
                                 value: int.tryParse(cat['id'].toString()),
@@ -407,59 +407,61 @@ class _SignupScreenState extends State<SignupScreen> {
                         },
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel('Years of Experience'),
+                      _buildLabel('Years of Experience', colors),
                       TextFormField(
                         controller: _experienceController,
                         keyboardType: TextInputType.number,
-                        style: GoogleFonts.outfit(color: AppTheme.textColor),
+                        style: GoogleFonts.outfit(color: colors.text),
                         decoration: const InputDecoration(hintText: 'Enter your experience in years'),
                         validator: (v) => _selectedRole == 'provider' && v!.isEmpty ? 'Experience is required' : null,
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel('Upload CNIC'),
+                      _buildLabel('Upload CNIC', colors),
                       _buildFileUploadTile(
                         title: _cnicFile == null ? 'Select CNIC Image' : _cnicFile!.name,
                         icon: Icons.badge_outlined,
                         onTap: _pickCnic,
                         isSelected: _cnicFile != null,
+                        colors: colors,
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel('Upload Certificates'),
+                      _buildLabel('Upload Certificates', colors),
                       _buildFileUploadTile(
                         title: _certificateFile == null ? 'Select Certificate Image' : _certificateFile!.name,
                         icon: Icons.card_membership_outlined,
                         onTap: _pickCertificate,
                         isSelected: _certificateFile != null,
+                        colors: colors,
                       ),
                     ],
                     const SizedBox(height: 20),
-                    _buildLabel('Password'),
+                    _buildLabel('Password', colors),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
-                      style: GoogleFonts.outfit(color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(color: colors.text),
                       decoration: InputDecoration(
                         hintText: 'Create a password',
                         suffixIcon: IconButton(
                           icon: Icon(_isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                           onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
-                          color: AppTheme.subtextColor.withOpacity(0.7),
+                          color: colors.subtext.withOpacity(0.7),
                         ),
                       ),
                       validator: (v) => v!.length < 6 ? 'Password must be at least 6 chars' : null,
                     ),
                     const SizedBox(height: 20),
-                    _buildLabel('Confirm Password'),
+                    _buildLabel('Confirm Password', colors),
                     TextFormField(
                       controller: _confirmPasswordController,
                       obscureText: !_isConfirmPasswordVisible,
-                      style: GoogleFonts.outfit(color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(color: colors.text),
                       decoration: InputDecoration(
                         hintText: 'Confirm your password',
                         suffixIcon: IconButton(
                           icon: Icon(_isConfirmPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                           onPressed: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
-                          color: AppTheme.subtextColor.withOpacity(0.7),
+                          color: colors.subtext.withOpacity(0.7),
                         ),
                       ),
                       validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
@@ -481,7 +483,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         Expanded(
                           child: RichText(
                             text: TextSpan(
-                              style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, height: 1.4),
+                              style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, height: 1.4),
                               children: [
                                 const TextSpan(text: 'I agree to the '),
                                 TextSpan(
@@ -521,7 +523,7 @@ class _SignupScreenState extends State<SignupScreen> {
                 children: [
                   Text(
                     "Already have an account? ",
-                    style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 15, fontWeight: FontWeight.w500),
+                    style: GoogleFonts.outfit(color: colors.subtext, fontSize: 15, fontWeight: FontWeight.w500),
                   ),
                   TextButton(
                     onPressed: () => context.pop(),
@@ -544,7 +546,7 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Widget _buildLabel(String text) {
+  Widget _buildLabel(String text, AppColors colors) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8.0),
       child: Text(
@@ -552,7 +554,7 @@ class _SignupScreenState extends State<SignupScreen> {
         style: GoogleFonts.outfit(
           fontSize: 14,
           fontWeight: FontWeight.w600,
-          color: AppTheme.textColor,
+          color: colors.text,
         ),
       ),
     );
@@ -563,6 +565,7 @@ class _SignupScreenState extends State<SignupScreen> {
     required IconData icon,
     required VoidCallback onTap,
     required bool isSelected,
+    required AppColors colors,
   }) {
     return InkWell(
       onTap: onTap,
@@ -570,22 +573,22 @@ class _SignupScreenState extends State<SignupScreen> {
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor.withOpacity(0.05) : const Color(0xFFF9FAFB),
+          color: isSelected ? AppTheme.primaryColor.withOpacity(0.05) : colors.surface,
           borderRadius: BorderRadius.circular(16),
           border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : const Color(0xFFE2E8F0),
+            color: isSelected ? AppTheme.primaryColor : colors.border,
             width: isSelected ? 1.5 : 1,
           ),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 22, color: isSelected ? AppTheme.primaryColor : AppTheme.subtextColor),
+            Icon(icon, size: 22, color: isSelected ? AppTheme.primaryColor : colors.subtext),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
                 style: GoogleFonts.outfit(
-                  color: isSelected ? AppTheme.textColor : AppTheme.subtextColor,
+                  color: isSelected ? colors.text : colors.subtext,
                   fontSize: 14,
                   fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
                 ),
@@ -595,7 +598,7 @@ class _SignupScreenState extends State<SignupScreen> {
             if (isSelected)
               const Icon(Icons.check_circle, size: 20, color: AppTheme.primaryColor)
             else
-              const Icon(Icons.add_a_photo_outlined, size: 20, color: Color(0xFFCBD5E1)),
+              Icon(Icons.add_a_photo_outlined, size: 20, color: colors.subtext),
           ],
         ),
       ),
@@ -613,27 +616,28 @@ class _RoleCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return GestureDetector(
       onTap: onTap,
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 200),
         padding: const EdgeInsets.symmetric(vertical: 20),
         decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor.withOpacity(0.05) : Colors.white,
+          color: isSelected ? AppTheme.primaryColor.withOpacity(0.05) : colors.surface,
           borderRadius: BorderRadius.circular(20),
           border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : const Color(0xFFE2E8F0),
+            color: isSelected ? AppTheme.primaryColor : colors.border,
             width: isSelected ? 2.0 : 1.0,
           ),
         ),
         child: Column(
           children: [
-            Icon(icon, size: 28, color: isSelected ? AppTheme.primaryColor : AppTheme.subtextColor),
+            Icon(icon, size: 28, color: isSelected ? AppTheme.primaryColor : colors.subtext),
             const SizedBox(height: 12),
             Text(
               title,
               style: GoogleFonts.outfit(
-                color: isSelected ? AppTheme.textColor : AppTheme.subtextColor,
+                color: isSelected ? colors.text : colors.subtext,
                 fontWeight: FontWeight.w600,
                 fontSize: 14,
               ),

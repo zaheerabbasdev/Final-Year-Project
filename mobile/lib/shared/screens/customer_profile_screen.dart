@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../features/provider/provider_service.dart';
 import '../../core/api_client.dart';
+import '../../core/theme.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
   final int customerId;
@@ -45,6 +46,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -71,7 +73,6 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         ),
       );
     }
-
     final avatarUrl = ApiClient.getImageUrl(_customer!['avatar']);
     final initials = _customer!['full_name']?.isNotEmpty == true ? _customer!['full_name'][0].toUpperCase() : '?';
     final joinedDate = _customer!['created_at'] != null 
@@ -79,7 +80,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         : 'Unknown';
 
     return Scaffold(
-      backgroundColor: const Color(0xFFF8FAFC),
+      backgroundColor: colors.background,
       body: CustomScrollView(
         slivers: [
           _buildSliverAppBar(avatarUrl, initials),
@@ -136,7 +137,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               ),
               child: CircleAvatar(
                 radius: 50,
-                backgroundColor: const Color(0xFFF1F5F9),
+                backgroundColor: Theme.of(context).appColors.card,
                 backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
                 child: avatarUrl == null 
                     ? Text(initials, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)))
@@ -167,12 +168,12 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 16),
-            const Icon(Icons.location_on, color: Color(0xFF94A3B8), size: 18),
+            Icon(Icons.location_on, color: Theme.of(context).appColors.subtext, size: 18),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
                 _customer!['location'] ?? 'Location not set',
-                style: const TextStyle(color: Color(0xFF64748B)),
+                style: TextStyle(color: Theme.of(context).appColors.subtext),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
               ),
@@ -186,7 +187,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   Widget _buildSectionTitle(String title) {
     return Text(
       title,
-      style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+      style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text),
     );
   }
 
@@ -194,16 +195,16 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).appColors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: Theme.of(context).appColors.border),
       ),
       child: Column(
         children: [
           _buildInfoRow(Icons.email_outlined, 'Email', _customer!['email'] ?? 'Not provided'),
-          const Divider(height: 32, color: Color(0xFFF1F5F9)),
+          Divider(height: 32, color: Theme.of(context).appColors.border),
           _buildInfoRow(Icons.phone_outlined, 'Phone', _customer!['phone'] ?? 'Not provided'),
-          const Divider(height: 32, color: Color(0xFFF1F5F9)),
+          Divider(height: 32, color: Theme.of(context).appColors.border),
           _buildInfoRow(Icons.calendar_today_outlined, 'Joined Since', 
               _customer!['created_at']?.toString().split('T').first ?? 'Unknown'),
         ],
@@ -217,7 +218,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         Container(
           padding: const EdgeInsets.all(10),
           decoration: BoxDecoration(
-            color: const Color(0xFFF8FAFC),
+              color: Theme.of(context).appColors.card,
             borderRadius: BorderRadius.circular(12),
           ),
           child: Icon(icon, color: const Color(0xFF6366F1), size: 20),
@@ -226,9 +227,9 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(label, style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 12)),
+            Text(label, style: TextStyle(color: Theme.of(context).appColors.subtext, fontSize: 12)),
             const SizedBox(height: 2),
-            Text(value, style: const TextStyle(fontWeight: FontWeight.w600, color: Color(0xFF1E293B))),
+            Text(value, style: TextStyle(fontWeight: FontWeight.w600, color: Theme.of(context).appColors.text)),
           ],
         ),
       ],

@@ -14,31 +14,32 @@ class MyJobsScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return DefaultTabController(
       length: 4,
       child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
+        backgroundColor: colors.background,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: colors.surface,
           scrolledUnderElevation: 0,
           elevation: 0,
           title: Text(
             'My Jobs',
             style: GoogleFonts.outfit(
-              color: AppTheme.textColor,
+              color: colors.text,
               fontWeight: FontWeight.bold,
               fontSize: 22,
             ),
           ),
-          actions: const [
-            NotificationBell(color: AppTheme.textColor),
+          actions: [
+            NotificationBell(color: colors.text),
           ],
           bottom: TabBar(
             isScrollable: true,
             indicatorColor: AppTheme.primaryColor,
             indicatorWeight: 3,
             labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.subtextColor,
+            unselectedLabelColor: colors.subtext,
             labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
             unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500, fontSize: 14),
             tabs: const [
@@ -81,6 +82,7 @@ class _JobsListViewState extends State<_JobsListView> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Consumer<JobService>(
       builder: (context, service, _) {
         if (service.isLoading) {
@@ -101,12 +103,12 @@ class _JobsListViewState extends State<_JobsListView> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Icon(Icons.assignment_outlined, size: 64, color: AppTheme.subtextColor.withOpacity(0.3)),
+                Icon(Icons.assignment_outlined, size: 64, color: colors.subtext.withOpacity(0.3)),
                 const SizedBox(height: 16),
                 Text(
                   'No jobs found',
                   style: GoogleFonts.outfit(
-                    color: AppTheme.subtextColor,
+                    color: colors.subtext,
                     fontSize: 16,
                     fontWeight: FontWeight.w500,
                   ),
@@ -135,17 +137,17 @@ class _JobsListViewState extends State<_JobsListView> {
                 statusColor = AppTheme.successColor;
                 break;
               default:
-                statusColor = AppTheme.subtextColor;
+                statusColor = colors.subtext;
             }
 
             return Container(
               margin: const EdgeInsets.only(bottom: 20),
               decoration: BoxDecoration(
-                color: AppTheme.surfaceColor,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(26),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.textColor.withOpacity(0.06),
+                    color: colors.text.withOpacity(0.06),
                     blurRadius: 20,
                     offset: const Offset(0, 10),
                   ),
@@ -166,14 +168,14 @@ class _JobsListViewState extends State<_JobsListView> {
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
                           children: [
                             Expanded(
-                              child: Text(
-                                job['title'] as String,
-                                style: GoogleFonts.outfit(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                  color: AppTheme.textColor,
+                                child: Text(
+                                  job['title'] as String,
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                    color: colors.text,
+                                  ),
                                 ),
-                              ),
                             ),
                             const SizedBox(width: 8),
                             Container(
@@ -197,30 +199,30 @@ class _JobsListViewState extends State<_JobsListView> {
                         const SizedBox(height: 10),
                         Text(
                           job['description'] as String,
-                          style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 14),
+                          style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
                         const SizedBox(height: 16),
                         Row(
                           children: [
-                            const Icon(Icons.calendar_today_outlined, size: 14, color: AppTheme.subtextColor),
+                            Icon(Icons.calendar_today_outlined, size: 14, color: colors.subtext),
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
                                 job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
-                                style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                                style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
                             const SizedBox(width: 16),
-                            const Icon(Icons.location_on_outlined, size: 14, color: AppTheme.subtextColor),
+                            Icon(Icons.location_on_outlined, size: 14, color: colors.subtext),
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
                                 job['location'] ?? 'Not specified',
-                                style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                                style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
                               ),
@@ -228,7 +230,7 @@ class _JobsListViewState extends State<_JobsListView> {
                           ],
                         ),
                         const SizedBox(height: 16),
-                        const Divider(color: Color(0xFFF1F5F9), height: 1),
+                        Divider(color: colors.border, height: 1),
                         const SizedBox(height: 16),
                         Row(
                           mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -250,7 +252,7 @@ class _JobsListViewState extends State<_JobsListView> {
                                   const SizedBox(width: 4),
                                   Text(
                                     'Budget',
-                                    style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500),
+                                    style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500),
                                   ),
                                 ],
                               ),

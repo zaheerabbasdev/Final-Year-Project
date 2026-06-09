@@ -3,6 +3,7 @@ import 'package:flutter/foundation.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme.dart';
+import 'core/providers/theme_provider.dart';
 import 'features/auth/auth_service.dart';
 import 'features/auth/screens/splash_screen.dart';
 import 'features/auth/screens/onboarding_screen.dart';
@@ -53,6 +54,7 @@ void main() async {
   runApp(
     MultiProvider(
       providers: [
+        ChangeNotifierProvider(create: (_) => ThemeProvider()),
         ChangeNotifierProvider(create: (_) => AuthService()..checkAuth()),
         ChangeNotifierProvider(create: (_) => CategoryService()),
         ChangeNotifierProvider(create: (_) => JobService()),
@@ -115,6 +117,7 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
   @override
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
+    final themeProvider = context.watch<ThemeProvider>();
     final socketService = context.read<SocketService>();
     final notificationProvider = context.read<NotificationProvider>();
     final syncProvider = context.read<SyncProvider>();
@@ -274,6 +277,8 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
       debugShowCheckedModeBanner: false,
       title: 'Kaarkun',
       theme: AppTheme.lightTheme,
+      darkTheme: AppTheme.darkTheme,
+      themeMode: themeProvider.themeMode,
       routerConfig: router,
     );
   }

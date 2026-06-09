@@ -4,6 +4,7 @@ import '../../features/provider/provider_service.dart';
 import '../../shared/services/review_service.dart';
 import '../../shared/widgets/review_card.dart';
 import '../../core/api_client.dart';
+import '../../core/theme.dart';
 import 'package:go_router/go_router.dart';
 
 class ProviderProfileScreen extends StatefulWidget {
@@ -43,6 +44,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -76,15 +78,15 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     final categoryName = profile?['category_name'] ?? _provider!['category_name'] ?? 'Provider';
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E293B)),
+          icon: Icon(Icons.arrow_back, color: colors.text),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text('Provider Profile', style: TextStyle(color: Color(0xFF1E293B), fontWeight: FontWeight.bold)),
+        title: Text('Provider Profile', style: TextStyle(color: colors.text, fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -95,16 +97,16 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_provider!['full_name'] ?? 'No Name', style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                  Text(_provider!['full_name'] ?? 'No Name', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.text)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
-                      const Icon(Icons.location_on_outlined, size: 16, color: Color(0xFF64748B)),
+                      Icon(Icons.location_on_outlined, size: 16, color: colors.subtext),
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
                           _provider!['location'] ?? 'Location not specified',
-                          style: const TextStyle(color: Color(0xFF64748B), fontSize: 14),
+                          style: TextStyle(color: colors.subtext, fontSize: 14),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
@@ -115,13 +117,13 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   _buildStatsRow(profile),
                   const SizedBox(height: 32),
                   if (profile?['bio'] != null && profile!['bio'].toString().isNotEmpty) ...[
-                    const Text('About', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                    Text('About', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
                     const SizedBox(height: 12),
-                    Text(profile['bio'], style: const TextStyle(color: Color(0xFF64748B), height: 1.6, fontSize: 14)),
+                    Text(profile['bio'], style: TextStyle(color: colors.subtext, height: 1.6, fontSize: 14)),
                     const SizedBox(height: 32),
                   ],
                   if (profile?['skills'] != null) ...[
-                    const Text('Specialized Skills', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+                    Text('Specialized Skills', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
                     const SizedBox(height: 16),
                     _buildSkillsWrap(profile['skills']),
                     const SizedBox(height: 32),
@@ -225,9 +227,9 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: Theme.of(context).appColors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFF1F5F9)),
+        border: Border.all(color: Theme.of(context).appColors.border),
       ),
       child: Column(
         children: [
@@ -242,7 +244,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           const SizedBox(height: 2),
           Text(
             label,
-            style: const TextStyle(color: Color(0xFF94A3B8), fontSize: 10),
+            style: TextStyle(color: Theme.of(context).appColors.subtext, fontSize: 10),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),

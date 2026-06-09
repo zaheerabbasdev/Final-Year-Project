@@ -11,6 +11,7 @@ import '../../features/provider/screens/browse_jobs_screen.dart';
 import '../../features/provider/screens/my_bids_screen.dart';
 import 'profile_screen.dart';
 import '../../features/chat/screens/chat_list_screen.dart';
+import '../../core/theme.dart';
 
 class MainNavigationScreen extends StatelessWidget {
   const MainNavigationScreen({super.key});
@@ -56,8 +57,9 @@ class MainNavigationScreen extends StatelessWidget {
 
     final items = role == 'customer' ? customerItems : providerItems;
 
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     return Scaffold(
-      backgroundColor: const Color(0xFFF5F7FB),
+      backgroundColor: Theme.of(context).appColors.background,
       // Set resizeToAvoidBottomInset to false so that floating bar is not squeezed by keyboard
       resizeToAvoidBottomInset: false,
       body: Stack(
@@ -83,18 +85,28 @@ class MainNavigationScreen extends StatelessWidget {
                 height: 72,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
-                    colors: [
-                      Colors.white.withOpacity(0.92),
-                      Colors.white.withOpacity(0.78),
-                    ],
+                    colors: isDark
+                        ? [
+                            AppTheme.darkSurface.withOpacity(0.96),
+                            AppTheme.darkCard.withOpacity(0.88),
+                          ]
+                        : [
+                            Colors.white.withOpacity(0.92),
+                            Colors.white.withOpacity(0.78),
+                          ],
                     begin: Alignment.topLeft,
                     end: Alignment.bottomRight,
                   ),
                   borderRadius: BorderRadius.circular(28),
-                  border: Border.all(color: Colors.white.withOpacity(0.70), width: 1.5),
+                  border: Border.all(
+                    color: isDark
+                        ? AppTheme.darkBorder.withOpacity(0.60)
+                        : Colors.white.withOpacity(0.70),
+                    width: 1.5,
+                  ),
                   boxShadow: [
                     BoxShadow(
-                      color: const Color(0xFF003B95).withOpacity(0.16),
+                      color: const Color(0xFF003B95).withOpacity(isDark ? 0.30 : 0.16),
                       blurRadius: 32,
                       offset: const Offset(0, 14),
                     ),

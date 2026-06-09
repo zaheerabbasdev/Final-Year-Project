@@ -105,13 +105,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     // Scroll to bottom when messages change
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
-        iconTheme: const IconThemeData(color: AppTheme.textColor),
+        iconTheme: IconThemeData(color: colors.text),
         titleSpacing: 0,
         title: InkWell(
           onTap: () {},
@@ -127,7 +128,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       widget.otherUserName,
                       style: GoogleFonts.outfit(
                         fontSize: 16,
-                        color: AppTheme.textColor,
+                        color: colors.text,
                         fontWeight: FontWeight.bold,
                       ),
                       overflow: TextOverflow.ellipsis,
@@ -146,7 +147,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                         'Online',
                         style: GoogleFonts.outfit(
                           fontSize: 12,
-                          color: AppTheme.subtextColor,
+                          color: colors.subtext,
                           fontWeight: FontWeight.w500,
                         ),
                       ),
@@ -158,15 +159,15 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.videocam_outlined, color: AppTheme.textColor),
+            icon: Icon(Icons.videocam_outlined, color: colors.text),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.call_outlined, color: AppTheme.textColor),
+            icon: Icon(Icons.call_outlined, color: colors.text),
             onPressed: () {},
           ),
           IconButton(
-            icon: const Icon(Icons.more_vert_rounded, color: AppTheme.textColor),
+            icon: Icon(Icons.more_vert_rounded, color: colors.text),
             onPressed: () {},
           ),
         ],
@@ -334,11 +335,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Widget _buildMessageBubble(ChatMessage message, bool isMe) {
+    final colors = Theme.of(context).appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 6),
       padding: const EdgeInsets.all(6),
       decoration: BoxDecoration(
-        color: isMe ? AppTheme.primaryColor : Colors.white,
+        color: isMe ? AppTheme.primaryColor : colors.surface,
         borderRadius: BorderRadius.only(
           topLeft: const Radius.circular(16),
           topRight: const Radius.circular(16),
@@ -349,7 +351,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             ? null
             : [
                 BoxShadow(
-                  color: AppTheme.textColor.withOpacity(0.04),
+                  color: colors.text.withOpacity(0.04),
                   blurRadius: 10,
                   offset: const Offset(0, 4),
                 ),
@@ -400,7 +402,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     message.content,
                     style: GoogleFonts.outfit(
                       fontSize: 15,
-                      color: isMe ? Colors.white : AppTheme.textColor,
+                      color: isMe ? Colors.white : colors.text,
                       fontWeight: FontWeight.w400,
                       height: 1.3,
                     ),
@@ -417,7 +419,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                 Text(
                   DateFormat('hh:mm a').format(message.createdAt),
                   style: GoogleFonts.outfit(
-                    color: isMe ? Colors.white.withOpacity(0.7) : AppTheme.subtextColor,
+                    color: isMe ? Colors.white.withOpacity(0.7) : colors.subtext,
                     fontSize: 10,
                     fontWeight: FontWeight.w500,
                   ),
@@ -439,14 +441,15 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Widget _buildMessageInput() {
+    final colors = Theme.of(context).appColors;
     final bottomPadding = MediaQuery.of(context).padding.bottom;
     return Container(
       padding: EdgeInsets.fromLTRB(16, 8, 16, bottomPadding > 0 ? bottomPadding : 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.04),
+            color: colors.text.withOpacity(0.04),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),
@@ -457,14 +460,14 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
             Expanded(
               child: Container(
                 decoration: BoxDecoration(
-                  color: AppTheme.backgroundColor,
+                  color: colors.background,
                   borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: const Color(0xFFE2E8F0), width: 1),
+                  border: Border.all(color: colors.border, width: 1),
                 ),
                 child: Row(
                   children: [
                     IconButton(
-                      icon: const Icon(Icons.sentiment_satisfied_alt_outlined, color: AppTheme.subtextColor),
+                      icon: Icon(Icons.sentiment_satisfied_alt_outlined, color: colors.subtext),
                       onPressed: () {},
                     ),
                     Expanded(
@@ -482,12 +485,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                           textInputAction: TextInputAction.send,
                           onSubmitted: (_) => _sendMessage(),
                           style: GoogleFonts.outfit(
-                            color: AppTheme.textColor,
+                            color: colors.text,
                             fontSize: 15,
                           ),
                           decoration: InputDecoration(
                             hintText: 'Type a message...',
-                            hintStyle: GoogleFonts.outfit(color: AppTheme.subtextColor),
+                            hintStyle: GoogleFonts.outfit(color: colors.subtext),
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,
                             focusedBorder: InputBorder.none,
@@ -499,12 +502,12 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       ),
                     ),
                     IconButton(
-                      icon: const Icon(Icons.attach_file_rounded, color: AppTheme.subtextColor),
+                      icon: Icon(Icons.attach_file_rounded, color: colors.subtext),
                       onPressed: _pickImage,
                     ),
                     if (_messageController.text.isEmpty)
                       IconButton(
-                        icon: const Icon(Icons.camera_alt_outlined, color: AppTheme.subtextColor),
+                        icon: Icon(Icons.camera_alt_outlined, color: colors.subtext),
                         onPressed: () => _pickImage(source: ImageSource.camera),
                       ),
                   ],

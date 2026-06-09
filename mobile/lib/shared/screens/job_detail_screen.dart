@@ -71,30 +71,31 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       return _buildProviderView(userId);
     }
 
+    final colors = Theme.of(context).appColors;
     return DefaultTabController(
       length: 2,
       child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
+        backgroundColor: colors.background,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: colors.surface,
           elevation: 0,
           scrolledUnderElevation: 0,
           leading: IconButton(
-            icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textColor, size: 20),
+            icon: Icon(Icons.arrow_back_ios_new_rounded, color: colors.text, size: 20),
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
             'Job Details',
-            style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 18),
+            style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           actions: [
-            const NotificationBell(color: AppTheme.textColor),
+            NotificationBell(color: colors.text),
           ],
           bottom: TabBar(
             indicatorColor: AppTheme.primaryColor,
             indicatorWeight: 3,
             labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.subtextColor,
+            unselectedLabelColor: colors.subtext,
             labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
             tabs: [
               const Tab(text: 'Details'),
@@ -135,22 +136,23 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       buttonColor = const Color(0xFFB91C1C);
       isButtonEnabled = true;
     }
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back_ios_new_rounded, color: AppTheme.textColor, size: 20),
+          icon: Icon(Icons.arrow_back_ios_new_rounded, color: colors.text, size: 20),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Job Details',
-          style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 18),
+          style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
-          const NotificationBell(color: AppTheme.textColor),
+          NotificationBell(color: colors.text),
         ],
       ),
       body: SingleChildScrollView(
@@ -161,12 +163,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             Container(
               padding: const EdgeInsets.all(24),
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: colors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.textColor.withOpacity(0.02),
+                    color: colors.text.withOpacity(0.02),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -181,7 +183,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       Expanded(
                         child: Text(
                           _job?['title'] ?? 'No Title',
-                          style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+                          style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: colors.text),
                         ),
                       ),
                       Container(
@@ -234,16 +236,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   const SizedBox(height: 16),
                   Row(
                     children: [
-                      const Icon(Icons.access_time_rounded, size: 16, color: AppTheme.subtextColor),
+                      Icon(Icons.access_time_rounded, size: 16, color: colors.subtext),
                       const SizedBox(width: 8),
                       Text(
                         'Posted ${_job?['created_at']?.toString().split('T').first ?? 'Unknown'}',
-                        style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500),
+                        style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500),
                       ),
                     ],
                   ),
                   const SizedBox(height: 24),
-                  const Divider(color: Color(0xFFE2E8F0)),
+                  Divider(color: colors.border),
                   const SizedBox(height: 24),
                   Container(
                     padding: const EdgeInsets.all(28),
@@ -255,7 +257,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Client Budget', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
+                        Text('Client Budget', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500)),
                         const SizedBox(height: 6),
                         Text(
                           'PKR ${(double.tryParse(_job?['budget']?.toString() ?? '0') ?? 0).toInt()}',
@@ -267,8 +269,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   const SizedBox(height: 24),
                   Row(
                     children: [
-                      Expanded(child: _buildSimpleStat(Icons.location_on_outlined, 'Location', _job?['location'] ?? 'Not specified')),
-                      Expanded(child: _buildSimpleStat(Icons.people_outline_rounded, 'Total Bids', '${_bids.length} bids')),
+                      Expanded(child: _buildSimpleStat(Icons.location_on_outlined, 'Location', _job?['location'] ?? 'Not specified', colors)),
+                      Expanded(child: _buildSimpleStat(Icons.people_outline_rounded, 'Total Bids', '${_bids.length} bids', colors)),
                     ],
                   ),
                 ],
@@ -311,18 +313,19 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               _buildProviderDetailSection('Job Location', _buildMapCard(
                 double.parse(_job!['latitude'].toString()),
                 double.parse(_job!['longitude'].toString()),
-              )),
+                colors,
+              ), colors),
             const SizedBox(height: 24),
             _buildProviderDetailSection('Job Description', Container(
               padding: const EdgeInsets.all(24),
               width: double.infinity,
               decoration: BoxDecoration(
-                color: Colors.white,
+                color: colors.surface,
                 borderRadius: BorderRadius.circular(24),
-                border: Border.all(color: const Color(0xFFE2E8F0)),
+                border: Border.all(color: colors.border),
                 boxShadow: [
                   BoxShadow(
-                    color: AppTheme.textColor.withOpacity(0.02),
+                    color: colors.text.withOpacity(0.02),
                     blurRadius: 15,
                     offset: const Offset(0, 5),
                   ),
@@ -330,15 +333,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
               child: Text(
                 _job?['description'] ?? 'No description provided.',
-                style: GoogleFonts.outfit(color: AppTheme.textColor.withOpacity(0.8), height: 1.6, fontSize: 14),
+                style: GoogleFonts.outfit(color: colors.text.withOpacity(0.8), height: 1.6, fontSize: 14),
               ),
-            )),
+            ), colors),
             const SizedBox(height: 24),
-            _buildProviderDetailSection('Attached Images', _buildImageGallery(_job?['images'])),
+            _buildProviderDetailSection('Attached Images', _buildImageGallery(_job?['images'], colors), colors),
             const SizedBox(height: 24),
-            _buildProviderDetailSection('Client Information', _buildClientInfoCard()),
+            _buildProviderDetailSection('Client Information', _buildClientInfoCard(colors), colors),
             const SizedBox(height: 24),
-            _buildProviderDetailSection('Bidding Competition', _buildCompetitionCard()),
+            _buildProviderDetailSection('Bidding Competition', _buildCompetitionCard(colors), colors),
             const SizedBox(height: 32),
             if (_booking != null && _booking!['status'] == 'confirmed' && _booking!['provider_id'] == currentUserId) ...[
               Container(
@@ -443,14 +446,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               child: OutlinedButton(
                 onPressed: () {},
                 style: OutlinedButton.styleFrom(
-                  side: const BorderSide(color: Color(0xFFE2E8F0)),
+                  side: BorderSide(color: colors.border),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: Text('Save for Later', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
+                child: Text('Save for Later', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
               ),
             ),
             const SizedBox(height: 24),
-            _buildBiddingTips(),
+            _buildBiddingTips(colors),
             const SizedBox(height: 48),
           ],
         ),
@@ -458,18 +461,18 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  Widget _buildProviderDetailSection(String title, Widget content) {
+  Widget _buildProviderDetailSection(String title, Widget content, AppColors colors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(title, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
+        Text(title, style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
         const SizedBox(height: 16),
         content,
       ],
     );
   }
 
-  Widget _buildClientInfoCard() {
+  Widget _buildClientInfoCard(AppColors colors) {
     final avatarUrl = ApiClient.getImageUrl(_job?['customer_avatar']);
     final customerName = _job?['customer_name'] ?? 'Unknown User';
     final initials = customerName.isNotEmpty ? customerName[0].toUpperCase() : '?';
@@ -477,12 +480,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.02),
+            color: colors.text.withOpacity(0.02),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -506,10 +509,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               children: [
                 Text(
                   customerName,
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18, color: AppTheme.textColor),
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18, color: colors.text),
                 ),
                 const SizedBox(height: 4),
-                Text('Verified Client', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500)),
+                Text('Verified Client', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -571,16 +574,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  Widget _buildCompetitionCard() {
+  Widget _buildCompetitionCard(AppColors colors) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.02),
+            color: colors.text.withOpacity(0.02),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -588,27 +591,27 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       ),
       child: Column(
         children: [
-          _buildCompetitionRow('Total Bids', '${_bids.length}'),
+          _buildCompetitionRow('Total Bids', '${_bids.length}', colors),
           const SizedBox(height: 16),
-          _buildCompetitionRow('Your Status', (_job?['status'] ?? 'Open').toUpperCase(), valueColor: AppTheme.successColor),
+          _buildCompetitionRow('Your Status', (_job?['status'] ?? 'Open').toUpperCase(), colors, valueColor: AppTheme.successColor),
           const SizedBox(height: 16),
-          _buildCompetitionRow('Category', _job?['category_name'] ?? 'N/A'),
+          _buildCompetitionRow('Category', _job?['category_name'] ?? 'N/A', colors),
         ],
       ),
     );
   }
 
-  Widget _buildCompetitionRow(String label, String value, {Color? valueColor}) {
+  Widget _buildCompetitionRow(String label, String value, AppColors colors, {Color? valueColor}) {
     return Row(
       mainAxisAlignment: MainAxisAlignment.spaceBetween,
       children: [
-        Text(label, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 14, fontWeight: FontWeight.w500)),
-        Text(value, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: valueColor ?? AppTheme.textColor)),
+        Text(label, style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14, fontWeight: FontWeight.w500)),
+        Text(value, style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: valueColor ?? colors.text)),
       ],
     );
   }
 
-  Widget _buildBiddingTips() {
+  Widget _buildBiddingTips(AppColors colors) {
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -622,40 +625,40 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             children: [
               const Icon(Icons.lightbulb_outline_rounded, color: AppTheme.primaryColor, size: 24),
               const SizedBox(width: 12),
-              Text('Bidding Tips', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor)),
+              Text('Bidding Tips', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
             ],
           ),
           const SizedBox(height: 16),
-          _buildTipItem('Research the job requirements carefully'),
-          _buildTipItem('Bid competitively but fairly'),
-          _buildTipItem('Highlight your relevant experience'),
-          _buildTipItem('Respond promptly to client questions'),
+          _buildTipItem('Research the job requirements carefully', colors),
+          _buildTipItem('Bid competitively but fairly', colors),
+          _buildTipItem('Highlight your relevant experience', colors),
+          _buildTipItem('Respond promptly to client questions', colors),
         ],
       ),
     );
   }
 
-  Widget _buildTipItem(String tip) {
+  Widget _buildTipItem(String tip, AppColors colors) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text('• ', style: TextStyle(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)),
-          Expanded(child: Text(tip, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, fontWeight: FontWeight.w500))),
+          Expanded(child: Text(tip, style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500))),
         ],
       ),
     );
   }
 
-  Widget _buildSectionHeader(String title) {
+  Widget _buildSectionHeader(String title, AppColors colors) {
     return Text(
       title,
-      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text),
     );
   }
 
-  Widget _buildSimpleStat(IconData icon, String label, String value) {
+  Widget _buildSimpleStat(IconData icon, String label, String value, AppColors colors) {
     return Row(
       children: [
         Icon(icon, size: 20, color: AppTheme.primaryColor),
@@ -664,11 +667,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 11, fontWeight: FontWeight.w500)),
+              Text(label, style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11, fontWeight: FontWeight.w500)),
               const SizedBox(height: 2),
               Text(
                 value,
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textColor),
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: colors.text),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -680,8 +683,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildDetailsTab(String? role) {
+    final colors = Theme.of(context).appColors;
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
-    if (_job == null) return Center(child: Text('Job not found', style: GoogleFonts.outfit(color: AppTheme.subtextColor)));
+    if (_job == null) return Center(child: Text('Job not found', style: GoogleFonts.outfit(color: colors.subtext)));
 
     final title = _job!['title'] ?? 'No Title';
     final category = _job!['category_name'] ?? 'General';
@@ -698,31 +702,32 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildJobMainCard(title, category, status),
+          _buildJobMainCard(title, category, status, colors),
           const SizedBox(height: 24),
-          _buildInfoSection('Description', description),
+          _buildInfoSection('Description', description, colors),
           const SizedBox(height: 24),
-          _buildStatsGrid(budget, location, createdAt, _bids.length),
+          _buildStatsGrid(budget, location, createdAt, _bids.length, colors),
           const SizedBox(height: 24),
           if (_job!['latitude'] != null && _job!['longitude'] != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoSectionTitle('Job Location'),
+                _buildInfoSectionTitle('Job Location', colors),
                 const SizedBox(height: 16),
                 _buildMapCard(
                   double.parse(_job!['latitude'].toString()),
                   double.parse(_job!['longitude'].toString()),
+                  colors,
                 ),
                 const SizedBox(height: 24),
               ],
             ),
-          _buildInfoSectionTitle('Images'),
+          _buildInfoSectionTitle('Images', colors),
           const SizedBox(height: 16),
-          _buildImageGallery(_job!['images']),
+          _buildImageGallery(_job!['images'], colors),
           const SizedBox(height: 24),
           if (_booking != null && _booking!['status'] == 'confirmed') ...[
-            _buildInfoSectionTitle('Service Verification'),
+            _buildInfoSectionTitle('Service Verification', colors),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(20),
@@ -766,9 +771,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             const SizedBox(height: 24),
           ],
           if (role == 'provider') ...[
-            _buildInfoSectionTitle('Customer Information'),
+            _buildInfoSectionTitle('Customer Information', colors),
             const SizedBox(height: 16),
-            _buildCustomerCard(_job!['customer_name'], createdAt),
+            _buildCustomerCard(_job!['customer_name'], createdAt, colors),
             const SizedBox(height: 32),
           ],
         ],
@@ -776,16 +781,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  Widget _buildJobMainCard(String title, String category, String status) {
+  Widget _buildJobMainCard(String title, String category, String status, AppColors colors) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.02),
+            color: colors.text.withOpacity(0.02),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -800,7 +805,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Expanded(
                 child: Text(
                   title,
-                  style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+                  style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: colors.text),
                 ),
               ),
               Container(
@@ -829,34 +834,34 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             ),
           ),
           const SizedBox(height: 20),
-          const Divider(color: Color(0xFFE2E8F0)),
+          Divider(color: colors.border),
         ],
       ),
     );
   }
 
-  Widget _buildInfoSection(String title, String content) {
+  Widget _buildInfoSection(String title, String content, AppColors colors) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        _buildInfoSectionTitle(title),
+        _buildInfoSectionTitle(title, colors),
         const SizedBox(height: 12),
         Text(
           content,
-          style: GoogleFonts.outfit(color: AppTheme.textColor.withOpacity(0.8), height: 1.6, fontSize: 14),
+          style: GoogleFonts.outfit(color: colors.text.withOpacity(0.8), height: 1.6, fontSize: 14),
         ),
       ],
     );
   }
 
-  Widget _buildInfoSectionTitle(String title) {
+  Widget _buildInfoSectionTitle(String title, AppColors colors) {
     return Text(
       title,
-      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+      style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text),
     );
   }
 
-  Widget _buildStatsGrid(String budget, String location, String date, int bidsCount) {
+  Widget _buildStatsGrid(String budget, String location, String date, int bidsCount, AppColors colors) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -865,15 +870,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       crossAxisSpacing: 16,
       childAspectRatio: 2.2,
       children: [
-        _buildStatItem(Icons.attach_money_rounded, 'Budget', 'PKR ${(double.tryParse(budget.toString()) ?? 0).toInt()}'),
-        _buildStatItem(Icons.location_on_outlined, 'Location', location),
-        _buildStatItem(Icons.calendar_today_outlined, 'Posted', date),
-        _buildStatItem(Icons.people_outline_rounded, 'Bids', '$bidsCount received'),
+        _buildStatItem(Icons.attach_money_rounded, 'Budget', 'PKR ${(double.tryParse(budget.toString()) ?? 0).toInt()}', colors),
+        _buildStatItem(Icons.location_on_outlined, 'Location', location, colors),
+        _buildStatItem(Icons.calendar_today_outlined, 'Posted', date, colors),
+        _buildStatItem(Icons.people_outline_rounded, 'Bids', '$bidsCount received', colors),
       ],
     );
   }
 
-  Widget _buildStatItem(IconData icon, String label, String value) {
+  Widget _buildStatItem(IconData icon, String label, String value, AppColors colors) {
     return Row(
       children: [
         Container(
@@ -890,10 +895,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             mainAxisAlignment: MainAxisAlignment.center,
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(label, style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 11, fontWeight: FontWeight.w500)),
+              Text(label, style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11, fontWeight: FontWeight.w500)),
               Text(
                 value,
-                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: AppTheme.textColor),
+                style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13, color: colors.text),
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
               ),
@@ -904,26 +909,26 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  Widget _buildImageGallery(List<dynamic>? images) {
+  Widget _buildImageGallery(List<dynamic>? images, AppColors colors) {
     if (images == null || images.isEmpty) {
       return Container(
         height: 120,
         alignment: Alignment.center,
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(24),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: colors.border),
         ),
-        child: Text('No images provided.', style: GoogleFonts.outfit(color: AppTheme.subtextColor)),
+        child: Text('No images provided.', style: GoogleFonts.outfit(color: colors.subtext)),
       );
     }
 
     return Container(
       height: 120,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
       ),
       padding: const EdgeInsets.all(16),
       child: ListView.builder(
@@ -949,16 +954,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  Widget _buildCustomerCard(String? name, String date) {
+  Widget _buildCustomerCard(String? name, String date, AppColors colors) {
     final avatarUrl = ApiClient.getImageUrl(_job?['customer_avatar']);
     final initials = name != null && name.isNotEmpty ? name[0].toUpperCase() : '?';
 
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
       ),
       child: Row(
         children: [
@@ -977,12 +982,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               children: [
                 Text(
                   name ?? 'Unknown',
-                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textColor),
+                  style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: colors.text),
                 ),
                 const SizedBox(height: 2),
                 Text(
                   'Job posted on $date',
-                  style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                  style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ],
             ),
@@ -999,10 +1004,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 }
               },
               style: OutlinedButton.styleFrom(
-                side: const BorderSide(color: Color(0xFFE2E8F0)),
+                side: BorderSide(color: colors.border),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: Text('View Profile', style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 12, fontWeight: FontWeight.bold)),
+              child: Text('View Profile', style: GoogleFonts.outfit(color: colors.text, fontSize: 12, fontWeight: FontWeight.bold)),
             ),
         ],
       ),
@@ -1010,8 +1015,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildBidsTab() {
+    final colors = Theme.of(context).appColors;
     if (_bids.isEmpty) {
-      return Center(child: Text('No bids yet.', style: GoogleFonts.outfit(color: AppTheme.subtextColor)));
+      return Center(child: Text('No bids yet.', style: GoogleFonts.outfit(color: colors.subtext)));
     }
 
     final bool hasAcceptedAny = _bids.any((b) => b['status'] == 'accepted');
@@ -1036,6 +1042,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 avatar: bid['provider_avatar'],
                 status: bid['status'],
                 hasAcceptedAny: hasAcceptedAny,
+                colors: colors,
               );
           }).toList(),
         ],
@@ -1055,6 +1062,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     String? avatar,
     required String status,
     required bool hasAcceptedAny,
+    required AppColors colors,
   }) {
     final avatarUrl = ApiClient.getImageUrl(avatar);
     
@@ -1085,12 +1093,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       margin: const EdgeInsets.only(bottom: 20),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.02),
+            color: colors.text.withOpacity(0.02),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -1115,15 +1123,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   children: [
                     Text(
                       name,
-                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: AppTheme.textColor),
+                      style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16, color: colors.text),
                     ),
                     const SizedBox(height: 2),
                     Row(
                       children: [
                         const Icon(Icons.star_rounded, color: AppTheme.warningColor, size: 16),
                         const SizedBox(width: 4),
-                        Text(rating.toString(), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 12, color: AppTheme.textColor)),
-                        Text(' ($reviews reviews)', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
+                        Text(rating.toString(), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 12, color: colors.text)),
+                        Text(' ($reviews reviews)', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500)),
                       ],
                     ),
                     const SizedBox(height: 8),
@@ -1187,10 +1195,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           const SizedBox(height: 16),
           Text(
             proposal,
-            style: GoogleFonts.outfit(color: AppTheme.textColor.withOpacity(0.8), fontSize: 14, height: 1.5),
+            style: GoogleFonts.outfit(color: colors.text.withOpacity(0.8), fontSize: 14, height: 1.5),
           ),
           const SizedBox(height: 16),
-          const Divider(color: Color(0xFFE2E8F0)),
+          Divider(color: colors.border),
           const SizedBox(height: 8),
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -1199,7 +1207,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                    Text('PKR ${(double.tryParse(price.toString()) ?? 0).toInt()}', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
-                  Text('Est. $time', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500)),
+                  Text('Est. $time', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500)),
                 ],
               ),
               if (status == 'pending' && context.read<AuthService>().role == 'customer')
@@ -1235,14 +1243,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  Widget _buildMapCard(double lat, double lng) {
+  Widget _buildMapCard(double lat, double lng, AppColors colors) {
     return Container(
       height: 200,
       width: double.infinity,
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(24),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
       ),
       child: ClipRRect(
         borderRadius: BorderRadius.circular(24),

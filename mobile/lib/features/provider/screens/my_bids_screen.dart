@@ -38,6 +38,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
   @override
   Widget build(BuildContext context) {
     final _allBids = context.watch<JobService>().providerBids;
+    final colors = Theme.of(context).appColors;
     
     final pendingCount = _allBids.where((b) {
       if (b['status'] == 'accepted') return false;
@@ -68,24 +69,24 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
     return DefaultTabController(
       length: 5,
       child: Scaffold(
-        backgroundColor: AppTheme.backgroundColor,
+        backgroundColor: colors.background,
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: colors.surface,
           scrolledUnderElevation: 0,
           elevation: 0,
           title: Text(
             'My Bids',
-            style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 22),
+            style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 22),
           ),
-          actions: const [
-            NotificationBell(color: AppTheme.textColor),
+          actions: [
+            NotificationBell(color: colors.text),
           ],
           bottom: TabBar(
             isScrollable: true,
             indicatorColor: AppTheme.primaryColor,
             indicatorWeight: 3,
             labelColor: AppTheme.primaryColor,
-            unselectedLabelColor: AppTheme.subtextColor,
+            unselectedLabelColor: colors.subtext,
             labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
             unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500, fontSize: 14),
             tabs: [
@@ -99,38 +100,38 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
         ),
         body: TabBarView(
           children: [
-            _buildBidsList(_allBids),
+            _buildBidsList(_allBids, colors),
             // Pending
             _buildBidsList(_allBids.where((b) {
               if (b['status'] == 'accepted') return false;
               final js = (b['job_status'] ?? 'open').toString().toLowerCase();
               return js == 'open' && b['status'] == 'pending';
-            }).toList()),
+            }).toList(), colors),
             // Active (in progress)
             _buildBidsList(_allBids.where((b) {
               if (b['status'] != 'accepted') return false;
               final js = (b['job_status'] ?? '').toString().toLowerCase();
               return js == 'active' || js == 'awaiting_confirmation';
-            }).toList()),
+            }).toList(), colors),
             // Completed
             _buildBidsList(_allBids.where((b) {
               if (b['status'] != 'accepted') return false;
               final js = (b['job_status'] ?? '').toString().toLowerCase();
               return js == 'completed';
-            }).toList()),
+            }).toList(), colors),
             // Availed (lost bids)
             _buildBidsList(_allBids.where((b) {
               if (b['status'] == 'accepted') return false;
               final js = (b['job_status'] ?? 'open').toString().toLowerCase();
               return js == 'active' || js == 'completed';
-            }).toList()),
+            }).toList(), colors),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildBidsList(List<dynamic> bids) {
+  Widget _buildBidsList(List<dynamic> bids, AppColors colors) {
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
     }
@@ -139,12 +140,12 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
-            Icon(Icons.assignment_outlined, size: 64, color: AppTheme.subtextColor.withOpacity(0.3)),
+            Icon(Icons.assignment_outlined, size: 64, color: colors.subtext.withOpacity(0.3)),
             const SizedBox(height: 16),
             Text(
               'No bids found',
               style: GoogleFonts.outfit(
-                color: AppTheme.subtextColor,
+                color: colors.subtext,
                 fontSize: 16,
                 fontWeight: FontWeight.w500,
               ),
@@ -163,11 +164,11 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
         return Container(
           margin: const EdgeInsets.only(bottom: 20),
           decoration: BoxDecoration(
-            color: Colors.white,
+            color: colors.surface,
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
               BoxShadow(
-                color: AppTheme.textColor.withOpacity(0.03),
+                color: colors.text.withOpacity(0.03),
                 blurRadius: 20,
                 offset: const Offset(0, 8),
               ),
@@ -184,45 +185,45 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                     Expanded(
                       child: Text(
                         bid['job_title'] ?? 'Unknown Job',
-                        style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: AppTheme.textColor),
+                        style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
                       ),
                     ),
                     const SizedBox(width: 8),
-                    _buildStatusBadge(bid),
+                    _buildStatusBadge(bid, colors),
                   ],
                 ),
                 const SizedBox(height: 10),
                 Text(
                   bid['cover_letter'] ?? 'No cover letter provided.',
-                  style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 13, height: 1.5),
+                  style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, height: 1.5),
                   maxLines: 2,
                   overflow: TextOverflow.ellipsis,
                 ),
                 const SizedBox(height: 16),
                 Row(
                   children: [
-                    const Icon(Icons.access_time, size: 14, color: AppTheme.subtextColor),
+                    Icon(Icons.access_time, size: 14, color: colors.subtext),
                     const SizedBox(width: 6),
                     Flexible(
                       child: Text(
                         bid['estimated_time'] ?? 'N/A',
-                        style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                        style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                         overflow: TextOverflow.ellipsis,
                       ),
                     ),
                     const SizedBox(width: 16),
                     Text(
                       'Submitted ',
-                      style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.w500),
+                      style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                     Text(
                       bid['created_at'] != null ? bid['created_at'].toString().split('T').first : 'Unknown',
-                      style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 12, fontWeight: FontWeight.bold),
+                      style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.bold),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
-                const Divider(color: Color(0xFFF1F5F9), height: 1),
+                Divider(color: colors.border, height: 1),
                 const SizedBox(height: 16),
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
@@ -232,7 +233,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                       children: [
                         Text(
                           'Your Bid',
-                          style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 11, fontWeight: FontWeight.w500),
+                          style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 2),
                         Text(
@@ -246,13 +247,13 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                       children: [
                         Text(
                           'Category',
-                          style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 11, fontWeight: FontWeight.w500),
+                          style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 2),
                         Text(
                           bid['category_name'] ?? 'N/A',
                           style: GoogleFonts.outfit(
-                            color: AppTheme.textColor,
+                            color: colors.text,
                             fontWeight: FontWeight.bold,
                             fontSize: 14,
                           ),
@@ -354,11 +355,11 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
     );
   }
 
-  Widget _buildStatusBadge(Map<String, dynamic> bid) {
+  Widget _buildStatusBadge(Map<String, dynamic> bid, AppColors colors) {
     String status = bid['status'] as String;
     final String jobStatus = (bid['job_status'] ?? 'open').toString().toLowerCase();
     
-    Color color = AppTheme.subtextColor;
+    Color color = colors.subtext;
     IconData icon = Icons.access_time_filled;
     String label = status;
 

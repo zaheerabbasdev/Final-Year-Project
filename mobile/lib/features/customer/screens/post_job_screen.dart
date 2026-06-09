@@ -255,20 +255,21 @@ class _PostJobScreenState extends State<PostJobScreen> {
   @override
   Widget build(BuildContext context) {
     final categories = context.watch<CategoryService>().categories;
+    final colors = Theme.of(context).appColors;
 
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         scrolledUnderElevation: 0,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textColor),
+          icon: Icon(Icons.arrow_back, color: colors.text),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Post a Job',
-          style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 20),
+          style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
       body: Column(
@@ -314,7 +315,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       contentPadding: EdgeInsets.zero,
                       title: Text(
                         'Budget is Negotiable',
-                        style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: AppTheme.textColor),
+                        style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: colors.text),
                       ),
                       value: _isNegotiable,
                       activeColor: AppTheme.primaryColor,
@@ -324,10 +325,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     Container(
                       padding: const EdgeInsets.all(16),
                       decoration: BoxDecoration(
-                        color: _isEmergency ? const Color(0xFFFEF2F2) : Colors.white,
+                        color: _isEmergency ? const Color(0xFFFEF2F2).withOpacity(0.1) : colors.surface,
                         borderRadius: BorderRadius.circular(20),
                         border: Border.all(
-                          color: _isEmergency ? AppTheme.errorColor.withOpacity(0.3) : const Color(0xFFE2E8F0),
+                          color: _isEmergency ? AppTheme.errorColor.withOpacity(0.3) : colors.border,
                           width: _isEmergency ? 1.5 : 1,
                         ),
                       ),
@@ -358,7 +359,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                               padding: const EdgeInsets.all(12),
                               margin: const EdgeInsets.only(top: 12),
                               decoration: BoxDecoration(
-                                color: Colors.white,
+                                color: colors.surface,
                                 borderRadius: BorderRadius.circular(12),
                                 border: Border.all(color: AppTheme.errorColor.withOpacity(0.15)),
                               ),
@@ -433,30 +434,32 @@ class _PostJobScreenState extends State<PostJobScreen> {
               ),
             ),
           ),
-          _buildFooter(),
+          _buildFooter(colors),
         ],
       ),
     );
   }
 
   Widget _buildSectionHeader(String title) {
+    final colors = Theme.of(context).appColors;
     return Padding(
       padding: const EdgeInsets.only(bottom: 8),
       child: Text(
         title,
-        style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: AppTheme.textColor),
+        style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w700, color: colors.text),
       ),
     );
   }
 
   Widget _buildTextField(TextEditingController controller, String hint, {int maxLines = 1, bool isNumber = false, Widget? prefix, Widget? suffix, bool readOnly = false, VoidCallback? onTap}) {
+    final colors = Theme.of(context).appColors;
     return TextFormField(
       controller: controller,
       maxLines: maxLines,
       readOnly: readOnly,
       onTap: onTap,
       keyboardType: isNumber ? TextInputType.number : TextInputType.text,
-      style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
+      style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
       decoration: InputDecoration(
         hintText: hint,
         prefixIcon: prefix,
@@ -467,9 +470,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Widget _buildDropdownField(List<dynamic> categories) {
+    final colors = Theme.of(context).appColors;
     return DropdownButtonFormField<int>(
       value: _selectedCategoryId,
-      style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
+      style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
       decoration: const InputDecoration(hintText: 'Select a category'),
       isExpanded: true,
       items: categories.map<DropdownMenuItem<int>>((cat) {
@@ -484,6 +488,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Widget _buildPickerField(String value, IconData icon, VoidCallback onTap) {
+    final colors = Theme.of(context).appColors;
     final hasVal = value.contains('/') || value.contains(':');
     return InkWell(
       onTap: onTap,
@@ -492,9 +497,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
         height: 54,
         padding: const EdgeInsets.symmetric(horizontal: 16),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: colors.surface,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(color: const Color(0xFFE2E8F0)),
+          border: Border.all(color: colors.border),
         ),
         child: Row(
           children: [
@@ -506,7 +511,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 maxLines: 1,
                 overflow: TextOverflow.ellipsis,
                 style: GoogleFonts.outfit(
-                  color: hasVal ? AppTheme.textColor : AppTheme.subtextColor,
+                  color: hasVal ? colors.text : colors.subtext,
                   fontSize: 15,
                   fontWeight: hasVal ? FontWeight.w500 : FontWeight.normal,
                 ),
@@ -569,9 +574,9 @@ class _PostJobScreenState extends State<PostJobScreen> {
             width: double.infinity,
             height: 100,
             decoration: BoxDecoration(
-              color: Colors.white,
+              color: Theme.of(context).appColors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: const Color(0xFFE2E8F0)),
+              border: Border.all(color: Theme.of(context).appColors.border),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -585,7 +590,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 Text(
                   _images.length >= 6 ? 'Maximum 6 images reached' : 'Add Project Images',
                   style: GoogleFonts.outfit(
-                    color: _images.length >= 6 ? AppTheme.subtextColor.withOpacity(0.5) : AppTheme.textColor,
+                    color: _images.length >= 6 ? Theme.of(context).appColors.subtext.withOpacity(0.5) : Theme.of(context).appColors.text,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
@@ -593,7 +598,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 const SizedBox(height: 2),
                 Text(
                   '(${_images.length}/6 items)',
-                  style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontSize: 11),
+                  style: GoogleFonts.outfit(color: Theme.of(context).appColors.subtext, fontSize: 11),
                 ),
               ],
             ),
@@ -603,14 +608,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
     );
   }
 
-  Widget _buildFooter() {
+  Widget _buildFooter(AppColors colors) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.05),
+            color: colors.text.withOpacity(0.05),
             blurRadius: 10,
             offset: const Offset(0, -4),
           ),
