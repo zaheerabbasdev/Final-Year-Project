@@ -10,6 +10,7 @@ class ReviewCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     final customerName = review['customer_name'] ?? 'Unknown User';
     final avatarUrl = ApiClient.getImageUrl(review['customer_avatar']);
     final initial = customerName.isNotEmpty ? customerName[0].toUpperCase() : '?';
@@ -25,12 +26,12 @@ class ReviewCard extends StatelessWidget {
       margin: const EdgeInsets.only(bottom: 16),
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: colors.surface,
         borderRadius: BorderRadius.circular(20),
-        border: Border.all(color: const Color(0xFFE2E8F0)),
+        border: Border.all(color: colors.border),
         boxShadow: [
           BoxShadow(
-            color: AppTheme.textColor.withOpacity(0.02),
+            color: colors.text.withOpacity(0.02),
             blurRadius: 15,
             offset: const Offset(0, 5),
           ),
@@ -64,7 +65,7 @@ class ReviewCard extends StatelessWidget {
                       customerName,
                       style: GoogleFonts.outfit(
                         fontWeight: FontWeight.bold,
-                        color: AppTheme.textColor,
+                        color: colors.text,
                         fontSize: 15,
                       ),
                     ),
@@ -72,7 +73,7 @@ class ReviewCard extends StatelessWidget {
                     Text(
                       dateStr,
                       style: GoogleFonts.outfit(
-                        color: AppTheme.subtextColor,
+                        color: colors.subtext,
                         fontSize: 12,
                         fontWeight: FontWeight.w500,
                       ),
@@ -84,7 +85,7 @@ class ReviewCard extends StatelessWidget {
                 children: List.generate(5, (index) {
                   return Icon(
                     index < rating ? Icons.star_rounded : Icons.star_outline_rounded,
-                    color: index < rating ? AppTheme.warningColor : const Color(0xFFE2E8F0),
+                    color: index < rating ? AppTheme.warningColor : colors.border,
                     size: 18,
                   );
                 }),
@@ -96,7 +97,7 @@ class ReviewCard extends StatelessWidget {
             Text(
               review['comment'],
               style: GoogleFonts.outfit(
-                color: AppTheme.textColor.withOpacity(0.8),
+                color: colors.text.withOpacity(0.8),
                 fontSize: 14,
                 height: 1.4,
               ),

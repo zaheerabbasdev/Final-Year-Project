@@ -174,7 +174,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   backgroundImage: avatarUrl != null 
                     ? NetworkImage(avatarUrl) as ImageProvider
                     : const NetworkImage('https://i.pravatar.cc/150?u=mike'),
-                  backgroundColor: const Color(0xFFF1F5F9),
+                  backgroundColor: Theme.of(context).appColors.card,
                 ),
               ),
               Positioned(
@@ -237,7 +237,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           const SizedBox(height: 8),
           Text(
             value,
-            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text),
             maxLines: 1,
             overflow: TextOverflow.ellipsis,
           ),
@@ -262,15 +262,15 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       skillsList = [skills];
     }
 
-    if (skillsList.isEmpty) return const Text('No skills listed', style: TextStyle(color: Color(0xFF94A3B8), fontStyle: FontStyle.italic));
+    if (skillsList.isEmpty) return Text('No skills listed', style: TextStyle(color: Theme.of(context).appColors.subtext, fontStyle: FontStyle.italic));
 
     return Wrap(
       spacing: 8,
       runSpacing: 8,
       children: skillsList.map((skill) => Container(
         padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-        decoration: BoxDecoration(color: const Color(0xFFF1F5F9), borderRadius: BorderRadius.circular(12)),
-        child: Text(skill, style: const TextStyle(color: Color(0xFF475569), fontSize: 12, fontWeight: FontWeight.w600)),
+        decoration: BoxDecoration(color: Theme.of(context).appColors.card, borderRadius: BorderRadius.circular(12)),
+        child: Text(skill, style: TextStyle(color: Theme.of(context).appColors.text, fontSize: 12, fontWeight: FontWeight.w600)),
       )).toList(),
     );
   }
@@ -282,10 +282,10 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            const Text('Reviews', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Color(0xFF1E293B))),
+            Text('Reviews', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text)),
             TextButton(
               onPressed: () => context.push('/provider-reviews/${widget.providerId}'),
-              child: const Text('View All', style: TextStyle(color: Color(0xFF6366F1))),
+              child: Text('View All', style: TextStyle(color: Theme.of(context).appColors.text, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -301,11 +301,12 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               return Container(
                 padding: const EdgeInsets.all(24),
                 decoration: BoxDecoration(
-                  color: const Color(0xFFF8FAFC),
+                  color: Theme.of(context).appColors.surface,
                   borderRadius: BorderRadius.circular(20),
+                  border: Border.all(color: Theme.of(context).appColors.border),
                 ),
-                child: const Center(
-                  child: Text('No reviews yet', style: TextStyle(color: Color(0xFF94A3B8))),
+                child: Center(
+                  child: Text('No reviews yet', style: TextStyle(color: Theme.of(context).appColors.subtext)),
                 ),
               );
             }

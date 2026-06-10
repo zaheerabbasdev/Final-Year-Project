@@ -108,21 +108,22 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
   Widget build(BuildContext context) {
     final avatarUrl = ApiClient.getImageUrl(widget.providerAvatar);
     final isSubmitting = context.watch<ReviewService>().isLoading;
+    final colors = Theme.of(context).appColors;
 
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
         scrolledUnderElevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.close_rounded, color: AppTheme.textColor),
+          icon: Icon(Icons.close_rounded, color: colors.text),
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
           'Leave a Review',
           style: GoogleFonts.outfit(
-            color: AppTheme.textColor,
+            color: colors.text,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -151,7 +152,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
             Text(
               'How was your experience with',
               style: GoogleFonts.outfit(
-                color: AppTheme.subtextColor,
+                color: colors.subtext,
                 fontSize: 15,
                 fontWeight: FontWeight.w500,
               ),
@@ -160,7 +161,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
             Text(
               widget.providerName,
               style: GoogleFonts.outfit(
-                color: AppTheme.textColor,
+                color: colors.text,
                 fontSize: 24,
                 fontWeight: FontWeight.bold,
               ),
@@ -175,7 +176,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                     padding: const EdgeInsets.symmetric(horizontal: 4),
                     child: Icon(
                       index < _rating ? Icons.star_rounded : Icons.star_outline_rounded,
-                      color: index < _rating ? AppTheme.warningColor : const Color(0xFFE2E8F0),
+                      color: index < _rating ? AppTheme.warningColor : colors.border,
                       size: 44,
                     ),
                   ),
@@ -187,7 +188,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
               _getRatingLabel(_rating),
               style: GoogleFonts.outfit(
                 fontSize: 16,
-                color: _rating > 0 ? AppTheme.secondaryColor : AppTheme.subtextColor,
+                color: _rating > 0 ? AppTheme.secondaryColor : colors.subtext,
                 fontWeight: FontWeight.bold,
               ),
             ),
@@ -195,19 +196,19 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
             TextField(
               controller: _commentController,
               maxLines: 5,
-              style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
+              style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
               decoration: InputDecoration(
                 hintText: 'Share details of your experience...',
-                hintStyle: GoogleFonts.outfit(color: const Color(0xFF94A3B8)),
+                hintStyle: GoogleFonts.outfit(color: colors.subtext),
                 filled: true,
-                fillColor: const Color(0xFFF8FAFC),
+                fillColor: colors.card,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                  borderSide: BorderSide(color: colors.border, width: 1),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0), width: 1),
+                  borderSide: BorderSide(color: colors.border, width: 1),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(16),

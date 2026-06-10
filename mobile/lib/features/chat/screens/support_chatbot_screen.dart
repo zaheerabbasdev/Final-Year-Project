@@ -94,14 +94,15 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: AppTheme.backgroundColor,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         scrolledUnderElevation: 0,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: AppTheme.textColor),
+          icon: Icon(Icons.arrow_back, color: colors.text),
           onPressed: () => Navigator.pop(context),
         ),
         title: Row(
@@ -120,7 +121,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
               children: [
                 Text(
                   'Kaarkun AI Support',
-                  style: GoogleFonts.outfit(color: AppTheme.textColor, fontWeight: FontWeight.bold, fontSize: 16),
+                  style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 Text(
                   'Always Online',
@@ -141,7 +142,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
               itemBuilder: (context, index) {
                 final msg = _messages[index];
                 final isUser = msg['role'] == 'user';
-                return _buildMessageBubble(msg['content'] as String, isUser);
+                return _buildMessageBubble(msg['content'] as String, isUser, colors);
               },
             ),
           ),
@@ -152,19 +153,19 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
                 children: [
                   Text(
                     'AI Support is typing...',
-                    style: GoogleFonts.outfit(fontSize: 12, color: AppTheme.subtextColor, fontStyle: FontStyle.italic),
+                    style: GoogleFonts.outfit(fontSize: 12, color: colors.subtext, fontStyle: FontStyle.italic),
                   ),
                 ],
               ),
             ),
-          if (_messages.length == 1 && !_isWriting) _buildSuggestionsRow(),
-          _buildInputBar(),
+          if (_messages.length == 1 && !_isWriting) _buildSuggestionsRow(colors),
+          _buildInputBar(colors),
         ],
       ),
     );
   }
 
-  Widget _buildMessageBubble(String content, bool isUser) {
+  Widget _buildMessageBubble(String content, bool isUser, AppColors colors) {
     return Align(
       alignment: isUser ? Alignment.centerRight : Alignment.centerLeft,
       child: Container(
@@ -172,7 +173,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
         padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         constraints: BoxConstraints(maxWidth: MediaQuery.of(context).size.width * 0.75),
         decoration: BoxDecoration(
-          color: isUser ? AppTheme.primaryColor : Colors.white,
+          color: isUser ? AppTheme.primaryColor : colors.surface,
           borderRadius: BorderRadius.only(
             topLeft: const Radius.circular(20),
             topRight: const Radius.circular(20),
@@ -181,7 +182,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
           ),
           boxShadow: [
             BoxShadow(
-              color: AppTheme.textColor.withOpacity(0.02),
+              color: colors.text.withOpacity(0.02),
               blurRadius: 10,
               offset: const Offset(0, 4),
             ),
@@ -190,7 +191,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
         child: Text(
           content,
           style: GoogleFonts.outfit(
-            color: isUser ? Colors.white : AppTheme.textColor,
+            color: isUser ? Colors.white : colors.text,
             fontSize: 14,
             height: 1.4,
           ),
@@ -199,7 +200,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
     );
   }
 
-  Widget _buildSuggestionsRow() {
+  Widget _buildSuggestionsRow(AppColors colors) {
     return Container(
       height: 48,
       margin: const EdgeInsets.only(bottom: 12),
@@ -212,13 +213,13 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
           return Padding(
             padding: const EdgeInsets.only(right: 8),
             child: ActionChip(
-              backgroundColor: Colors.white,
+              backgroundColor: colors.surface,
               surfaceTintColor: Colors.transparent,
-              side: const BorderSide(color: Color(0xFFE2E8F0)),
+              side: BorderSide(color: colors.border),
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
               label: Text(
                 suggestion,
-                style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 13, fontWeight: FontWeight.bold),
+                style: GoogleFonts.outfit(color: colors.text, fontSize: 13, fontWeight: FontWeight.bold),
               ),
               onPressed: () => _sendMessage(suggestion),
             ),
@@ -228,31 +229,31 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
     );
   }
 
-  Widget _buildInputBar() {
+  Widget _buildInputBar(AppColors colors) {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(top: BorderSide(color: Color(0xFFF1F5F9))),
+      decoration: BoxDecoration(
+        color: colors.surface,
+        border: Border(top: BorderSide(color: colors.border)),
       ),
       child: Row(
         children: [
           Expanded(
             child: TextField(
               controller: _messageController,
-              style: GoogleFonts.outfit(color: AppTheme.textColor, fontSize: 15),
+              style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
               decoration: InputDecoration(
                 hintText: 'Ask anything...',
-                hintStyle: GoogleFonts.outfit(color: AppTheme.subtextColor.withOpacity(0.7)),
+                hintStyle: GoogleFonts.outfit(color: colors.subtext.withOpacity(0.7)),
                 filled: true,
-                fillColor: const Color(0xFFF9FAFB),
+                fillColor: colors.card,
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  borderSide: BorderSide(color: colors.border),
                 ),
                 enabledBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),
-                  borderSide: const BorderSide(color: Color(0xFFE2E8F0)),
+                  borderSide: BorderSide(color: colors.border),
                 ),
                 focusedBorder: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(20),

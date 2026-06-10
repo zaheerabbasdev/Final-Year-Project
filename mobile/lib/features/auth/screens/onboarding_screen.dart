@@ -21,26 +21,38 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
       'title': 'Find Expert Help\nFor Your Home',
       'description': 'From plumbing to electrical work, find verified professionals for all your service needs.',
       'icon': Icons.search_rounded,
-      'themeColor': AppTheme.primaryColor,
     },
     {
       'title': 'Real-time Tracking\n& Live Updates',
       'description': 'Track your service provider in real-time and get instant updates on your booking status.',
       'icon': Icons.location_on_rounded,
-      'themeColor': AppTheme.secondaryColor,
     },
     {
       'title': 'Secure Payments\n& Quality Work',
       'description': 'Pay securely through the app and only when the job is done to your satisfaction.',
       'icon': Icons.verified_user_rounded,
-      'themeColor': AppTheme.warningColor,
     },
   ];
 
+  Color _getThemeColor(int index) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    if (index == 0) {
+      return isDark ? const Color(0xFF38BDF8) : AppTheme.primaryColor;
+    }
+    if (index == 1) {
+      return AppTheme.secondaryColor;
+    }
+    return AppTheme.warningColor;
+  }
+
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final themeColor = _getThemeColor(_currentPage);
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.background,
       body: Stack(
         children: [
           // Background Gradient Blobs
@@ -53,7 +65,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               height: 400,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _pages[_currentPage]['themeColor'].withOpacity(0.05),
+                color: themeColor.withOpacity(isDark ? 0.08 : 0.05),
               ),
             ),
           ),
@@ -66,7 +78,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
               height: 500,
               decoration: BoxDecoration(
                 shape: BoxShape.circle,
-                color: _pages[_currentPage]['themeColor'].withOpacity(0.03),
+                color: themeColor.withOpacity(isDark ? 0.05 : 0.03),
               ),
             ),
           ),
@@ -85,10 +97,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                           Container(
                             padding: const EdgeInsets.all(8),
                             decoration: BoxDecoration(
-                              color: AppTheme.primaryColor.withOpacity(0.1),
+                              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            child: const Icon(Icons.business_center_rounded, size: 20, color: AppTheme.primaryColor),
+                            child: Icon(
+                              Icons.business_center_rounded, 
+                              size: 20, 
+                              color: Theme.of(context).colorScheme.primary,
+                            ),
                           ),
                           const SizedBox(width: 12),
                           Text(
@@ -96,7 +112,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                             style: GoogleFonts.outfit(
                               fontSize: 18,
                               fontWeight: FontWeight.bold,
-                              color: AppTheme.textColor,
+                              color: colors.text,
                               letterSpacing: -0.5,
                             ),
                           ),
@@ -107,7 +123,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                         child: Text(
                           'Skip',
                           style: GoogleFonts.outfit(
-                            color: AppTheme.subtextColor,
+                            color: colors.subtext,
                             fontWeight: FontWeight.w600,
                           ),
                         ),
@@ -123,6 +139,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                     itemCount: _pages.length,
                     onPageChanged: (index) => setState(() => _currentPage = index),
                     itemBuilder: (context, index) {
+                      final pageThemeColor = _getThemeColor(index);
                       return Center(
                         child: SingleChildScrollView(
                           padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 16),
@@ -141,18 +158,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       _pages[index]['icon'],
                                       key: ValueKey('icon_$index'),
                                       size: 200,
-                                      color: _pages[index]['themeColor'].withOpacity(0.05),
+                                      color: pageThemeColor.withOpacity(isDark ? 0.08 : 0.05),
                                     ),
                                   ),
                                   // Main Logo
                                   Container(
                                     padding: const EdgeInsets.all(30),
                                     decoration: BoxDecoration(
-                                      color: Colors.white,
+                                      color: colors.surface,
                                       shape: BoxShape.circle,
                                       boxShadow: [
                                         BoxShadow(
-                                          color: _pages[index]['themeColor'].withOpacity(0.15),
+                                          color: pageThemeColor.withOpacity(isDark ? 0.25 : 0.15),
                                           blurRadius: 40,
                                           spreadRadius: 5,
                                         ),
@@ -180,7 +197,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       style: GoogleFonts.outfit(
                                         fontSize: 32,
                                         fontWeight: FontWeight.w800,
-                                        color: AppTheme.textColor,
+                                        color: colors.text,
                                         height: 1.2,
                                       ),
                                     ),
@@ -190,7 +207,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.outfit(
                                         fontSize: 16,
-                                        color: AppTheme.subtextColor,
+                                        color: colors.subtext,
                                         height: 1.6,
                                       ),
                                     ),
@@ -215,18 +232,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       Row(
                         children: List.generate(
                           _pages.length,
-                          (index) => AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            margin: const EdgeInsets.only(right: 8),
-                            height: 8,
-                            width: _currentPage == index ? 24 : 8,
-                            decoration: BoxDecoration(
-                              color: _currentPage == index 
-                                  ? _pages[index]['themeColor'] 
-                                  : _pages[index]['themeColor'].withOpacity(0.2),
-                              borderRadius: BorderRadius.circular(4),
-                            ),
-                          ),
+                          (index) {
+                            final dotColor = _getThemeColor(index);
+                            return AnimatedContainer(
+                              duration: const Duration(milliseconds: 300),
+                              margin: const EdgeInsets.only(right: 8),
+                              height: 8,
+                              width: _currentPage == index ? 24 : 8,
+                              decoration: BoxDecoration(
+                                color: _currentPage == index 
+                                    ? dotColor 
+                                    : dotColor.withOpacity(isDark ? 0.3 : 0.2),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                            );
+                          },
                         ),
                       ),
 
@@ -251,19 +271,19 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               child: CircularProgressIndicator(
                                 value: (_currentPage + 1) / _pages.length,
                                 strokeWidth: 3,
-                                backgroundColor: _pages[_currentPage]['themeColor'].withOpacity(0.1),
-                                valueColor: AlwaysStoppedAnimation<Color>(_pages[_currentPage]['themeColor']),
+                                backgroundColor: themeColor.withOpacity(isDark ? 0.15 : 0.1),
+                                valueColor: AlwaysStoppedAnimation<Color>(themeColor),
                               ),
                             ),
                             Container(
                               width: 54,
                               height: 54,
                               decoration: BoxDecoration(
-                                color: _pages[_currentPage]['themeColor'],
+                                color: themeColor,
                                 shape: BoxShape.circle,
                                 boxShadow: [
                                   BoxShadow(
-                                    color: _pages[_currentPage]['themeColor'].withOpacity(0.4),
+                                    color: themeColor.withOpacity(isDark ? 0.5 : 0.4),
                                     blurRadius: 10,
                                     offset: const Offset(0, 4),
                                   ),

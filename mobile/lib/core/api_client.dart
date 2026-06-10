@@ -5,7 +5,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://10.31.204.234:5000/api'; 
+  static const String baseUrl = 'http://10.64.254.234:5000/api'; 
   // static const String baseUrl = 'http://127.0.0.1:5000/api'; 
   
   static final ApiClient _instance = ApiClient._internal();

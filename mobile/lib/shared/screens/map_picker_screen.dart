@@ -2,6 +2,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../core/services/location_service.dart';
+import '../../core/theme.dart';
 
 class MapPickerScreen extends StatefulWidget {
   final LatLng? initialLocation;
@@ -159,19 +160,20 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final colors = Theme.of(context).appColors;
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: colors.background,
       appBar: AppBar(
-        backgroundColor: Colors.white,
+        backgroundColor: colors.surface,
         elevation: 0,
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Color(0xFF1E293B)),
+          icon: Icon(Icons.arrow_back, color: colors.text),
           onPressed: () => Navigator.pop(context),
         ),
-        title: const Text(
+        title: Text(
           'Select Location',
           style: TextStyle(
-            color: Color(0xFF1E293B),
+            color: colors.text,
             fontWeight: FontWeight.bold,
             fontSize: 18,
           ),
@@ -187,7 +189,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                 padding: const EdgeInsets.fromLTRB(16, 8, 16, 0),
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.white,
+                    color: colors.surface,
                     borderRadius: BorderRadius.circular(12),
                     border: Border.all(color: const Color(0xFF6366F1), width: 1.5),
                     boxShadow: [
@@ -202,8 +204,8 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                     controller: _searchController,
                     decoration: InputDecoration(
                       hintText: 'Search for a place...',
-                      hintStyle: const TextStyle(
-                        color: Color(0xFF94A3B8),
+                      hintStyle: TextStyle(
+                        color: colors.subtext,
                         fontSize: 15,
                       ),
                       border: InputBorder.none,
@@ -272,12 +274,12 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                   child: Row(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Text(
+                      Text(
                         'Address: ',
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
-                          color: Color(0xFF1E293B),
+                          color: colors.text,
                         ),
                       ),
                       Expanded(
@@ -285,9 +287,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                           _isLoadingAddress 
                               ? 'Fetching address...' 
                               : (_currentAddress ?? 'Determining location...'),
-                          style: const TextStyle(
+                          style: TextStyle(
                             fontSize: 14,
-                            color: Color(0xFF475569),
+                            color: colors.text,
                             height: 1.4,
                           ),
                         ),
@@ -331,7 +333,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                       left: 12,
                       child: Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: colors.surface,
                           borderRadius: BorderRadius.circular(8),
                           boxShadow: [
                             BoxShadow(
@@ -360,7 +362,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                           width: 48,
                           height: 48,
                           decoration: BoxDecoration(
-                            color: Colors.white,
+                            color: colors.surface,
                             shape: BoxShape.circle,
                             boxShadow: [
                               BoxShadow(
@@ -434,7 +436,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
               child: Container(
                 constraints: const BoxConstraints(maxHeight: 300),
                 decoration: BoxDecoration(
-                  color: Colors.white,
+                  color: colors.surface,
                   borderRadius: BorderRadius.circular(12),
                   boxShadow: [
                     BoxShadow(

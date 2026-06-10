@@ -140,7 +140,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
                 backgroundColor: Theme.of(context).appColors.card,
                 backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
                 child: avatarUrl == null 
-                    ? Text(initials, style: const TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Color(0xFF6366F1)))
+                    ? Text(initials, style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text))
                     : null,
               ),
             ),
@@ -156,7 +156,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       children: [
         Text(
           _customer!['full_name'] ?? 'Unknown Client',
-          style: const TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color(0xFF1E293B)),
+          style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text),
         ),
         const SizedBox(height: 8),
         Row(

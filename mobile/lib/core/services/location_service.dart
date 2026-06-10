@@ -3,10 +3,11 @@ import 'package:flutter/material.dart' show debugPrint;
 import 'package:dio/dio.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import '../api_client.dart';
 
 /// All geocoding goes through our own backend proxy at /api/geocode
 /// Now using Google Maps Platform APIs for 100% Google Maps functionality.
-const _kGeoProxyBase = 'http://127.0.0.1:5000/api/geocode';
+final String _kGeoProxyBase = '${ApiClient.baseUrl}/geocode';
 
 class LocationService {
   final Dio _dio = Dio(BaseOptions(
