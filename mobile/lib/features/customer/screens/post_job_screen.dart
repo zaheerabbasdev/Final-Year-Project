@@ -37,6 +37,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   final ImagePicker _picker = ImagePicker();
 
   Future<void> _autocompleteDescription() async {
+    final colors = Theme.of(context).appColors;
     final title = _titleController.text.trim();
     final desc = _descController.text.trim();
 
@@ -54,7 +55,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text('Please enter a Job Title or description first so AI can generate details.', style: GoogleFonts.outfit()),
-          backgroundColor: AppTheme.textColor,
+          backgroundColor: colors.text,
         ),
       );
       return;
@@ -160,6 +161,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Future<void> _pickDate() async {
+    final colors = Theme.of(context).appColors;
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -168,10 +170,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppTheme.primaryColor,
               onPrimary: Colors.white,
-              onSurface: AppTheme.textColor,
+              onSurface: colors.text,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -187,16 +189,17 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Future<void> _pickTime() async {
+    final colors = Theme.of(context).appColors;
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: const ColorScheme.light(
+            colorScheme: ColorScheme.light(
               primary: AppTheme.primaryColor,
               onPrimary: Colors.white,
-              onSurface: AppTheme.textColor,
+              onSurface: colors.text,
             ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
@@ -308,7 +311,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       _budgetController,
                       'Enter your budget',
                       isNumber: true,
-                      prefix: const Icon(Icons.attach_money, size: 20, color: AppTheme.subtextColor),
+                      prefix: Icon(Icons.attach_money, size: 20, color: colors.subtext),
                     ),
                     const SizedBox(height: 8),
                     SwitchListTile(
@@ -349,7 +352,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                               'Skip bidding. The first provider to accept will be hired immediately.',
                               style: GoogleFonts.outfit(fontSize: 12, color: AppTheme.errorColor.withOpacity(0.8), height: 1.3),
                             ),
-                            secondary: Icon(Icons.bolt, color: _isEmergency ? AppTheme.errorColor : AppTheme.subtextColor),
+                            secondary: Icon(Icons.bolt, color: _isEmergency ? AppTheme.errorColor : colors.subtext),
                             value: _isEmergency,
                             activeColor: AppTheme.errorColor,
                             onChanged: (v) => setState(() => _isEmergency = v),
@@ -503,7 +506,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: AppTheme.subtextColor),
+            Icon(icon, size: 20, color: colors.subtext),
             const SizedBox(width: 12),
             Expanded(
               child: Text(
@@ -524,6 +527,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Widget _buildImageUpload() {
+    final colors = Theme.of(context).appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -574,16 +578,16 @@ class _PostJobScreenState extends State<PostJobScreen> {
             width: double.infinity,
             height: 100,
             decoration: BoxDecoration(
-              color: Theme.of(context).appColors.surface,
+              color: colors.surface,
               borderRadius: BorderRadius.circular(20),
-              border: Border.all(color: Theme.of(context).appColors.border),
+              border: Border.all(color: colors.border),
             ),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Icon(
                   Icons.add_photo_alternate_outlined,
-                  color: _images.length >= 6 ? AppTheme.subtextColor.withOpacity(0.5) : AppTheme.primaryColor,
+                  color: _images.length >= 6 ? colors.subtext.withOpacity(0.5) : AppTheme.primaryColor,
                   size: 28,
                 ),
                 const SizedBox(height: 6),
@@ -628,7 +632,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
               onPressed: () => Navigator.pop(context),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontWeight: FontWeight.bold, fontSize: 16),
+                style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
           ),

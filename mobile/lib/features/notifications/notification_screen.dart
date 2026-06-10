@@ -238,7 +238,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
               style: GoogleFonts.outfit(
                 fontSize: 20,
                 fontWeight: FontWeight.bold,
-                color: AppTheme.textColor,
+                color: colors.text,
               ),
             ),
             const SizedBox(height: 12),
@@ -305,6 +305,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   }
 
   Color _getTypeColor(String type) {
+    final colors = Theme.of(context).appColors;
     switch (type) {
       case 'new_bid':
         return AppTheme.warningColor;
@@ -317,7 +318,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       case 'new_job_posted':
         return Colors.teal;
       default:
-        return AppTheme.subtextColor;
+        return colors.subtext;
     }
   }
 

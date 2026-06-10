@@ -397,10 +397,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             backgroundColor: Colors.white,
                             surfaceTintColor: Colors.transparent,
                             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                            title: Text('Accept Emergency Job?', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.textColor)),
-                            content: Text('By accepting this emergency request, you agree to arrive at the customer\'s location as soon as possible.', style: GoogleFonts.outfit(color: AppTheme.subtextColor)),
+                            title: Text('Accept Emergency Job?', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text)),
+                            content: Text('By accepting this emergency request, you agree to arrive at the customer\'s location as soon as possible.', style: GoogleFonts.outfit(color: Theme.of(context).appColors.subtext)),
                             actions: [
-                              TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: GoogleFonts.outfit(color: AppTheme.subtextColor, fontWeight: FontWeight.bold))),
+                              TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: GoogleFonts.outfit(color: Theme.of(context).appColors.subtext, fontWeight: FontWeight.bold))),
                               ElevatedButton(
                                 onPressed: () => Navigator.pop(context, true),
                                 style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
