@@ -31,6 +31,7 @@ import 'shared/screens/provider_profile_screen.dart';
 import 'shared/screens/customer_profile_screen.dart';
 import 'shared/screens/submit_review_screen.dart';
 import 'shared/screens/qr_handshake_screen.dart';
+import 'shared/screens/settings_screen.dart';
 import 'features/notifications/notification_screen.dart';
 import 'features/notifications/notification_provider.dart';
 import 'core/services/socket_service.dart';
@@ -91,57 +92,15 @@ class KaarkunApp extends StatefulWidget {
 
 class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
   bool? _wasAuthenticated;
+  late final GoRouter _router;
 
   @override
-
   void initState() {
     super.initState();
     WidgetsBinding.instance.addObserver(this);
-  }
 
-  @override
-  void dispose() {
-    WidgetsBinding.instance.removeObserver(this);
-    super.dispose();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState state) {
-    if (state == AppLifecycleState.resumed) {
-      // Trigger global sync when app returns from background
-      final syncProvider = context.read<SyncProvider>();
-      syncProvider.syncAll(context);
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    final authService = context.watch<AuthService>();
-    final themeProvider = context.watch<ThemeProvider>();
-    final socketService = context.read<SocketService>();
-    final notificationProvider = context.read<NotificationProvider>();
-    final syncProvider = context.read<SyncProvider>();
-
-    // Initial sync and re-sync on login
-    if (authService.isAuthenticated && _wasAuthenticated != true) {
-      _wasAuthenticated = true;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        syncProvider.syncAll(context);
-      });
-    } else if (!authService.isAuthenticated) {
-      _wasAuthenticated = false;
-    }
-
-    // Connect socket if authenticated
-
-    if (authService.isAuthenticated && authService.user != null) {
-      socketService.connect(authService.user!['id']);
-    } else {
-      socketService.disconnect();
-    }
-
-
-    final router = GoRouter(
+    final authService = context.read<AuthService>();
+    _router = GoRouter(
       navigatorKey: navigatorKey,
       initialLocation: '/splash',
       refreshListenable: authService,
@@ -191,6 +150,10 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
             final bool editMode = state.extra is bool ? state.extra as bool : false;
             return ProfileScreen(initialEditMode: editMode);
           }
+        ),
+        GoRoute(
+          path: '/settings',
+          builder: (context, state) => const SettingsScreen(),
         ),
         GoRoute(path: '/main', builder: (context, state) => const MainNavigationScreen()),
         GoRoute(
@@ -272,6 +235,48 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
         ),
       ],
     );
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    if (state == AppLifecycleState.resumed) {
+      // Trigger global sync when app returns from background
+      final syncProvider = context.read<SyncProvider>();
+      syncProvider.syncAll(context);
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final authService = context.watch<AuthService>();
+    final themeProvider = context.watch<ThemeProvider>();
+    final socketService = context.read<SocketService>();
+    final notificationProvider = context.read<NotificationProvider>();
+    final syncProvider = context.read<SyncProvider>();
+
+    // Initial sync and re-sync on login
+    if (authService.isAuthenticated && _wasAuthenticated != true) {
+      _wasAuthenticated = true;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        syncProvider.syncAll(context);
+      });
+    } else if (!authService.isAuthenticated) {
+      _wasAuthenticated = false;
+    }
+
+    // Connect socket if authenticated
+
+    if (authService.isAuthenticated && authService.user != null) {
+      socketService.connect(authService.user!['id']);
+    } else {
+      socketService.disconnect();
+    }
 
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
@@ -279,7 +284,7 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
-      routerConfig: router,
+      routerConfig: _router,
     );
   }
 }
