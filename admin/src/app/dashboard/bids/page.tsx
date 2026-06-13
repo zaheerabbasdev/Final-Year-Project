@@ -35,7 +35,7 @@ export default function BidsPage() {
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
         <div>
-          <h2 className="text-2xl font-bold text-slate-900">Marketplace Bids</h2>
+          <h2 className="text-2xl font-bold text-[var(--text)]">Marketplace Bids</h2>
           <p className="text-sm text-slate-500 mt-1">Track your bid activity and vendor responses.</p>
         </div>
         <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">
@@ -54,7 +54,7 @@ export default function BidsPage() {
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[var(--border-color)]">
             {loading ? (
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
             ) : (

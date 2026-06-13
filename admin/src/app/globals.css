@@ -2,7 +2,7 @@
 
 :root {
   --background: #F5F7FB;
-  --foreground: #0F172A;
+  --foreground: #1E293B;
   --surface: #FFFFFF;
   --primary: #003B95;
   --secondary: #0A84FF;
@@ -11,7 +11,94 @@
   --danger: #EF4444;
   --success: #2ECC71;
   --radius: 28px;
+  --border-color: #E2E8F0;
+  --card-bg: #F8FAFC;
 }
+
+.dark {
+  --background: #0B0F19; /* Deeper premium background */
+  --foreground: #FFFFFF; /* Crisp white foreground */
+  --surface: #1E293B;
+  --primary: #6366F1; /* Dynamic premium purple-indigo for dark mode */
+  --secondary: #818CF8;
+  --text: #FFFFFF; /* Pure white text for headings/important content */
+  --subtext: #94A3B8; /* Muted contrast text */
+  --danger: #EF4444;
+  --success: #2ECC71;
+  --border-color: rgba(255, 255, 255, 0.04); /* Extremely light border for dark mode */
+  --card-bg: #151D30; /* Premium dark card background */
+}
+
+/* Override static tailwind utility colors in dark mode to ensure text legibility */
+.dark .text-slate-900,
+.dark .text-slate-800,
+.dark .text-slate-700,
+.dark .text-gray-900,
+.dark .text-gray-800,
+.dark .text-gray-700,
+.dark .text-slate-600 {
+  color: var(--text) !important;
+}
+
+.dark .text-slate-500,
+.dark .text-slate-400,
+.dark .text-gray-500,
+.dark .text-gray-400,
+.dark .text-gray-600 {
+  color: var(--subtext) !important;
+}
+
+.dark .bg-slate-50,
+.dark .bg-slate-100,
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: var(--card-bg) !important;
+}
+
+.dark .border-slate-100,
+.dark .border-slate-200,
+.dark .border-gray-100,
+.dark .border-gray-200 {
+  border-color: var(--border-color) !important;
+}
+
+.dark .bg-blue-50,
+.dark .bg-green-50,
+.dark .bg-orange-50,
+.dark .bg-indigo-50,
+.dark .bg-purple-50,
+.dark .bg-teal-50,
+.dark .bg-red-50,
+.dark .bg-yellow-50 {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+.dark .text-blue-600 { color: #60A5FA !important; }
+.dark .text-green-600 { color: #34D399 !important; }
+.dark .text-orange-600 { color: #FB923C !important; }
+.dark .text-indigo-600 { color: #818CF8 !important; }
+.dark .text-purple-600 { color: #A78BFA !important; }
+.dark .text-teal-600 { color: #2DD4BF !important; }
+.dark .text-red-600 { color: #F87171 !important; }
+.dark .text-yellow-600 { color: #FBBF24 !important; }
+
+/* Ensure table rows do not use light mode hover background colors */
+.dark .hover\:bg-slate-50:hover,
+.dark .hover\:bg-gray-50:hover {
+  background-color: rgba(255, 255, 255, 0.03) !important;
+}
+
+/* Ensure table rows show white text on hover */
+.dark .hover\:bg-slate-50:hover td,
+.dark .hover\:bg-gray-50:hover td {
+  color: #FFFFFF !important;
+}
+
+/* Ensure table headers text matches high contrast subtext style */
+.dark th {
+  color: var(--subtext) !important;
+}
+
 
 @theme inline {
   --color-background: var(--background);
@@ -22,10 +109,16 @@
 
 body {
   background: radial-gradient(circle at top left, rgba(10, 132, 255, 0.10), transparent 35%),
-              linear-gradient(180deg, #F8FBFF 0%, #EFF3F9 100%);
+              var(--background);
   color: var(--foreground);
   font-family: var(--font-sans), Arial, Helvetica, sans-serif;
   min-height: 100vh;
+  transition: background-color 0.2s ease, color 0.2s ease;
+}
+
+body.dark {
+  background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.15), transparent 35%),
+              var(--background);
 }
 
 button,
@@ -36,28 +129,45 @@ select {
 }
 
 .app-card {
-  background: rgba(255, 255, 255, 0.95);
-  border: 1px solid rgba(148, 163, 184, 0.14);
+  background: var(--card-bg);
+  border: 1px solid var(--border-color); /* Thinner/lighter cleaner border */
   border-radius: var(--radius);
-  box-shadow: 0 28px 65px rgba(15, 23, 42, 0.08);
+  box-shadow: 0 28px 65px rgba(0, 0, 0, 0.05);
   backdrop-filter: blur(14px);
+  transition: background-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              border-color 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              transform 0.25s cubic-bezier(0.4, 0, 0.2, 1),
+              box-shadow 0.25s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
+.app-card:hover {
+  transform: translateY(-4px);
+  border-color: var(--primary); /* highlight using theme primary color */
+  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.12);
+}
+
+.dark .app-card:hover {
+  border-color: var(--primary) !important; /* Lighter highlight instead of bold white */
+  box-shadow: 0 32px 70px rgba(99, 102, 241, 0.08);
+}
+
+
 .app-panel {
-  background: rgba(255, 255, 255, 0.94);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  background: var(--surface);
+  border: 1px solid var(--border-color);
   border-radius: 28px;
-  box-shadow: 0 20px 45px rgba(15, 23, 42, 0.06);
+  box-shadow: 0 20px 45px rgba(0, 0, 0, 0.08);
   backdrop-filter: blur(12px);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .app-table thead {
-  background: rgba(248, 250, 252, 0.92);
+  background: var(--background);
 }
 
 .app-table th,
 .app-table td {
-  border-color: rgba(148, 163, 184, 0.14);
+  border-color: var(--border-color);
 }
 
 .app-badge-success {
@@ -82,9 +192,10 @@ select {
 
 .app-card-sm {
   background: var(--surface);
-  border: 1px solid rgba(148, 163, 184, 0.12);
+  border: 1px solid var(--border-color);
   border-radius: 22px;
-  box-shadow: 0 18px 40px rgba(15, 23, 42, 0.05);
+  box-shadow: 0 18px 40px rgba(0, 0, 0, 0.05);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
 }
 
 .app-button {
@@ -107,9 +218,24 @@ select {
 }
 
 .app-button-secondary {
-  background: #fff;
-  color: var(--text);
-  border: 1px solid rgba(148, 163, 184, 0.2);
+  background: var(--surface);
+  color: var(--text) !important;
+  border: 1px solid var(--border-color);
+  transition: background-color 0.2s ease, border-color 0.2s ease;
+}
+
+.dark .app-button-secondary {
+  border-color: rgba(255, 255, 255, 0.1) !important; /* Make it less bold but visible */
+  background: rgba(255, 255, 255, 0.08);
+  color: #FFFFFF !important;
+}
+
+.app-button-secondary:hover {
+  background: var(--card-bg);
+}
+
+.dark .app-button-secondary:hover {
+  background: rgba(255, 255, 255, 0.1) !important;
 }
 
 .app-pill {

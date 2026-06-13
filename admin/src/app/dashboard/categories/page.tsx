@@ -55,7 +55,7 @@ export default function CategoriesPage() {
   return (
     <div className="max-w-4xl space-y-8">
       <div className="flex justify-between items-center">
-        <h2 className="text-2xl font-bold text-gray-900">Manage Categories</h2>
+        <h2 className="text-2xl font-bold text-[var(--text)]">Manage Categories</h2>
       </div>
 
       {/* Add Category Form */}
@@ -90,7 +90,7 @@ export default function CategoriesPage() {
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
-          <tbody className="divide-y divide-gray-100">
+          <tbody className="divide-y divide-[var(--border-color)]">
             {loading ? (
               [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={3} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
             ) : (

@@ -23,6 +23,8 @@ export const metadata: Metadata = {
   description: "Kaarkun admin dashboard for managing marketplace",
 };
 
+import { ThemeProvider } from "@/lib/ThemeContext";
+
 export default function RootLayout({
   children,
 }: Readonly<{
@@ -34,7 +36,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} ${outfit.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-[var(--background)] text-[var(--foreground)]">
-        {children}
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
         <Toaster position="top-right" />
       </body>
     </html>

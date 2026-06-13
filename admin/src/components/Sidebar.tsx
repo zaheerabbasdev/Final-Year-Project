@@ -12,8 +12,8 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-72 bg-(--surface)/95 backdrop-blur-xl border-r border-slate-200/80 h-screen fixed left-0 top-0 overflow-y-auto shadow-2xl">
-      <div className="p-6 border-b border-slate-200/80">
+    <aside className="w-72 bg-(--surface)/95 backdrop-blur-xl border-r border-[var(--border-color)] h-screen fixed left-0 top-0 overflow-y-auto shadow-2xl">
+      <div className="p-6 border-b border-[var(--border-color)]">
         <Link href="/dashboard" className="flex items-center gap-3">
           <div className="h-11 w-11 bg-(--primary) rounded-3xl flex items-center justify-center text-white font-bold text-lg shadow-lg shadow-[rgba(0,59,149,0.16)]">K</div>
           <div>
@@ -32,7 +32,7 @@ export default function Sidebar() {
         <SidebarLink href="/dashboard/categories" icon="📁" label="Categories" pathname={pathname} />
       </nav>
 
-      <div className="absolute bottom-0 w-full p-6 border-t border-slate-200/80 bg-(--surface)/95">
+      <div className="absolute bottom-0 w-full p-6 border-t border-[var(--border-color)] bg-(--surface)/95">
         <button
           onClick={handleLogout}
           className="flex items-center gap-3 text-(--subtext) hover:text-(--danger) transition-colors font-medium w-full text-left"
