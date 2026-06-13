@@ -8,6 +8,7 @@ import '../../../core/api_client.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/widgets/notification_bell.dart';
+import '../../core/providers/currency_provider.dart';
 import '../../core/theme.dart';
 
 class JobDetailScreen extends StatefulWidget {
@@ -260,7 +261,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         Text('Client Budget', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500)),
                         const SizedBox(height: 6),
                         Text(
-                          'PKR ${(double.tryParse(_job?['budget']?.toString() ?? '0') ?? 0).toInt()}',
+                          context.watch<CurrencyProvider>().format(_job?['budget']),
                           style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
                         ),
                       ],
@@ -870,7 +871,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       crossAxisSpacing: 16,
       childAspectRatio: 2.2,
       children: [
-        _buildStatItem(Icons.attach_money_rounded, 'Budget', 'PKR ${(double.tryParse(budget.toString()) ?? 0).toInt()}', colors),
+        _buildStatItem(Icons.attach_money_rounded, 'Budget', context.watch<CurrencyProvider>().format(budget), colors),
         _buildStatItem(Icons.location_on_outlined, 'Location', location, colors),
         _buildStatItem(Icons.calendar_today_outlined, 'Posted', date, colors),
         _buildStatItem(Icons.people_outline_rounded, 'Bids', '$bidsCount received', colors),
@@ -1206,7 +1207,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                   Text('PKR ${(double.tryParse(price.toString()) ?? 0).toInt()}', style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
+                   Text(context.watch<CurrencyProvider>().format(price), style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.bold, color: AppTheme.primaryColor)),
                   Text('Est. $time', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500)),
                 ],
               ),

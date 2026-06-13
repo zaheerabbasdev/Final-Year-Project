@@ -9,6 +9,7 @@ import '../category_service.dart';
 import '../job_service.dart';
 import '../../../shared/screens/map_picker_screen.dart';
 import '../../../core/services/location_service.dart';
+import '../../../core/providers/currency_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/theme.dart';
 
@@ -130,11 +131,20 @@ class _PostJobScreenState extends State<PostJobScreen> {
     }
 
     setState(() => _isLoading = true);
+    
+    final currencyProvider = context.read<CurrencyProvider>();
+    double baseBudget = double.tryParse(_budgetController.text) ?? 0.0;
+    if (currencyProvider.selectedCurrency == 'USD') {
+      baseBudget = baseBudget * CurrencyProvider.usdRate;
+    } else if (currencyProvider.selectedCurrency == 'AED') {
+      baseBudget = baseBudget * CurrencyProvider.aedRate;
+    }
+
     final jobData = {
       'title': _titleController.text,
       'description': _descController.text,
       'category_id': _selectedCategoryId,
-      'budget': double.parse(_budgetController.text),
+      'budget': baseBudget,
       'location': _locationController.text,
       'latitude': _selectedLocationData?.latitude,
       'longitude': _selectedLocationData?.longitude,
@@ -306,7 +316,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     _buildSectionHeader('Category *'),
                     _buildDropdownField(categories),
                     const SizedBox(height: 20),
-                    _buildSectionHeader('Budget (PKR) *'),
+                    _buildSectionHeader('Budget (${context.watch<CurrencyProvider>().selectedCurrency}) *'),
                     _buildTextField(
                       _budgetController,
                       'Enter your budget',

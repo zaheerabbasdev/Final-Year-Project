@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../features/auth/auth_service.dart';
 import '../../core/providers/theme_provider.dart';
+import '../../core/providers/currency_provider.dart';
 import '../../core/theme.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -13,6 +14,7 @@ class SettingsScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
     final themeProvider = context.watch<ThemeProvider>();
+    final currencyProvider = context.watch<CurrencyProvider>();
     final role = authService.role;
     final colors = Theme.of(context).appColors;
     final isDark = themeProvider.isDarkMode;
@@ -65,6 +67,7 @@ class SettingsScreen extends StatelessWidget {
                       colors,
                     ),
                     _buildDarkModeMenuItem(context, themeProvider, colors),
+                    _buildCurrencyMenuItem(context, currencyProvider, colors),
                   ],
                 ),
               ),
@@ -121,6 +124,43 @@ class SettingsScreen extends StatelessWidget {
         value: isDark,
         activeColor: AppTheme.primaryColor,
         onChanged: (val) => themeProvider.toggleTheme(val),
+      ),
+    );
+  }
+
+  Widget _buildCurrencyMenuItem(
+    BuildContext context,
+    CurrencyProvider currencyProvider,
+    AppColors colors,
+  ) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: colors.card, borderRadius: BorderRadius.circular(12)),
+        child: Icon(Icons.monetization_on_outlined, color: colors.text, size: 20),
+      ),
+      title: Text(
+        'Currency',
+        style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.w600, fontSize: 16),
+      ),
+      trailing: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: currencyProvider.selectedCurrency,
+          dropdownColor: colors.surface,
+          icon: Icon(Icons.arrow_drop_down, color: colors.subtext),
+          style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold),
+          onChanged: (String? newValue) {
+            if (newValue != null) {
+              currencyProvider.updateCurrency(newValue);
+            }
+          },
+          items: <String>['PKR', 'USD', 'AED', 'SAR', 'EUR', 'GBP'].map<DropdownMenuItem<String>>((String value) {
+            return DropdownMenuItem<String>(
+              value: value,
+              child: Text(value),
+            );
+          }).toList(),
+        ),
       ),
     );
   }

@@ -7,6 +7,7 @@ import '../../../core/api_client.dart';
 import '../../../shared/widgets/notification_bell.dart';
 import '../../../core/services/socket_service.dart';
 import '../../../core/services/location_tracking_service.dart';
+import '../../../core/providers/currency_provider.dart';
 import '../../../core/theme.dart';
 
 class MyBidsScreen extends StatefulWidget {
@@ -237,7 +238,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                         ),
                         const SizedBox(height: 2),
                         Text(
-                          'PKR ${(double.tryParse(bid['amount']?.toString() ?? '0') ?? 0).toInt()}',
+                          context.watch<CurrencyProvider>().format(bid['amount']),
                           style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
                         ),
                       ],

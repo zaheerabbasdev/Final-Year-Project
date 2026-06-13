@@ -7,6 +7,7 @@ import '../../customer/job_service.dart';
 import '../../customer/category_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../../../core/providers/currency_provider.dart';
 import '../../../core/theme.dart';
 
 class BrowseJobsScreen extends StatefulWidget {
@@ -566,7 +567,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                         crossAxisAlignment: WrapCrossAlignment.center,
                         children: [
                           Text(
-                            'PKR ${(double.tryParse(job['budget']?.toString() ?? '0') ?? 0).toInt()}',
+                            context.watch<CurrencyProvider>().format(job['budget']),
                             style: GoogleFonts.outfit(fontSize: 22, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
                           ),
                           if (job['is_negotiable'].toString() == '1' || job['is_negotiable'] == true || job['is_negotiable'].toString() == 'true')

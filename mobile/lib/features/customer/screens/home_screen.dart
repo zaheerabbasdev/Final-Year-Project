@@ -11,6 +11,7 @@ import '../job_service.dart';
 import '../../provider/provider_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../../../core/providers/currency_provider.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -610,7 +611,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                       children: [
                         Flexible(
                           child: Text(
-                            'PKR ${price.toInt()}',
+                            context.watch<CurrencyProvider>().format(price),
                             style: GoogleFonts.outfit(
                               fontSize: 16, 
                               fontWeight: FontWeight.bold, 

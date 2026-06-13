@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../customer/job_service.dart';
 import 'package:go_router/go_router.dart';
 import '../../../shared/services/navigation_service.dart';
+import '../../../core/providers/currency_provider.dart';
 import '../../../core/theme.dart';
 
 class PlaceBidScreen extends StatefulWidget {
@@ -52,9 +53,18 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
     }
 
     setState(() => _isLoading = true);
+    
+    final currencyProvider = context.read<CurrencyProvider>();
+    double bidAmount = double.tryParse(_amountController.text) ?? 0.0;
+    if (currencyProvider.selectedCurrency == 'USD') {
+      bidAmount = bidAmount * CurrencyProvider.usdRate;
+    } else if (currencyProvider.selectedCurrency == 'AED') {
+      bidAmount = bidAmount * CurrencyProvider.aedRate;
+    }
+
     final success = await context.read<JobService>().createBid({
       'job_id': widget.jobId,
-      'amount': double.parse(_amountController.text),
+      'amount': bidAmount,
       'estimated_time': _timeController.text,
       'cover_letter': _proposalController.text,
     });
@@ -204,7 +214,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                       children: [
                         Flexible(
                           child: Text(
-                            'PKR ${(double.tryParse(_job!['budget']?.toString() ?? '0') ?? 0).toInt()}',
+                            context.watch<CurrencyProvider>().format(_job!['budget']),
                             style: GoogleFonts.outfit(fontSize: 24, fontWeight: FontWeight.w800, color: AppTheme.primaryColor),
                             overflow: TextOverflow.ellipsis,
                           ),
@@ -273,7 +283,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInputLabel('Your Bid Amount (PKR) *', colors),
+          _buildInputLabel('Your Bid Amount (${context.watch<CurrencyProvider>().selectedCurrency}) *', colors),
           const SizedBox(height: 12),
           _buildTextField(
             controller: _amountController,
@@ -296,7 +306,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Suggested competitive bid: PKR ${(double.tryParse(_suggestion!["suggestedMin"].toString()) ?? 0).toInt()} - PKR ${(double.tryParse(_suggestion!["suggestedMax"].toString()) ?? 0).toInt()} (Average: PKR ${(double.tryParse(_suggestion!["averagePrice"].toString()) ?? 0).toInt()})',
+                      'Suggested competitive bid: ${context.watch<CurrencyProvider>().format(_suggestion!["suggestedMin"])} - ${context.watch<CurrencyProvider>().format(_suggestion!["suggestedMax"])} (Average: ${context.watch<CurrencyProvider>().format(_suggestion!["averagePrice"])})',
                       style: GoogleFonts.outfit(
                         color: AppTheme.secondaryColor,
                         fontSize: 12,

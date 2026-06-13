@@ -7,6 +7,7 @@ import '../../../shared/services/booking_service.dart';
 import '../../../features/auth/auth_service.dart';
 import '../../../shared/widgets/notification_bell.dart';
 import '../../../core/theme.dart';
+import '../../../core/providers/currency_provider.dart';
 import '../screens/track_provider_screen.dart';
 
 class MyJobsScreen extends StatelessWidget {
@@ -240,7 +241,7 @@ class _JobsListViewState extends State<_JobsListView> {
                                 children: [
                                   Flexible(
                                     child: Text(
-                                      'PKR ${(double.tryParse(job['budget']?.toString() ?? '0') ?? 0).toInt()}',
+                                      context.watch<CurrencyProvider>().format(job['budget']),
                                       style: GoogleFonts.outfit(
                                         fontSize: 20,
                                         fontWeight: FontWeight.w800,

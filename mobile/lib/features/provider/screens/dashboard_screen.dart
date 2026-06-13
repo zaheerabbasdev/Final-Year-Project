@@ -11,6 +11,7 @@ import '../../provider/provider_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
+import '../../../core/providers/currency_provider.dart';
 import '../../../core/theme.dart';
 
 class ProviderDashboardScreen extends StatefulWidget {
@@ -359,7 +360,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           ),
           const SizedBox(height: 4),
           Text(
-            'PKR ${(double.tryParse(context.watch<ProviderService>().dashboardStats?['total_earnings']?.toString() ?? '0') ?? 0).toInt()}',
+            context.watch<CurrencyProvider>().format(context.watch<ProviderService>().dashboardStats?['total_earnings']),
             style: GoogleFonts.outfit(fontSize: 32, fontWeight: FontWeight.bold, color: Colors.white, letterSpacing: 0.5),
           ),
           const SizedBox(height: 24),
@@ -532,7 +533,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                   children: [
                     Flexible(
                       child: Text(
-                        'PKR ${(double.tryParse(job['budget'].toString()) ?? 150.0).toInt()}',
+                        context.watch<CurrencyProvider>().format(job['budget']),
                         style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: const Color(0xFF003B95)),
                         overflow: TextOverflow.ellipsis,
                       ),
