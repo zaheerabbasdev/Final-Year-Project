@@ -46,15 +46,14 @@ const getStats = async (req, res) => {
         const [bidCount] = await db.execute('SELECT COUNT(*) as count FROM bids');
         const [activeJobs] = await db.execute('SELECT COUNT(*) as count FROM jobs WHERE status = "active"');
         
-        // Calculate Revenue (Example: 10% of all completed jobs)
-        const [revenueData] = await db.execute('SELECT SUM(budget) * 0.1 as total FROM jobs WHERE status = "completed"');
+        const [categoryCount] = await db.execute('SELECT COUNT(*) as count FROM categories');
 
         res.json({
             users: userCount[0].count,
             jobs: jobCount[0].count,
             bids: bidCount[0].count,
             activeJobs: activeJobs[0].count,
-            revenue: revenueData[0].total || 0
+            categories: categoryCount[0].count
         });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching admin stats' });

@@ -33,7 +33,7 @@ export default function DashboardPage() {
         <StatCard title="Total Users" value={stats?.users || 0} change="+12%" icon="👥" color="blue" />
         <StatCard title="Active Jobs" value={stats?.activeJobs || 0} change="+5%" icon="💼" color="green" />
         <StatCard title="Total Bids" value={stats?.bids || 0} change="+18%" icon="⚖️" color="orange" />
-        <StatCard title="Revenue" value={`$${Math.round(stats?.revenue || 0).toLocaleString()}`} change="+24%" icon="💰" color="indigo" />
+        <StatCard title="Total Categories" value={stats?.categories || 0} change="+3%" icon="📑" color="indigo" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
