@@ -482,6 +482,56 @@ Return ONLY a JSON object:
     },
 
     /**
+     * One-Click Dispute Resolution Summarizer
+     */
+    summarizeDispute: async (jobId) => {
+        try {
+            // Fetch job info
+            const [jobs] = await db.execute(
+                `SELECT j.title, j.description, j.budget, j.status, c.full_name as customer_name 
+                 FROM jobs j JOIN users c ON j.customer_id = c.id WHERE j.id = ?`,
+                [jobId]
+            );
+            if (jobs.length === 0) return null;
+            const job = jobs[0];
+
+            // Fetch messages for the job
+            const [messages] = await db.execute(
+                `SELECT m.content, m.created_at, u.full_name as sender_name, u.role
+                 FROM messages m
+                 JOIN users u ON m.sender_id = u.id
+                 WHERE m.job_id = ?
+                 ORDER BY m.created_at ASC`,
+                [jobId]
+            );
+
+            if (messages.length === 0) {
+                return "No chat history found for this job. Cannot generate a summary.";
+            }
+
+            // Construct transcript
+            let transcript = `Job Details:\nTitle: ${job.title}\nDescription: ${job.description}\nBudget: $${job.budget}\n\nChat Transcript:\n`;
+            messages.forEach(m => {
+                transcript += `[${new Date(m.created_at).toLocaleString()}] ${m.sender_name} (${m.role}): ${m.content}\n`;
+            });
+
+            const systemPrompt = `You are a neutral, objective AI assistant for the Kaarkun admin team.
+Your task is to analyze a dispute between a customer and a service provider based on their chat history.
+Please provide a 3-part summary using the exact structure below. Be concise and factual.
+
+1. Customer's Claim: [Summarize what the customer is unhappy about or claiming]
+2. Provider's Claim: [Summarize the provider's defense or point of view]
+3. AI Recommendation: [Based ONLY on the chat evidence, who seems to be at fault? What is a fair resolution? If unclear, state that.]`;
+
+            const summary = await AIService.callLLM(systemPrompt, transcript);
+            return summary || "Failed to generate summary.";
+        } catch (error) {
+            console.error('[AI] Dispute summarization error:', error);
+            throw new Error('Could not generate dispute summary');
+        }
+    },
+
+    /**
      * Generic LLM Caller
      * Priority: 1. Groq (free, fast) → 2. Gemini → 3. Claude
      */

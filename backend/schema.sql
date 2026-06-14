@@ -64,6 +64,7 @@ CREATE TABLE IF NOT EXISTS jobs (
     longitude DECIMAL(11, 8),
     is_negotiable BOOLEAN DEFAULT FALSE,
     is_emergency BOOLEAN DEFAULT FALSE,
+    ai_dispute_summary TEXT DEFAULT NULL,
     created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (customer_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL

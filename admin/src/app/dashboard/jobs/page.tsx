@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import JobModal from '@/components/JobModal';
 
 type Job = {
   id: number;
@@ -15,6 +16,7 @@ type Job = {
 export default function JobsPage() {
   const [jobs, setJobs] = useState<Job[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedJobId, setSelectedJobId] = useState<number | null>(null);
 
   const fetchJobs = async () => {
     try {
@@ -93,7 +95,13 @@ export default function JobsPage() {
                     </span>
                   </td>
                   <td className="px-6 py-4 text-right">
-                    <button className="text-gray-400 hover:text-indigo-600 p-2">👁️</button>
+                    <button 
+                      onClick={() => setSelectedJobId(job.id)}
+                      className="text-gray-400 hover:text-indigo-600 p-2"
+                      title="View Details & Summarize"
+                    >
+                      👁️
+                    </button>
                     <button 
                       onClick={() => handleDelete(job.id)}
                       className="text-gray-400 hover:text-red-600 p-2"
@@ -107,6 +115,14 @@ export default function JobsPage() {
           </tbody>
         </table>
       </div>
+
+      {selectedJobId && (
+        <JobModal 
+          jobId={selectedJobId} 
+          onClose={() => setSelectedJobId(null)} 
+          onRefresh={fetchJobs} 
+        />
+      )}
     </div>
   );
 }

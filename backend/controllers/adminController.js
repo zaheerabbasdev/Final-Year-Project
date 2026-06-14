@@ -211,6 +211,34 @@ const deleteJob = async (req, res) => {
     }
 };
 
+const summarizeJobDispute = async (req, res) => {
+    try {
+        const { id } = req.params;
+        
+        // Check if summary already exists
+        const [jobs] = await db.execute('SELECT ai_dispute_summary FROM jobs WHERE id = ?', [id]);
+        if (jobs.length === 0) {
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        
+        if (jobs[0].ai_dispute_summary) {
+            return res.json({ summary: jobs[0].ai_dispute_summary });
+        }
+
+        const aiService = require('../services/aiService');
+        const summary = await aiService.summarizeDispute(id);
+
+        if (summary) {
+            await db.execute('UPDATE jobs SET ai_dispute_summary = ? WHERE id = ?', [summary, id]);
+        }
+
+        res.json({ summary });
+    } catch (error) {
+        console.error("ADMIN_DEBUG_ERROR:", error);
+        res.status(500).json({ message: 'Error summarizing dispute' });
+    }
+};
+
 const getAllBids = async (req, res) => {
     try {
         const [rows] = await db.execute(`
@@ -257,5 +285,5 @@ const deleteCategory = async (req, res) => {
 
 module.exports = { 
     registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus, autoVerifyProvider,
-    getAllJobs, deleteJob, getAllBids, getAllCategories, createCategory, deleteCategory 
+    getAllJobs, deleteJob, summarizeJobDispute, getAllBids, getAllCategories, createCategory, deleteCategory 
 };

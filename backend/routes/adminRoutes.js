@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 const { 
     registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus, autoVerifyProvider,
-    getAllJobs, deleteJob, getAllBids, getAllCategories, createCategory, deleteCategory 
+    getAllJobs, deleteJob, summarizeJobDispute, getAllBids, getAllCategories, createCategory, deleteCategory 
 } = require('../controllers/adminController');
 const adminAuth = require('../middleware/adminAuth');
 
@@ -19,6 +19,7 @@ router.post('/providers/:id/auto-verify', adminAuth, autoVerifyProvider);
 router.delete('/users/:id', adminAuth, deleteUser);
 router.get('/jobs', adminAuth, getAllJobs);
 router.delete('/jobs/:id', adminAuth, deleteJob);
+router.post('/jobs/:id/summarize-dispute', adminAuth, summarizeJobDispute);
 router.get('/bids', adminAuth, getAllBids);
 router.get('/categories', adminAuth, getAllCategories);
 router.post('/categories', adminAuth, createCategory);
