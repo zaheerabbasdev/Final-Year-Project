@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import BidModal from '@/components/BidModal';
 
 type Bid = {
   id: number;
@@ -14,6 +15,7 @@ type Bid = {
 export default function BidsPage() {
   const [bids, setBids] = useState<Bid[]>([]);
   const [loading, setLoading] = useState(true);
+  const [selectedBidId, setSelectedBidId] = useState<number | null>(null);
 
   const fetchBids = async () => {
     try {
@@ -52,6 +54,7 @@ export default function BidsPage() {
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Amount</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
               <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
+              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
             </tr>
           </thead>
           <tbody className="divide-y divide-[var(--border-color)]">
@@ -80,12 +83,28 @@ export default function BidsPage() {
                   <td className="px-6 py-4 text-sm text-gray-500">
                     {new Date(bid.created_at).toLocaleDateString()}
                   </td>
+                  <td className="px-6 py-4 text-right">
+                    <button 
+                      onClick={() => setSelectedBidId(bid.id)}
+                      className="text-gray-400 hover:text-indigo-600 p-2"
+                      title="View Bid Details"
+                    >
+                      👁️
+                    </button>
+                  </td>
                 </tr>
               ))
             )}
           </tbody>
         </table>
       </div>
+
+      {selectedBidId && (
+        <BidModal 
+          bidId={selectedBidId} 
+          onClose={() => setSelectedBidId(null)} 
+        />
+      )}
     </div>
   );
 }
