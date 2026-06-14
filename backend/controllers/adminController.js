@@ -147,6 +147,45 @@ const updateUserStatus = async (req, res) => {
     }
 };
 
+const autoVerifyProvider = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const [users] = await db.execute('SELECT full_name, email FROM users WHERE id = ? AND role = "provider"', [id]);
+        
+        if (users.length === 0) {
+            return res.status(404).json({ message: 'Provider not found' });
+        }
+        
+        const [profiles] = await db.execute('SELECT cnic_url FROM provider_profiles WHERE user_id = ?', [id]);
+        if (profiles.length === 0 || !profiles[0].cnic_url) {
+            return res.status(400).json({ message: 'No CNIC document uploaded' });
+        }
+
+        const user = users[0];
+        const profile = profiles[0];
+
+        const aiService = require('../services/aiService');
+        const verificationResult = await aiService.verifyDocument(profile.cnic_url, {
+            full_name: user.full_name,
+            email: user.email
+        });
+
+        await db.execute(
+            'UPDATE provider_profiles SET ai_confidence_score = ?, ai_verification_notes = ? WHERE user_id = ?',
+            [verificationResult.confidence, verificationResult.notes, id]
+        );
+
+        res.json({ 
+            message: 'AI verification completed', 
+            confidence: verificationResult.confidence,
+            notes: verificationResult.notes
+        });
+    } catch (error) {
+        console.error("ADMIN_DEBUG_ERROR:", error);
+        res.status(500).json({ message: 'Error running AI verification' });
+    }
+};
+
 const getAllJobs = async (req, res) => {
     try {
         const [rows] = await db.execute(`
@@ -217,6 +256,6 @@ const deleteCategory = async (req, res) => {
 };
 
 module.exports = { 
-    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus,
+    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus, autoVerifyProvider,
     getAllJobs, deleteJob, getAllBids, getAllCategories, createCategory, deleteCategory 
 };

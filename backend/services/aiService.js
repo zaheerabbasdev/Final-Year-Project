@@ -413,6 +413,75 @@ Keep your answers brief, friendly, helpful and directly related to Kaarkun. Maxi
     },
 
     /**
+     * KYC Document Verification
+     */
+    verifyDocument: async (imagePath, expectedData) => {
+        try {
+            const fs = require('fs');
+            const path = require('path');
+
+            // Resolve the actual file path
+            let actualPath = imagePath;
+            if (imagePath.startsWith('/uploads/')) {
+                actualPath = path.join(__dirname, '..', imagePath);
+            }
+
+            if (!fs.existsSync(actualPath)) {
+                return { confidence: 0, notes: "Image file not found locally." };
+            }
+
+            const imageBuffer = fs.readFileSync(actualPath);
+            const base64Image = imageBuffer.toString('base64');
+            const ext = path.extname(actualPath).toLowerCase().replace('.', '');
+            const mimeType = ext === 'png' ? 'image/png' : (ext === 'webp' ? 'image/webp' : 'image/jpeg');
+
+            const systemPrompt = `You are Kaarkun KYC AI. Your job is to verify identity documents (CNIC).
+Analyze the provided document image.
+Expected User Details:
+- Name: ${expectedData.full_name}
+- Email: ${expectedData.email}
+
+Check if the name on the document matches the expected name (allow minor spelling differences).
+Check if the document looks like a valid Pakistani CNIC (Computerized National Identity Card).
+Is it clear and readable?
+Return ONLY a JSON object:
+{"confidence": 85, "notes": "Name matches. Document is clear and appears to be a valid CNIC."}`;
+
+            const GEMINI_KEY = process.env.GEMINI_API_KEY;
+            if (!GEMINI_KEY || GEMINI_KEY.includes('your_gemini_api_key')) {
+                 return { confidence: 50, notes: "AI Vision API not configured." };
+            }
+
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+            const response = await axios.post(url, {
+                contents: [{
+                    role: 'user',
+                    parts: [
+                        { text: systemPrompt },
+                        { inline_data: { mime_type: mimeType, data: base64Image } }
+                    ]
+                }],
+                generationConfig: { maxOutputTokens: 200, temperature: 0.1 }
+            }, { timeout: 20000 });
+
+            const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+            if (text) {
+                const cleaned = text.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
+                const data = JSON.parse(cleaned);
+                return {
+                    confidence: data.confidence || 0,
+                    notes: data.notes || "No notes provided."
+                };
+            }
+            return { confidence: 0, notes: "Failed to extract data." };
+
+        } catch (error) {
+            console.error('[AI] Vision API error:', error.message);
+            return { confidence: 0, notes: `Error: ${error.message}` };
+        }
+    },
+
+    /**
      * Generic LLM Caller
      * Priority: 1. Groq (free, fast) → 2. Gemini → 3. Claude
      */

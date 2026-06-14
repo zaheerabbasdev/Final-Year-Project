@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const { 
-    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus,
+    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus, autoVerifyProvider,
     getAllJobs, deleteJob, getAllBids, getAllCategories, createCategory, deleteCategory 
 } = require('../controllers/adminController');
 const adminAuth = require('../middleware/adminAuth');
@@ -15,6 +15,7 @@ router.get('/stats', adminAuth, getStats);
 router.get('/users', adminAuth, getAllUsers);
 router.get('/users/:id', adminAuth, getUserDetails);
 router.put('/users/:id/status', adminAuth, updateUserStatus);
+router.post('/providers/:id/auto-verify', adminAuth, autoVerifyProvider);
 router.delete('/users/:id', adminAuth, deleteUser);
 router.get('/jobs', adminAuth, getAllJobs);
 router.delete('/jobs/:id', adminAuth, deleteJob);

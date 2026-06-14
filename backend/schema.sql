@@ -34,6 +34,8 @@ CREATE TABLE IF NOT EXISTS provider_profiles (
     cnic_url VARCHAR(255),
     certificates_url VARCHAR(255),
     is_online BOOLEAN DEFAULT FALSE,
+    ai_confidence_score INT DEFAULT NULL,
+    ai_verification_notes TEXT DEFAULT NULL,
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
     FOREIGN KEY (category_id) REFERENCES categories(id) ON DELETE SET NULL
 );

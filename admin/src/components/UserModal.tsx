@@ -5,6 +5,7 @@ import { toast } from 'react-hot-toast';
 export default function UserModal({ userId, onClose, onRefresh }: { userId: number | null, onClose: () => void, onRefresh: () => void }) {
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(false);
+  const [verifying, setVerifying] = useState(false);
 
   useEffect(() => {
     if (userId) {
@@ -25,6 +26,20 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
     }
   };
 
+  const handleAutoVerify = async () => {
+    setVerifying(true);
+    try {
+      const token = localStorage.getItem('adminToken');
+      const response = await api.post(`/admin/providers/${userId}/auto-verify`, {}, token || '');
+      toast.success(response.message || 'AI verification completed');
+      fetchUserDetails();
+      onRefresh();
+    } catch (err: any) {
+      toast.error(err.message || 'Error running AI verification');
+    } finally {
+      setVerifying(false);
+    }
+  };
 
   if (!userId) return null;
 
@@ -102,6 +117,35 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
                       ) : <span className="text-sm text-slate-400">Not provided</span>}
                     </div>
                   </div>
+
+                  {user.profile.cnic_url && (
+                    <div className="mt-4 p-4 bg-purple-50 rounded-2xl border border-purple-100 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                      <div>
+                        <h5 className="text-[12px] font-bold text-purple-900 flex items-center gap-2">
+                          <span className="text-lg">✨</span> AI Document Verification
+                        </h5>
+                        {user.profile.ai_confidence_score !== null && user.profile.ai_confidence_score !== undefined ? (
+                          <div className="mt-1">
+                            <p className="text-sm text-purple-800">
+                              <strong>Confidence:</strong> {user.profile.ai_confidence_score}%
+                            </p>
+                            <p className="text-sm text-purple-700 mt-1">
+                              <strong>Notes:</strong> {user.profile.ai_verification_notes}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-sm text-purple-700 mt-1">Not verified by AI yet.</p>
+                        )}
+                      </div>
+                      <button 
+                        onClick={handleAutoVerify}
+                        disabled={verifying}
+                        className="app-button-primary bg-purple-600 hover:bg-purple-700 disabled:opacity-50 text-xs px-4 py-2 whitespace-nowrap"
+                      >
+                        {verifying ? 'Verifying...' : 'Auto-Verify with AI'}
+                      </button>
+                    </div>
+                  )}
                 </div>
               )}
 
