@@ -164,4 +164,17 @@ class JobService extends ChangeNotifier {
       return null;
     }
   }
+
+  Future<bool> cancelJob(int jobId) async {
+    try {
+      final response = await _apiClient.dio.put('/jobs/$jobId', data: {'status': 'cancelled'});
+      if (response.statusCode == 200) {
+        await fetchJobs();
+        return true;
+      }
+    } catch (e) {
+      print('Error cancelling job: $e');
+    }
+    return false;
+  }
 }

@@ -151,11 +151,65 @@ const verifyHandshakeToken = async (req, res) => {
     }
 };
 
+const cancelBooking = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const userId = req.user.id;
+        const userRole = req.user.role;
+
+        const booking = await Booking.findById(id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+
+        // Only allow cancellation for confirmed or in_progress bookings
+        if (!['confirmed', 'in_progress'].includes(booking.status)) {
+            return res.status(400).json({ message: `Cannot cancel a booking with status "${booking.status}"` });
+        }
+
+        // Ensure the user is part of this booking
+        if (userId !== booking.customer_id && userId !== booking.provider_id) {
+            return res.status(403).json({ message: 'You are not authorized to cancel this booking' });
+        }
+
+        // Cancel the booking
+        await Booking.updateStatus(id, 'cancelled');
+
+        // Reset all other bids for this job back to 'pending'
+        await db.execute('UPDATE bids SET status = ? WHERE job_id = ? AND id != ?', ['pending', booking.job_id, booking.bid_id || 0]);
+
+        // Delete the accepted bid so the provider can bid again and it doesn't show as accepted
+        if (booking.bid_id) {
+            await db.execute('DELETE FROM bids WHERE id = ?', [booking.bid_id]);
+        }
+
+        // Reopen the job so other providers can bid
+        await Job.update(booking.job_id, { status: 'open' });
+
+        // Notify the other party
+        const [jobRows] = await db.execute('SELECT title FROM jobs WHERE id = ?', [booking.job_id]);
+        const jobTitle = jobRows[0] ? jobRows[0].title : 'a job';
+        const cancellerRole = userId === booking.customer_id ? 'customer' : 'provider';
+        const recipientId = userId === booking.customer_id ? booking.provider_id : booking.customer_id;
+
+        await createNotification(
+            recipientId,
+            'Booking Cancelled',
+            `The ${cancellerRole} has cancelled the booking for "${jobTitle}".`,
+            'booking'
+        );
+
+        res.json({ message: 'Booking cancelled successfully. The job has been reopened.' });
+    } catch (error) {
+        console.error('Error cancelling booking:', error);
+        res.status(500).json({ message: 'Error cancelling booking' });
+    }
+};
+
 module.exports = { 
     getMyBookings, 
     updateBookingStatus, 
     updateBookingStatusByJob, 
     getBookingByJob,
     generateHandshakeToken,
-    verifyHandshakeToken
+    verifyHandshakeToken,
+    cancelBooking
 };

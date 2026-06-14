@@ -64,4 +64,17 @@ class BookingService extends ChangeNotifier {
       return null;
     }
   }
+
+  Future<bool> cancelBooking(int bookingId) async {
+    try {
+      final response = await _apiClient.dio.put('/bookings/$bookingId/cancel');
+      if (response.statusCode == 200) {
+        await fetchBookings();
+        return true;
+      }
+    } catch (e) {
+      print('Error cancelling booking: $e');
+    }
+    return false;
+  }
 }

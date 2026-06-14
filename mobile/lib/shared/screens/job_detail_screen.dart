@@ -54,6 +54,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
     if (mounted) {
       print('DEBUG: Job Detail Data: $job');
+      print('DEBUG: Booking Detail Data: $booking');
       setState(() {
         _job = job;
         _booking = booking;
@@ -62,6 +63,133 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       });
     }
   }
+
+  Future<void> _showCancelDialog() async {
+    final colors = Theme.of(context).appColors;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Cancel Booking?',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: colors.text),
+        ),
+        content: Text(
+          'Are you sure you want to cancel this booking? The job will be reopened so other providers can bid on it.',
+          style: GoogleFonts.outfit(color: colors.subtext),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Keep Booking', style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.errorColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text('Yes, Cancel', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true && _booking != null) {
+      final bookingService = context.read<BookingService>();
+      final success = await bookingService.cancelBooking(_booking!['id']);
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Booking cancelled successfully.', style: GoogleFonts.outfit(color: Colors.white)),
+              backgroundColor: AppTheme.successColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(12),
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to cancel booking. Please try again.', style: GoogleFonts.outfit(color: Colors.white)),
+              backgroundColor: AppTheme.errorColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(12),
+            ),
+          );
+        }
+      }
+    }
+  }
+
+  Future<void> _showCancelJobDialog() async {
+    final colors = Theme.of(context).appColors;
+    final confirm = await showDialog<bool>(
+      context: context,
+      builder: (context) => AlertDialog(
+        backgroundColor: colors.surface,
+        surfaceTintColor: Colors.transparent,
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+        title: Text(
+          'Cancel Job Post?',
+          style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: colors.text),
+        ),
+        content: Text(
+          'Are you sure you want to cancel this job post? It will no longer be visible to providers for bidding.',
+          style: GoogleFonts.outfit(color: colors.subtext),
+        ),
+        actions: [
+          TextButton(
+            onPressed: () => Navigator.pop(context, false),
+            child: Text('Keep Job', style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold)),
+          ),
+          ElevatedButton(
+            onPressed: () => Navigator.pop(context, true),
+            style: ElevatedButton.styleFrom(
+              backgroundColor: AppTheme.errorColor,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+            ),
+            child: Text('Yes, Cancel', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+          ),
+        ],
+      ),
+    );
+
+    if (confirm == true) {
+      final jobService = context.read<JobService>();
+      final success = await jobService.cancelJob(widget.jobId);
+      if (mounted) {
+        if (success) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Job cancelled successfully.', style: GoogleFonts.outfit(color: Colors.white)),
+              backgroundColor: AppTheme.successColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(12),
+            ),
+          );
+          _loadData();
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Failed to cancel job. Please try again.', style: GoogleFonts.outfit(color: Colors.white)),
+              backgroundColor: AppTheme.errorColor,
+              behavior: SnackBarBehavior.floating,
+              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+              margin: const EdgeInsets.all(12),
+            ),
+          );
+        }
+      }
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final authService = context.watch<AuthService>();
@@ -384,6 +512,24 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   ],
                 ),
               ),
+            ],
+            // Cancel Booking Button for Provider (visible for confirmed or in_progress)
+            if (_booking != null && ['confirmed', 'in_progress'].contains(_booking!['status']) && _booking!['provider_id'] == currentUserId) ...[
+              SizedBox(
+                width: double.infinity,
+                height: 52,
+                child: OutlinedButton.icon(
+                  onPressed: () => _showCancelDialog(),
+                  icon: const Icon(Icons.cancel_outlined, size: 18),
+                  label: Text('Cancel Booking', style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
+                  style: OutlinedButton.styleFrom(
+                    foregroundColor: AppTheme.errorColor,
+                    side: BorderSide(color: AppTheme.errorColor.withOpacity(0.5)),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
             ],
             SizedBox(
               width: double.infinity,
@@ -767,6 +913,44 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     ),
                   ),
                 ],
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+          // Cancel Booking Button (visible for confirmed or in_progress bookings)
+          if (_booking != null && ['confirmed', 'in_progress'].contains(_booking!['status'])) ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: OutlinedButton.icon(
+                onPressed: () => _showCancelDialog(),
+                icon: const Icon(Icons.cancel_outlined, size: 18),
+                label: Text('Cancel Booking', style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.errorColor,
+                  side: BorderSide(color: AppTheme.errorColor.withOpacity(0.5)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
+              ),
+            ),
+            const SizedBox(height: 24),
+          ],
+          // Cancel Job Button (visible to customer when job is open)
+          if (role == 'customer' && status == 'open') ...[
+            const SizedBox(height: 8),
+            SizedBox(
+              width: double.infinity,
+              height: 52,
+              child: OutlinedButton.icon(
+                onPressed: () => _showCancelJobDialog(),
+                icon: const Icon(Icons.delete_outline_rounded, size: 18),
+                label: Text('Cancel Job', style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
+                style: OutlinedButton.styleFrom(
+                  foregroundColor: AppTheme.errorColor,
+                  side: BorderSide(color: AppTheme.errorColor.withOpacity(0.5)),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                ),
               ),
             ),
             const SizedBox(height: 24),

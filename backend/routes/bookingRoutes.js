@@ -6,7 +6,8 @@ const {
     updateBookingStatusByJob, 
     getBookingByJob,
     generateHandshakeToken,
-    verifyHandshakeToken
+    verifyHandshakeToken,
+    cancelBooking
 } = require('../controllers/bookingController');
 const { authMiddleware } = require('../middleware/auth');
 
@@ -16,5 +17,6 @@ router.put('/job/:jobId/status', authMiddleware, updateBookingStatusByJob);
 router.put('/:id/status', authMiddleware, updateBookingStatus);
 router.post('/:id/handshake/generate', authMiddleware, generateHandshakeToken);
 router.post('/:id/handshake/verify', authMiddleware, verifyHandshakeToken);
+router.put('/:id/cancel', authMiddleware, cancelBooking);
 
 module.exports = router;
