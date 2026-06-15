@@ -2,16 +2,23 @@
 @variant dark (&:where(.dark, .dark *));
 
 :root {
-  --background: #ffffff;
-  --foreground: #18181b;
-  /* zinc-900 */
+  --background: #f8f9fc;
+  --foreground: #0f0f13;
+  --sidebar-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-border: #e8eaf0;
+  --accent: #6366f1;
+  --accent-soft: #ede9fe;
 }
 
 .dark {
-  --background: #09090b;
-  /* zinc-950 */
-  --foreground: #fafafa;
-  /* zinc-50 */
+  --background: #0a0a0f;
+  --foreground: #f4f4f8;
+  --sidebar-bg: #0f0f17;
+  --card-bg: #13131e;
+  --card-border: #1e1e2e;
+  --accent: #818cf8;
+  --accent-soft: #1e1b4b;
 }
 
 @theme inline {
@@ -22,70 +29,91 @@
 }
 
 html {
-  font-size: 16.5px;
-  /* Comfortably scaled base scale */
+  font-size: 15.5px;
 }
 
 body {
   background-color: var(--background);
   color: var(--foreground);
-  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
   font-size: 1rem;
-  /* Medium default text size */
   line-height: 1.6;
 }
 
-/* Make sure text elements have proper defaults */
-h1,
-h2,
-h3,
-h4,
-h5,
-h6 {
+/* Scrollbar Styling */
+::-webkit-scrollbar {
+  width: 5px;
+  height: 5px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 99px;
+}
+.dark ::-webkit-scrollbar-thumb {
+  background: #27272a;
+}
+
+/* Heading colours */
+h1, h2, h3, h4, h5, h6 {
   color: var(--foreground);
 }
 
-p,
-span,
-label,
-input,
-textarea,
-select {
-  font-size: 0.975rem;
-  /* Medium scaled text */
+p, span, label, input, textarea, select {
+  font-size: 0.9375rem;
 }
 
-.text-xs {
-  font-size: 0.775rem !important;
-  /* Scaled up slightly but remaining small */
+/* Text utility overrides */
+.text-xs  { font-size: 0.75rem !important; }
+.text-sm  { font-size: 0.875rem !important; }
+.text-base { font-size: 1rem !important; }
+.text-lg  { font-size: 1.125rem !important; }
+.text-xl  { font-size: 1.25rem !important; }
+.text-2xl { font-size: 1.5rem !important; }
+.text-3xl { font-size: 1.875rem !important; }
+.text-4xl { font-size: 2.25rem !important; }
+
+/* Glass card */
+.glass-card {
+  background: var(--card-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 1rem;
+  backdrop-filter: blur(12px);
 }
 
-.text-sm {
-  font-size: 0.875rem !important;
-  /* Standard modern small text */
+/* Gradient text */
+.gradient-text {
+  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
-.text-base {
-  font-size: 1rem !important;
-  /* Standard base text size */
+/* Glow accent */
+.glow {
+  box-shadow: 0 0 24px rgba(99, 102, 241, 0.18);
 }
 
-.text-lg {
-  font-size: 1.125rem !important;
-  /* Medium large text */
+/* Stat card hover */
+.stat-card {
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+.stat-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 30px rgba(0,0,0,0.08);
+}
+.dark .stat-card:hover {
+  box-shadow: 0 8px 30px rgba(0,0,0,0.4);
 }
 
-.text-xl {
-  font-size: 1.25rem !important;
-  /* Medium headers */
+/* Smooth page fade */
+@keyframes page-fade-in {
+  from { opacity: 0; transform: translateY(8px); }
+  to   { opacity: 1; transform: translateY(0); }
 }
 
-.text-2xl {
-  font-size: 1.5rem !important;
-  /* Page headers */
-}
-
-.text-3xl {
-  font-size: 1.875rem !important;
-  /* Large page headers */
+.page-enter {
+  animation: page-fade-in 0.3s ease both;
 }

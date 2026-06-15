@@ -52,10 +52,10 @@ export default function RootLayout({
           }}
         />
       </head>
-      <body className="h-full bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50">
+      <body className="h-full bg-[#f8f9fc] dark:bg-[#0a0a0f] text-zinc-900 dark:text-zinc-50">
         <ThemeProvider>
           <AuthProvider>
-            <div className="flex h-screen w-full overflow-hidden bg-zinc-50 dark:bg-zinc-950 transition-colors duration-300">
+            <div className="flex h-screen w-full overflow-hidden transition-colors duration-300">
               <Sidebar />
               <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
                 <Navbar />
