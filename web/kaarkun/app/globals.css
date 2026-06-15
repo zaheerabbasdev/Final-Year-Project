@@ -1,8 +1,17 @@
 @import "tailwindcss";
+@variant dark (&:where(.dark, .dark *));
 
 :root {
   --background: #ffffff;
-  --foreground: #171717;
+  --foreground: #18181b;
+  /* zinc-900 */
+}
+
+.dark {
+  --background: #09090b;
+  /* zinc-950 */
+  --foreground: #fafafa;
+  /* zinc-50 */
 }
 
 @theme inline {
@@ -12,15 +21,71 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
+html {
+  font-size: 16.5px;
+  /* Comfortably scaled base scale */
 }
 
 body {
-  background: var(--background);
+  background-color: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
+  font-size: 1rem;
+  /* Medium default text size */
+  line-height: 1.6;
+}
+
+/* Make sure text elements have proper defaults */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  color: var(--foreground);
+}
+
+p,
+span,
+label,
+input,
+textarea,
+select {
+  font-size: 0.975rem;
+  /* Medium scaled text */
+}
+
+.text-xs {
+  font-size: 0.775rem !important;
+  /* Scaled up slightly but remaining small */
+}
+
+.text-sm {
+  font-size: 0.875rem !important;
+  /* Standard modern small text */
+}
+
+.text-base {
+  font-size: 1rem !important;
+  /* Standard base text size */
+}
+
+.text-lg {
+  font-size: 1.125rem !important;
+  /* Medium large text */
+}
+
+.text-xl {
+  font-size: 1.25rem !important;
+  /* Medium headers */
+}
+
+.text-2xl {
+  font-size: 1.5rem !important;
+  /* Page headers */
+}
+
+.text-3xl {
+  font-size: 1.875rem !important;
+  /* Large page headers */
 }

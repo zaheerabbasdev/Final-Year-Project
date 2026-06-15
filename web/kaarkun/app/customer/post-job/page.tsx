@@ -14,7 +14,8 @@ import {
   Upload, 
   AlertCircle, 
   CheckCircle,
-  FileImage
+  FileImage,
+  Sparkles
 } from 'lucide-react';
 
 interface Category {
@@ -66,6 +67,34 @@ export default function PostJobPage() {
       })
       .catch(err => console.log('Could not fetch categories, using fallback', err));
   }, [user, authLoading, router]);
+
+  const handleAIAutocomplete = async () => {
+    if (!description.trim() || description.length < 5) return;
+    setError(null);
+    setSuccess(null);
+    setLocalLoading(true);
+    try {
+      const result = await api.post('/ai/autocomplete', {
+        partialDescription: description
+      });
+      if (result) {
+        if (result.completion) setDescription(result.completion);
+        if (result.suggestedBudget) setBudget(result.suggestedBudget.toString());
+        if (result.category) {
+          const matchedCategory = categories.find(c => c.name.toLowerCase() === result.category.toLowerCase());
+          if (matchedCategory) {
+            setCategoryId(matchedCategory.id.toString());
+          }
+        }
+        setSuccess('AI suggestions applied! Budget, Category & Description updated.');
+      }
+    } catch (err: any) {
+      console.error(err);
+      setError(err.message || 'AI Autocomplete request failed.');
+    } finally {
+      setLocalLoading(false);
+    }
+  };
 
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files) {
@@ -167,15 +196,26 @@ export default function PostJobPage() {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Describe what needs to be done
-            </label>
+            <div className="flex justify-between items-center mb-1">
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
+                Describe what needs to be done
+              </label>
+              <button
+                type="button"
+                onClick={handleAIAutocomplete}
+                disabled={localLoading || !description.trim() || description.length < 5}
+                className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 flex items-center gap-1 bg-violet-50 dark:bg-violet-950/30 px-2.5 py-1 rounded-lg border border-violet-100 dark:border-violet-900/50 disabled:opacity-50 transition-all cursor-pointer"
+              >
+                <Sparkles size={12} />
+                Improve with AI
+              </button>
+            </div>
             <textarea
               required
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+              className="block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-55 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
               placeholder="Provide details about the job. Specify materials, size, or special requirements if any."
             />
           </div>

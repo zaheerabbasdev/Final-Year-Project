@@ -16,7 +16,10 @@ import {
   AlertCircle,
   FileCheck,
   User as UserIcon,
-  MessageSquare
+  MessageSquare,
+  Star,
+  CheckCheck,
+  XCircle
 } from 'lucide-react';
 
 interface Job {
@@ -32,6 +35,7 @@ interface Job {
 
 interface Booking {
   id: number;
+  provider_id?: number;
   job_id: number;
   job_title?: string;
   provider_name?: string;
@@ -49,6 +53,8 @@ export default function CustomerDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [confirmLoading, setConfirmLoading] = useState<number | null>(null);
+  const [cancelLoading, setCancelLoading] = useState<number | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -76,6 +82,32 @@ export default function CustomerDashboard() {
 
     fetchData();
   }, [user, authLoading, router]);
+
+  const handleConfirmCompletion = async (bookingId: number) => {
+    if (!confirm('Confirm that the job has been completed?')) return;
+    setConfirmLoading(bookingId);
+    try {
+      await api.put(`/bookings/${bookingId}/status`, { status: 'completed' });
+      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'completed' } : b));
+    } catch (err: any) {
+      setError(err.message || 'Failed to confirm completion.');
+    } finally {
+      setConfirmLoading(null);
+    }
+  };
+
+  const handleCancelJob = async (jobId: number) => {
+    if (!confirm('Are you sure you want to cancel this job?')) return;
+    setCancelLoading(jobId);
+    try {
+      await api.put(`/jobs/${jobId}`, { status: 'cancelled' });
+      setJobs(prev => prev.map(j => j.id === jobId ? { ...j, status: 'cancelled' } : j));
+    } catch (err: any) {
+      setError(err.message || 'Failed to cancel job.');
+    } finally {
+      setCancelLoading(null);
+    }
+  };
 
   if (authLoading || loading) {
     return (
@@ -233,7 +265,7 @@ export default function CustomerDashboard() {
                       )}
                     </div>
 
-                    <div className="flex gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
+                    <div className="flex flex-wrap gap-2 pt-1 border-t border-zinc-100 dark:border-zinc-800">
                       <Link 
                         href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`} 
                         className="flex-1 text-center py-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg flex items-center justify-center gap-1"
@@ -241,6 +273,27 @@ export default function CustomerDashboard() {
                         <MessageSquare size={12} />
                         Message
                       </Link>
+
+                      {booking.status === 'awaiting_confirmation' && (
+                        <button
+                          onClick={() => handleConfirmCompletion(booking.id)}
+                          disabled={confirmLoading === booking.id}
+                          className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1 transition-all"
+                        >
+                          <CheckCheck size={12} />
+                          {confirmLoading === booking.id ? 'Confirming...' : 'Confirm Done'}
+                        </button>
+                      )}
+
+                      {booking.status === 'completed' && booking.provider_id && (
+                        <Link
+                          href={`/customer/submit-review?bookingId=${booking.id}&jobId=${booking.job_id}&providerId=${booking.provider_id}&providerName=${encodeURIComponent(booking.provider_name || 'Provider')}`}
+                          className="flex-1 py-1.5 bg-amber-500 hover:bg-amber-600 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1 transition-all"
+                        >
+                          <Star size={12} />
+                          Leave Review
+                        </Link>
+                      )}
                     </div>
                   </div>
                 ))}

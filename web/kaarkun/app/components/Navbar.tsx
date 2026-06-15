@@ -4,15 +4,19 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 import {
   Bell,
   LogOut,
-  Menu
+  Menu,
+  Sun,
+  Moon
 } from 'lucide-react';
 
 export default function Navbar() {
   const { user, logout } = useAuth();
+  const { theme, toggleTheme } = useTheme();
   const pathname = usePathname();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<any[]>([]);
@@ -59,6 +63,8 @@ export default function Navbar() {
     if (pathname.includes('/browse-jobs')) return 'Browse Jobs Feed';
     if (pathname.includes('/bids')) return 'My Proposals & Bids';
     if (pathname.includes('/chat')) return 'Messages Hub';
+    if (pathname.includes('/profile')) return 'My Profile';
+    if (pathname.includes('/support-chatbot')) return 'AI Support Chatbot';
     return '';
   };
 
@@ -95,7 +101,7 @@ export default function Navbar() {
               <p className="text-[10px] tracking-widest font-bold text-zinc-400 uppercase mb-0.5">
                 {getPageSubtitle()}
               </p>
-              <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight">
+              <h2 className="text-2xl font-extrabold text-zinc-900 dark:text-zinc-55 tracking-tight">
                 {getPageTitle()}
               </h2>
             </div>
@@ -112,6 +118,22 @@ export default function Navbar() {
                 <span className="w-2 h-2 rounded-full bg-blue-600 animate-pulse"></span>
                 Live
               </div>
+
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                title={theme === 'dark' ? 'Switch to Light Mode' : 'Switch to Dark Mode'}
+                className="p-2.5 rounded-full transition-all duration-200 border shadow-sm
+                  bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700
+                  text-zinc-600 dark:text-zinc-300
+                  border-zinc-200 dark:border-zinc-700"
+              >
+                {theme === 'dark' ? (
+                  <Sun size={16} className="text-amber-400" />
+                ) : (
+                  <Moon size={16} className="text-indigo-500" />
+                )}
+              </button>
 
               <button
                 onClick={() => setShowNotifications(!showNotifications)}
@@ -161,7 +183,7 @@ export default function Navbar() {
                 </div>
               )}
 
-              <div className="flex items-center gap-3 pl-4 border-l border-zinc-200 dark:border-zinc-800">
+              <Link href="/profile" className="flex items-center gap-3 pl-4 border-l border-zinc-200 dark:border-zinc-800 hover:opacity-80 transition-opacity">
                 <div className="hidden sm:flex flex-col text-right">
                   <span className="text-sm font-bold text-zinc-900 dark:text-zinc-100">{user.full_name}</span>
                   <span className="text-[10px] text-zinc-500">{user.email || 'customer@gmail.com'}</span>
@@ -177,7 +199,7 @@ export default function Navbar() {
                     {user.full_name.charAt(0).toUpperCase()}
                   </div>
                 )}
-              </div>
+              </Link>
 
             </div>
           ) : (
