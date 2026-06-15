@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
+import LocationInput from '../../components/LocationInput';
 import { 
   Briefcase, 
   MapPin, 
@@ -43,6 +44,8 @@ export default function PostJobPage() {
   const [budget, setBudget] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState(33.6844);
+  const [longitude, setLongitude] = useState(73.0479);
   const [prefDate, setPrefDate] = useState('');
   const [prefTime, setPrefTime] = useState('');
   const [isNegotiable, setIsNegotiable] = useState(false);
@@ -123,9 +126,8 @@ export default function PostJobPage() {
     formData.append('preferred_time', prefTime || '');
     formData.append('is_negotiable', String(isNegotiable));
     formData.append('is_emergency', String(isEmergency));
-    // Default coords for testing (Islamabad)
-    formData.append('latitude', '33.6844');
-    formData.append('longitude', '73.0479');
+    formData.append('latitude', String(latitude));
+    formData.append('longitude', String(longitude));
 
     images.forEach(img => {
       formData.append('images', img);
@@ -265,17 +267,16 @@ export default function PostJobPage() {
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Address / Location details
             </label>
-            <div className="mt-1 relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                <MapPin size={16} />
-              </div>
-              <input
-                type="text"
-                required
+            <div className="mt-1">
+              <LocationInput
                 value={location}
-                onChange={(e) => setLocation(e.target.value)}
-                className="block w-full pl-8 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                placeholder="e.g. Sector F-7, Islamabad"
+                onChange={setLocation}
+                onCoordinatesChange={(lat, lng) => {
+                  setLatitude(lat);
+                  setLongitude(lng);
+                }}
+                placeholder="Search for a location, e.g. Sector F-7, Islamabad"
+                required
               />
             </div>
           </div>

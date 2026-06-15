@@ -20,6 +20,7 @@ import {
   Layers,
   Award
 } from 'lucide-react';
+import LocationInput from '../components/LocationInput';
 
 interface Review {
   id: number;
@@ -51,6 +52,8 @@ export default function ProfilePage() {
   const [fullName, setFullName] = useState('');
   const [phone, setPhone] = useState('');
   const [location, setLocation] = useState('');
+  const [latitude, setLatitude] = useState<number | null>(null);
+  const [longitude, setLongitude] = useState<number | null>(null);
   const [bio, setBio] = useState('');
   const [experienceYears, setExperienceYears] = useState('');
   const [skills, setSkills] = useState('');
@@ -82,6 +85,8 @@ export default function ProfilePage() {
           setFullName(freshUser.full_name || '');
           setPhone(freshUser.phone || '');
           setLocation(freshUser.location || '');
+          setLatitude(freshUser.latitude || freshUser.profile?.latitude || null);
+          setLongitude(freshUser.longitude || freshUser.profile?.longitude || null);
           
           if (freshUser.role === 'provider') {
             const profile = freshUser.profile || {};
@@ -193,8 +198,8 @@ export default function ProfilePage() {
       full_name: fullName,
       phone,
       location,
-      latitude: user?.profile?.latitude || 33.6844,
-      longitude: user?.profile?.longitude || 73.0479,
+      latitude: latitude || user?.profile?.latitude || user?.latitude || 33.6844,
+      longitude: longitude || user?.profile?.longitude || user?.longitude || 73.0479,
     };
 
     if (user?.role === 'provider') {
@@ -402,18 +407,15 @@ export default function ProfilePage() {
 
                 <div>
                   <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Location Details</label>
-                  <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                      <MapPin size={14} />
-                    </div>
-                    <input
-                      type="text"
-                      required
-                      value={location}
-                      onChange={(e) => setLocation(e.target.value)}
-                      className="block w-full pl-9 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 text-sm"
-                    />
-                  </div>
+                  <LocationInput
+                    value={location}
+                    onChange={setLocation}
+                    onCoordinatesChange={(lat, lng) => {
+                      setLatitude(lat);
+                      setLongitude(lng);
+                    }}
+                    required
+                  />
                 </div>
 
                 {user?.role === 'provider' && (
