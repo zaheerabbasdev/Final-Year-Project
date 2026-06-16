@@ -265,7 +265,7 @@ export default function ProfilePage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
         {/* Left Column: Avatar & Basic Stats */}
-        <div className="space-y-6">
+        <div className="lg:col-span-3 space-y-6">
           <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm text-center relative overflow-hidden">
             {/* Role Header Banner */}
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
@@ -324,7 +324,7 @@ export default function ProfilePage() {
             )}
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 gap-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
+            <div className="grid grid-cols-2 max-w-md mx-auto gap-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
               <div className="p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
                 <Briefcase className="w-5 h-5 text-indigo-500 mx-auto mb-1.5" />
                 <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{stats.totalJobs || 0}</span>
@@ -352,7 +352,7 @@ export default function ProfilePage() {
         </div>
 
         {/* Right Columns: Bio Form / Editor */}
-        <div className="lg:col-span-2 space-y-6">
+        <div className="lg:col-span-3 space-y-6">
           <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Profile Information</h3>
