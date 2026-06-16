@@ -184,128 +184,130 @@ export default function CustomerDashboard() {
         ))}
       </div>
 
-      {/* Main grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      {/* My Job Posts — Full width */}
+      <div className="mb-6">
+        <div className="glass-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <Layers size={18} className="text-indigo-500" />
+              <h2 className="font-bold text-zinc-900 dark:text-white">My Job Posts</h2>
+            </div>
+            <Link href="/customer/jobs" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+              View all <ChevronRight size={13} />
+            </Link>
+          </div>
 
-        {/* My Jobs — 2 cols */}
-        <div className="lg:col-span-2">
-          <div className="glass-card overflow-hidden">
-            <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <Layers size={18} className="text-indigo-500" />
-                <h2 className="font-bold text-zinc-900 dark:text-white">My Job Posts</h2>
-              </div>
-              <Link href="/customer/jobs" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
-                View all <ChevronRight size={13} />
+          {jobs.length === 0 ? (
+            <div className="px-6 py-14 text-center">
+              <div className="text-4xl mb-3">📋</div>
+              <p className="text-zinc-500 dark:text-zinc-400 font-medium">No jobs posted yet</p>
+              <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+                <Sparkles size={14} />
+                Post your first job →
               </Link>
             </div>
-
-            {jobs.length === 0 ? (
-              <div className="px-6 py-14 text-center">
-                <div className="text-4xl mb-3">📋</div>
-                <p className="text-zinc-500 dark:text-zinc-400 font-medium">No jobs posted yet</p>
-                <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
-                  <Sparkles size={14} />
-                  Post your first job →
-                </Link>
-              </div>
-            ) : (
-              <div className="divide-y divide-zinc-50 dark:divide-white/[0.04]">
-                {jobs.slice(0, 6).map((job) => (
-                  <div key={job.id} className="px-6 py-4 hover:bg-zinc-50/70 dark:hover:bg-white/[0.02] transition-colors group">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
-                            {job.title}
-                          </h3>
-                          <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[job.status] || STATUS_STYLES.cancelled}`}>
-                            {job.status}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400">
-                          <span className="flex items-center gap-1"><MapPin size={11} />{job.location}</span>
-                          <span className="flex items-center gap-1 font-semibold text-zinc-600 dark:text-zinc-300">
-                            <DollarSign size={11} />{format(job.budget)}
-                          </span>
-                          <span className="flex items-center gap-1"><Clock size={11} />{new Date(job.created_at).toLocaleDateString()}</span>
-                        </div>
+          ) : (
+            <div className="divide-y divide-zinc-50 dark:divide-white/[0.04]">
+              {jobs.slice(0, 6).map((job) => (
+                <div key={job.id} className="px-6 py-4 hover:bg-zinc-50/70 dark:hover:bg-white/[0.02] transition-colors group">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                          {job.title}
+                        </h3>
+                        <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[job.status] || STATUS_STYLES.cancelled}`}>
+                          {job.status}
+                        </span>
                       </div>
-                      <div className="flex items-center gap-2 shrink-0">
-                        {job.status === 'open' && (
-                          <span className="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-lg font-medium">
-                            {job.bids_count || 0} bids
-                          </span>
-                        )}
-                        {job.status === 'open' && (
-                          <button
-                            onClick={() => handleCancelJob(job.id)}
-                            className="p-1.5 text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20"
-                            title="Cancel job"
-                          >
-                            <XCircle size={15} />
-                          </button>
-                        )}
-                        <Link
-                          href={`/customer/jobs/${job.id}`}
-                          className="flex items-center gap-1 text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400">
+                        <span className="flex items-center gap-1"><MapPin size={11} />{job.location}</span>
+                        <span className="flex items-center gap-1 font-semibold text-zinc-600 dark:text-zinc-300">
+                          <DollarSign size={11} />{format(job.budget)}
+                        </span>
+                        <span className="flex items-center gap-1"><Clock size={11} />{new Date(job.created_at).toLocaleDateString()}</span>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      {job.status === 'open' && (
+                        <span className="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-lg font-medium">
+                          {job.bids_count || 0} bids
+                        </span>
+                      )}
+                      {job.status === 'open' && (
+                        <button
+                          onClick={() => handleCancelJob(job.id)}
+                          className="p-1.5 text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20"
+                          title="Cancel job"
                         >
-                          Details <ChevronRight size={13} />
-                        </Link>
-                      </div>
+                          <XCircle size={15} />
+                        </button>
+                      )}
+                      <Link
+                        href={`/customer/jobs/${job.id}`}
+                        className="flex items-center gap-1 text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                      >
+                        Details <ChevronRight size={13} />
+                      </Link>
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Right col: Active bookings */}
-        <div>
-          <div className="glass-card overflow-hidden">
-            <div className="px-5 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
-              <div className="flex items-center gap-2">
-                <CalendarCheck size={18} className="text-emerald-500" />
-                <h2 className="font-bold text-zinc-900 dark:text-white">Active Bookings</h2>
-              </div>
-              <Link href="/customer/bookings" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
-                All <ChevronRight size={13} />
-              </Link>
+                </div>
+              ))}
             </div>
+          )}
+        </div>
+      </div>
 
-            {bookings.length === 0 ? (
-              <div className="px-5 py-12 text-center">
-                <div className="text-4xl mb-3">📅</div>
-                <p className="text-sm text-zinc-400">No bookings yet. Hired jobs will appear here.</p>
-              </div>
-            ) : (
-              <div className="divide-y divide-zinc-50 dark:divide-white/[0.04]">
-                {bookings.map((booking) => (
-                  <div key={booking.id} className="px-5 py-4 space-y-3">
-                    <div>
-                      <p className="font-semibold text-sm text-zinc-900 dark:text-white leading-tight mb-1">
-                        {booking.job_title || `Booking #${booking.id}`}
-                      </p>
-                      <span className={`inline-block text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[booking.status] || STATUS_STYLES.cancelled}`}>
-                        {booking.status.replace('_', ' ')}
-                      </span>
-                    </div>
+      {/* Active Bookings — Full width */}
+      <div>
+        <div className="glass-card overflow-hidden">
+          <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
+            <div className="flex items-center gap-2">
+              <CalendarCheck size={18} className="text-emerald-500" />
+              <h2 className="font-bold text-zinc-900 dark:text-white">Active Bookings</h2>
+            </div>
+            <Link href="/customer/bookings" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+              View all <ChevronRight size={13} />
+            </Link>
+          </div>
 
-                    <div className="text-xs text-zinc-400 space-y-1">
-                      <div className="flex items-center gap-1.5">
-                        <UserIcon size={11} />
-                        Provider: <span className="font-semibold text-zinc-600 dark:text-zinc-300">{booking.provider_name || 'Provider'}</span>
+          {bookings.length === 0 ? (
+            <div className="px-6 py-14 text-center">
+              <div className="text-4xl mb-3">📅</div>
+              <p className="text-sm text-zinc-400">No bookings yet. Hired jobs will appear here.</p>
+            </div>
+          ) : (
+            <div className="divide-y divide-zinc-50 dark:divide-white/[0.04]">
+              {bookings.map((booking) => (
+                <div key={booking.id} className="px-6 py-4 hover:bg-zinc-50/70 dark:hover:bg-white/[0.02] transition-colors group">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-2 mb-1">
+                        <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                          {booking.job_title || `Booking #${booking.id}`}
+                        </h3>
+                        <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[booking.status] || STATUS_STYLES.cancelled}`}>
+                          {booking.status.replace(/_/g, ' ')}
+                        </span>
                       </div>
-                      {booking.provider_phone && (
-                        <div>📞 {booking.provider_phone}</div>
-                      )}
+                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
+                        <span className="flex items-center gap-1.5">
+                          <UserIcon size={11} />
+                          <span className="font-semibold text-zinc-600 dark:text-zinc-300">{booking.provider_name || 'Provider'}</span>
+                        </span>
+                        {booking.provider_phone && (
+                          <span className="flex items-center gap-1">📞 {booking.provider_phone}</span>
+                        )}
+                        <span className="flex items-center gap-1">
+                          <Clock size={11} />
+                          {new Date(booking.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                        </span>
+                      </div>
                     </div>
-
-                    <div className="flex gap-2">
+                    <div className="flex items-center gap-2 shrink-0">
                       <Link
                         href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
-                        className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-semibold bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-all"
+                        className="px-3 py-1.5 text-[11px] font-bold bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-all inline-flex items-center gap-1"
                       >
                         <MessageSquare size={11} /> Message
                       </Link>
@@ -313,7 +315,7 @@ export default function CustomerDashboard() {
                         <button
                           onClick={() => handleConfirmCompletion(booking.id)}
                           disabled={confirmLoading === booking.id}
-                          className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all disabled:opacity-50"
+                          className="px-3 py-1.5 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all disabled:opacity-50 inline-flex items-center gap-1"
                         >
                           <CheckCheck size={11} />
                           {confirmLoading === booking.id ? '...' : 'Confirm Done'}
@@ -322,19 +324,18 @@ export default function CustomerDashboard() {
                       {booking.status === 'completed' && booking.provider_id && (
                         <Link
                           href={`/customer/submit-review?bookingId=${booking.id}&jobId=${booking.job_id}&providerId=${booking.provider_id}&providerName=${encodeURIComponent(booking.provider_name || 'Provider')}`}
-                          className="flex-1 flex items-center justify-center gap-1 py-1.5 text-xs font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all"
+                          className="px-3 py-1.5 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all inline-flex items-center gap-1"
                         >
                           <Star size={11} /> Review
                         </Link>
                       )}
                     </div>
                   </div>
-                ))}
-              </div>
-            )}
-          </div>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
-
       </div>
     </div>
   );
