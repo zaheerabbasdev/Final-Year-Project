@@ -6,11 +6,11 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { api } from '../../utils/api';
-import { 
-  Briefcase, 
-  MapPin, 
-  DollarSign, 
-  Clock, 
+import {
+  Briefcase,
+  MapPin,
+  DollarSign,
+  Clock,
   AlertCircle,
   MessageSquare,
   CheckCircle2,
@@ -131,7 +131,7 @@ export default function ProviderBidsPage() {
   const displayedBids = filterBids(activeTab);
 
   return (
-    <div className="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-grow max-w-57xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6">
         <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
           My Placed Bids
@@ -161,16 +161,14 @@ export default function ProviderBidsPage() {
           <button
             key={tab.key}
             onClick={() => setActiveTab(tab.key)}
-            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${
-              activeTab === tab.key
+            className={`flex-shrink-0 flex items-center gap-1.5 px-3 py-2 rounded-lg text-xs font-bold transition-all ${activeTab === tab.key
                 ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 shadow-sm'
                 : 'text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-zinc-200'
-            }`}
+              }`}
           >
             {tab.label}
-            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold ${
-              activeTab === tab.key ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400' : 'bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500'
-            }`}>
+            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold ${activeTab === tab.key ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400' : 'bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500'
+              }`}>
               {countTab(tab.key)}
             </span>
           </button>
@@ -197,11 +195,10 @@ export default function ProviderBidsPage() {
             return (
               <div
                 key={bid.id}
-                className={`bg-white dark:bg-zinc-900/40 p-5 rounded-2xl border shadow-sm flex flex-col gap-4 ${
-                  isActiveJob ? 'border-blue-200/60 dark:border-blue-800/50' :
-                  isAwaiting ? 'border-amber-200/60 dark:border-amber-800/50' :
-                  'border-zinc-200/60 dark:border-zinc-800/80'
-                }`}
+                className={`bg-white dark:bg-zinc-900/40 p-5 rounded-2xl border shadow-sm flex flex-col gap-4 ${isActiveJob ? 'border-blue-200/60 dark:border-blue-800/50' :
+                    isAwaiting ? 'border-amber-200/60 dark:border-amber-800/50' :
+                      'border-zinc-200/60 dark:border-zinc-800/80'
+                  }`}
               >
                 <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
                   <div className="space-y-1.5 flex-grow">
