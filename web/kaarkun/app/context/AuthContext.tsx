@@ -12,6 +12,9 @@ interface User {
   role: 'customer' | 'provider' | 'admin';
   avatar?: string;
   status: string;
+  location?: string;
+  latitude?: number;
+  longitude?: number;
   profile?: any;
 }
 

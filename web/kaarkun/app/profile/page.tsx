@@ -222,12 +222,12 @@ export default function ProfilePage() {
         phone,
         location,
         profile: user?.role === 'provider' ? {
-          ...user.profile,
+          ...user?.profile,
           bio,
           experience_years: parseInt(experienceYears) || 0,
           skills: skillsArray,
-          category_id: categoryId ? parseInt(categoryId) : user.profile?.category_id,
-        } : user.profile
+          category_id: categoryId ? parseInt(categoryId) : user?.profile?.category_id,
+        } : user?.profile
       });
     } catch (err: any) {
       setError(err.message || 'Failed to update profile.');

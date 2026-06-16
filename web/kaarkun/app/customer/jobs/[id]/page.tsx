@@ -4,6 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
+import { useCurrency } from '../../../context/CurrencyContext';
 import { api } from '../../../utils/api';
 import { 
   Briefcase, 
@@ -49,6 +50,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
   const jobId = resolvedParams.id;
   
   const { user, loading: authLoading } = useAuth();
+  const { format } = useCurrency();
   const router = useRouter();
 
   const [job, setJob] = useState<Job | null>(null);
@@ -142,7 +144,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
               </div>
               <div className="text-right">
                 <p className="text-xs text-zinc-500">Budget</p>
-                <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">PKR {Number(job.budget).toLocaleString()}</p>
+                <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{format(job.budget)}</p>
               </div>
             </div>
 
@@ -210,7 +212,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">PKR {Number(bid.amount).toLocaleString()}</p>
+                        <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{format(bid.amount)}</p>
                         <p className="text-[10px] text-zinc-500">Est: {bid.estimated_time}</p>
                       </div>
                     </div>

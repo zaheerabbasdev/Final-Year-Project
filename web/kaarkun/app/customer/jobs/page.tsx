@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { api } from '../../utils/api';
 import {
   Briefcase,
@@ -51,6 +52,7 @@ const STATUS_BADGE: Record<string, string> = {
 
 export default function CustomerJobsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { format } = useCurrency();
   const router = useRouter();
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -233,7 +235,7 @@ export default function CustomerJobsPage() {
                     <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500 pt-1">
                       <span className="flex items-center gap-1 font-semibold text-zinc-800 dark:text-zinc-200">
                         <DollarSign size={12} className="text-indigo-500" />
-                        PKR {Number(job.budget).toLocaleString()}
+                        {format(job.budget)}
                         {job.is_negotiable && <span className="font-normal text-zinc-400">(Neg.)</span>}
                       </span>
                       <span className="flex items-center gap-1"><MapPin size={12} />{job.location}</span>

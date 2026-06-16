@@ -95,92 +95,168 @@ export default function CustomerBookingsPage() {
   }
 
   return (
-    <div className="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <h1 className="text-3xl font-bold mb-6 text-zinc-900 dark:text-zinc-50">My Bookings</h1>
+    <div className="flex-grow w-full px-4 sm:px-6 lg:px-8 py-8">
+      {/* Page Header */}
+      <div className="mb-8">
+        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
+          My Bookings
+        </h1>
+        <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">
+          Track and manage your service bookings
+        </p>
+      </div>
 
       {error && (
-        <div className="mb-4 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 flex items-start gap-2">
+        <div className="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 flex items-start gap-2 text-sm">
           <AlertCircle size={18} className="shrink-0 mt-0.5" />
           <span>{error}</span>
         </div>
       )}
 
       {bookings.length === 0 ? (
-        <div className="text-center py-12 bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl">
-          <Briefcase size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
-          <p className="text-zinc-500 dark:text-zinc-400">You have no bookings at the moment.</p>
-          <Link href="/customer/browse-jobs" className="inline-block mt-4 text-indigo-600 dark:text-indigo-400 hover:underline font-medium">
-            Browse Jobs →
+        <div className="text-center py-20 bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl">
+          <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
+            <Briefcase size={28} className="text-zinc-400 dark:text-zinc-600" />
+          </div>
+          <p className="text-zinc-500 dark:text-zinc-400 font-medium">You have no bookings at the moment.</p>
+          <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">Your confirmed service hires will appear here</p>
+          <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-5 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all">
+            <Briefcase size={14} />
+            Post a Job
           </Link>
         </div>
       ) : (
         <div className="space-y-4">
-          {bookings.map((booking) => (
-            <div
-              key={booking.id}
-              className="bg-white dark:bg-zinc-900/40 p-5 rounded-2xl border shadow-sm flex flex-col gap-4"
-            >
-              <div className="flex flex-col sm:flex-row sm:justify-between gap-2">
-                <h3 className="font-bold text-lg text-zinc-900 dark:text-zinc-50">{booking.job_title || `Booking #${booking.id}`}</h3>
-                <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase ${
-                  booking.status === 'confirmed' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400' :
-                  booking.status === 'in_progress' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400' :
-                  booking.status === 'awaiting_confirmation' ? 'bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400' :
-                  booking.status === 'completed' ? 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400' :
-                  booking.status === 'cancelled' ? 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400' :
-                  'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300'
-                }`}> {booking.status.replace('_', ' ')} </span>
+          {bookings.map((booking) => {
+            const statusConfig: Record<string, { color: string; bg: string; border: string; accent: string; icon: React.ReactNode }> = {
+              confirmed:              { color: 'text-blue-700 dark:text-blue-400',    bg: 'bg-blue-50 dark:bg-blue-950/30',      border: 'border-blue-200 dark:border-blue-800', accent: 'bg-blue-500',    icon: <CheckCircle2 size={13} /> },
+              in_progress:            { color: 'text-amber-700 dark:text-amber-400',  bg: 'bg-amber-50 dark:bg-amber-950/30',    border: 'border-amber-200 dark:border-amber-800', accent: 'bg-amber-500',  icon: <Clock size={13} /> },
+              awaiting_confirmation:  { color: 'text-violet-700 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', accent: 'bg-violet-500', icon: <Clock size={13} /> },
+              completed:              { color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', accent: 'bg-emerald-500', icon: <CheckCircle2 size={13} /> },
+              cancelled:              { color: 'text-rose-700 dark:text-rose-400',    bg: 'bg-rose-50 dark:bg-rose-950/30',      border: 'border-rose-200 dark:border-rose-800', accent: 'bg-rose-500',   icon: <XCircle size={13} /> },
+            };
+            const sc = statusConfig[booking.status] || statusConfig.confirmed;
+
+            return (
+              <div
+                key={booking.id}
+                className="group w-full bg-white dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+              >
+                <div className="flex">
+                  {/* Accent bar */}
+                  <div className={`w-1.5 shrink-0 ${sc.accent} rounded-l-2xl`} />
+
+                  {/* Card content */}
+                  <div className="flex-1 p-5 sm:p-6">
+                    {/* Top row: title + status */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className={`w-10 h-10 rounded-xl ${sc.bg} flex items-center justify-center shrink-0`}>
+                          <Briefcase size={18} className={sc.color} />
+                        </div>
+                        <div className="min-w-0">
+                          <h3 className="font-bold text-base text-zinc-900 dark:text-white truncate">
+                            {booking.job_title || `Booking #${booking.id}`}
+                          </h3>
+                          <p className="text-xs text-zinc-400 dark:text-zinc-500 mt-0.5">
+                            Booking #{booking.id}
+                          </p>
+                        </div>
+                      </div>
+                      <span className={`inline-flex items-center gap-1.5 px-3 py-1 text-[11px] font-bold rounded-full uppercase tracking-wide ${sc.bg} ${sc.color} border ${sc.border} self-start sm:self-auto whitespace-nowrap`}>
+                        {sc.icon}
+                        {booking.status.replace(/_/g, ' ')}
+                      </span>
+                    </div>
+
+                    {/* Info grid */}
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                      {booking.provider_name && (
+                        <div className="flex items-center gap-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                          <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center shrink-0">
+                            <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                              {booking.provider_name.charAt(0).toUpperCase()}
+                            </span>
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">Provider</p>
+                            <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200 truncate">{booking.provider_name}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      {booking.provider_phone && (
+                        <div className="flex items-center gap-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                          <div className="w-8 h-8 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                            <MessageSquare size={14} className="text-emerald-600 dark:text-emerald-400" />
+                          </div>
+                          <div className="min-w-0">
+                            <p className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">Phone</p>
+                            <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{booking.provider_phone}</p>
+                          </div>
+                        </div>
+                      )}
+
+                      <div className="flex items-center gap-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                        <div className="w-8 h-8 rounded-lg bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center shrink-0">
+                          <Clock size={14} className="text-amber-600 dark:text-amber-400" />
+                        </div>
+                        <div className="min-w-0">
+                          <p className="text-[10px] uppercase tracking-wider text-zinc-400 dark:text-zinc-500 font-semibold">Created</p>
+                          <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">
+                            {new Date(booking.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                          </p>
+                        </div>
+                      </div>
+                    </div>
+
+                    {/* Actions */}
+                    <div className="flex flex-wrap gap-2 pt-4 border-t border-zinc-100 dark:border-white/[0.06]">
+                      <Link
+                        href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
+                        className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-700 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg inline-flex items-center gap-1.5 transition-all hover:border-indigo-300 dark:hover:border-indigo-700"
+                      >
+                        <MessageSquare size={12} />
+                        Message Provider
+                      </Link>
+
+                      {booking.status === 'completed' && (
+                        <Link
+                          href={`/customer/submit-review?bookingId=${booking.id}&jobId=${booking.job_id}&providerId=${booking.provider_id}&providerName=${encodeURIComponent(booking.provider_name || '')}`}
+                          className="px-3.5 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm"
+                        >
+                          <Star size={12} />
+                          Leave a Review
+                        </Link>
+                      )}
+
+                      {booking.status === 'awaiting_confirmation' && (
+                        <button
+                          onClick={() => handleConfirm(booking.id)}
+                          disabled={actionLoading === booking.id}
+                          className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm"
+                        >
+                          <CheckCheck size={12} />
+                          {actionLoading === booking.id ? 'Confirming...' : 'Confirm Completion'}
+                        </button>
+                      )}
+
+                      {booking.status === 'confirmed' && (
+                        <button
+                          onClick={() => handleCancel(booking.id)}
+                          disabled={actionLoading === booking.id}
+                          className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all"
+                        >
+                          <XCircle size={12} />
+                          {actionLoading === booking.id ? 'Cancelling...' : 'Cancel Booking'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
               </div>
-
-              <div className="flex flex-col sm:flex-row sm:justify-between text-sm text-zinc-500 dark:text-zinc-400 pt-1">
-                {booking.provider_name && (
-                  <p className="flex items-center gap-1">
-                    Provider: <strong>{booking.provider_name}</strong>
-                  </p>
-                )}
-                {booking.provider_phone && (
-                  <p className="flex items-center gap-1">
-                    Phone: <strong>{booking.provider_phone}</strong>
-                  </p>
-                )}
-                <p className="flex items-center gap-1">
-                  Created: <strong>{booking.created_at.split('T')[0]}</strong>
-                </p>
-              </div>
-
-              <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
-                <Link
-                  href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
-                  className="flex-1 text-center py-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg flex items-center justify-center gap-1"
-                >
-                  <MessageSquare size={12} />
-                  Message Provider
-                </Link>
-
-                {booking.status === 'awaiting_confirmation' && (
-                  <button
-                    onClick={() => handleConfirm(booking.id)}
-                    disabled={actionLoading === booking.id}
-                    className="flex-1 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1"
-                  >
-                    <CheckCheck size={12} />
-                    {actionLoading === booking.id ? 'Confirming...' : 'Confirm Completion'}
-                  </button>
-                )}
-
-                {booking.status === 'confirmed' && (
-                  <button
-                    onClick={() => handleCancel(booking.id)}
-                    disabled={actionLoading === booking.id}
-                    className="flex-1 py-1.5 bg-rose-600 hover:bg-rose-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1"
-                  >
-                    <XCircle size={12} />
-                    {actionLoading === booking.id ? 'Cancelling...' : 'Cancel Booking'}
-                  </button>
-                )}
-              </div>
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>

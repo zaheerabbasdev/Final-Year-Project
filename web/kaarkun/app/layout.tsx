@@ -1,20 +1,10 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
+import { CurrencyProvider } from "./context/CurrencyContext";
 import Navbar from "./components/Navbar";
 import Sidebar from "./components/Sidebar";
-
-const geistSans = Geist({
-  variable: "--font-geist-sans",
-  subsets: ["latin"],
-});
-
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
-  subsets: ["latin"],
-});
 
 export const metadata: Metadata = {
   title: "Kaarkun - Job Marketplace & Service On Demand",
@@ -29,7 +19,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
+      className={`h-full antialiased`}
     >
       <head>
         {/* Prevent dark mode flash on initial load */}
@@ -54,17 +44,19 @@ export default function RootLayout({
       </head>
       <body className="h-full bg-[#f8f9fc] dark:bg-[#0a0a0f] text-zinc-900 dark:text-zinc-50">
         <ThemeProvider>
-          <AuthProvider>
-            <div className="flex h-screen w-full overflow-hidden transition-colors duration-300">
-              <Sidebar />
-              <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-                <Navbar />
-                <main className="flex-1 overflow-y-auto w-full">
-                  {children}
-                </main>
+          <CurrencyProvider>
+            <AuthProvider>
+              <div className="flex h-screen w-full overflow-hidden transition-colors duration-300">
+                <Sidebar />
+                <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+                  <Navbar />
+                  <main className="flex-1 overflow-y-auto w-full">
+                    {children}
+                  </main>
+                </div>
               </div>
-            </div>
-          </AuthProvider>
+            </AuthProvider>
+          </CurrencyProvider>
         </ThemeProvider>
       </body>
     </html>

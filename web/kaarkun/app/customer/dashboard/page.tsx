@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { api } from '../../utils/api';
 import {
   Briefcase,
@@ -59,6 +60,7 @@ const STATUS_STYLES: Record<string, string> = {
 
 export default function CustomerDashboard() {
   const { user, loading: authLoading } = useAuth();
+  const { format } = useCurrency();
   const router = useRouter();
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -224,7 +226,7 @@ export default function CustomerDashboard() {
                         <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400">
                           <span className="flex items-center gap-1"><MapPin size={11} />{job.location}</span>
                           <span className="flex items-center gap-1 font-semibold text-zinc-600 dark:text-zinc-300">
-                            <DollarSign size={11} />PKR {Number(job.budget).toLocaleString()}
+                            <DollarSign size={11} />{format(job.budget)}
                           </span>
                           <span className="flex items-center gap-1"><Clock size={11} />{new Date(job.created_at).toLocaleDateString()}</span>
                         </div>

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useCurrency, SUPPORTED_CURRENCIES } from '../context/CurrencyContext';
 import { api } from '../utils/api';
 import {
   Bell,
@@ -13,7 +14,8 @@ import {
   Moon,
   X,
   CheckCheck,
-  Sparkles
+  Sparkles,
+  Globe
 } from 'lucide-react';
 
 const PAGE_META: Record<string, { title: string; sub: string; icon: string }> = {
@@ -33,10 +35,14 @@ const PAGE_META: Record<string, { title: string; sub: string; icon: string }> = 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { selectedCurrency, setCurrency } = useCurrency();
   const pathname = usePathname();
-  const [showNotifications, setShowNotifications] = useState(false);
+  const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
+  const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const currencyRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -49,8 +55,11 @@ export default function Navbar() {
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
+      if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) {
+        setShowCurrencyDropdown(false);
+      }
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
-        setShowNotifications(false);
+        setShowNotificationsDropdown(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -78,6 +87,16 @@ export default function Navbar() {
     }
   };
 
+  const handleMarkOneRead = async (id: number) => {
+    try {
+      await api.put(`/notifications/${id}/read`);
+      setUnreadCount(prev => Math.max(0, prev - 1));
+      setNotifications(notifications.map(n => n.id === id ? { ...n, is_read: true } : n));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
   const toggleSidebar = () => window.dispatchEvent(new Event('toggle-sidebar'));
 
   const getPageMeta = () => {
@@ -93,8 +112,9 @@ export default function Navbar() {
   const roleGradient = isCustomer ? 'from-blue-500 to-cyan-400' : 'from-violet-500 to-indigo-500';
 
   return (
-    <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-zinc-100 dark:border-white/[0.06] transition-colors duration-300">
-      <div className="px-5 h-[70px] flex items-center justify-between gap-4">
+    <>
+      <header className="sticky top-0 z-40 bg-white/80 dark:bg-[#0a0a0f]/90 backdrop-blur-xl border-b border-zinc-100 dark:border-white/[0.06] transition-colors duration-300">
+        <div className="px-5 h-[70px] flex items-center justify-between gap-4">
 
         {/* Left: Hamburger + Page title */}
         <div className="flex items-center gap-4 min-w-0">
@@ -141,6 +161,43 @@ export default function Navbar() {
                 {isCustomer ? 'Customer' : 'Provider'}
               </div>
 
+              {/* Currency Selector */}
+              <div className="relative" ref={currencyRef}>
+                <button
+                  onClick={() => setShowCurrencyDropdown(!showCurrencyDropdown)}
+                  title="Select Application Currency"
+                  className="flex items-center gap-1.5 px-3 py-2 rounded-xl text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all border border-zinc-100 dark:border-white/[0.08]"
+                >
+                  <Globe size={16} className="text-indigo-500" />
+                  <span>{selectedCurrency}</span>
+                </button>
+
+                {showCurrencyDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-48 bg-white dark:bg-[#13131e] border border-zinc-100 dark:border-white/[0.08] rounded-2xl shadow-2xl z-50 overflow-hidden py-1.5 animate-in fade-in slide-in-from-top-2 duration-150">
+                    <div className="px-3.5 py-1.5 text-[11px] font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-wider">
+                      Currency
+                    </div>
+                    {SUPPORTED_CURRENCIES.map((curr) => (
+                      <button
+                        key={curr.code}
+                        onClick={() => {
+                          setCurrency(curr.code);
+                          setShowCurrencyDropdown(false);
+                        }}
+                        className={`w-full text-left px-4 py-2 text-xs flex justify-between items-center transition-colors ${
+                          selectedCurrency === curr.code
+                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/[0.02]'
+                        }`}
+                      >
+                        <span>{curr.name}</span>
+                        <span className="text-[10px] font-mono opacity-80">{curr.code} ({curr.symbol})</span>
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
+
               {/* Theme toggle */}
               <button
                 onClick={toggleTheme}
@@ -154,10 +211,10 @@ export default function Navbar() {
                 )}
               </button>
 
-              {/* Notifications */}
+              {/* Notifications dropdown */}
               <div className="relative" ref={notifRef}>
                 <button
-                  onClick={() => setShowNotifications(!showNotifications)}
+                  onClick={() => setShowNotificationsDropdown(!showNotificationsDropdown)}
                   className="relative p-2 rounded-xl text-zinc-500 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
                 >
                   <Bell size={18} />
@@ -166,8 +223,7 @@ export default function Navbar() {
                   )}
                 </button>
 
-                {/* Notifications panel */}
-                {showNotifications && (
+                {showNotificationsDropdown && (
                   <div className="absolute top-full right-0 mt-2 w-[340px] bg-white dark:bg-[#13131e] border border-zinc-100 dark:border-white/[0.08] rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/40 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-3 border-b border-zinc-100 dark:border-white/[0.06] flex justify-between items-center">
                       <div>
@@ -196,7 +252,14 @@ export default function Navbar() {
                         notifications.map(notif => (
                           <div
                             key={notif.id}
-                            className={`px-4 py-3 border-b border-zinc-50 dark:border-white/[0.04] last:border-0 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors ${
+                            onClick={() => {
+                              if (!notif.is_read) {
+                                handleMarkOneRead(notif.id);
+                              }
+                              setSelectedNotification(notif);
+                              setShowNotificationsDropdown(false);
+                            }}
+                            className={`px-4 py-3 border-b border-zinc-50 dark:border-white/[0.04] last:border-0 hover:bg-zinc-50 dark:hover:bg-white/[0.03] transition-colors cursor-pointer relative ${
                               !notif.is_read ? 'bg-indigo-50/50 dark:bg-indigo-500/5' : ''
                             }`}
                           >
@@ -273,7 +336,47 @@ export default function Navbar() {
             </div>
           )}
         </div>
-      </div>
-    </header>
+        </div>
+      </header>
+
+      {/* Notification Detail Modal */}
+      {selectedNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#13131e] border border-zinc-100 dark:border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden p-6 flex flex-col animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setSelectedNotification(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
+            >
+              <X size={18} />
+            </button>
+            <div className="flex items-start gap-3.5 mb-4 pr-6">
+              <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl shrink-0 mt-0.5">
+                <Bell size={20} className="text-indigo-600 dark:text-indigo-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-zinc-950 dark:text-white text-base leading-tight">
+                  {selectedNotification.title}
+                </h3>
+                <p className="text-[10px] text-zinc-400 mt-1">
+                  {new Date(selectedNotification.created_at).toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <div className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap bg-zinc-50/50 dark:bg-white/[0.01] p-4 rounded-xl border border-zinc-100 dark:border-white/[0.04] mb-4">
+              {selectedNotification.message}
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setSelectedNotification(null)}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+    </>
   );
 }
+

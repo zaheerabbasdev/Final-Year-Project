@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { api } from '../../utils/api';
 import { 
   Briefcase, 
@@ -39,6 +40,7 @@ type TabKey = 'all' | 'pending' | 'active' | 'completed' | 'availed';
 
 export default function ProviderBidsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { format } = useCurrency();
   const router = useRouter();
 
   const [bids, setBids] = useState<Bid[]>([]);
@@ -230,7 +232,7 @@ export default function ProviderBidsPage() {
                       )}
                       <span className="flex items-center gap-1 font-semibold text-zinc-700 dark:text-zinc-300">
                         <DollarSign size={11} />
-                        PKR {Number(bid.amount).toLocaleString()}
+                        {format(bid.amount)}
                       </span>
                       <span className="flex items-center gap-1">
                         <Clock size={11} />

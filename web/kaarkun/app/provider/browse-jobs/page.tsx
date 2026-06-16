@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useCurrency } from '../../context/CurrencyContext';
 import { api } from '../../utils/api';
 import { 
   Briefcase, 
@@ -56,6 +57,7 @@ interface AISuggestion {
 
 export default function BrowseJobsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { format, convertToPkr, convertFromPkr, currencyInfo } = useCurrency();
   const router = useRouter();
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -155,7 +157,7 @@ export default function BrowseJobsPage() {
 
   const handleOpenBidModal = async (job: Job) => {
     setBiddingJob(job);
-    setBidAmount(String(job.budget));
+    setBidAmount(convertFromPkr(job.budget).toFixed(currencyInfo.code === 'PKR' ? 0 : 2));
     setEstimatedTime('');
     setCoverLetter('');
     setBidError(null);
@@ -189,7 +191,7 @@ export default function BrowseJobsPage() {
     try {
       await api.post('/bids', {
         job_id: biddingJob.id,
-        amount: parseFloat(bidAmount),
+        amount: convertToPkr(bidAmount),
         estimated_time: estimatedTime,
         cover_letter: coverLetter,
       });
@@ -417,7 +419,7 @@ export default function BrowseJobsPage() {
                 <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-zinc-500 pt-1">
                   <span className="flex items-center gap-1.5 font-semibold text-zinc-800 dark:text-zinc-250">
                     <DollarSign size={14} className="text-indigo-500" />
-                    PKR {Number(job.budget).toLocaleString()} {job.is_negotiable && <span className="font-normal text-zinc-400">(Negotiable)</span>}
+                    {format(job.budget)} {job.is_negotiable && <span className="font-normal text-zinc-400">(Negotiable)</span>}
                   </span>
                   <span className="flex items-center gap-1.5">
                     <MapPin size={14} />
@@ -471,7 +473,7 @@ export default function BrowseJobsPage() {
               Place Bid: {biddingJob.title}
             </h3>
             <p className="text-xs text-zinc-500 mb-4">
-              Client budget: PKR {Number(biddingJob.budget).toLocaleString()}
+              Client budget: {format(biddingJob.budget)}
             </p>
 
             {/* AI Bid Suggestion Panel */}
@@ -490,15 +492,15 @@ export default function BrowseJobsPage() {
                   <div className="flex gap-3 text-center">
                     <div className="flex-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-violet-100 dark:border-violet-900/50">
                       <p className="text-[9px] text-zinc-400 uppercase font-bold">Min</p>
-                      <p className="text-sm font-extrabold text-violet-700 dark:text-violet-400">PKR {aiSuggestion.suggestedMin.toLocaleString()}</p>
+                      <p className="text-sm font-extrabold text-violet-700 dark:text-violet-400">{format(aiSuggestion.suggestedMin)}</p>
                     </div>
                     <div className="flex-1 p-2 bg-violet-600 rounded-lg">
                       <p className="text-[9px] text-violet-200 uppercase font-bold">Avg</p>
-                      <p className="text-sm font-extrabold text-white">PKR {aiSuggestion.averagePrice.toLocaleString()}</p>
+                      <p className="text-sm font-extrabold text-white">{format(aiSuggestion.averagePrice)}</p>
                     </div>
                     <div className="flex-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-violet-100 dark:border-violet-900/50">
                       <p className="text-[9px] text-zinc-400 uppercase font-bold">Max</p>
-                      <p className="text-sm font-extrabold text-violet-700 dark:text-violet-400">PKR {aiSuggestion.suggestedMax.toLocaleString()}</p>
+                      <p className="text-sm font-extrabold text-violet-700 dark:text-violet-400">{format(aiSuggestion.suggestedMax)}</p>
                     </div>
                   </div>
                   <p className="text-[10px] text-zinc-400 mt-2 text-center">
@@ -508,10 +510,10 @@ export default function BrowseJobsPage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => setBidAmount(aiSuggestion.averagePrice.toString())}
+                    onClick={() => setBidAmount(convertFromPkr(aiSuggestion.averagePrice).toFixed(currencyInfo.code === 'PKR' ? 0 : 2))}
                     className="mt-2 w-full text-[10px] font-bold text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-800/50 rounded-lg py-1 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-colors"
                   >
-                    Use AI Average (PKR {aiSuggestion.averagePrice.toLocaleString()})
+                    Use AI Average ({format(aiSuggestion.averagePrice)})
                   </button>
                 </div>
               ) : (
@@ -536,7 +538,7 @@ export default function BrowseJobsPage() {
             <form onSubmit={handlePlaceBid} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Your Bid Amount (PKR)
+                  Your Bid Amount ({currencyInfo.code})
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">

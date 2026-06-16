@@ -173,30 +173,6 @@ export default function Sidebar() {
           </button>
         </div>
 
-        {/* User card */}
-        <div className="px-3 pt-4 pb-2 shrink-0">
-          <Link href="/profile" className="flex items-center gap-3 p-2.5 rounded-xl hover:bg-zinc-50 dark:hover:bg-white/5 transition-colors group">
-            {user.avatar ? (
-              <img
-                src={`http://localhost:5000${user.avatar}`}
-                alt={user.full_name}
-                className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/30 shrink-0"
-              />
-            ) : (
-              <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${roleColor} flex items-center justify-center text-white font-bold text-sm shrink-0 shadow-md`}>
-                {avatarInitial}
-              </div>
-            )}
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-zinc-800 dark:text-zinc-100 truncate leading-tight">
-                {user.full_name}
-              </p>
-              <p className="text-[11px] text-zinc-400 truncate">
-                {user.email}
-              </p>
-            </div>
-          </Link>
-        </div>
 
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">

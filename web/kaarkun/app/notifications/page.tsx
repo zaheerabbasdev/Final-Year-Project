@@ -14,7 +14,8 @@ import {
   Briefcase,
   MessageSquare,
   Star,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 
 interface Notification {
@@ -52,6 +53,7 @@ export default function NotificationsPage() {
   const router = useRouter();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
@@ -150,7 +152,12 @@ export default function NotificationsPage() {
           {notifications.map(notif => (
             <div
               key={notif.id}
-              onClick={() => !notif.is_read && handleMarkOneRead(notif.id)}
+              onClick={() => {
+                if (!notif.is_read) {
+                  handleMarkOneRead(notif.id);
+                }
+                setSelectedNotification(notif);
+              }}
               className={`group relative flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
                 notif.is_read
                   ? 'bg-white dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50 dark:hover:bg-zinc-900/50'
@@ -183,6 +190,44 @@ export default function NotificationsPage() {
               )}
             </div>
           ))}
+        </div>
+      )}
+
+      {/* Notification Detail Modal */}
+      {selectedNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="relative w-full max-w-md bg-white dark:bg-[#13131e] border border-zinc-100 dark:border-white/[0.08] rounded-2xl shadow-2xl overflow-hidden p-6 flex flex-col animate-in zoom-in-95 duration-200">
+            <button
+              onClick={() => setSelectedNotification(null)}
+              className="absolute top-4 right-4 p-1.5 rounded-lg text-zinc-400 hover:text-zinc-500 dark:hover:text-zinc-350 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors"
+            >
+              <X size={18} />
+            </button>
+            <div className="flex items-start gap-3.5 mb-4 pr-6">
+              <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl shrink-0 mt-0.5">
+                {getNotifIcon(selectedNotification.type)}
+              </div>
+              <div>
+                <h3 className="font-bold text-zinc-950 dark:text-white text-base leading-tight">
+                  {selectedNotification.title}
+                </h3>
+                <p className="text-[10px] text-zinc-400 mt-1">
+                  {new Date(selectedNotification.created_at).toLocaleString()}
+                </p>
+              </div>
+            </div>
+            <div className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed whitespace-pre-wrap bg-zinc-50/50 dark:bg-white/[0.01] p-4 rounded-xl border border-zinc-100 dark:border-white/[0.04] mb-4">
+              {selectedNotification.message}
+            </div>
+            <div className="flex justify-end">
+              <button
+                onClick={() => setSelectedNotification(null)}
+                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
+              >
+                Dismiss
+              </button>
+            </div>
+          </div>
         </div>
       )}
     </div>

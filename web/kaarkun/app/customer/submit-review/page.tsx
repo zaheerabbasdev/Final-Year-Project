@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, use } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
@@ -14,7 +14,7 @@ const RATING_LABELS: Record<number, string> = {
   5: 'Excellent!',
 };
 
-export default function SubmitReviewPage() {
+function SubmitReviewContent() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -183,5 +183,17 @@ export default function SubmitReviewPage() {
         </form>
       </div>
     </div>
+  );
+}
+
+export default function SubmitReviewPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+      </div>
+    }>
+      <SubmitReviewContent />
+    </Suspense>
   );
 }

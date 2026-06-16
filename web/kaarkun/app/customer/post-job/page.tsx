@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import LocationInput from '../../components/LocationInput';
+import { useCurrency } from '../../context/CurrencyContext';
 import { 
   Briefcase, 
   MapPin, 
@@ -26,6 +27,7 @@ interface Category {
 
 export default function PostJobPage() {
   const { user, loading: authLoading } = useAuth();
+  const { currencyInfo, convertToPkr, convertFromPkr } = useCurrency();
   const router = useRouter();
 
   const [categories, setCategories] = useState<Category[]>([
@@ -82,7 +84,7 @@ export default function PostJobPage() {
       });
       if (result) {
         if (result.completion) setDescription(result.completion);
-        if (result.suggestedBudget) setBudget(result.suggestedBudget.toString());
+        if (result.suggestedBudget) setBudget(convertFromPkr(result.suggestedBudget).toFixed(currencyInfo.code === 'PKR' ? 0 : 2));
         if (result.category) {
           const matchedCategory = categories.find(c => c.name.toLowerCase() === result.category.toLowerCase());
           if (matchedCategory) {
@@ -119,7 +121,7 @@ export default function PostJobPage() {
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('budget', budget);
+    formData.append('budget', String(convertToPkr(budget)));
     formData.append('category_id', categoryId);
     formData.append('location', location);
     formData.append('preferred_date', prefDate || '');
@@ -244,7 +246,7 @@ export default function PostJobPage() {
 
             <div>
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Budget (PKR)
+                Budget ({currencyInfo.code})
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
