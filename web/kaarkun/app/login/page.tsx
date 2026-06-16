@@ -122,13 +122,13 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column: Visual Brand Block */}
-      <div className="hidden lg:flex flex-1 relative bg-zinc-900 overflow-hidden items-center justify-center">
+      <div className="hidden lg:flex flex-1 relative dark:bg-zinc-900 overflow-hidden items-center justify-center">
         <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/60 via-zinc-950 to-zinc-950"></div>
         <div className="relative z-10 max-w-md text-center px-6">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
             Get Professional Help instantly
           </h1>
-          <p className="mt-4 text-lg text-zinc-300">
+          <p className="mt-4 text-lg text-zinc-800 dark:text-white">
             Post jobs, browse rates, message experts, and get services completed effortlessly with the Kaarkun marketplace.
           </p>
         </div>
