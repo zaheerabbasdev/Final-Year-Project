@@ -17,6 +17,7 @@ import {
   Star,
   Activity,
   Briefcase,
+  BadgeCheck,
   Layers,
   Award
 } from 'lucide-react';
@@ -302,29 +303,10 @@ export default function ProfilePage() {
               {user?.role === 'provider' ? providerCategory : roleName}
             </p>
 
-            {/* Provider availability toggle */}
-            {user?.role === 'provider' && (
-              <div className="mt-6 flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800">
-                <div className="text-left">
-                  <span className="text-xs font-bold text-zinc-755 dark:text-zinc-350">Status Availability</span>
-                  <p className="text-[10px] text-zinc-400">{isOnline ? 'Online & Receiving Bids' : 'Offline Mode'}</p>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleOnlineToggle}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isOnline ? 'bg-emerald-500' : 'bg-zinc-350 dark:bg-zinc-700'
-                    }`}
-                >
-                  <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isOnline ? 'translate-x-5' : 'translate-x-0'
-                      }`}
-                  />
-                </button>
-              </div>
-            )}
+
 
             {/* Stats Row */}
-            <div className="grid grid-cols-2 max-w-md mx-auto gap-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
+            <div className="grid grid-cols-3 max-w-md mx-auto gap-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
               <div className="p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
                 <Briefcase className="w-5 h-5 text-indigo-500 mx-auto mb-1.5" />
                 <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{stats.totalJobs || 0}</span>
@@ -347,6 +329,28 @@ export default function ProfilePage() {
                   </>
                 )}
               </div>
+
+              {/* Provider availability toggle */}
+              {user?.role === 'provider' && (
+                <div className=" flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800">
+                  <div className="text-left">
+                    <BadgeCheck className="w-5 h-5 text-emerald-500 mx-auto mb-1.5" />
+                    <span className="text-xs font-bold text-zinc-755 dark:text-zinc-350">Available</span>
+                    <p className="text-[10px] text-zinc-400">{isOnline ? 'Online' : 'Offline'}</p>
+                  </div>
+                  <button
+                    type="button"
+                    onClick={handleOnlineToggle}
+                    className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isOnline ? 'bg-emerald-500' : 'bg-zinc-350 dark:bg-zinc-700'
+                      }`}
+                  >
+                    <span
+                      className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isOnline ? 'translate-x-5' : 'translate-x-0'
+                        }`}
+                    />
+                  </button>
+                </div>
+              )}
             </div>
           </div>
         </div>
