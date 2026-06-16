@@ -94,7 +94,7 @@ function SubmitReviewContent() {
   const activeRating = hoverRating || rating;
 
   return (
-    <div className="flex-grow max-w-lg w-full mx-auto px-4 sm:px-6 py-8">
+    <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <button
         onClick={() => router.back()}
         className="mb-6 flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-indigo-600 transition-colors"
@@ -144,11 +144,10 @@ function SubmitReviewContent() {
                 >
                   <Star
                     size={44}
-                    className={`transition-colors ${
-                      star <= activeRating
+                    className={`transition-colors ${star <= activeRating
                         ? 'text-amber-400 fill-amber-400'
                         : 'text-zinc-300 dark:text-zinc-700'
-                    }`}
+                      }`}
                   />
                 </button>
               ))}

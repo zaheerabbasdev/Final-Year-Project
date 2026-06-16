@@ -4,11 +4,11 @@ import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
-import { 
-  Send, 
-  Bot, 
-  User as UserIcon, 
-  ChevronLeft, 
+import {
+  Send,
+  Bot,
+  User as UserIcon,
+  ChevronLeft,
   Sparkles,
   RefreshCw
 } from 'lucide-react';
@@ -127,7 +127,7 @@ export default function SupportChatbotPage() {
   }
 
   return (
-    <div className="flex-grow max-w-4xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col h-[calc(100vh-8rem)]">
+    <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 flex flex-col h-[calc(100vh-8rem)]">
       {/* Header Panel */}
       <div className="bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-t-2xl shadow-sm p-4 flex justify-between items-center shrink-0">
         <div className="flex items-center gap-3">
@@ -168,20 +168,18 @@ export default function SupportChatbotPage() {
             key={m.id}
             className={`flex gap-3 max-w-[80%] ${m.sender === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
           >
-            <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${
-              m.sender === 'user' 
-                ? 'bg-indigo-600 text-white' 
-                : 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-400 border border-violet-200/50 dark:border-violet-800/50'
-            }`}>
+            <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${m.sender === 'user'
+              ? 'bg-indigo-600 text-white'
+              : 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-400 border border-violet-200/50 dark:border-violet-800/50'
+              }`}>
               {m.sender === 'user' ? <UserIcon size={14} /> : <Bot size={14} />}
             </div>
 
             <div className="space-y-1">
-              <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${
-                m.sender === 'user'
-                  ? 'bg-indigo-600 text-white rounded-tr-none'
-                  : 'bg-white dark:bg-zinc-900 text-zinc-850 dark:text-zinc-55 border border-zinc-200/40 dark:border-zinc-800/80 rounded-tl-none'
-              }`}>
+              <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${m.sender === 'user'
+                ? 'bg-indigo-600 text-white rounded-tr-none'
+                : 'bg-white dark:bg-zinc-900 text-zinc-850 dark:text-zinc-55 border border-zinc-200/40 dark:border-zinc-800/80 rounded-tl-none'
+                }`}>
                 {m.text}
               </div>
               <span className={`text-[9px] text-zinc-400 block px-1 ${m.sender === 'user' ? 'text-right' : 'text-left'}`}>

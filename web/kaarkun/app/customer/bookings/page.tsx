@@ -5,17 +5,17 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
-import { 
-  Briefcase, 
-  MapPin, 
-  DollarSign, 
-  Clock, 
-  CheckCircle2, 
-  XCircle, 
-  MessageSquare, 
-  Star, 
-  CheckCheck, 
-  AlertCircle 
+import {
+  Briefcase,
+  MapPin,
+  DollarSign,
+  Clock,
+  CheckCircle2,
+  XCircle,
+  MessageSquare,
+  Star,
+  CheckCheck,
+  AlertCircle
 } from 'lucide-react';
 
 interface Booking {
@@ -95,7 +95,7 @@ export default function CustomerBookingsPage() {
   }
 
   return (
-    <div className="flex-grow w-full px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Header */}
       <div className="mb-8">
         <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
@@ -129,11 +129,11 @@ export default function CustomerBookingsPage() {
         <div className="space-y-4">
           {bookings.map((booking) => {
             const statusConfig: Record<string, { color: string; bg: string; border: string; accent: string; icon: React.ReactNode }> = {
-              confirmed:              { color: 'text-blue-700 dark:text-blue-400',    bg: 'bg-blue-50 dark:bg-blue-950/30',      border: 'border-blue-200 dark:border-blue-800', accent: 'bg-blue-500',    icon: <CheckCircle2 size={13} /> },
-              in_progress:            { color: 'text-amber-700 dark:text-amber-400',  bg: 'bg-amber-50 dark:bg-amber-950/30',    border: 'border-amber-200 dark:border-amber-800', accent: 'bg-amber-500',  icon: <Clock size={13} /> },
-              awaiting_confirmation:  { color: 'text-violet-700 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', accent: 'bg-violet-500', icon: <Clock size={13} /> },
-              completed:              { color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', accent: 'bg-emerald-500', icon: <CheckCircle2 size={13} /> },
-              cancelled:              { color: 'text-rose-700 dark:text-rose-400',    bg: 'bg-rose-50 dark:bg-rose-950/30',      border: 'border-rose-200 dark:border-rose-800', accent: 'bg-rose-500',   icon: <XCircle size={13} /> },
+              confirmed: { color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800', accent: 'bg-blue-500', icon: <CheckCircle2 size={13} /> },
+              in_progress: { color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800', accent: 'bg-amber-500', icon: <Clock size={13} /> },
+              awaiting_confirmation: { color: 'text-violet-700 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', accent: 'bg-violet-500', icon: <Clock size={13} /> },
+              completed: { color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', accent: 'bg-emerald-500', icon: <CheckCircle2 size={13} /> },
+              cancelled: { color: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800', accent: 'bg-rose-500', icon: <XCircle size={13} /> },
             };
             const sc = statusConfig[booking.status] || statusConfig.confirmed;
 

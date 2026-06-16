@@ -6,15 +6,15 @@ import { useAuth } from '../../context/AuthContext';
 import { api } from '../../utils/api';
 import LocationInput from '../../components/LocationInput';
 import { useCurrency } from '../../context/CurrencyContext';
-import { 
-  Briefcase, 
-  MapPin, 
-  DollarSign, 
-  Calendar, 
-  Clock, 
-  AlertTriangle, 
-  Upload, 
-  AlertCircle, 
+import {
+  Briefcase,
+  MapPin,
+  DollarSign,
+  Calendar,
+  Clock,
+  AlertTriangle,
+  Upload,
+  AlertCircle,
   CheckCircle,
   FileImage,
   Sparkles
@@ -157,7 +157,7 @@ export default function PostJobPage() {
   }
 
   return (
-    <div className="flex-grow max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white dark:bg-zinc-900/40 p-8 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm backdrop-blur-sm">
         <div className="mb-8">
           <span className="inline-flex items-center justify-center p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 mb-4">
@@ -184,7 +184,7 @@ export default function PostJobPage() {
         )}
 
         <form onSubmit={handleSubmit} className="space-y-6">
-          
+
           <div>
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
               Job Title

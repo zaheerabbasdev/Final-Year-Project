@@ -4,15 +4,15 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
-import { 
-  User as UserIcon, 
-  Mail, 
-  Phone, 
-  MapPin, 
-  Camera, 
-  Save, 
-  X, 
-  CheckCircle2, 
+import {
+  User as UserIcon,
+  Mail,
+  Phone,
+  MapPin,
+  Camera,
+  Save,
+  X,
+  CheckCircle2,
   AlertCircle,
   Star,
   Activity,
@@ -87,12 +87,12 @@ export default function ProfilePage() {
           setLocation(freshUser.location || '');
           setLatitude(freshUser.latitude || freshUser.profile?.latitude || null);
           setLongitude(freshUser.longitude || freshUser.profile?.longitude || null);
-          
+
           if (freshUser.role === 'provider') {
             const profile = freshUser.profile || {};
             setBio(profile.bio || '');
             setExperienceYears(profile.experience_years?.toString() || '0');
-            
+
             // Format skills
             if (Array.isArray(profile.skills)) {
               setSkills(profile.skills.join(', '));
@@ -101,7 +101,7 @@ export default function ProfilePage() {
             } else {
               setSkills('');
             }
-            
+
             setCategoryId(profile.category_id?.toString() || '');
             setIsOnline(!!profile.is_online);
 
@@ -150,7 +150,7 @@ export default function ProfilePage() {
     };
 
     loadProfileData();
-  // Only re-run when user ID or auth loading changes — NOT on every user object update
+    // Only re-run when user ID or auth loading changes — NOT on every user object update
   }, [user?.id, authLoading, router]);
 
   const handleOnlineToggle = async () => {
@@ -167,7 +167,7 @@ export default function ProfilePage() {
   const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
     if (!e.target.files || e.target.files.length === 0) return;
     const file = e.target.files[0];
-    
+
     const formData = new FormData();
     formData.append('avatar', file);
 
@@ -215,7 +215,7 @@ export default function ProfilePage() {
       await api.put('/users/me', payload);
       setSuccess('Profile updated successfully!');
       setIsEditing(false);
-      
+
       // Update local state
       updateUser({
         full_name: fullName,
@@ -248,8 +248,7 @@ export default function ProfilePage() {
   const providerCategory = categories.find(c => c.id === parseInt(categoryId))?.name || 'Provider';
 
   return (
-    <div className="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      {/* Messages */}
+    <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {error && (
         <div className="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-sm flex items-start gap-2 animate-in fade-in">
           <AlertCircle size={18} className="shrink-0 mt-0.5" />
@@ -264,13 +263,13 @@ export default function ProfilePage() {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-        
+
         {/* Left Column: Avatar & Basic Stats */}
         <div className="space-y-6">
           <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm text-center relative overflow-hidden">
             {/* Role Header Banner */}
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
-            
+
             <div className="relative w-32 h-32 mx-auto mt-4">
               {user?.avatar ? (
                 <img
@@ -283,7 +282,7 @@ export default function ProfilePage() {
                   {user?.full_name?.charAt(0).toUpperCase()}
                 </div>
               )}
-              
+
               <label className="absolute bottom-0 right-0 p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full cursor-pointer shadow-lg hover:scale-105 transition-all">
                 <Camera size={16} />
                 <input
@@ -313,14 +312,12 @@ export default function ProfilePage() {
                 <button
                   type="button"
                   onClick={handleOnlineToggle}
-                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${
-                    isOnline ? 'bg-emerald-500' : 'bg-zinc-350 dark:bg-zinc-700'
-                  }`}
+                  className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent transition-colors duration-200 ease-in-out focus:outline-none ${isOnline ? 'bg-emerald-500' : 'bg-zinc-350 dark:bg-zinc-700'
+                    }`}
                 >
                   <span
-                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${
-                      isOnline ? 'translate-x-5' : 'translate-x-0'
-                    }`}
+                    className={`pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out ${isOnline ? 'translate-x-5' : 'translate-x-0'
+                      }`}
                   />
                 </button>
               </div>

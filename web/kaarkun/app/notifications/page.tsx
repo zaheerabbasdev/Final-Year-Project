@@ -108,7 +108,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="flex-grow max-w-3xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+    <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <div>
@@ -158,18 +158,16 @@ export default function NotificationsPage() {
                 }
                 setSelectedNotification(notif);
               }}
-              className={`group relative flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${
-                notif.is_read
+              className={`group relative flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${notif.is_read
                   ? 'bg-white dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50 dark:hover:bg-zinc-900/50'
                   : 'bg-indigo-50/40 dark:bg-indigo-950/10 border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/20'
-              }`}
+                }`}
             >
               {/* Icon */}
-              <div className={`shrink-0 p-2 rounded-xl mt-0.5 ${
-                notif.is_read
+              <div className={`shrink-0 p-2 rounded-xl mt-0.5 ${notif.is_read
                   ? 'bg-zinc-100 dark:bg-zinc-800'
                   : 'bg-white dark:bg-zinc-900 shadow-sm border border-indigo-100 dark:border-indigo-900/50'
-              }`}>
+                }`}>
                 {getNotifIcon(notif.type)}
               </div>
 
