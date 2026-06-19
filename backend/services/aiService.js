@@ -476,8 +476,13 @@ Return ONLY a JSON object:
             return { confidence: 0, notes: "Failed to extract data." };
 
         } catch (error) {
-            console.error('[AI] Vision API error:', error.message);
-            return { confidence: 0, notes: `Error: ${error.message}` };
+            console.error('[AI] Vision API error:', error.response?.data || error.message);
+            // Distinguish "service unavailable" (confidence: null) from "document looks fraudulent"
+            // (confidence: 0) so the admin doesn't mistake a rate-limit/outage for a failed check.
+            if (error.response?.status === 429) {
+                return { confidence: null, notes: 'AI verification is temporarily rate-limited. Please try again shortly or verify this document manually.' };
+            }
+            return { confidence: null, notes: 'AI verification service is unavailable right now. Please verify this document manually.' };
         }
     },
 
