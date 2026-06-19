@@ -69,6 +69,16 @@ export default function RegisterPage() {
     e.preventDefault();
     setError(null);
     setSuccessMsg(null);
+
+    if (password.length < 8) {
+      setError('Password must be at least 8 characters long.');
+      return;
+    }
+    if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
+      setError('Password must contain at least one letter and one number.');
+      return;
+    }
+
     setLocalLoading(true);
 
     const formData = new FormData();
@@ -229,12 +239,14 @@ export default function RegisterPage() {
                 <input
                   type="password"
                   required
+                  minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
                   placeholder="••••••••"
                 />
               </div>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">At least 8 characters, with letters and numbers.</p>
             </div>
           </div>
 

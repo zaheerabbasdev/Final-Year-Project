@@ -1,0 +1,6 @@
+sdk.dir=/path/to/Android/Sdk
+flutter.sdk=/path/to/flutter
+
+# Get a key from https://console.cloud.google.com/ and restrict it to this
+# app's package name + SHA-1 certificate fingerprint.
+MAPS_API_KEY=

@@ -1,0 +1,18 @@
+# dependencies
+/node_modules
+
+# environment variables (contains secrets)
+.env
+.env.*
+!.env.example
+
+# user-uploaded content (runtime data, not source)
+/uploads/*
+!/uploads/.gitkeep
+
+# logs
+*.log
+npm-debug.log*
+
+# misc
+.DS_Store

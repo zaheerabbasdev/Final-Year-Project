@@ -4,6 +4,8 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:provider/provider.dart';
 import '../../core/api_client.dart';
+import '../../core/utils/token_storage.dart';
+import '../../core/utils/app_logger.dart';
 import '../../shared/services/navigation_service.dart';
 import '../../main.dart';
 
@@ -29,7 +31,7 @@ class AuthService extends ChangeNotifier {
 
   Future<void> checkAuth() async {
     final prefs = await SharedPreferences.getInstance();
-    final token = prefs.getString('token');
+    final token = await TokenStorage.getToken();
     final role = prefs.getString('role');
     _isFirstTime = prefs.getBool('isFirstTime') ?? true;
     
@@ -75,8 +77,8 @@ class AuthService extends ChangeNotifier {
         final data = response.data;
         final prefs = await SharedPreferences.getInstance();
         _token = data['token'];
-        await prefs.setString('token', _token!);
-        
+        await TokenStorage.setToken(_token!);
+
         _isAuthenticated = true;
         _user = data['user'];
         _role = _user?['role'];
@@ -89,7 +91,7 @@ class AuthService extends ChangeNotifier {
         };
       }
     } catch (e) {
-      print(e);
+      logDebug(e);
       if (e is DioException) {
         return {
           'success': false,
@@ -155,7 +157,7 @@ class AuthService extends ChangeNotifier {
         'requiresOTP': response.data['requiresOTP'] ?? false,
       };
     } catch (e) {
-      print(e);
+      logDebug(e);
     }
     return {'success': false, 'requiresOTP': false};
   }
@@ -168,31 +170,31 @@ class AuthService extends ChangeNotifier {
       });
       return response.statusCode == 200;
     } catch (e) {
-      print(e);
+      logDebug(e);
       return false;
     }
   }
 
   Future<bool> updateAvatar(XFile file) async {
     try {
-      print('DEBUG: Starting avatar upload for ${file.name}');
+      logDebug('Starting avatar upload for ${file.name}');
       final bytes = await file.readAsBytes();
       final formData = FormData.fromMap({
         'avatar': MultipartFile.fromBytes(bytes, filename: file.name),
       });
 
       final response = await _apiClient.dio.post('/users/me/avatar', data: formData);
-      print('DEBUG: Upload response status: ${response.statusCode}');
+      logDebug('Upload response status: ${response.statusCode}');
       if (response.statusCode == 200) {
-        print('DEBUG: New avatar URL from server: ${response.data['avatarUrl']}');
+        logDebug('New avatar URL from server: ${response.data['avatarUrl']}');
         await checkAuth();
         return true;
       }
     } catch (e) {
       if (e is DioException) {
-        print('DEBUG: Avatar upload failed: ${e.response?.data ?? e.message}');
+        logDebug('Avatar upload failed: ${e.response?.data ?? e.message}');
       } else {
-        print('DEBUG: Avatar upload error: $e');
+        logDebug('Avatar upload error: $e');
       }
     }
     return false;
@@ -206,7 +208,7 @@ class AuthService extends ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print('Error updating profile: $e');
+      logDebug('Error updating profile: $e');
     }
     return false;
   }
@@ -220,7 +222,7 @@ class AuthService extends ChangeNotifier {
 
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('token');
+    await TokenStorage.clearToken();
     await prefs.remove('role');
     _token = null;
     _isAuthenticated = false;

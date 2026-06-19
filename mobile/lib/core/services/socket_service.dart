@@ -1,5 +1,7 @@
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 import '../api_client.dart';
+import '../utils/token_storage.dart';
+import '../utils/app_logger.dart';
 import 'notification_service.dart';
 import '../../features/chat/providers/chat_provider.dart';
 import '../../features/chat/models/chat_message.dart';
@@ -32,71 +34,79 @@ class SocketService {
     } else if (userId is String) {
       userId = int.tryParse(userId) ?? userId;
     }
-    
-    print('DEBUG: SocketService.connect called with userId: $userId (type: ${userId.runtimeType})');
-    
+
+    logDebug('SocketService.connect called with userId: $userId (type: ${userId.runtimeType})');
+
     if (_socket != null && _socket!.connected) {
-      print('DEBUG: Socket already connected, re-emitting join_room');
+      logDebug('Socket already connected, re-emitting join_room');
       _socket!.emit('join_room', userId);
       return;
     }
 
+    // Fetch the auth token before opening the connection — the backend
+    // rejects the handshake without it.
+    TokenStorage.getToken().then((token) => _establishConnection(token));
+  }
+
+  void _establishConnection(String? token) {
+    if (_socket != null && _socket!.connected) return;
+
     final serverUrl = ApiClient.baseUrl.replaceAll('/api', '');
-    
+
     _socket = IO.io(serverUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
+      'auth': {'token': token},
     });
 
     _socket!.connect();
 
     _socket!.onConnect((_) {
-      print('Socket connected: ${_socket!.id}');
-      _socket!.emit('join_room', userId);
+      logDebug('Socket connected: ${_socket!.id}');
     });
 
     _socket!.on('new_notification', (data) {
-      print('New notification received: $data');
+      logDebug('New notification received: $data');
       _notificationService.handleNewNotification(data);
     });
 
     _socket!.on('new_message', (data) {
-      print('New message received: $data');
+      logDebug('New message received: $data');
       final message = ChatMessage.fromJson(data);
       _chatProvider.receiveMessage(message);
     });
 
     _socket!.on('user_typing', (data) {
-      print('User typing: $data');
+      logDebug('User typing: $data');
       _chatProvider.setOtherTyping(true, data['jobId']);
     });
 
     _socket!.on('user_stop_typing', (data) {
-      print('User stop typing: $data');
+      logDebug('User stop typing: $data');
       _chatProvider.setOtherTyping(false, data['jobId']);
     });
 
     // ─── Live Location Tracking Listeners ───────────────────────────────
     _socket!.on('provider_location', (data) {
-      print('Provider location received: $data');
+      logDebug('Provider location received: $data');
       if (_onProviderLocation != null) {
         _onProviderLocation!(data);
       }
     });
 
     _socket!.on('provider_location_stopped', (data) {
-      print('Provider location stopped: $data');
+      logDebug('Provider location stopped: $data');
       if (_onProviderLocationStopped != null) {
         _onProviderLocationStopped!(data);
       }
     });
 
     _socket!.onDisconnect((_) {
-      print('Socket disconnected');
+      logDebug('Socket disconnected');
     });
 
-    _socket!.onConnectError((err) => print('Socket Connect Error: $err'));
-    _socket!.onError((err) => print('Socket Error: $err'));
+    _socket!.onConnectError((err) => logDebug('Socket Connect Error: $err'));
+    _socket!.onError((err) => logDebug('Socket Error: $err'));
   }
 
   // ─── Live Location Tracking ─────────────────────────────────────────────
@@ -108,17 +118,14 @@ class SocketService {
     required double latitude,
     required double longitude,
   }) {
-    print('DEBUG: emitLocationUpdate - socket connected: ${_socket?.connected}');
-    print('DEBUG: emitLocationUpdate - jobId: $jobId, customerId: $customerId, lat: $latitude, lng: $longitude');
-    
+    logDebug('emitLocationUpdate - socket connected: ${_socket?.connected}');
+
     _socket?.emit('location_update', {
       'jobId': jobId,
       'customerId': customerId,
       'latitude': latitude,
       'longitude': longitude,
     });
-    
-    print('DEBUG: location_update event emitted');
   }
 
   /// Provider calls this to notify customer that location sharing has stopped.
@@ -134,19 +141,16 @@ class SocketService {
 
   /// Customer calls this once to start listening for provider location.
   void listenProviderLocation(void Function(Map<String, dynamic>) onUpdate) {
-    print('DEBUG: listenProviderLocation callback registered');
     _onProviderLocation = onUpdate;
   }
 
   /// Customer calls this to listen for when provider stops sharing location.
   void listenProviderLocationStopped(void Function(Map<String, dynamic>) onStop) {
-    print('DEBUG: listenProviderLocationStopped callback registered');
     _onProviderLocationStopped = onStop;
   }
 
   /// Customer calls this to stop listening.
   void stopListeningProviderLocation() {
-    print('DEBUG: stopListeningProviderLocation called');
     _onProviderLocation = null;
     _onProviderLocationStopped = null;
   }

@@ -5,10 +5,11 @@ const {
     getAllJobs, deleteJob, summarizeJobDispute, getAllBids, getAllCategories, createCategory, deleteCategory 
 } = require('../controllers/adminController');
 const adminAuth = require('../middleware/adminAuth');
+const { loginLimiter } = require('../middleware/rateLimiter');
 
-// Public Auth Routes
+// Public Auth Routes (registration requires ADMIN_SETUP_KEY, see adminController.registerAdmin)
 router.post('/auth/register', registerAdmin);
-router.post('/auth/login', loginAdmin);
+router.post('/auth/login', loginLimiter, loginAdmin);
 
 // Protected Admin Routes
 router.get('/stats', adminAuth, getStats);

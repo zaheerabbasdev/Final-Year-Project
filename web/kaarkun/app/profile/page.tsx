@@ -3,7 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { api } from '../utils/api';
+import { api, fileOrigin } from '../utils/api';
 import {
   User as UserIcon,
   Mail,
@@ -274,7 +274,7 @@ export default function ProfilePage() {
             <div className="relative w-32 h-32 mx-auto mt-4">
               {user?.avatar ? (
                 <img
-                  src={`http://localhost:5000${user.avatar}`}
+                  src={`${fileOrigin}${user.avatar}`}
                   alt={user.full_name}
                   className="w-full h-full rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-md"
                 />

@@ -1,16 +1,36 @@
+function handleUnauthorized() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('adminToken');
+    localStorage.removeItem('adminUser');
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
+  }
+}
+
+async function parseError(res: Response) {
+  try {
+    const error = await res.json();
+    return error.message || 'API request failed';
+  } catch {
+    return `API request failed (${res.status})`;
+  }
+}
+
+// Origin (no /api suffix) for static asset URLs like /uploads/<file>
+export const fileOrigin = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+
 export const api = {
-  baseUrl: 'http://localhost:5000/api',
-  
+  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+
   async get(endpoint: string, token?: string) {
     const res = await fetch(`${this.baseUrl}${endpoint}`, {
       headers: {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'API request failed');
-    }
+    if (res.status === 401) handleUnauthorized();
+    if (!res.ok) throw new Error(await parseError(res));
     return res.json();
   },
 
@@ -23,10 +43,8 @@ export const api = {
       },
       body: JSON.stringify(data),
     });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'API request failed');
-    }
+    if (res.status === 401) handleUnauthorized();
+    if (!res.ok) throw new Error(await parseError(res));
     return res.json();
   },
 
@@ -39,10 +57,8 @@ export const api = {
       },
       body: JSON.stringify(data),
     });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'API request failed');
-    }
+    if (res.status === 401) handleUnauthorized();
+    if (!res.ok) throw new Error(await parseError(res));
     return res.json();
   },
 
@@ -53,10 +69,8 @@ export const api = {
         'Authorization': `Bearer ${token}`,
       },
     });
-    if (!res.ok) {
-      const error = await res.json();
-      throw new Error(error.message || 'API request failed');
-    }
+    if (res.status === 401) handleUnauthorized();
+    if (!res.ok) throw new Error(await parseError(res));
     return res.json();
   }
 };

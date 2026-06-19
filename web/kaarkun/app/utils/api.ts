@@ -1,7 +1,20 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api';
 
+// Origin (no /api suffix) for static asset URLs like /uploads/<file>
+export const fileOrigin = API_URL.replace(/\/api\/?$/, '');
+
 interface RequestOptions extends RequestInit {
   body?: any;
+}
+
+function handleUnauthorized() {
+  if (typeof window !== 'undefined') {
+    localStorage.removeItem('token');
+    localStorage.removeItem('user');
+    if (window.location.pathname !== '/login') {
+      window.location.href = '/login';
+    }
+  }
 }
 
 async function request(path: string, options: RequestOptions = {}) {
@@ -32,6 +45,8 @@ async function request(path: string, options: RequestOptions = {}) {
   } catch (err) {
     data = { error: text };
   }
+
+  if (response.status === 401) handleUnauthorized();
 
   if (!response.ok) {
     throw new Error(data.message || data.error || 'Something went wrong');

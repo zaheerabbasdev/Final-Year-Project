@@ -4,7 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../utils/api';
+import { api, fileOrigin } from '../../utils/api';
 import {
   Briefcase,
   MapPin,
@@ -120,7 +120,7 @@ export default function ProviderDashboard() {
           <div className="flex items-center gap-4">
             {user?.avatar ? (
               <img
-                src={`http://localhost:5000${user.avatar}`}
+                src={`${fileOrigin}${user.avatar}`}
                 alt={user.full_name}
                 className="w-16 h-16 rounded-2xl object-cover ring-2 ring-white/30 shadow-xl"
               />

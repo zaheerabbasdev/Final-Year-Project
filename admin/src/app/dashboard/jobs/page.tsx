@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import JobModal from '@/components/JobModal';
+import { toast } from 'react-hot-toast';
 
 type Job = {
   id: number;
@@ -39,9 +40,10 @@ export default function JobsPage() {
     try {
       const token = localStorage.getItem('adminToken');
       await api.delete(`/admin/jobs/${id}`, token || '');
+      toast.success('Job deleted successfully');
       fetchJobs();
     } catch {
-      alert('Failed to delete job');
+      toast.error('Failed to delete job');
     }
   };
 

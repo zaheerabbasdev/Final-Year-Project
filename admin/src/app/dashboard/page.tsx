@@ -27,43 +27,68 @@ export default function DashboardPage() {
     </div>
   </div>;
 
+  const userGrowth: { month: string; count: number }[] = stats?.userGrowth || [];
+  const maxGrowth = Math.max(1, ...userGrowth.map((m) => m.count));
+  const categoryPopularity: { name: string; count: number }[] = stats?.categoryPopularity || [];
+  const maxCategoryCount = Math.max(1, ...categoryPopularity.map((c) => c.count));
+  const categoryColors = ['bg-[var(--primary)]', 'bg-indigo-500', 'bg-purple-500', 'bg-teal-500', 'bg-orange-500'];
+
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-6">
-        <StatCard title="Total Users" value={stats?.users || 0} change="+12%" icon="👥" color="blue" />
-        <StatCard title="Active Jobs" value={stats?.activeJobs || 0} change="+5%" icon="💼" color="green" />
-        <StatCard title="Total Bids" value={stats?.bids || 0} change="+18%" icon="⚖️" color="orange" />
-        <StatCard title="Total Categories" value={stats?.categories || 0} change="+3%" icon="📑" color="indigo" />
+        <StatCard title="Total Users" value={stats?.users || 0} icon="👥" color="blue" />
+        <StatCard title="Active Jobs" value={stats?.activeJobs || 0} icon="💼" color="green" />
+        <StatCard title="Total Bids" value={stats?.bids || 0} icon="⚖️" color="orange" />
+        <StatCard title="Total Categories" value={stats?.categories || 0} icon="📑" color="indigo" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
         <div className="app-card p-6 hover:shadow-xl transition-shadow">
-          <h3 className="text-lg text-(--text) font-bold mb-6">User Growth</h3>
-          <div className="h-64 flex items-end justify-between gap-2 px-4">
-            {[40, 70, 45, 90, 65, 80, 55, 95, 70, 85, 45, 75].map((v, i) => (
-              <div key={i} className="w-full rounded-t-3xl transition-all duration-300" style={{ height: `${v}%`, background: i % 2 === 0 ? 'rgba(3, 105, 252, 0.16)' : 'rgba(10, 132, 255, 0.24)' }} />
-            ))}
-          </div>
-          <div className="flex justify-between mt-4 text-xs text-(--subtext) px-2 uppercase tracking-[0.2em]">
-            <span>Jan</span><span>Mar</span><span>May</span><span>Jul</span><span>Sep</span><span>Nov</span>
-          </div>
+          <h3 className="text-lg text-(--text) font-bold mb-6">User Growth (last 12 months)</h3>
+          {userGrowth.length === 0 ? (
+            <p className="text-sm text-(--subtext) py-8 text-center">No signups in this period yet.</p>
+          ) : (
+            <>
+              <div className="h-64 flex items-end justify-between gap-2 px-4">
+                {userGrowth.map((m, i) => (
+                  <div
+                    key={m.month}
+                    title={`${m.month}: ${m.count} new users`}
+                    className="w-full rounded-t-3xl transition-all duration-300"
+                    style={{ height: `${(m.count / maxGrowth) * 100}%`, background: i % 2 === 0 ? 'rgba(3, 105, 252, 0.16)' : 'rgba(10, 132, 255, 0.24)' }}
+                  />
+                ))}
+              </div>
+              <div className="flex justify-between mt-4 text-xs text-(--subtext) px-2 uppercase tracking-[0.2em]">
+                {userGrowth.map((m) => <span key={m.month}>{m.month.slice(5)}</span>)}
+              </div>
+            </>
+          )}
         </div>
 
         <div className="app-card p-6 hover:shadow-xl transition-shadow">
           <h3 className="text-lg text-(--text) font-bold mb-6">Popular Categories</h3>
-          <div className="space-y-4">
-            <CategoryProgressBar label="Cleaning" percent={75} color="bg-[var(--primary)]" />
-            <CategoryProgressBar label="Plumbing" percent={45} color="bg-indigo-500" />
-            <CategoryProgressBar label="Electric" percent={90} color="bg-purple-500" />
-            <CategoryProgressBar label="Gardening" percent={30} color="bg-teal-500" />
-          </div>
+          {categoryPopularity.length === 0 ? (
+            <p className="text-sm text-(--subtext) py-8 text-center">No categories yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {categoryPopularity.map((c, i) => (
+                <CategoryProgressBar
+                  key={c.name}
+                  label={c.name}
+                  percent={Math.round((c.count / maxCategoryCount) * 100)}
+                  color={categoryColors[i % categoryColors.length]}
+                />
+              ))}
+            </div>
+          )}
         </div>
       </div>
     </div>
   );
 }
 
-function StatCard({ title, value, change, icon, color }: any) {
+function StatCard({ title, value, icon, color }: any) {
   const colors: any = {
     blue: 'text-blue-600 bg-blue-50',
     green: 'text-green-600 bg-green-50',
@@ -77,7 +102,6 @@ function StatCard({ title, value, change, icon, color }: any) {
         <div className={`p-3 rounded-xl ${colors[color]}`}>
           <span className="text-2xl">{icon}</span>
         </div>
-        <span className="text-xs font-bold text-green-500 bg-green-50 px-2 py-1 rounded-lg">{change}</span>
       </div>
       <div>
         <p className="text-sm text-slate-500 font-medium">{title}</p>

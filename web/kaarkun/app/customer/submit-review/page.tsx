@@ -3,7 +3,7 @@
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
-import { api } from '../../utils/api';
+import { api, fileOrigin } from '../../utils/api';
 import { Star, CheckCircle2, AlertCircle, ChevronLeft, Send } from 'lucide-react';
 
 const RATING_LABELS: Record<number, string> = {
@@ -108,7 +108,7 @@ function SubmitReviewContent() {
         <div className="text-center mb-8">
           {providerAvatar ? (
             <img
-              src={`http://localhost:5000${providerAvatar}`}
+              src={`${fileOrigin}${providerAvatar}`}
               alt={providerName}
               className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-md mx-auto mb-4"
             />

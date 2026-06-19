@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { api } from '@/lib/api';
+import { api, fileOrigin } from '@/lib/api';
 import { toast } from 'react-hot-toast';
 
 export default function UserModal({ userId, onClose, onRefresh }: { userId: number | null, onClose: () => void, onRefresh: () => void }) {
@@ -63,7 +63,7 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
               <div className="flex items-center gap-4">
                 {user.avatar ? (
                   <img 
-                    src={`http://localhost:5000${user.avatar}`} 
+                    src={`${fileOrigin}${user.avatar}`}
                     alt={user.full_name} 
                     className="h-16 w-16 rounded-full object-cover border-2 border-[var(--primary)]/20"
                     onError={(e) => {
@@ -107,13 +107,13 @@ export default function UserModal({ userId, onClose, onRefresh }: { userId: numb
                     <div>
                       <h5 className="text-[10px] font-bold text-[var(--subtext)] uppercase tracking-wider mb-2">CNIC Document</h5>
                       {user.profile.cnic_url ? (
-                        <a href={`http://localhost:5000${user.profile.cnic_url}`} target="_blank" rel="noreferrer" className="text-[var(--primary)] hover:underline text-sm font-medium">View CNIC</a>
+                        <a href={`${fileOrigin}${user.profile.cnic_url}`} target="_blank" rel="noreferrer" className="text-[var(--primary)] hover:underline text-sm font-medium">View CNIC</a>
                       ) : <span className="text-sm text-slate-400">Not provided</span>}
                     </div>
                     <div>
                       <h5 className="text-[10px] font-bold text-[var(--subtext)] uppercase tracking-wider mb-2">Certificates</h5>
                       {user.profile.certificates_url ? (
-                        <a href={`http://localhost:5000${user.profile.certificates_url}`} target="_blank" rel="noreferrer" className="text-[var(--primary)] hover:underline text-sm font-medium">View Certificates</a>
+                        <a href={`${fileOrigin}${user.profile.certificates_url}`} target="_blank" rel="noreferrer" className="text-[var(--primary)] hover:underline text-sm font-medium">View Certificates</a>
                       ) : <span className="text-sm text-slate-400">Not provided</span>}
                     </div>
                   </div>

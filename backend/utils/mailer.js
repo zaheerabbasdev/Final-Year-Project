@@ -1,15 +1,17 @@
 const nodemailer = require('nodemailer');
 
-// Configure your email service here
-// For testing, you can use ethereal.email or log to console if not configured
+if (!process.env.EMAIL_USER || !process.env.EMAIL_PASS) {
+    console.warn('WARNING: EMAIL_USER/EMAIL_PASS are not set — outgoing email (OTP, status notifications) will fail.');
+}
+
 const transporter = nodemailer.createTransport({
     host: process.env.EMAIL_HOST || 'smtp.gmail.com',
     port: process.env.EMAIL_PORT || 587,
-    secure: false, 
+    secure: false,
     pool: true, // Use connection pooling
     auth: {
-        user: process.env.EMAIL_USER || 'zabbas092002@gmail.com',
-        pass: process.env.EMAIL_PASS || 'tjdzryjqdnflmdyt',
+        user: process.env.EMAIL_USER,
+        pass: process.env.EMAIL_PASS,
     },
     tls: {
         rejectUnauthorized: false // Helps with some network/firewall issues
@@ -18,8 +20,8 @@ const transporter = nodemailer.createTransport({
 
 const sendOTP = async (to, code) => {
     try {
-        const senderEmail = process.env.EMAIL_USER || 'zabbas092002@gmail.com';
-        
+        const senderEmail = process.env.EMAIL_USER;
+
         const info = await transporter.sendMail({
             from: `"Service Hub" <${senderEmail}>`,
             to: to,
@@ -38,8 +40,8 @@ const sendOTP = async (to, code) => {
 
 const sendStatusNotification = async (to, status, reason) => {
     try {
-        const senderEmail = process.env.EMAIL_USER || 'zabbas092002@gmail.com';
-        
+        const senderEmail = process.env.EMAIL_USER;
+
         let subject = '';
         let message = '';
 

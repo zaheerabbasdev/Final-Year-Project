@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
+import { api } from '@/lib/api';
 
 export default function SignupPage() {
   const [formData, setFormData] = useState({
@@ -10,6 +11,7 @@ export default function SignupPage() {
     email: '',
     password: '',
     confirmPassword: '',
+    setupKey: '',
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -26,7 +28,7 @@ export default function SignupPage() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/admin/auth/register', {
+      const res = await fetch(`${api.baseUrl}/admin/auth/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -34,6 +36,7 @@ export default function SignupPage() {
           username: formData.username,
           email: formData.email,
           password: formData.password,
+          setupKey: formData.setupKey,
         }),
       });
 
@@ -131,6 +134,18 @@ export default function SignupPage() {
                 placeholder="••••••••"
                 value={formData.confirmPassword}
                 onChange={(e) => setFormData({...formData, confirmPassword: e.target.value})}
+              />
+            </div>
+
+            <div>
+              <label className="text-xs font-semibold text-gray-500 uppercase tracking-wider block mb-1">Setup Key</label>
+              <input
+                type="password"
+                required
+                className="appearance-none rounded-xl relative block w-full px-3 py-3 border border-gray-300 placeholder-gray-500 text-gray-900 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
+                placeholder="Provided by your server admin (ADMIN_SETUP_KEY)"
+                value={formData.setupKey}
+                onChange={(e) => setFormData({...formData, setupKey: e.target.value})}
               />
             </div>
           </div>

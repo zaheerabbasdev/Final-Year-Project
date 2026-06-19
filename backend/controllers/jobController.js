@@ -103,12 +103,24 @@ const getJobById = async (req, res) => {
     }
 };
 
+const UPDATABLE_JOB_FIELDS = [
+    'title', 'description', 'category_id', 'budget', 'location',
+    'preferred_date', 'preferred_time', 'latitude', 'longitude',
+    'is_negotiable', 'is_emergency'
+];
+
 const updateJob = async (req, res) => {
     try {
         const job = await Job.findById(req.params.id);
+        if (!job) return res.status(404).json({ message: 'Job not found' });
         if (job.customer_id !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
 
-        await Job.update(req.params.id, req.body);
+        const updates = {};
+        for (const field of UPDATABLE_JOB_FIELDS) {
+            if (req.body[field] !== undefined) updates[field] = req.body[field];
+        }
+
+        await Job.update(req.params.id, updates);
         res.json({ message: 'Job updated successfully' });
     } catch (error) {
         res.status(500).json({ message: 'Error updating job' });

@@ -6,7 +6,7 @@ import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useCurrency, SUPPORTED_CURRENCIES } from '../context/CurrencyContext';
-import { api } from '../utils/api';
+import { api, fileOrigin } from '../utils/api';
 import {
   Bell,
   Menu,
@@ -298,7 +298,7 @@ export default function Navbar() {
                 </div>
                 {user.avatar ? (
                   <img
-                    src={`http://localhost:5000${user.avatar}`}
+                    src={`${fileOrigin}${user.avatar}`}
                     alt={user.full_name}
                     className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/30"
                   />

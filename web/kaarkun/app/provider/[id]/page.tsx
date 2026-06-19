@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '../../utils/api';
+import { api, fileOrigin } from '../../utils/api';
 import { 
   User as UserIcon, 
   Mail, 
@@ -118,7 +118,7 @@ export default function ProviderPublicProfilePage({ params }: { params: Promise<
             <div className="relative w-32 h-32 mx-auto mt-4">
               {provider.avatar ? (
                 <img
-                  src={`http://localhost:5000${provider.avatar}`}
+                  src={`${fileOrigin}${provider.avatar}`}
                   alt={provider.full_name}
                   className="w-full h-full rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-md"
                 />

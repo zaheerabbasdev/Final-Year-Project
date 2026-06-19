@@ -1,6 +1,7 @@
 'use client';
 import Sidebar from '@/components/Sidebar';
 import { useEffect, useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { useTheme } from '@/lib/ThemeContext';
 
 export default function DashboardLayout({
@@ -9,14 +10,26 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   const [user, setUser] = useState<any>(null);
+  const [checked, setChecked] = useState(false);
   const { theme, toggleTheme } = useTheme();
+  const router = useRouter();
 
   useEffect(() => {
+    const token = localStorage.getItem('adminToken');
+    if (!token) {
+      router.replace('/login');
+      return;
+    }
     const userData = localStorage.getItem('adminUser');
     if (userData) {
       setUser(JSON.parse(userData));
     }
-  }, []);
+    setChecked(true);
+  }, [router]);
+
+  if (!checked) {
+    return null;
+  }
 
   return (
     <div className="min-h-screen bg-[var(--background)] transition-colors duration-200">

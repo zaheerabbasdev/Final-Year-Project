@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:dio/dio.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fluttertoast/fluttertoast.dart';
+import 'utils/token_storage.dart';
 
 class ApiClient {
-  static const String baseUrl = 'http://10.64.254.234:5000/api'; 
-  // static const String baseUrl = 'http://127.0.0.1:5000/api'; 
-  
+  // Override at build time with:
+  // flutter run --dart-define=API_BASE_URL=http://<lan-ip-or-domain>:5000/api
+  static const String baseUrl = String.fromEnvironment(
+    'API_BASE_URL',
+    defaultValue: 'http://10.64.254.234:5000/api',
+  );
+
   static final ApiClient _instance = ApiClient._internal();
   VoidCallback? onUnauthorized;
   late final Dio _dio;
@@ -28,8 +32,7 @@ class ApiClient {
 
     _dio.interceptors.add(InterceptorsWrapper(
       onRequest: (options, handler) async {
-        final prefs = await SharedPreferences.getInstance();
-        final token = prefs.getString('token');
+        final token = await TokenStorage.getToken();
         if (token != null) {
           options.headers['Authorization'] = 'Bearer $token';
         }

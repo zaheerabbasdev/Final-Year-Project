@@ -7,8 +7,13 @@ const jwt = require('jsonwebtoken');
 
 const registerAdmin = async (req, res) => {
     try {
-        const { username, email, password, full_name } = req.body;
-        const password_hash = await bcrypt.hash(password, 10);
+        const { username, email, password, full_name, setupKey } = req.body;
+
+        if (!process.env.ADMIN_SETUP_KEY || setupKey !== process.env.ADMIN_SETUP_KEY) {
+            return res.status(403).json({ message: 'Invalid or missing setup key' });
+        }
+
+        const password_hash = await bcrypt.hash(password, 12);
         const adminId = await Admin.create({ username, email, password_hash, full_name });
         res.status(201).json({ message: 'Admin registered successfully', adminId });
     } catch (error) {
@@ -45,15 +50,34 @@ const getStats = async (req, res) => {
         const [jobCount] = await db.execute('SELECT COUNT(*) as count FROM jobs');
         const [bidCount] = await db.execute('SELECT COUNT(*) as count FROM bids');
         const [activeJobs] = await db.execute('SELECT COUNT(*) as count FROM jobs WHERE status = "active"');
-        
+
         const [categoryCount] = await db.execute('SELECT COUNT(*) as count FROM categories');
+
+        const [userGrowth] = await db.execute(`
+            SELECT DATE_FORMAT(created_at, '%Y-%m') as month, COUNT(*) as count
+            FROM users
+            WHERE created_at >= DATE_SUB(CURDATE(), INTERVAL 12 MONTH)
+            GROUP BY month
+            ORDER BY month ASC
+        `);
+
+        const [categoryPopularity] = await db.execute(`
+            SELECT c.name, COUNT(j.id) as count
+            FROM categories c
+            LEFT JOIN jobs j ON j.category_id = c.id
+            GROUP BY c.id, c.name
+            ORDER BY count DESC
+            LIMIT 5
+        `);
 
         res.json({
             users: userCount[0].count,
             jobs: jobCount[0].count,
             bids: bidCount[0].count,
             activeJobs: activeJobs[0].count,
-            categories: categoryCount[0].count
+            categories: categoryCount[0].count,
+            userGrowth,
+            categoryPopularity
         });
     } catch (error) {
         res.status(500).json({ message: 'Error fetching admin stats' });

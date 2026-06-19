@@ -1,6 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
+import { toast } from 'react-hot-toast';
 
 export default function CategoriesPage() {
   const [categories, setCategories] = useState<any[]>([]);
@@ -33,9 +34,10 @@ export default function CategoriesPage() {
       const token = localStorage.getItem('adminToken');
       await api.post('/admin/categories', { name: newCategory }, token || '');
       setNewCategory('');
+      toast.success('Category added successfully');
       fetchCategories();
-    } catch (err) {
-      alert('Failed to add category');
+    } catch {
+      toast.error('Failed to add category');
     } finally {
       setSubmitting(false);
     }
@@ -46,9 +48,10 @@ export default function CategoriesPage() {
     try {
       const token = localStorage.getItem('adminToken');
       await api.delete(`/admin/categories/${id}`, token || '');
+      toast.success('Category deleted successfully');
       fetchCategories();
-    } catch (err) {
-      alert('Failed to delete category');
+    } catch {
+      toast.error('Failed to delete category');
     }
   };
 

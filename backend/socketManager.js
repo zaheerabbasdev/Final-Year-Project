@@ -1,25 +1,45 @@
 const { Server } = require('socket.io');
+const jwt = require('jsonwebtoken');
 
 let io;
 
 const initSocket = (server) => {
+    const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+        .split(',')
+        .map(o => o.trim())
+        .filter(Boolean);
+
     io = new Server(server, {
         cors: {
-            origin: "*", // Adjust this for production
-            methods: ["GET", "POST"]
+            origin: allowedOrigins,
+            methods: ["GET", "POST"],
+            credentials: true
+        }
+    });
+
+    // Require a valid JWT to establish a socket connection at all
+    io.use((socket, next) => {
+        const token = socket.handshake.auth && socket.handshake.auth.token;
+        if (!token) {
+            return next(new Error('Authentication required'));
+        }
+        try {
+            const decoded = jwt.verify(token, process.env.JWT_SECRET);
+            socket.userId = Math.floor(Number(decoded.id));
+            next();
+        } catch (err) {
+            next(new Error('Invalid or expired token'));
         }
     });
 
     io.on('connection', (socket) => {
         console.log('User connected:', socket.id);
 
-        socket.on('join_room', (userId) => {
-            const normalizedId = Math.floor(Number(userId));
-            console.log(`DEBUG: Socket ${socket.id} joining room for userId: ${userId} -> normalized: ${normalizedId}`);
-            const roomName = `user_${normalizedId}`;
-            socket.join(roomName);
-            console.log(`User ${normalizedId} joined room: ${roomName}`);
-            console.log(`DEBUG: Socket ${socket.id} is now in rooms:`, Array.from(socket.rooms));
+        // Join the room derived from the authenticated token, never a client-supplied id
+        socket.join(`user_${socket.userId}`);
+
+        socket.on('join_room', () => {
+            socket.join(`user_${socket.userId}`);
         });
 
         socket.on('typing', (data) => {

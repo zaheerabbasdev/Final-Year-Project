@@ -1,6 +1,7 @@
 'use client';
 import { useState, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
+import { api } from '@/lib/api';
 
 function LoginContent() {
   const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ function LoginContent() {
     setError('');
 
     try {
-      const res = await fetch('http://localhost:5000/api/admin/auth/login', {
+      const res = await fetch(`${api.baseUrl}/admin/auth/login`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ email, password }),

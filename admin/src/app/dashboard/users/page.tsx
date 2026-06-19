@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, type SyntheticEvent } from 'react';
-import { api } from '@/lib/api';
+import { api, fileOrigin } from '@/lib/api';
 import UserModal from '@/components/UserModal';
 import ReasonModal from '@/components/ReasonModal';
 import { toast } from 'react-hot-toast';
@@ -63,6 +63,31 @@ export default function UsersPage() {
     }
   };
 
+  const handleExportCsv = () => {
+    if (users.length === 0) {
+      toast.error('No customers to export');
+      return;
+    }
+    const headers = ['ID', 'Full Name', 'Email', 'Role', 'Status', 'Joined'];
+    const escapeCsv = (value: string) => `"${value.replace(/"/g, '""')}"`;
+    const rows = users.map((u) => [
+      u.id,
+      escapeCsv(u.full_name),
+      escapeCsv(u.email),
+      u.role,
+      u.status || 'pending',
+      new Date(u.created_at).toLocaleDateString(),
+    ].join(','));
+    const csv = [headers.join(','), ...rows].join('\n');
+    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const link = document.createElement('a');
+    link.href = url;
+    link.download = `customers-${new Date().toISOString().slice(0, 10)}.csv`;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
+
   return (
     <div className="space-y-6">
       <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
@@ -74,7 +99,10 @@ export default function UsersPage() {
           <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">
             {users.length} Total Customers
           </span>
-          <button className="app-button-secondary px-4 py-2 rounded-2xl text-sm font-medium transition-all">
+          <button
+            onClick={handleExportCsv}
+            className="app-button-secondary px-4 py-2 rounded-2xl text-sm font-medium transition-all"
+          >
             Export CSV
           </button>
         </div>
@@ -102,7 +130,7 @@ export default function UsersPage() {
                       {user.avatar ? (
                         // eslint-disable-next-line @next/next/no-img-element
                         <img
-                          src={`http://localhost:5000${user.avatar}`}
+                          src={`${fileOrigin}${user.avatar}`}
                           alt={user.full_name}
                           className="h-10 w-10 rounded-full object-cover border border-gray-200"
                           onError={(e: SyntheticEvent<HTMLImageElement>) => {

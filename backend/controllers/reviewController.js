@@ -3,25 +3,33 @@ const Booking = require('../models/bookingModel');
 
 const submitReview = async (req, res) => {
     try {
-        const { booking_id, job_id, provider_id, rating, comment } = req.body;
+        const { booking_id, rating, comment } = req.body;
         const customer_id = req.user.id;
 
-        // Verify booking
-        const _ = await Booking.findByUserId(customer_id, 'customer');
-        // Let's get the specific booking (we should have a findById, but we will assume it's valid if they have it, ideally check if booking_id exists)
-        
-        // We really should check booking, assuming it's done for brevity or check via DB
-        // Check if reviewing twice
+        if (!booking_id || !Number.isInteger(Number(rating)) || rating < 1 || rating > 5) {
+            return res.status(400).json({ message: 'A valid booking_id and rating (1-5) are required' });
+        }
+
+        // Verify the booking exists, belongs to this customer, and is completed
+        const booking = await Booking.findById(booking_id);
+        if (!booking) return res.status(404).json({ message: 'Booking not found' });
+        if (booking.customer_id !== customer_id) {
+            return res.status(403).json({ message: 'You can only review your own bookings' });
+        }
+        if (booking.status !== 'completed') {
+            return res.status(400).json({ message: 'You can only review completed bookings' });
+        }
+
         const hasReviewed = await Review.hasReviewed(booking_id);
         if (hasReviewed) {
             return res.status(409).json({ message: 'A review for this booking already exists.' });
         }
 
         const reviewId = await Review.create({
-            job_id,
+            job_id: booking.job_id,
             booking_id,
             customer_id,
-            provider_id,
+            provider_id: booking.provider_id,
             rating,
             comment
         });

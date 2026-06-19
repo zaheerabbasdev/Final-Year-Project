@@ -13,9 +13,21 @@ const getMyBookings = async (req, res) => {
     }
 };
 
+const ALLOWED_BOOKING_STATUSES = ['confirmed', 'in_progress', 'awaiting_confirmation', 'completed', 'cancelled'];
+
 const updateBookingStatus = async (req, res) => {
     try {
         const { status } = req.body;
+        if (!ALLOWED_BOOKING_STATUSES.includes(status)) {
+            return res.status(400).json({ message: 'Invalid status' });
+        }
+
+        const existing = await Booking.findById(req.params.id);
+        if (!existing) return res.status(404).json({ message: 'Booking not found' });
+        if (req.user.id !== existing.customer_id && req.user.id !== existing.provider_id) {
+            return res.status(403).json({ message: 'You are not part of this booking' });
+        }
+
         await Booking.updateStatus(req.params.id, status);
 
         const booking = await Booking.findById(req.params.id);
@@ -53,14 +65,20 @@ const getBookingByJob = async (req, res) => {
     try {
         // We will need to join with provider details so the review screen has it
         const [rows] = await db.execute(
-            `SELECT b.*, u.full_name as provider_name, u.avatar as provider_avatar 
-             FROM bookings b 
-             JOIN users u ON b.provider_id = u.id 
+            `SELECT b.*, u.full_name as provider_name, u.avatar as provider_avatar
+             FROM bookings b
+             JOIN users u ON b.provider_id = u.id
              WHERE b.job_id = ?`,
             [req.params.jobId]
         );
         if (rows.length === 0) return res.status(404).json({ message: 'Booking not found' });
-        res.json(rows[0]);
+
+        const booking = rows[0];
+        if (req.user.id !== booking.customer_id && req.user.id !== booking.provider_id) {
+            return res.status(403).json({ message: 'You are not part of this booking' });
+        }
+
+        res.json(booking);
     } catch (error) {
         res.status(500).json({ message: 'Error fetching booking' });
     }
@@ -69,9 +87,16 @@ const getBookingByJob = async (req, res) => {
 const updateBookingStatusByJob = async (req, res) => {
     try {
         const { status } = req.body;
+        if (!ALLOWED_BOOKING_STATUSES.includes(status)) {
+            return res.status(400).json({ message: 'Invalid status' });
+        }
+
         const booking = await Booking.findByJobId(req.params.jobId);
         if (!booking) return res.status(404).json({ message: 'Booking not found' });
-        
+        if (req.user.id !== booking.customer_id && req.user.id !== booking.provider_id) {
+            return res.status(403).json({ message: 'You are not part of this booking' });
+        }
+
         await Booking.updateStatus(booking.id, status);
 
         if (status === 'completed') {

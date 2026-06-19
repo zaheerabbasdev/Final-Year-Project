@@ -1,6 +1,6 @@
 'use client';
 import { useEffect, useState, type SyntheticEvent } from 'react';
-import { api } from '@/lib/api';
+import { api, fileOrigin } from '@/lib/api';
 import UserModal from '@/components/UserModal';
 import ReasonModal from '@/components/ReasonModal';
 import { toast } from 'react-hot-toast';
@@ -96,7 +96,7 @@ export default function ProvidersPage() {
                       {provider.avatar ? (
                         // eslint-disable-next-line @next/next/no-img-element
                       <img 
-                          src={`http://localhost:5000${provider.avatar}`} 
+                          src={`${fileOrigin}${provider.avatar}`}
                           alt={provider.full_name} 
                           className="h-10 w-10 rounded-full object-cover border border-gray-200"
                           onError={(e: SyntheticEvent<HTMLImageElement>) => {

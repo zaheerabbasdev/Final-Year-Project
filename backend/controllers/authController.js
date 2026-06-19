@@ -16,15 +16,12 @@ const register = async (req, res) => {
         }
 
         // Hash password
-        const salt = await bcrypt.genSalt(10);
+        const salt = await bcrypt.genSalt(12);
         const password_hash = await bcrypt.hash(password, salt);
 
         let avatarUrl = null;
         let cnicUrl = null;
         let certificatesUrl = null;
-
-        console.log('DEBUG: Register Body:', req.body);
-        console.log('DEBUG: Register Files:', req.files);
 
         if (req.files && Array.isArray(req.files)) {
             req.files.forEach(file => {

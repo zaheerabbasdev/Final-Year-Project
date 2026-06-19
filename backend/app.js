@@ -29,21 +29,31 @@ const server = http.createServer(app);
 initSocket(server);
 
 const suspendedCheck = require('./middleware/suspendedCheck');
-// ... (rest of middleware)
-// Bulletproof CORS Middleware with Logging
+
+// CORS — only allow known frontend origins (admin panel, web app, mobile dev tools)
+const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
+    .split(',')
+    .map(o => o.trim())
+    .filter(Boolean);
+
+// Flutter web's debug server binds a random port each run, so it can't be
+// pinned in ALLOWED_ORIGINS — allow any localhost/127.0.0.1 origin instead.
+// This is safe: a remote attacker's browser cannot forge a localhost Origin
+// header, since the browser sets it from the page's actual origin.
+const isLocalDevOrigin = (origin) => /^https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?$/.test(origin);
+
 app.use((req, res, next) => {
     const origin = req.headers.origin;
-    console.log(`[CORS] Request from Origin: ${origin}, Method: ${req.method}, Path: ${req.url}`);
-    
-    res.setHeader('Access-Control-Allow-Origin', origin || '*');
+    if (origin && (allowedOrigins.includes(origin) || isLocalDevOrigin(origin))) {
+        res.setHeader('Access-Control-Allow-Origin', origin);
+        res.setHeader('Access-Control-Allow-Credentials', 'true');
+    }
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, PATCH, OPTIONS');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With, Content-Type, Authorization, Accept, Origin');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
     res.setHeader('Access-Control-Max-Age', '86400'); // Cache preflight for 24 hours
 
     // Handle Preflight
     if (req.method === 'OPTIONS') {
-        console.log(`[CORS] Responding to Preflight for: ${req.url}`);
         return res.status(200).end();
     }
     next();
@@ -74,7 +84,7 @@ app.get('/', (req, res) => {
     res.json({ message: "Welcome to Kaarkun API" });
 });
 
-// Basic Error Handler
+// Basic Error Handler — log full details server-side, never leak them to the client
 app.use((err, req, res, next) => {
     console.error('=== GLOBAL ERROR HANDLER ===');
     console.error('Error message:', err.message || err);
@@ -82,7 +92,7 @@ app.use((err, req, res, next) => {
     console.error('Error stack:', err.stack);
     console.error('Request URL:', req.method, req.url);
     console.error('============================');
-    res.status(err.status || 500).json({ error: err.message || 'Something went wrong!' });
+    res.status(err.status || 500).json({ error: 'Something went wrong!' });
 });
 
 const PORT = process.env.PORT || 5000;
