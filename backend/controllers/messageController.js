@@ -32,10 +32,36 @@ const getChatList = async (req, res) => {
 const sendMessage = async (req, res) => {
     try {
         const { job_id, receiver_id, content } = req.body;
+        const senderId = req.user.id;
+        const receiverId = parseInt(receiver_id);
         let image_url = null;
-        
+
         if (req.file) {
             image_url = `uploads/${req.file.filename}`;
+        }
+
+        // Authorize: one side must be the job's customer, the other must be a
+        // bidder or the booked provider on that job — not an arbitrary stranger.
+        const [jobRows] = await db.execute('SELECT customer_id FROM jobs WHERE id = ?', [job_id]);
+        if (jobRows.length === 0) return res.status(404).json({ message: 'Job not found' });
+        const jobCustomerId = jobRows[0].customer_id;
+
+        const customerSide = senderId === jobCustomerId ? senderId : (receiverId === jobCustomerId ? receiverId : null);
+        const otherSide = customerSide === senderId ? receiverId : senderId;
+
+        if (!customerSide || customerSide === otherSide) {
+            return res.status(403).json({ message: 'You are not authorized to message this user for this job' });
+        }
+
+        const [providerCheck] = await db.execute(
+            `SELECT 1 FROM bids WHERE job_id = ? AND provider_id = ?
+             UNION
+             SELECT 1 FROM bookings WHERE job_id = ? AND provider_id = ?
+             LIMIT 1`,
+            [job_id, otherSide, job_id, otherSide]
+        );
+        if (providerCheck.length === 0) {
+            return res.status(403).json({ message: 'You are not authorized to message this user for this job' });
         }
 
         const messageId = await Message.create({

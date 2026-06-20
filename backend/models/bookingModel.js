@@ -47,7 +47,9 @@ const Booking = {
     },
 
     findByJobId: async (jobId) => {
-        const [rows] = await db.execute('SELECT * FROM bookings WHERE job_id = ?', [jobId]);
+        // A job can be cancelled and rebooked (cancelBooking reopens it for re-bidding),
+        // so more than one booking row can exist per job — always take the latest.
+        const [rows] = await db.execute('SELECT * FROM bookings WHERE job_id = ? ORDER BY id DESC LIMIT 1', [jobId]);
         return rows[0] || null;
     },
 

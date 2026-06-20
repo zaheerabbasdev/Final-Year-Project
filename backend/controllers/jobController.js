@@ -2,6 +2,7 @@ const Job = require('../models/jobModel');
 const User = require('../models/userModel');
 const ProviderProfile = require('../models/providerModel');
 const Booking = require('../models/bookingModel');
+const db = require('../config/db');
 const { createNotification } = require('../services/notificationService');
 
 // ... rest of imports if any ...
@@ -149,33 +150,45 @@ const getMyJobs = async (req, res) => {
 };
 
 const expressAccept = async (req, res) => {
+    const connection = await db.getConnection();
     try {
         const jobId = req.params.id;
         const providerId = req.user.id;
 
         const job = await Job.findById(jobId);
-        if (!job) return res.status(404).json({ message: 'Job not found' });
-        
+        if (!job) {
+            connection.release();
+            return res.status(404).json({ message: 'Job not found' });
+        }
+
         if (!job.is_emergency) {
+            connection.release();
             return res.status(400).json({ message: 'Only emergency jobs can be accepted instantly' });
         }
 
-        if (job.status !== 'open') {
-            return res.status(400).json({ message: 'Job is already taken or closed' });
+        await connection.beginTransaction();
+
+        // Atomically claim the job — only succeeds if still 'open', so two
+        // providers can never both express-accept the same emergency job.
+        const [claimResult] = await connection.execute(
+            "UPDATE jobs SET status = 'active' WHERE id = ? AND status = 'open'",
+            [jobId]
+        );
+        if (claimResult.affectedRows === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(409).json({ message: 'Job is already taken or closed' });
         }
 
-        // Create Booking immediately
-        const bookingId = await Booking.create({
-            job_id: jobId,
-            provider_id: providerId,
-            customer_id: job.customer_id,
-            status: 'confirmed'
-        });
+        const [bookingResult] = await connection.execute(
+            'INSERT INTO bookings (job_id, bid_id, customer_id, provider_id, status) VALUES (?, NULL, ?, ?, ?)',
+            [jobId, job.customer_id, providerId, 'confirmed']
+        );
 
-        // Update Job Status
-        await Job.update(jobId, { status: 'active' });
+        await connection.commit();
+        connection.release();
 
-        // Notify Customer
+        // Notify Customer (after commit — not part of the atomic transaction)
         await createNotification(
             job.customer_id,
             'Job Accepted Instantly!',
@@ -183,8 +196,10 @@ const expressAccept = async (req, res) => {
             'emergency_job_accepted'
         );
 
-        res.json({ message: 'You have accepted the emergency job!', bookingId });
+        res.json({ message: 'You have accepted the emergency job!', bookingId: bookingResult.insertId });
     } catch (error) {
+        await connection.rollback();
+        connection.release();
         console.error("DEBUG expressAccept error:", error);
         res.status(500).json({ message: 'Error accepting job' });
     }

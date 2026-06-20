@@ -68,7 +68,8 @@ const getBookingByJob = async (req, res) => {
             `SELECT b.*, u.full_name as provider_name, u.avatar as provider_avatar
              FROM bookings b
              JOIN users u ON b.provider_id = u.id
-             WHERE b.job_id = ?`,
+             WHERE b.job_id = ?
+             ORDER BY b.id DESC LIMIT 1`,
             [req.params.jobId]
         );
         if (rows.length === 0) return res.status(404).json({ message: 'Booking not found' });

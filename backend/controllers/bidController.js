@@ -1,6 +1,7 @@
 const Bid = require('../models/bidModel');
 const Job = require('../models/jobModel');
 const Booking = require('../models/bookingModel');
+const db = require('../config/db');
 const { createNotification } = require('../services/notificationService');
 
 const placeBid = async (req, res) => {
@@ -62,29 +63,49 @@ const getMyBids = async (req, res) => {
 };
 
 const acceptBid = async (req, res) => {
+    const connection = await db.getConnection();
     try {
         const bid = await Bid.findById(req.params.id);
-        if (!bid) return res.status(404).json({ message: 'Bid not found' });
+        if (!bid) {
+            connection.release();
+            return res.status(404).json({ message: 'Bid not found' });
+        }
 
         const job = await Job.findById(bid.job_id);
-        if (job.customer_id !== req.user.id) return res.status(403).json({ message: 'Unauthorized' });
+        if (!job) {
+            connection.release();
+            return res.status(404).json({ message: 'Job not found' });
+        }
+        if (job.customer_id !== req.user.id) {
+            connection.release();
+            return res.status(403).json({ message: 'Unauthorized' });
+        }
 
-        // Update bid status
-        await Bid.updateStatus(req.params.id, 'accepted');
-        // Update job status
-        await Job.update(job.id, { status: 'active' });
-        // Reject all other bids for this job
-        await Bid.rejectOthers(job.id, req.params.id);
+        await connection.beginTransaction();
 
-        // Create booking
-        await Booking.create({
-            job_id: job.id,
-            bid_id: bid.id,
-            customer_id: job.customer_id,
-            provider_id: bid.provider_id
-        });
+        // Atomically claim the job — only succeeds if it's still 'open', so two
+        // bids on the same job can never both be accepted (no race condition).
+        const [claimResult] = await connection.execute(
+            "UPDATE jobs SET status = 'active' WHERE id = ? AND status = 'open'",
+            [job.id]
+        );
+        if (claimResult.affectedRows === 0) {
+            await connection.rollback();
+            connection.release();
+            return res.status(409).json({ message: 'This job is no longer open — another bid may have already been accepted.' });
+        }
 
-        // Notify Provider
+        await connection.execute("UPDATE bids SET status = 'accepted' WHERE id = ?", [bid.id]);
+        await connection.execute("UPDATE bids SET status = 'rejected' WHERE job_id = ? AND id != ?", [job.id, bid.id]);
+        await connection.execute(
+            'INSERT INTO bookings (job_id, bid_id, customer_id, provider_id) VALUES (?, ?, ?, ?)',
+            [job.id, bid.id, job.customer_id, bid.provider_id]
+        );
+
+        await connection.commit();
+        connection.release();
+
+        // Notify Provider (after commit — not part of the atomic transaction)
         await createNotification(
             bid.provider_id,
             'Bid Accepted!',
@@ -94,6 +115,9 @@ const acceptBid = async (req, res) => {
 
         res.json({ message: 'Bid accepted and booking created' });
     } catch (error) {
+        await connection.rollback();
+        connection.release();
+        console.error('Error accepting bid:', error);
         res.status(500).json({ message: 'Error accepting bid' });
     }
 };
