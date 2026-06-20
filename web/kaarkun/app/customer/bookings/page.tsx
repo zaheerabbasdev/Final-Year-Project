@@ -15,7 +15,8 @@ import {
   MessageSquare,
   Star,
   CheckCheck,
-  AlertCircle
+  AlertCircle,
+  KeyRound
 } from 'lucide-react';
 
 interface Booking {
@@ -38,6 +39,8 @@ export default function CustomerBookingsPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<number | null>(null);
+  const [pinInputs, setPinInputs] = useState<Record<number, string>>({});
+  const [verifyingPin, setVerifyingPin] = useState<number | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -70,6 +73,21 @@ export default function CustomerBookingsPage() {
       setError(err.message || 'Failed to cancel booking.');
     } finally {
       setActionLoading(null);
+    }
+  };
+
+  const handleVerifyPin = async (bookingId: number) => {
+    const token = (pinInputs[bookingId] || '').trim();
+    if (!token) return;
+    setVerifyingPin(bookingId);
+    try {
+      await api.post(`/bookings/${bookingId}/handshake/verify`, { token });
+      setBookings(prev => prev.map(b => b.id === bookingId ? { ...b, status: 'in_progress' } : b));
+      setPinInputs(prev => ({ ...prev, [bookingId]: '' }));
+    } catch (err: any) {
+      setError(err.message || 'Invalid or expired PIN.');
+    } finally {
+      setVerifyingPin(null);
     }
   };
 
@@ -242,14 +260,34 @@ export default function CustomerBookingsPage() {
                       )}
 
                       {booking.status === 'confirmed' && (
-                        <button
-                          onClick={() => handleCancel(booking.id)}
-                          disabled={actionLoading === booking.id}
-                          className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all"
-                        >
-                          <XCircle size={12} />
-                          {actionLoading === booking.id ? 'Cancelling...' : 'Cancel Booking'}
-                        </button>
+                        <>
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              inputMode="numeric"
+                              placeholder="Arrival PIN"
+                              value={pinInputs[booking.id] || ''}
+                              onChange={(e) => setPinInputs(prev => ({ ...prev, [booking.id]: e.target.value }))}
+                              className="w-28 px-3 py-1.5 text-[11px] font-bold tracking-widest rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                            <button
+                              onClick={() => handleVerifyPin(booking.id)}
+                              disabled={verifyingPin === booking.id || !(pinInputs[booking.id] || '').trim()}
+                              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm"
+                            >
+                              <KeyRound size={12} />
+                              {verifyingPin === booking.id ? 'Verifying...' : 'Verify Arrival'}
+                            </button>
+                          </div>
+                          <button
+                            onClick={() => handleCancel(booking.id)}
+                            disabled={actionLoading === booking.id}
+                            className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all"
+                          >
+                            <XCircle size={12} />
+                            {actionLoading === booking.id ? 'Cancelling...' : 'Cancel Booking'}
+                          </button>
+                        </>
                       )}
                     </div>
                   </div>

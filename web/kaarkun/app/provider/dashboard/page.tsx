@@ -22,7 +22,8 @@ import {
   Sparkles,
   Activity,
   Award,
-  Zap
+  Zap,
+  KeyRound
 } from 'lucide-react';
 
 interface Booking {
@@ -51,6 +52,8 @@ export default function ProviderDashboard() {
   const [bookings, setBookings] = useState<Booking[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [handshakeTokens, setHandshakeTokens] = useState<Record<number, string>>({});
+  const [handshakeLoading, setHandshakeLoading] = useState<number | null>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -71,6 +74,18 @@ export default function ProviderDashboard() {
     };
     fetchDashboard();
   }, [user, authLoading, router]);
+
+  const handleGeneratePin = async (bookingId: number) => {
+    setHandshakeLoading(bookingId);
+    try {
+      const data = await api.post(`/bookings/${bookingId}/handshake/generate`, {});
+      setHandshakeTokens(prev => ({ ...prev, [bookingId]: data.token }));
+    } catch (err: any) {
+      setError(err.message || 'Failed to generate arrival PIN.');
+    } finally {
+      setHandshakeLoading(null);
+    }
+  };
 
   if (authLoading || loading) {
     return (
@@ -238,13 +253,34 @@ export default function ProviderDashboard() {
                           <span><Clock size={11} className="inline mr-0.5" />{new Date(booking.created_at).toLocaleDateString()}</span>
                         </div>
                       </div>
-                      <Link
-                        href={`/chat?jobId=${booking.job_id}&userId=${booking.customer_id}`}
-                        className="shrink-0 flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-all shadow-sm"
-                      >
-                        <MessageSquare size={12} /> Chat Client
-                      </Link>
+                      <div className="shrink-0 flex items-center gap-2">
+                        {booking.status === 'confirmed' && (
+                          handshakeTokens[booking.id] ? (
+                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                              <KeyRound size={12} className="text-emerald-600 dark:text-emerald-400" />
+                              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 tracking-widest">{handshakeTokens[booking.id]}</span>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={() => handleGeneratePin(booking.id)}
+                              disabled={handshakeLoading === booking.id}
+                              className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg transition-all shadow-sm"
+                            >
+                              <KeyRound size={12} /> {handshakeLoading === booking.id ? 'Generating...' : 'Generate Arrival PIN'}
+                            </button>
+                          )
+                        )}
+                        <Link
+                          href={`/chat?jobId=${booking.job_id}&userId=${booking.customer_id}`}
+                          className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-all shadow-sm"
+                        >
+                          <MessageSquare size={12} /> Chat Client
+                        </Link>
+                      </div>
                     </div>
+                    {booking.status === 'confirmed' && handshakeTokens[booking.id] && (
+                      <p className="text-[11px] text-zinc-400 mt-2">Share this PIN with the customer on arrival — they'll enter it to start the job.</p>
+                    )}
                   </div>
                 ))}
               </div>
