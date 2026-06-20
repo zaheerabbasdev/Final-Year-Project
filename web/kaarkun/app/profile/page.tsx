@@ -267,7 +267,7 @@ export default function ProfilePage() {
 
         {/* Left Column: Avatar & Basic Stats */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm text-center relative overflow-hidden">
+          <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow text-center relative overflow-hidden">
             {/* Role Header Banner */}
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
 
@@ -307,15 +307,19 @@ export default function ProfilePage() {
 
             {/* Stats Row */}
             <div className="grid grid-cols-3 max-w-md mx-auto gap-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
-                <Briefcase className="w-5 h-5 text-indigo-500 mx-auto mb-1.5" />
+              <div className="stat-card p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
+                <div className="w-9 h-9 mx-auto mb-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
+                  <Briefcase className="w-4.5 h-4.5 text-indigo-500" />
+                </div>
                 <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{stats.totalJobs || 0}</span>
                 <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">Jobs Posted</p>
               </div>
-              <div className="p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
+              <div className="stat-card p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
                 {user?.role === 'provider' ? (
                   <>
-                    <Star className="w-5 h-5 text-amber-500 fill-amber-500/20 mx-auto mb-1.5" />
+                    <div className="w-9 h-9 mx-auto mb-1.5 rounded-lg bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center">
+                      <Star className="w-4.5 h-4.5 text-amber-500 fill-amber-500/20" />
+                    </div>
                     <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                       {reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : '5.0'}
                     </span>
@@ -323,7 +327,9 @@ export default function ProfilePage() {
                   </>
                 ) : (
                   <>
-                    <Activity className="w-5 h-5 text-emerald-500 mx-auto mb-1.5" />
+                    <div className="w-9 h-9 mx-auto mb-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
+                      <Activity className="w-4.5 h-4.5 text-emerald-500" />
+                    </div>
                     <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Active</span>
                     <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">Status</p>
                   </>
@@ -332,9 +338,11 @@ export default function ProfilePage() {
 
               {/* Provider availability toggle */}
               {user?.role === 'provider' && (
-                <div className=" flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800">
+                <div className="stat-card flex items-center justify-between p-3 rounded-xl bg-zinc-50 dark:bg-zinc-900/60 border border-zinc-100 dark:border-zinc-800">
                   <div className="text-left">
-                    <BadgeCheck className="w-5 h-5 text-emerald-500 mx-auto mb-1.5" />
+                    <div className="w-9 h-9 mb-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
+                      <BadgeCheck className="w-4.5 h-4.5 text-emerald-500" />
+                    </div>
                     <span className="text-xs font-bold text-zinc-755 dark:text-zinc-350">Available</span>
                     <p className="text-[10px] text-zinc-400">{isOnline ? 'Online' : 'Offline'}</p>
                   </div>
@@ -357,7 +365,7 @@ export default function ProfilePage() {
 
         {/* Right Columns: Bio Form / Editor */}
         <div className="lg:col-span-3 space-y-6">
-          <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm">
+          <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Profile Information</h3>
               {!isEditing && (
@@ -506,43 +514,57 @@ export default function ProfilePage() {
               </form>
             ) : (
               <div className="space-y-6">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Email Address</span>
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 mt-0.5">
-                      <Mail size={14} className="text-zinc-400" />
-                      {user?.email}
-                    </p>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div className="stat-card flex items-center gap-3 p-3.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                    <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center shrink-0">
+                      <Mail size={15} className="text-blue-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Email Address</p>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.email}</p>
+                    </div>
                   </div>
-                  <div>
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Phone Number</span>
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 mt-0.5">
-                      <Phone size={14} className="text-zinc-400" />
-                      {user?.phone || 'Not provided'}
-                    </p>
+                  <div className="stat-card flex items-center gap-3 p-3.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                    <div className="w-9 h-9 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center shrink-0">
+                      <Phone size={15} className="text-emerald-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Phone Number</p>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.phone || 'Not provided'}</p>
+                    </div>
                   </div>
-                  <div className="sm:col-span-2">
-                    <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Service Location</span>
-                    <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 flex items-center gap-1.5 mt-0.5">
-                      <MapPin size={14} className="text-zinc-400" />
-                      {user?.location || 'Not provided'}
-                    </p>
+                  <div className="stat-card sm:col-span-2 flex items-center gap-3 p-3.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                    <div className="w-9 h-9 rounded-lg bg-rose-100 dark:bg-rose-950/40 flex items-center justify-center shrink-0">
+                      <MapPin size={15} className="text-rose-500" />
+                    </div>
+                    <div className="min-w-0">
+                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Service Location</p>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.location || 'Not provided'}</p>
+                    </div>
                   </div>
                 </div>
 
                 {user?.role === 'provider' && (
                   <>
-                    <div className="border-t border-zinc-100 dark:border-zinc-800 pt-6">
-                      <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Experience</span>
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 mt-0.5">
-                        {experienceYears} Years
-                      </p>
+                    <div className="stat-card flex items-center gap-3 p-3.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                      <div className="w-9 h-9 rounded-lg bg-amber-100 dark:bg-amber-950/40 flex items-center justify-center shrink-0">
+                        <Award size={15} className="text-amber-500" />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Experience</p>
+                        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{experienceYears} Years</p>
+                      </div>
                     </div>
 
                     {skills && (
                       <div className="border-t border-zinc-100 dark:border-zinc-800 pt-6">
-                        <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Skills Tags</span>
-                        <div className="flex flex-wrap gap-2 mt-1.5">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <div className="w-6 h-6 rounded-md bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center">
+                            <Layers size={12} className="text-violet-500" />
+                          </div>
+                          <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Skills Tags</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
                           {skills.split(',').map((s, idx) => (
                             <span key={idx} className="px-2.5 py-1 text-xs font-semibold bg-zinc-50 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 rounded-lg border border-zinc-100 dark:border-zinc-800">
                               {s.trim()}
@@ -554,8 +576,13 @@ export default function ProfilePage() {
 
                     {bio && (
                       <div className="border-t border-zinc-100 dark:border-zinc-800 pt-6">
-                        <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Bio Description</span>
-                        <p className="text-sm text-zinc-600 dark:text-zinc-400 mt-1 whitespace-pre-wrap leading-relaxed">
+                        <div className="flex items-center gap-2 mb-2.5">
+                          <div className="w-6 h-6 rounded-md bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
+                            <UserIcon size={12} className="text-indigo-500" />
+                          </div>
+                          <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Bio Description</span>
+                        </div>
+                        <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed bg-zinc-50/50 dark:bg-white/[0.02] p-4 rounded-xl border border-zinc-100 dark:border-white/[0.04]">
                           {bio}
                         </p>
                       </div>
@@ -568,7 +595,7 @@ export default function ProfilePage() {
 
           {/* Provider Reviews */}
           {user?.role === 'provider' && (
-            <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm">
+            <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow">
               <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-6">Customer Reviews</h3>
               {reviews.length === 0 ? (
                 <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm">
@@ -577,20 +604,25 @@ export default function ProfilePage() {
               ) : (
                 <div className="space-y-4">
                   {reviews.map((r) => (
-                    <div key={r.id} className="p-4 rounded-xl border border-zinc-100 dark:border-zinc-850 bg-zinc-50/30 dark:bg-zinc-950/20">
-                      <div className="flex justify-between items-start">
-                        <div>
-                          <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{r.customer_name}</h4>
-                          <span className="text-[10px] text-zinc-400">{new Date(r.created_at).toLocaleDateString()}</span>
-                        </div>
-                        <div className="flex items-center gap-1 text-xs font-bold text-amber-500">
-                          <Star size={12} fill="currentColor" />
-                          <span>{r.rating.toFixed(1)}</span>
-                        </div>
+                    <div key={r.id} className="stat-card flex gap-3 p-4 rounded-xl border border-zinc-100 dark:border-zinc-850 bg-zinc-50/30 dark:bg-zinc-950/20">
+                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
+                        {r.customer_name?.charAt(0).toUpperCase() || '?'}
                       </div>
-                      <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 italic font-light">
-                        "{r.comment}"
-                      </p>
+                      <div className="min-w-0 flex-1">
+                        <div className="flex justify-between items-start gap-2">
+                          <div>
+                            <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{r.customer_name}</h4>
+                            <span className="text-[10px] text-zinc-400">{new Date(r.created_at).toLocaleDateString()}</span>
+                          </div>
+                          <div className="flex items-center gap-1 text-xs font-bold text-amber-500 shrink-0">
+                            <Star size={12} fill="currentColor" />
+                            <span>{r.rating.toFixed(1)}</span>
+                          </div>
+                        </div>
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 italic font-light">
+                          "{r.comment}"
+                        </p>
+                      </div>
                     </div>
                   ))}
                 </div>

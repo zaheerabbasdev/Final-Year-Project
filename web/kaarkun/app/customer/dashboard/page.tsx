@@ -58,6 +58,16 @@ const STATUS_STYLES: Record<string, string> = {
   awaiting_confirmation:'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
 };
 
+const STATUS_ACCENT: Record<string, string> = {
+  open:                 'bg-indigo-400',
+  active:               'bg-amber-400',
+  completed:            'bg-emerald-400',
+  cancelled:            'bg-zinc-300 dark:bg-zinc-700',
+  confirmed:            'bg-blue-400',
+  in_progress:          'bg-amber-400',
+  awaiting_confirmation:'bg-violet-400',
+};
+
 export default function CustomerDashboard() {
   const { user, loading: authLoading } = useAuth();
   const { format } = useCurrency();
@@ -207,49 +217,60 @@ export default function CustomerDashboard() {
               </Link>
             </div>
           ) : (
-            <div className="divide-y divide-zinc-50 dark:divide-white/[0.04]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
               {jobs.slice(0, 6).map((job) => (
-                <div key={job.id} className="px-6 py-4 hover:bg-zinc-50/70 dark:hover:bg-white/[0.02] transition-colors group">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div
+                  key={job.id}
+                  className="stat-card relative overflow-hidden rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 group"
+                >
+                  <div className={`absolute top-0 left-0 h-1 w-full ${STATUS_ACCENT[job.status] || STATUS_ACCENT.cancelled}`} />
+
+                  <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="min-w-0">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
-                          {job.title}
-                        </h3>
-                        <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[job.status] || STATUS_STYLES.cancelled}`}>
-                          {job.status}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400">
-                        <span className="flex items-center gap-1"><MapPin size={11} />{job.location}</span>
-                        <span className="flex items-center gap-1 font-semibold text-zinc-600 dark:text-zinc-300">
-                          <DollarSign size={11} />{format(job.budget)}
-                        </span>
-                        <span className="flex items-center gap-1"><Clock size={11} />{new Date(job.created_at).toLocaleDateString()}</span>
-                      </div>
+                      <h3 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                        {job.title}
+                      </h3>
+                      <p className="flex items-center gap-1 text-xs text-zinc-400 mt-1">
+                        <MapPin size={11} className="shrink-0" />
+                        <span className="truncate">{job.location}</span>
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      {job.status === 'open' && (
-                        <span className="text-xs bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 px-2.5 py-1 rounded-lg font-medium">
-                          {job.bids_count || 0} bids
-                        </span>
-                      )}
-                      {job.status === 'open' && (
-                        <button
-                          onClick={() => handleCancelJob(job.id)}
-                          className="p-1.5 text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20"
-                          title="Cancel job"
-                        >
-                          <XCircle size={15} />
-                        </button>
-                      )}
-                      <Link
-                        href={`/customer/jobs/${job.id}`}
-                        className="flex items-center gap-1 text-xs font-semibold text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors px-2.5 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20"
+                    <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[job.status] || STATUS_STYLES.cancelled}`}>
+                      {job.status}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06]">
+                    <span className="flex items-center gap-1 text-base font-black text-zinc-900 dark:text-white">
+                      <DollarSign size={14} className="text-indigo-500" />{format(job.budget)}
+                    </span>
+                    {job.status === 'open' ? (
+                      <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-lg">
+                        {job.bids_count || 0} bid{job.bids_count === 1 ? '' : 's'}
+                      </span>
+                    ) : (
+                      <span className="flex items-center gap-1 text-[11px] text-zinc-400">
+                        <Clock size={11} />{new Date(job.created_at).toLocaleDateString()}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 mt-3">
+                    <Link
+                      href={`/customer/jobs/${job.id}`}
+                      className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                    >
+                      Details <ChevronRight size={13} />
+                    </Link>
+                    {job.status === 'open' && (
+                      <button
+                        onClick={() => handleCancelJob(job.id)}
+                        className="p-1.5 text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 shrink-0"
+                        title="Cancel job"
                       >
-                        Details <ChevronRight size={13} />
-                      </Link>
-                    </div>
+                        <XCircle size={15} />
+                      </button>
+                    )}
                   </div>
                 </div>
               ))}
@@ -277,59 +298,67 @@ export default function CustomerDashboard() {
               <p className="text-sm text-zinc-400">No bookings yet. Hired jobs will appear here.</p>
             </div>
           ) : (
-            <div className="divide-y divide-zinc-50 dark:divide-white/[0.04]">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
               {bookings.map((booking) => (
-                <div key={booking.id} className="px-6 py-4 hover:bg-zinc-50/70 dark:hover:bg-white/[0.02] transition-colors group">
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+                <div
+                  key={booking.id}
+                  className="stat-card relative overflow-hidden rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 group"
+                >
+                  <div className={`absolute top-0 left-0 h-1 w-full ${STATUS_ACCENT[booking.status] || STATUS_ACCENT.cancelled}`} />
+
+                  <div className="flex items-start gap-3 mb-3">
+                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center text-white font-black text-sm shrink-0">
+                      {(booking.provider_name || 'P').charAt(0).toUpperCase()}
+                    </div>
                     <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-2 mb-1">
-                        <h3 className="font-semibold text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
-                          {booking.job_title || `Booking #${booking.id}`}
-                        </h3>
-                        <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[booking.status] || STATUS_STYLES.cancelled}`}>
-                          {booking.status.replace(/_/g, ' ')}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-400">
-                        <span className="flex items-center gap-1.5">
-                          <UserIcon size={11} />
-                          <span className="font-semibold text-zinc-600 dark:text-zinc-300">{booking.provider_name || 'Provider'}</span>
-                        </span>
-                        {booking.provider_phone && (
-                          <span className="flex items-center gap-1">📞 {booking.provider_phone}</span>
-                        )}
-                        <span className="flex items-center gap-1">
-                          <Clock size={11} />
-                          {new Date(booking.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
-                        </span>
-                      </div>
+                      <h3 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                        {booking.job_title || `Booking #${booking.id}`}
+                      </h3>
+                      <p className="flex items-center gap-1 text-xs text-zinc-400 mt-0.5 truncate">
+                        <UserIcon size={11} className="shrink-0" />
+                        {booking.provider_name || 'Provider'}
+                      </p>
                     </div>
-                    <div className="flex items-center gap-2 shrink-0">
-                      <Link
-                        href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
-                        className="px-3 py-1.5 text-[11px] font-bold bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-all inline-flex items-center gap-1"
+                    <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[booking.status] || STATUS_STYLES.cancelled}`}>
+                      {booking.status.replace(/_/g, ' ')}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06] text-[11px] text-zinc-400">
+                    {booking.provider_phone ? (
+                      <span>📞 {booking.provider_phone}</span>
+                    ) : <span />}
+                    <span className="flex items-center gap-1">
+                      <Clock size={11} />
+                      {new Date(booking.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                    </span>
+                  </div>
+
+                  <div className="flex items-center gap-2 mt-3">
+                    <Link
+                      href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
+                      className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-all"
+                    >
+                      <MessageSquare size={11} /> Message
+                    </Link>
+                    {booking.status === 'awaiting_confirmation' && (
+                      <button
+                        onClick={() => handleConfirmCompletion(booking.id)}
+                        disabled={confirmLoading === booking.id}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all disabled:opacity-50"
                       >
-                        <MessageSquare size={11} /> Message
+                        <CheckCheck size={11} />
+                        {confirmLoading === booking.id ? '...' : 'Confirm Done'}
+                      </button>
+                    )}
+                    {booking.status === 'completed' && booking.provider_id && (
+                      <Link
+                        href={`/customer/submit-review?bookingId=${booking.id}&jobId=${booking.job_id}&providerId=${booking.provider_id}&providerName=${encodeURIComponent(booking.provider_name || 'Provider')}`}
+                        className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all"
+                      >
+                        <Star size={11} /> Review
                       </Link>
-                      {booking.status === 'awaiting_confirmation' && (
-                        <button
-                          onClick={() => handleConfirmCompletion(booking.id)}
-                          disabled={confirmLoading === booking.id}
-                          className="px-3 py-1.5 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white rounded-lg transition-all disabled:opacity-50 inline-flex items-center gap-1"
-                        >
-                          <CheckCheck size={11} />
-                          {confirmLoading === booking.id ? '...' : 'Confirm Done'}
-                        </button>
-                      )}
-                      {booking.status === 'completed' && booking.provider_id && (
-                        <Link
-                          href={`/customer/submit-review?bookingId=${booking.id}&jobId=${booking.job_id}&providerId=${booking.provider_id}&providerName=${encodeURIComponent(booking.provider_name || 'Provider')}`}
-                          className="px-3 py-1.5 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all inline-flex items-center gap-1"
-                        >
-                          <Star size={11} /> Review
-                        </Link>
-                      )}
-                    </div>
+                    )}
                   </div>
                 </div>
               ))}

@@ -144,7 +144,7 @@ export default function CustomerBookingsPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {bookings.map((booking) => {
             const statusConfig: Record<string, { color: string; bg: string; border: string; accent: string; icon: React.ReactNode }> = {
               confirmed: { color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800', accent: 'bg-blue-500', icon: <CheckCircle2 size={13} /> },
@@ -158,14 +158,14 @@ export default function CustomerBookingsPage() {
             return (
               <div
                 key={booking.id}
-                className="group w-full bg-white dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden"
+                className="group w-full bg-white dark:bg-zinc-900/50 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-lg hover:-translate-y-0.5 transition-all duration-300 overflow-hidden flex flex-col"
               >
                 <div className="flex">
                   {/* Accent bar */}
                   <div className={`w-1.5 shrink-0 ${sc.accent} rounded-l-2xl`} />
 
                   {/* Card content */}
-                  <div className="flex-1 p-5 sm:p-6">
+                  <div className="flex-1 p-5 sm:p-6 flex flex-col">
                     {/* Top row: title + status */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2 mb-4">
                       <div className="flex items-center gap-3 min-w-0">
@@ -188,7 +188,7 @@ export default function CustomerBookingsPage() {
                     </div>
 
                     {/* Info grid */}
-                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mb-5">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                       {booking.provider_name && (
                         <div className="flex items-center gap-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
                           <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center shrink-0">
@@ -229,7 +229,7 @@ export default function CustomerBookingsPage() {
                     </div>
 
                     {/* Actions */}
-                    <div className="flex flex-wrap gap-2 pt-4 border-t border-zinc-100 dark:border-white/[0.06]">
+                    <div className="flex flex-wrap gap-2 pt-4 mt-auto border-t border-zinc-100 dark:border-white/[0.06]">
                       <Link
                         href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
                         className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-700 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg inline-flex items-center gap-1.5 transition-all hover:border-indigo-300 dark:hover:border-indigo-700"

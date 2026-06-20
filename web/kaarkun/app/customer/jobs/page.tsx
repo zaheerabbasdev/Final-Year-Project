@@ -18,7 +18,9 @@ import {
   XCircle,
   Navigation,
   ChevronRight,
-  AlertTriangle
+  AlertTriangle,
+  Wrench,
+  Users
 } from 'lucide-react';
 
 interface Job {
@@ -48,6 +50,14 @@ const STATUS_BADGE: Record<string, string> = {
   awaiting_confirmation: 'bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400',
   completed: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400',
   cancelled: 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400',
+};
+
+const STATUS_ACCENT: Record<string, string> = {
+  open: 'bg-blue-400',
+  active: 'bg-amber-400',
+  awaiting_confirmation: 'bg-violet-400',
+  completed: 'bg-emerald-400',
+  cancelled: 'bg-rose-300',
 };
 
 export default function CustomerJobsPage() {
@@ -195,7 +205,7 @@ export default function CustomerJobsPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {displayed.map(job => {
             const displayStatus = job.booking_status === 'awaiting_confirmation' ? 'awaiting_confirmation' : job.status;
             const badgeClass = STATUS_BADGE[displayStatus] || STATUS_BADGE['open'];
@@ -207,53 +217,71 @@ export default function CustomerJobsPage() {
             return (
               <div
                 key={job.id}
-                className={`bg-white dark:bg-zinc-900/40 p-5 rounded-2xl border shadow-sm flex flex-col gap-4 transition-all ${isAwaiting ? 'border-violet-200/60 dark:border-violet-800/50' :
-                  isActive ? 'border-amber-200/60 dark:border-amber-800/50' :
-                    'border-zinc-200/60 dark:border-zinc-800/80'
-                  }`}
+                className="relative overflow-hidden bg-white dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col transition-all hover:shadow-lg hover:-translate-y-0.5"
               >
-                {/* Top Row */}
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2">
-                  <div className="space-y-1 flex-grow">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-50">{job.title}</h3>
-                      {job.is_emergency && (
-                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 rounded-full uppercase">
-                          <AlertTriangle size={9} /> Emergency
-                        </span>
-                      )}
-                      {job.category_name && (
-                        <span className="px-2 py-0.5 text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-full">
-                          {job.category_name}
-                        </span>
-                      )}
+                <div className={`absolute top-0 left-0 h-1 w-full ${STATUS_ACCENT[displayStatus] || STATUS_ACCENT.cancelled}`} />
+
+                <div className="p-5 flex flex-col gap-4 flex-grow">
+                  {/* Top Row: icon + title + status */}
+                  <div className="flex items-start justify-between gap-3">
+                    <div className="flex items-start gap-3 min-w-0">
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${job.is_emergency ? 'bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400' : 'bg-indigo-100 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'}`}>
+                        <Wrench size={18} />
+                      </div>
+                      <div className="min-w-0">
+                        <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-50 truncate">{job.title}</h3>
+                        <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                          {job.is_emergency && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 rounded-full uppercase">
+                              <AlertTriangle size={9} /> Emergency
+                            </span>
+                          )}
+                          {job.category_name && (
+                            <span className="px-2 py-0.5 text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-full">
+                              {job.category_name}
+                            </span>
+                          )}
+                        </div>
+                      </div>
                     </div>
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-2">{job.description}</p>
-                    <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-zinc-500 pt-1">
-                      <span className="flex items-center gap-1 font-semibold text-zinc-800 dark:text-zinc-200">
-                        <DollarSign size={12} className="text-indigo-500" />
-                        {format(job.budget)}
-                        {job.is_negotiable && <span className="font-normal text-zinc-400">(Neg.)</span>}
-                      </span>
-                      <span className="flex items-center gap-1"><MapPin size={12} />{job.location}</span>
-                      <span className="flex items-center gap-1"><Clock size={12} />{job.created_at?.split('T')[0]}</span>
-                    </div>
-                  </div>
-                  <div className="shrink-0 flex flex-col items-end gap-2">
-                    <span className={`px-2.5 py-1 text-[10px] font-semibold rounded-full uppercase ${badgeClass}`}>
+                    <span className={`shrink-0 px-2.5 py-1 text-[10px] font-semibold rounded-full uppercase ${badgeClass}`}>
                       {displayStatus.replace(/_/g, ' ')}
                     </span>
-                    {job.provider_name && (
-                      <p className="text-[10px] text-zinc-400">Provider: <strong className="text-zinc-600 dark:text-zinc-300">{job.provider_name}</strong></p>
-                    )}
                   </div>
+
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 leading-relaxed line-clamp-2">{job.description}</p>
+
+                  {/* Stat pills */}
+                  <div className="grid grid-cols-3 gap-2">
+                    <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] p-2.5">
+                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><DollarSign size={10} /> Budget</p>
+                      <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5 truncate">
+                        {format(job.budget)}{job.is_negotiable && <span className="text-[10px] font-normal text-zinc-400"> (Neg.)</span>}
+                      </p>
+                    </div>
+                    <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] p-2.5">
+                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><MapPin size={10} /> Location</p>
+                      <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200 mt-0.5 truncate">{job.location}</p>
+                    </div>
+                    <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] p-2.5">
+                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><Clock size={10} /> Posted</p>
+                      <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200 mt-0.5 truncate">{job.created_at?.split('T')[0]}</p>
+                    </div>
+                  </div>
+
+                  {job.provider_name && (
+                    <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
+                      <Users size={12} className="shrink-0" />
+                      Provider: <strong className="text-zinc-700 dark:text-zinc-200">{job.provider_name}</strong>
+                    </div>
+                  )}
                 </div>
 
                 {/* Action Buttons */}
-                <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                <div className="flex flex-wrap gap-2 px-5 py-4 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-white/[0.02]">
                   <Link
                     href={`/customer/jobs/${job.id}`}
-                    className="flex items-center gap-1 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-xl transition-all"
+                    className="flex items-center gap-1 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-900 rounded-xl transition-all"
                   >
                     <ChevronRight size={12} /> View Bids
                   </Link>

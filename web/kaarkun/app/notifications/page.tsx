@@ -28,15 +28,22 @@ interface Notification {
   related_id?: number;
 }
 
-const getNotifIcon = (type?: string) => {
-  switch (type) {
-    case 'bid': return <Briefcase size={18} className="text-indigo-500" />;
-    case 'message': return <MessageSquare size={18} className="text-blue-500" />;
-    case 'review': return <Star size={18} className="text-amber-500" />;
-    case 'emergency': return <Zap size={18} className="text-rose-500" />;
-    default: return <Info size={18} className="text-zinc-400" />;
-  }
+const NOTIF_STYLE: Record<string, { icon: React.ReactNode; chip: string; accent: string }> = {
+  bid:       { icon: <Briefcase size={18} className="text-indigo-500" />, chip: 'bg-indigo-100 dark:bg-indigo-950/40', accent: 'bg-indigo-400' },
+  message:   { icon: <MessageSquare size={18} className="text-blue-500" />, chip: 'bg-blue-100 dark:bg-blue-950/40', accent: 'bg-blue-400' },
+  review:    { icon: <Star size={18} className="text-amber-500" />, chip: 'bg-amber-100 dark:bg-amber-950/40', accent: 'bg-amber-400' },
+  emergency: { icon: <Zap size={18} className="text-rose-500" />, chip: 'bg-rose-100 dark:bg-rose-950/40', accent: 'bg-rose-400' },
+  booking:   { icon: <CheckCheck size={18} className="text-emerald-500" />, chip: 'bg-emerald-100 dark:bg-emerald-950/40', accent: 'bg-emerald-400' },
+  default:   { icon: <Info size={18} className="text-zinc-400" />, chip: 'bg-zinc-100 dark:bg-zinc-800', accent: 'bg-zinc-300 dark:bg-zinc-700' },
 };
+
+const getNotifStyle = (type?: string) => {
+  if (!type) return NOTIF_STYLE.default;
+  if (type.includes('booking') || type.includes('handshake') || type.includes('suspend')) return NOTIF_STYLE.booking;
+  return NOTIF_STYLE[type] || NOTIF_STYLE.default;
+};
+
+const getNotifIcon = (type?: string) => getNotifStyle(type).icon;
 
 const timeAgo = (dateStr: string) => {
   const diff = Date.now() - new Date(dateStr).getTime();
@@ -148,46 +155,48 @@ export default function NotificationsPage() {
           <p className="text-xs text-zinc-400 mt-1">Activity alerts will appear here.</p>
         </div>
       ) : (
-        <div className="space-y-2">
-          {notifications.map(notif => (
-            <div
-              key={notif.id}
-              onClick={() => {
-                if (!notif.is_read) {
-                  handleMarkOneRead(notif.id);
-                }
-                setSelectedNotification(notif);
-              }}
-              className={`group relative flex items-start gap-4 p-4 rounded-2xl border transition-all cursor-pointer ${notif.is_read
-                  ? 'bg-white dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50 dark:hover:bg-zinc-900/50'
-                  : 'bg-indigo-50/40 dark:bg-indigo-950/10 border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/20'
-                }`}
-            >
-              {/* Icon */}
-              <div className={`shrink-0 p-2 rounded-xl mt-0.5 ${notif.is_read
-                  ? 'bg-zinc-100 dark:bg-zinc-800'
-                  : 'bg-white dark:bg-zinc-900 shadow-sm border border-indigo-100 dark:border-indigo-900/50'
-                }`}>
-                {getNotifIcon(notif.type)}
-              </div>
+        <div className="space-y-3">
+          {notifications.map(notif => {
+            const style = getNotifStyle(notif.type);
+            return (
+              <div
+                key={notif.id}
+                onClick={() => {
+                  if (!notif.is_read) {
+                    handleMarkOneRead(notif.id);
+                  }
+                  setSelectedNotification(notif);
+                }}
+                className={`group relative overflow-hidden flex items-start gap-4 p-4 pl-5 rounded-2xl border transition-all cursor-pointer hover:shadow-md hover:-translate-y-0.5 ${notif.is_read
+                    ? 'bg-white dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50 dark:hover:bg-zinc-900/50'
+                    : 'bg-indigo-50/40 dark:bg-indigo-950/10 border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/20'
+                  }`}
+              >
+                <div className={`absolute top-0 left-0 h-full w-1.5 ${style.accent}`} />
 
-              {/* Content */}
-              <div className="flex-grow min-w-0">
-                <div className="flex items-start justify-between gap-2">
-                  <h4 className={`text-sm leading-snug ${notif.is_read ? 'font-medium text-zinc-700 dark:text-zinc-300' : 'font-bold text-zinc-900 dark:text-zinc-50'}`}>
-                    {notif.title}
-                  </h4>
-                  <span className="text-[10px] text-zinc-400 shrink-0 mt-0.5">{timeAgo(notif.created_at)}</span>
+                {/* Icon */}
+                <div className={`shrink-0 p-2.5 rounded-xl mt-0.5 ${style.chip}`}>
+                  {style.icon}
                 </div>
-                <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">{notif.message}</p>
-              </div>
 
-              {/* Unread dot */}
-              {!notif.is_read && (
-                <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
-              )}
-            </div>
-          ))}
+                {/* Content */}
+                <div className="grow min-w-0">
+                  <div className="flex items-start justify-between gap-2">
+                    <h4 className={`text-sm leading-snug ${notif.is_read ? 'font-medium text-zinc-700 dark:text-zinc-300' : 'font-bold text-zinc-900 dark:text-zinc-50'}`}>
+                      {notif.title}
+                    </h4>
+                    <span className="text-[10px] text-zinc-400 shrink-0 mt-0.5">{timeAgo(notif.created_at)}</span>
+                  </div>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-0.5 leading-relaxed">{notif.message}</p>
+                </div>
+
+                {/* Unread dot */}
+                {!notif.is_read && (
+                  <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
+                )}
+              </div>
+            );
+          })}
         </div>
       )}
 
@@ -202,7 +211,7 @@ export default function NotificationsPage() {
               <X size={18} />
             </button>
             <div className="flex items-start gap-3.5 mb-4 pr-6">
-              <div className="p-2.5 bg-indigo-50 dark:bg-indigo-950/40 rounded-xl shrink-0 mt-0.5">
+              <div className={`p-2.5 rounded-xl shrink-0 mt-0.5 ${getNotifStyle(selectedNotification.type).chip}`}>
                 {getNotifIcon(selectedNotification.type)}
               </div>
               <div>
