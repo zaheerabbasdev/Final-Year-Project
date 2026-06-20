@@ -4,6 +4,7 @@ const User = require('../models/userModel');
 const mailer = require('../utils/mailer');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
+const { createNotification } = require('../services/notificationService');
 
 const registerAdmin = async (req, res) => {
     try {
@@ -155,13 +156,38 @@ const updateUserStatus = async (req, res) => {
         }
         
         await db.execute('UPDATE users SET status = ?, status_reason = ? WHERE id = ?', [status, reason || null, id]);
-        
+
         // Send email notification (Non-blocking)
         User.findById(id).then(user => {
             if (user && user.email) {
                 mailer.sendStatusNotification(user.email, status, reason);
             }
         }).catch(err => console.error('Email Notification Error:', err));
+
+        // If this user is being suspended, proactively notify anyone with an active
+        // booking against them — the system doesn't auto-cancel (the work may be
+        // nearly done), but the other party should know right away rather than
+        // waiting on an unresponsive customer/provider before deciding to cancel.
+        if (status === 'blocked') {
+            db.execute(
+                `SELECT b.id, b.job_id, b.customer_id, b.provider_id, j.title as job_title
+                 FROM bookings b
+                 JOIN jobs j ON b.job_id = j.id
+                 WHERE (b.customer_id = ? OR b.provider_id = ?)
+                   AND b.status IN ('confirmed', 'in_progress')`,
+                [id, id]
+            ).then(([bookings]) => {
+                for (const booking of bookings) {
+                    const otherPartyId = Number(booking.customer_id) === Number(id) ? booking.provider_id : booking.customer_id;
+                    createNotification(
+                        otherPartyId,
+                        'Booking Affected by Account Suspension',
+                        `The other party on "${booking.job_title}" has had their account suspended. You may want to cancel this booking to find a replacement.`,
+                        'booking_party_suspended'
+                    );
+                }
+            }).catch(err => console.error('Error notifying affected bookings:', err));
+        }
 
         res.json({ message: `User status updated to ${status}` });
     } catch (error) {

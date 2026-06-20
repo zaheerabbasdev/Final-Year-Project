@@ -121,9 +121,11 @@ Base URL: `http://<host>:5000/api`. JWT is sent as `Authorization: Bearer <token
 | GET | `/my` | JWT | Bookings for the current user (as customer or provider). |
 | GET | `/job/:jobId` | JWT | Booking tied to a specific job. |
 | PUT | `/job/:jobId/status` / `/:id/status` | JWT (participant) | Advance booking status. `completed` auto-marks the job completed and notifies the provider; `awaiting_confirmation` notifies the customer to confirm. |
-| POST | `/:id/handshake/generate` | provider (owner) | **QR handshake**: provider generates a random 6-digit PIN, encoded as a QR code, to prove they're physically on-site. |
-| POST | `/:id/handshake/verify` | customer (owner) | Customer scans/enters the PIN to confirm the provider arrived → booking moves to `in_progress`; token is single-use (cleared after verification). |
+| POST | `/:id/handshake/generate` | provider (owner) | **Arrival handshake**: provider generates a random 6-digit PIN to prove they're physically on-site. Surfaced as a scannable QR code on mobile and a plain PIN display on the web app. |
+| POST | `/:id/handshake/verify` | customer (owner) | Customer scans (mobile) or types in (web) the PIN to confirm the provider arrived → booking moves to `in_progress`; token is single-use (cleared after verification). |
 | PUT | `/:id/cancel` | participant | Cancel a `confirmed`/`in_progress` booking — reopens the job, resets/deletes the accepted bid so other providers can bid again, notifies the other party. |
+
+> **Note:** `acceptBid` and `expressAccept` claim a job atomically (`UPDATE jobs SET status='active' WHERE id=? AND status='open'` inside a transaction), so two concurrent accept/express-accept attempts on the same job can never both succeed — the loser gets a clean `409 Conflict` instead of a duplicate booking. `findByJobId`-style lookups always return the most recent booking for a job (`ORDER BY id DESC LIMIT 1`), so a job that was cancelled and successfully rebooked doesn't resolve to its stale, cancelled booking.
 
 ### `/api/admin` — Staff/Ops Console
 | Method | Path | Auth | Description |
@@ -132,7 +134,7 @@ Base URL: `http://<host>:5000/api`. JWT is sent as `Authorization: Bearer <token
 | POST | `/auth/login` | none (rate-limited) | Admin login → admin JWT. |
 | GET | `/stats` | admin | Dashboard aggregates: user/job/bid/category counts, 12-month signup trend, top-5 categories by job volume. |
 | GET/DELETE | `/users`, `/users/:id` | admin | List, inspect, delete users. |
-| PUT | `/users/:id/status` | admin | Verify / reject / suspend a user, with an optional reason (emails the user). |
+| PUT | `/users/:id/status` | admin | Verify / reject / suspend a user, with an optional reason (emails the user). If the user is suspended (`blocked`) and has any `confirmed`/`in_progress` bookings, the other party on each booking gets a real-time notification that their booking is affected, since suspension doesn't auto-cancel anything. |
 | POST | `/providers/:id/auto-verify` | admin | **AI-assisted KYC**: runs the uploaded CNIC image through Gemini Vision to auto-suggest a confidence score + notes for manual review. |
 | GET/DELETE | `/jobs`, `/jobs/:id` | admin | Moderate job listings. |
 | POST | `/jobs/:id/summarize-dispute` | admin | **AI dispute summarizer**: feeds the full chat transcript to the LLM chain and returns a structured 3-part summary (customer's claim / provider's claim / recommendation). |
@@ -158,7 +160,7 @@ Base URL: `http://<host>:5000/api`. JWT is sent as `Authorization: Bearer <token
 |---|---|---|---|
 | GET | `/list` | JWT | Chat thread list (conversations grouped by job + other participant). |
 | GET | `/:jobId/:otherUserId` | JWT | Message history for one job conversation. |
-| POST | `/send` | JWT | Send a message (text and/or image attachment). |
+| POST | `/send` | JWT | Send a message (text and/or image attachment). Authorized only between a job's customer and a legitimate counterpart on that job (a bidder or the booked provider) — an arbitrary user ID can't be messaged just by guessing it. |
 | PUT | `/read/:jobId/:senderId` | JWT | Mark a thread as read. |
 
 ### `/api/geocode` — Location Search (proxies OpenStreetMap Nominatim, biased to Pakistan)
@@ -197,6 +199,8 @@ Six distinct AI-powered features run on top of this chain:
 - KYC document (CNIC) verification — uses **Gemini Vision** specifically (multimodal image + text prompt) to cross-check the uploaded ID photo against the user's claimed name
 - Dispute summarization — LLM reads the full chat transcript of a job and produces a structured "who's right" summary for admin review
 
+> **Caveat:** unlike the other five AI features, KYC verification has no fallback chain — it calls Gemini Vision directly, since Groq/Claude weren't multimodal-vision-capable at the time of writing. If the Gemini key's Google Cloud project has no billing enabled, Google returns `429 RESOURCE_EXHAUSTED` with zero free-tier quota (a project/billing-level restriction, not a bad key). When that happens, the function returns `{ confidence: null, notes: '...verify manually...' }` instead of a fabricated score, and the admin can still manually verify/reject providers — auto-verify is an assist feature, not a hard dependency for provider onboarding.
+
 ---
 
 ## 6. Real-Time Features (Socket.io)
@@ -205,7 +209,7 @@ The backend runs a Socket.io server alongside the REST API (`socketManager.js`),
 
 - **Live chat** — `new_message`, `user_typing`/`user_stop_typing` events, scoped per job conversation.
 - **In-app notifications** — `new_notification` pushed instantly (job posted, bid accepted, booking status changes, etc.) without polling.
-- **Live provider GPS tracking** — while en route, a provider emits `location_update` (lat/lng); the customer's app listens via `provider_location` to show a live map marker; `location_stopped` ends tracking when the job starts or is cancelled.
+- **Live provider GPS tracking** — while en route, a provider emits `location_update` (lat/lng); the customer's app listens via `provider_location` to show a live map marker; `location_stopped` ends tracking when the job starts or is cancelled. **Mobile-only by design** — the web app doesn't connect to Socket.io at all; a desktop browser tab is a poor fit for continuous background GPS reporting, so this stays a native-app feature.
 
 ---
 
@@ -235,8 +239,8 @@ The browser-based counterpart to the mobile app — full product functionality w
 |---|---|---|
 | Auth | `/login`, `/register`, `/verify-otp` | Sign-up with role selection, password-strength validation (min 8 chars, letter+number), OTP email verification |
 | Shared | `/profile`, `/notifications`, `/chat`, `/support-chatbot` | Profile editing, live notification feed, real-time chat, AI support chatbot |
-| Customer | `/customer/dashboard`, `/customer/jobs`, `/customer/jobs/[id]`, `/customer/post-job`, `/customer/bookings`, `/customer/submit-review` | Post jobs with photos/budget/location (with address-autocomplete `LocationInput`), review incoming bids, track bookings, leave reviews |
-| Provider | `/provider/dashboard`, `/provider/browse-jobs`, `/provider/bids`, `/provider/[id]` | Browse/filter open jobs, place bids, track bid status, public provider profile page |
+| Customer | `/customer/dashboard`, `/customer/jobs`, `/customer/jobs/[id]`, `/customer/post-job`, `/customer/bookings`, `/customer/submit-review` | Post jobs with photos/budget/location (with address-autocomplete `LocationInput`), review incoming bids, track bookings, **enter the provider's arrival PIN to start the job**, leave reviews |
+| Provider | `/provider/dashboard`, `/provider/browse-jobs`, `/provider/bids`, `/provider/[id]` | Browse/filter open jobs, place bids, track bid status, **generate an arrival PIN for confirmed bookings**, public provider profile page |
 
 Cross-cutting: `AuthContext` (session), `CurrencyContext`, `ThemeContext` (dark/light mode), automatic `401` logout, environment-driven image URLs (no hardcoded backend host).
 
@@ -253,6 +257,8 @@ Flutter app targeting Android/iOS (and Web/Desktop as secondary Flutter targets)
 - Post a job (with photos, budget, location picker, negotiable/emergency flags, AI-assisted description autocomplete)
 - My Jobs (track status, view/accept bids)
 - Track Provider screen (live GPS map while a provider is en route)
+
+`LocationTrackingService` checks GPS-enabled/permission status before starting and surfaces a clear error (SnackBar + inline warning) if location can't be shared, instead of silently doing nothing while the customer waits indefinitely. Note: tracking runs on a foreground Dart timer, not a background service — it will stop reporting if the provider backgrounds the app for an extended period (a known platform limitation, not a bug).
 
 **Provider features** (`features/provider/`):
 - Dashboard (online/offline toggle, stats)
@@ -293,6 +299,9 @@ Flutter app targeting Android/iOS (and Web/Desktop as secondary Flutter targets)
 - **Mobile secure storage**: JWT tokens stored in the OS keystore via `flutter_secure_storage`, not plaintext `SharedPreferences`.
 - **No stack-trace leakage**: every controller catch-block returns a generic message to the client while logging full details server-side only.
 - **Socket.io auth**: real-time connections require a valid JWT handshake, preventing anonymous clients from joining notification/chat rooms.
+- **Chat authorization**: sending a message requires the sender/receiver pair to actually correspond to the job's customer and a legitimate bidder/booked provider on that job — not an arbitrary user ID.
+- **Race-condition-safe job claiming**: bid acceptance and emergency express-accept both use a DB transaction with an atomic conditional `UPDATE ... WHERE status='open'` to claim the job, so two concurrent accept attempts on the same job can never both succeed (verified with real concurrent-request tests).
+- **Suspension-aware notifications**: suspending a user with an active booking notifies the other party immediately rather than leaving them waiting on someone who can no longer respond.
 
 ---
 
@@ -318,11 +327,12 @@ Flutter app targeting Android/iOS (and Web/Desktop as secondary Flutter targets)
 - [x] Edit/delete own job postings
 
 **Bookings & Job Execution**
-- [x] Booking creation on bid acceptance
-- [x] QR/PIN handshake to verify on-site arrival before starting work
+- [x] Booking creation on bid acceptance (atomic — race-condition-safe)
+- [x] Arrival handshake to verify on-site presence before starting work — QR/PIN on mobile, PIN entry on web
 - [x] Status lifecycle: confirmed → in_progress → awaiting_confirmation → completed
 - [x] Booking cancellation with automatic job reopening + bid reset
-- [x] Live GPS tracking of provider en route to job
+- [x] Live GPS tracking of provider en route to job (mobile-only)
+- [x] Affected-party notification when the other side of an active booking is suspended
 
 **Communication**
 - [x] Real-time chat per job (text + image attachments, typing indicators, read receipts)
@@ -382,3 +392,5 @@ These require real-world values once a hosting target is chosen — they are not
 - File uploads (`backend/uploads/`) are stored on local disk — fine on a persistent VM, but requires migrating to object storage (S3-style) on ephemeral-filesystem hosts.
 - The Android release build currently signs with the debug keystore — a real release keystore is required before Play Store submission.
 - The Google Maps API key should be restricted in Google Cloud Console (Android package + SHA-1, Web HTTP referrer) to prevent abuse.
+- The Gemini API key needs a Google Cloud project with billing enabled to get non-zero free-tier quota (account/region-level requirement, not a code or key-format issue) — until then, KYC auto-verify falls back to "verify manually" rather than erroring out.
+- Real background location tracking for providers (continuing reliably while the app is backgrounded) would need a native foreground service (e.g. `flutter_background_service`) — current tracking is foreground-only.
