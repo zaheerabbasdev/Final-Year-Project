@@ -269,23 +269,38 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                   Consumer<LocationTrackingService>(
                     builder: (context, trackingService, _) {
                       final isTrackingThisJob = trackingService.isTracking && trackingService.activeJobId == bid['job_id'];
-                      return SizedBox(
+                      return Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          SizedBox(
                         width: double.infinity,
                         height: 48,
                         child: ElevatedButton.icon(
-                          onPressed: () {
+                          onPressed: () async {
                             if (isTrackingThisJob) {
                               final socket = context.read<SocketService>();
                               trackingService.stopTracking(socket: socket);
                             } else {
                               final socket = context.read<SocketService>();
                               final custId = bid['client_id'] ?? bid['customer_id'] ?? 0;
+                              final messenger = ScaffoldMessenger.of(context);
                               debugPrint('DEBUG: Starting location tracking for jobId: ${bid['job_id']}, customerId: $custId');
-                              trackingService.startTracking(
+                              final success = await trackingService.startTracking(
                                 socket,
                                 jobId: bid['job_id'],
                                 customerId: custId,
                               );
+                              if (!success && trackingService.lastError != null) {
+                                messenger.showSnackBar(
+                                  SnackBar(
+                                    content: Text(trackingService.lastError!, style: GoogleFonts.outfit()),
+                                    backgroundColor: AppTheme.errorColor,
+                                    behavior: SnackBarBehavior.floating,
+                                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                                    margin: const EdgeInsets.all(12),
+                                  ),
+                                );
+                              }
                             }
                           },
                           icon: Icon(
@@ -303,6 +318,16 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                             elevation: 0,
                           ),
                         ),
+                          ),
+                          if (isTrackingThisJob && trackingService.lastError != null)
+                            Padding(
+                              padding: const EdgeInsets.only(top: 6, left: 4),
+                              child: Text(
+                                trackingService.lastError!,
+                                style: GoogleFonts.outfit(fontSize: 12, color: AppTheme.errorColor),
+                              ),
+                            ),
+                        ],
                       );
                     },
                   ),

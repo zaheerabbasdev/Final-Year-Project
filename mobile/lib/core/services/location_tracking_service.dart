@@ -10,20 +10,43 @@ class LocationTrackingService extends ChangeNotifier {
   bool _isTracking = false;
   int? _activeJobId;
   int? _activeCustomerId;
+  String? _lastError;
 
   bool get isTracking => _isTracking;
   int? get activeJobId => _activeJobId;
+  String? get lastError => _lastError;
 
   /// Begin streaming location every [intervalSeconds] seconds.
-  void startTracking(
+  /// Returns false (with [lastError] set) if GPS/permission isn't available,
+  /// so the caller can show feedback instead of silently doing nothing.
+  Future<bool> startTracking(
     SocketService socket, {
     required int jobId,
     required int customerId,
     int intervalSeconds = 5,
-  }) {
+  }) async {
     if (_isTracking) {
       debugPrint('[LocationTracking] Already tracking, returning');
-      return;
+      return true;
+    }
+
+    _lastError = null;
+
+    final serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      _lastError = 'Location services are turned off. Please enable GPS to share your location.';
+      notifyListeners();
+      return false;
+    }
+
+    var permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+    }
+    if (permission == LocationPermission.denied || permission == LocationPermission.deniedForever) {
+      _lastError = 'Location permission is required to share your live location with the customer.';
+      notifyListeners();
+      return false;
     }
 
     _activeJobId = jobId;
@@ -35,11 +58,12 @@ class LocationTrackingService extends ChangeNotifier {
 
     // Emit immediately (socket should be ready at this point)
     _emitOnce(socket);
-    
+
     // Then emit on a timer
     _timer = Timer.periodic(Duration(seconds: intervalSeconds), (_) {
       _emitOnce(socket);
     });
+    return true;
   }
 
   Future<void> _emitOnce(SocketService socket) async {
@@ -62,11 +86,18 @@ class LocationTrackingService extends ChangeNotifier {
         longitude: position.longitude,
       );
 
+      if (_lastError != null) {
+        _lastError = null;
+        notifyListeners();
+      }
+
       debugPrint(
         '[LocationTracking] Emitted successfully',
       );
     } catch (e) {
       debugPrint('[LocationTracking] GPS error: $e');
+      _lastError = 'Lost GPS signal — retrying…';
+      notifyListeners();
     }
   }
 
