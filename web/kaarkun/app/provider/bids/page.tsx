@@ -17,7 +17,9 @@ import {
   XCircle,
   Hourglass,
   CheckCheck,
-  AlertTriangle
+  AlertTriangle,
+  Scale,
+  Send
 } from 'lucide-react';
 
 interface Bid {
@@ -103,13 +105,13 @@ export default function ProviderBidsPage() {
   const getStatusBadge = (bid: Bid) => {
     const jobStatus = getJobStatus(bid);
     if (bid.status === 'accepted') {
-      if (jobStatus === 'completed') return { label: 'Completed', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400' };
-      if (jobStatus === 'awaiting_confirmation') return { label: 'Awaiting Confirmation', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400' };
-      return { label: 'Active', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400' };
+      if (jobStatus === 'completed') return { label: 'Completed', color: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400', accent: 'bg-emerald-400' };
+      if (jobStatus === 'awaiting_confirmation') return { label: 'Awaiting Confirmation', color: 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400', accent: 'bg-amber-400' };
+      return { label: 'Active', color: 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400', accent: 'bg-blue-400' };
     }
-    if (jobStatus === 'active' || jobStatus === 'completed') return { label: 'Service Availed', color: 'bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-400' };
-    if (bid.status === 'rejected') return { label: 'Rejected', color: 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400' };
-    return { label: 'Pending', color: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300' };
+    if (jobStatus === 'active' || jobStatus === 'completed') return { label: 'Service Availed', color: 'bg-orange-100 text-orange-800 dark:bg-orange-950/40 dark:text-orange-400', accent: 'bg-orange-400' };
+    if (bid.status === 'rejected') return { label: 'Rejected', color: 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400', accent: 'bg-rose-400' };
+    return { label: 'Pending', color: 'bg-zinc-100 text-zinc-700 dark:bg-zinc-800 dark:text-zinc-300', accent: 'bg-zinc-300 dark:bg-zinc-700' };
   };
 
   if (authLoading || loading) {
@@ -184,71 +186,77 @@ export default function ProviderBidsPage() {
           </Link>
         </div>
       ) : (
-        <div className="space-y-4">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
           {displayedBids.map((bid) => {
             const badge = getStatusBadge(bid);
             const jobStatus = getJobStatus(bid);
             const isActiveJob = bid.status === 'accepted' && jobStatus === 'active';
             const isAwaiting = bid.status === 'accepted' && jobStatus === 'awaiting_confirmation';
             const customerId = bid.customer_id || bid.client_id;
+            const hasActions = isActiveJob || isAwaiting || (bid.status === 'accepted' && customerId);
 
             return (
               <div
                 key={bid.id}
-                className={`bg-white dark:bg-zinc-900/40 p-5 rounded-2xl border shadow-sm flex flex-col gap-4 ${isActiveJob ? 'border-blue-200/60 dark:border-blue-800/50' :
-                    isAwaiting ? 'border-amber-200/60 dark:border-amber-800/50' :
-                      'border-zinc-200/60 dark:border-zinc-800/80'
-                  }`}
+                className="stat-card relative overflow-hidden bg-white dark:bg-zinc-900/40 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all"
               >
-                <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-3">
-                  <div className="space-y-1.5 flex-grow">
-                    <div className="flex flex-wrap items-center gap-2">
-                      <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-50">
+                <div className={`absolute top-0 left-0 h-1 w-full ${badge.accent}`} />
+
+                <div className="p-5 flex-1 space-y-3">
+                  <div className="flex items-start gap-3">
+                    <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center shrink-0">
+                      <Scale size={18} className="text-indigo-500" />
+                    </div>
+                    <div className="min-w-0 flex-1">
+                      <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-50 truncate">
                         {bid.job_title || `Job #${bid.job_id}`}
                       </h3>
-                      <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase ${badge.color}`}>
-                        {badge.label}
-                      </span>
-                      {bid.category_name && (
-                        <span className="px-2 py-0.5 text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-full">
-                          {bid.category_name}
+                      <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                        <span className={`px-2 py-0.5 text-[10px] font-semibold rounded-full uppercase ${badge.color}`}>
+                          {badge.label}
                         </span>
-                      )}
+                        {bid.category_name && (
+                          <span className="px-2 py-0.5 text-[10px] font-medium bg-zinc-100 dark:bg-zinc-800 text-zinc-500 rounded-full">
+                            {bid.category_name}
+                          </span>
+                        )}
+                      </div>
                     </div>
+                  </div>
 
-                    <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-xl italic">
-                      "{bid.cover_letter}"
-                    </p>
+                  <p className="text-xs text-zinc-500 dark:text-zinc-400 italic line-clamp-2">
+                    "{bid.cover_letter}"
+                  </p>
 
-                    <div className="flex flex-wrap items-center gap-x-4 gap-y-1 text-xs text-zinc-500 pt-0.5">
-                      {bid.job_location && (
-                        <span className="flex items-center gap-1">
-                          <MapPin size={11} />
-                          {bid.job_location}
-                        </span>
-                      )}
-                      <span className="flex items-center gap-1 font-semibold text-zinc-700 dark:text-zinc-300">
-                        <DollarSign size={11} />
-                        {format(bid.amount)}
-                      </span>
-                      <span className="flex items-center gap-1">
-                        <Clock size={11} />
-                        Est: {bid.estimated_time}
-                      </span>
-                      <span className="flex items-center gap-1 text-zinc-400">
-                        Submitted: {bid.created_at?.split('T')[0]}
-                      </span>
+                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1">
+                    <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                      <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><DollarSign size={10} /> Amount</p>
+                      <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{format(bid.amount)}</p>
+                    </div>
+                    {bid.job_location && (
+                      <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                        <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><MapPin size={10} /> Location</p>
+                        <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{bid.job_location}</p>
+                      </div>
+                    )}
+                    <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                      <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><Clock size={10} /> Est. Time</p>
+                      <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{bid.estimated_time}</p>
+                    </div>
+                    <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                      <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><Send size={10} /> Submitted</p>
+                      <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{bid.created_at?.split('T')[0]}</p>
                     </div>
                   </div>
                 </div>
 
                 {/* Action buttons */}
-                {(isActiveJob || isAwaiting || (bid.status === 'accepted' && customerId)) && (
-                  <div className="flex flex-wrap gap-2 pt-2 border-t border-zinc-100 dark:border-zinc-800">
+                {hasActions && (
+                  <div className="flex flex-wrap gap-2 px-5 py-3.5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-white/[0.02] rounded-b-2xl mt-auto">
                     {customerId && (
                       <Link
                         href={`/chat?jobId=${bid.job_id}&userId=${customerId}`}
-                        className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-xl transition-all"
+                        className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 bg-white dark:bg-zinc-950 rounded-xl transition-all"
                       >
                         <MessageSquare size={13} />
                         Chat Client

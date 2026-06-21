@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { api, fileOrigin } from '../utils/api';
 import {
@@ -19,7 +20,8 @@ import {
   Briefcase,
   BadgeCheck,
   Layers,
-  Award
+  Award,
+  ChevronRight
 } from 'lucide-react';
 import LocationInput from '../components/LocationInput';
 
@@ -596,35 +598,60 @@ export default function ProfilePage() {
           {/* Provider Reviews */}
           {user?.role === 'provider' && (
             <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-6">Customer Reviews</h3>
+              <div className="flex items-center justify-between gap-3 mb-6">
+                <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
+                  Customer Reviews {reviews.length > 0 && <span className="text-zinc-400 font-medium">({reviews.length})</span>}
+                </h3>
+                {reviews.length > 0 && (
+                  <Link
+                    href="/provider/reviews"
+                    className="flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
+                  >
+                    All Reviews <ChevronRight size={13} />
+                  </Link>
+                )}
+              </div>
               {reviews.length === 0 ? (
                 <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm">
                   No reviews left by clients yet.
                 </div>
               ) : (
-                <div className="space-y-4">
-                  {reviews.map((r) => (
-                    <div key={r.id} className="stat-card flex gap-3 p-4 rounded-xl border border-zinc-100 dark:border-zinc-850 bg-zinc-50/30 dark:bg-zinc-950/20">
-                      <div className="w-9 h-9 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-bold text-xs shrink-0">
-                        {r.customer_name?.charAt(0).toUpperCase() || '?'}
-                      </div>
-                      <div className="min-w-0 flex-1">
-                        <div className="flex justify-between items-start gap-2">
-                          <div>
-                            <h4 className="text-sm font-semibold text-zinc-900 dark:text-zinc-50">{r.customer_name}</h4>
-                            <span className="text-[10px] text-zinc-400">{new Date(r.created_at).toLocaleDateString()}</span>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  {reviews.slice(0, 4).map((r) => {
+                    const tier = r.rating >= 4.5 ? 'emerald' : r.rating >= 3.5 ? 'blue' : r.rating >= 2.5 ? 'amber' : 'rose';
+                    return (
+                      <div
+                        key={r.id}
+                        className="stat-card relative overflow-hidden flex flex-col gap-3 p-4 rounded-xl border border-zinc-100 dark:border-white/[0.06] bg-zinc-50/30 dark:bg-white/[0.02] hover:shadow-md transition-all"
+                      >
+                        <div className={`absolute top-0 left-0 h-1 w-full bg-${tier}-400`} />
+
+                        <div className="flex items-start gap-3">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                            {r.customer_name?.charAt(0).toUpperCase() || '?'}
                           </div>
-                          <div className="flex items-center gap-1 text-xs font-bold text-amber-500 shrink-0">
-                            <Star size={12} fill="currentColor" />
-                            <span>{r.rating.toFixed(1)}</span>
+                          <div className="min-w-0 flex-1">
+                            <div className="flex items-start justify-between gap-2">
+                              <div className="min-w-0">
+                                <h4 className="text-sm font-bold text-zinc-900 dark:text-zinc-50 truncate">{r.customer_name}</h4>
+                                <p className="text-[10px] text-zinc-400 mt-0.5">
+                                  {new Date(r.created_at).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' })}
+                                </p>
+                              </div>
+                              <span className={`shrink-0 inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[11px] font-bold bg-${tier}-100 text-${tier}-700 dark:bg-${tier}-950/40 dark:text-${tier}-400`}>
+                                <Star size={11} fill="currentColor" />
+                                {r.rating.toFixed(1)}
+                              </span>
+                            </div>
                           </div>
                         </div>
-                        <p className="text-xs text-zinc-600 dark:text-zinc-400 mt-2 italic font-light">
+
+                        <p className="text-xs text-zinc-600 dark:text-zinc-400 italic font-light leading-relaxed bg-white/60 dark:bg-white/[0.02] p-3 rounded-lg border border-zinc-100 dark:border-white/[0.04]">
                           "{r.comment}"
                         </p>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
               )}
             </div>

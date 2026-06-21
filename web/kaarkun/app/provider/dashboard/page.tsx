@@ -45,6 +45,14 @@ const STATUS_STYLES: Record<string, string> = {
   cancelled:             'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
 };
 
+const STATUS_ACCENT: Record<string, string> = {
+  confirmed:             'bg-blue-400',
+  in_progress:           'bg-amber-400',
+  awaiting_confirmation: 'bg-violet-400',
+  completed:             'bg-emerald-400',
+  cancelled:             'bg-zinc-300 dark:bg-zinc-700',
+};
+
 export default function ProviderDashboard() {
   const { user, loading: authLoading } = useAuth();
   const router = useRouter();
@@ -234,52 +242,64 @@ export default function ProviderDashboard() {
                 )}
               </div>
             ) : (
-              <div className="divide-y divide-zinc-50 dark:divide-white/[0.04]">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
                 {bookings.map((booking) => (
-                  <div key={booking.id} className="px-6 py-4 hover:bg-zinc-50/70 dark:hover:bg-white/[0.02] transition-colors group">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                      <div className="min-w-0">
-                        <div className="flex items-center gap-2 mb-1">
-                          <h3 className="font-semibold text-zinc-900 dark:text-white truncate">
-                            {booking.job_title || `Booking #${booking.id}`}
-                          </h3>
-                          <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[booking.status] || STATUS_STYLES.cancelled}`}>
-                            {booking.status.replace('_', ' ')}
-                          </span>
-                        </div>
-                        <div className="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs text-zinc-400">
-                          <span>Client: <strong className="text-zinc-600 dark:text-zinc-300">{booking.customer_name || 'Client'}</strong></span>
-                          {booking.customer_phone && <span>📞 {booking.customer_phone}</span>}
-                          <span><Clock size={11} className="inline mr-0.5" />{new Date(booking.created_at).toLocaleDateString()}</span>
-                        </div>
+                  <div
+                    key={booking.id}
+                    className="stat-card relative overflow-hidden rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 group"
+                  >
+                    <div className={`absolute top-0 left-0 h-1 w-full ${STATUS_ACCENT[booking.status] || STATUS_ACCENT.cancelled}`} />
+
+                    <div className="flex items-start gap-3 mb-3">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-black text-sm shrink-0">
+                        {(booking.customer_name || 'C').charAt(0).toUpperCase()}
                       </div>
-                      <div className="shrink-0 flex items-center gap-2">
-                        {booking.status === 'confirmed' && (
-                          handshakeTokens[booking.id] ? (
-                            <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
-                              <KeyRound size={12} className="text-emerald-600 dark:text-emerald-400" />
-                              <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 tracking-widest">{handshakeTokens[booking.id]}</span>
-                            </div>
-                          ) : (
-                            <button
-                              onClick={() => handleGeneratePin(booking.id)}
-                              disabled={handshakeLoading === booking.id}
-                              className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg transition-all shadow-sm"
-                            >
-                              <KeyRound size={12} /> {handshakeLoading === booking.id ? 'Generating...' : 'Generate Arrival PIN'}
-                            </button>
-                          )
-                        )}
-                        <Link
-                          href={`/chat?jobId=${booking.job_id}&userId=${booking.customer_id}`}
-                          className="flex items-center gap-1.5 px-4 py-1.5 text-xs font-semibold bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-all shadow-sm"
+                      <div className="min-w-0 flex-1">
+                        <h3 className="font-bold text-sm text-zinc-900 dark:text-white truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                          {booking.job_title || `Booking #${booking.id}`}
+                        </h3>
+                        <p className="text-xs text-zinc-400 mt-0.5 truncate">
+                          Client: <strong className="text-zinc-600 dark:text-zinc-300">{booking.customer_name || 'Client'}</strong>
+                        </p>
+                      </div>
+                      <span className={`shrink-0 text-[10px] font-bold px-2 py-0.5 rounded-full uppercase ${STATUS_STYLES[booking.status] || STATUS_STYLES.cancelled}`}>
+                        {booking.status.replace('_', ' ')}
+                      </span>
+                    </div>
+
+                    <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06] text-[11px] text-zinc-400">
+                      {booking.customer_phone ? <span>📞 {booking.customer_phone}</span> : <span />}
+                      <span className="flex items-center gap-1">
+                        <Clock size={11} />{new Date(booking.created_at).toLocaleDateString()}
+                      </span>
+                    </div>
+
+                    {booking.status === 'confirmed' && handshakeTokens[booking.id] && (
+                      <div className="flex items-center gap-1.5 mt-3 px-3 py-1.5 rounded-lg bg-emerald-50 dark:bg-emerald-900/20 border border-emerald-200 dark:border-emerald-800">
+                        <KeyRound size={12} className="text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span className="text-xs font-bold text-emerald-700 dark:text-emerald-400 tracking-widest">{handshakeTokens[booking.id]}</span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center gap-2 mt-3">
+                      {booking.status === 'confirmed' && !handshakeTokens[booking.id] && (
+                        <button
+                          onClick={() => handleGeneratePin(booking.id)}
+                          disabled={handshakeLoading === booking.id}
+                          className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg transition-all shadow-sm"
                         >
-                          <MessageSquare size={12} /> Chat Client
-                        </Link>
-                      </div>
+                          <KeyRound size={11} /> {handshakeLoading === booking.id ? 'Generating...' : 'Generate PIN'}
+                        </button>
+                      )}
+                      <Link
+                        href={`/chat?jobId=${booking.job_id}&userId=${booking.customer_id}`}
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-[11px] font-bold bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-all shadow-sm"
+                      >
+                        <MessageSquare size={11} /> Chat
+                      </Link>
                     </div>
                     {booking.status === 'confirmed' && handshakeTokens[booking.id] && (
-                      <p className="text-[11px] text-zinc-400 mt-2">Share this PIN with the customer on arrival — they'll enter it to start the job.</p>
+                      <p className="text-[10px] text-zinc-400 mt-2">Share this PIN with the customer on arrival.</p>
                     )}
                   </div>
                 ))}
@@ -295,40 +315,61 @@ export default function ProviderDashboard() {
               <Sparkles size={17} className="text-violet-500" />
               Quick Actions
             </h2>
-            <div className="space-y-2.5">
+            <div className="grid grid-cols-2 gap-3">
               {isVerified ? (
                 <Link
                   href="/provider/browse-jobs"
-                  className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-sm font-bold shadow-lg shadow-violet-500/20 transition-all"
+                  className="stat-card col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/20 transition-all"
                 >
-                  <span className="flex items-center gap-2"><Search size={15} /> Browse Jobs</span>
-                  <ChevronRight size={14} />
+                  <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
+                    <Search size={18} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold">Browse Jobs</p>
+                    <p className="text-[11px] text-violet-200">Find new work nearby</p>
+                  </div>
+                  <ChevronRight size={16} className="shrink-0" />
                 </Link>
               ) : (
-                <div className="flex items-center justify-between w-full px-4 py-3 rounded-xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 text-sm font-bold cursor-not-allowed">
-                  <span className="flex items-center gap-2"><Search size={15} /> Browse Jobs</span>
-                  <span className="text-[10px]">Pending</span>
+                <div className="col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-zinc-100 dark:bg-zinc-800 text-zinc-400 cursor-not-allowed">
+                  <div className="w-10 h-10 rounded-xl bg-zinc-200 dark:bg-zinc-700 flex items-center justify-center shrink-0">
+                    <Search size={18} />
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <p className="text-sm font-bold">Browse Jobs</p>
+                    <p className="text-[11px]">Available once verified</p>
+                  </div>
                 </div>
               )}
+
               <Link
                 href="/provider/bids"
-                className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/[0.04] text-sm font-semibold transition-all"
+                className="stat-card flex flex-col gap-2.5 p-4 rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-zinc-50/50 dark:bg-white/[0.02] hover:bg-zinc-50 dark:hover:bg-white/[0.05] transition-all"
               >
-                <span className="flex items-center gap-2"><Scale size={15} /> My Bid History</span>
-                <ChevronRight size={14} />
+                <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
+                  <Scale size={16} className="text-indigo-500" />
+                </div>
+                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Bid History</span>
               </Link>
+
               <Link
                 href="/profile"
-                className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-white/[0.08] text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-white/[0.04] text-sm font-semibold transition-all"
+                className="stat-card flex flex-col gap-2.5 p-4 rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-zinc-50/50 dark:bg-white/[0.02] hover:bg-zinc-50 dark:hover:bg-white/[0.05] transition-all"
               >
-                <span className="flex items-center gap-2"><UserCheck size={15} /> Edit Profile</span>
-                <ChevronRight size={14} />
+                <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center">
+                  <UserCheck size={16} className="text-blue-500" />
+                </div>
+                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Edit Profile</span>
               </Link>
+
               <Link
                 href="/support-chatbot"
-                className="flex items-center justify-between w-full px-4 py-3 rounded-xl border border-violet-200 dark:border-violet-800/30 bg-violet-50 dark:bg-violet-900/10 text-violet-700 dark:text-violet-400 text-sm font-semibold transition-all hover:bg-violet-100 dark:hover:bg-violet-900/20"
+                className="stat-card col-span-2 flex items-center gap-3 p-4 rounded-2xl border border-violet-200 dark:border-violet-800/30 bg-violet-50 dark:bg-violet-900/10 hover:bg-violet-100 dark:hover:bg-violet-900/20 transition-all"
               >
-                <span className="flex items-center gap-2"><Sparkles size={15} /> AI Assistant</span>
+                <div className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
+                  <Sparkles size={16} className="text-violet-600 dark:text-violet-400" />
+                </div>
+                <span className="text-xs font-bold text-violet-700 dark:text-violet-400 flex-1">AI Assistant</span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 bg-violet-200 dark:bg-violet-800/40 text-violet-700 dark:text-violet-300 rounded-full">AI</span>
               </Link>
             </div>

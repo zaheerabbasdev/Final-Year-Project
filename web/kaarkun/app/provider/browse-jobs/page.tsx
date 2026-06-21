@@ -5,14 +5,14 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
 import { api } from '../../utils/api';
-import { 
-  Briefcase, 
-  MapPin, 
-  DollarSign, 
-  Clock, 
-  Search, 
-  Filter, 
-  X, 
+import {
+  Briefcase,
+  MapPin,
+  DollarSign,
+  Clock,
+  Search,
+  Filter,
+  X,
   Send,
   AlertCircle,
   CheckCircle,
@@ -20,7 +20,8 @@ import {
   Sparkles,
   Zap,
   TrendingUp,
-  Brain
+  Brain,
+  Wrench
 } from 'lucide-react';
 
 interface Job {
@@ -359,49 +360,58 @@ export default function BrowseJobsPage() {
           <p className="text-zinc-500 dark:text-zinc-400 text-base">No open jobs found{activeTab === 'recommended' ? ' matching your AI profile' : ' matching your filters'}.</p>
         </div>
       ) : (
-        <div className="space-y-6">
-          {filteredJobs.map((job) => (
-            <div 
-              key={job.id} 
-              className={`bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border shadow-sm flex flex-col md:flex-row justify-between gap-6 hover:shadow-md transition-all ${
-                activeTab === 'recommended' && job.match_score && job.match_score >= 70
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+          {filteredJobs.map((job) => {
+            const highMatch = activeTab === 'recommended' && job.match_score !== undefined && job.match_score >= 70;
+            return (
+            <div
+              key={job.id}
+              className={`stat-card relative overflow-hidden bg-white dark:bg-zinc-900/40 rounded-2xl border shadow-sm flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all ${
+                highMatch
                   ? 'border-violet-200/60 dark:border-violet-800/50'
                   : 'border-zinc-200/60 dark:border-zinc-800/80'
               }`}
             >
-              <div className="space-y-3 flex-grow max-w-3xl">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-                    {job.title}
-                  </h3>
-                  {job.is_emergency && (
-                    <span className="inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 rounded-full uppercase">
-                      <AlertTriangle size={10} />
-                      Emergency
-                    </span>
-                  )}
-                  {categories.find(c => c.id === job.category_id) && (
-                    <span className="px-2.5 py-0.5 text-[10px] font-medium bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400 rounded-full">
-                      {job.category_name || categories.find(c => c.id === job.category_id)?.name}
-                    </span>
-                  )}
+              <div className={`absolute top-0 left-0 h-1 w-full ${job.is_emergency ? 'bg-rose-400' : highMatch ? 'bg-violet-400' : 'bg-indigo-300'}`} />
 
-                  {/* AI Match Score Badge */}
-                  {activeTab === 'recommended' && job.match_score !== undefined && (
-                    <span className={`inline-flex items-center gap-1 px-2.5 py-0.5 text-[10px] font-bold rounded-full uppercase ${
-                      job.match_score >= 70
-                        ? 'bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400'
-                        : job.match_score >= 45
-                          ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400'
-                          : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
-                    }`}>
-                      <TrendingUp size={9} />
-                      {job.match_score}% Match
-                    </span>
-                  )}
+              <div className="p-5 flex-1 space-y-3">
+                <div className="flex items-start gap-3">
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${job.is_emergency ? 'bg-rose-100 dark:bg-rose-950/40' : 'bg-indigo-100 dark:bg-indigo-950/40'}`}>
+                    {job.is_emergency ? <Zap size={18} className="text-rose-500" /> : <Wrench size={18} className="text-indigo-500" />}
+                  </div>
+                  <div className="min-w-0 flex-1">
+                    <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 truncate">
+                      {job.title}
+                    </h3>
+                    <div className="flex flex-wrap items-center gap-1.5 mt-1">
+                      {job.is_emergency && (
+                        <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 rounded-full uppercase">
+                          <AlertTriangle size={10} />
+                          Emergency
+                        </span>
+                      )}
+                      {categories.find(c => c.id === job.category_id) && (
+                        <span className="px-2 py-0.5 text-[10px] font-medium bg-zinc-100 text-zinc-650 dark:bg-zinc-800 dark:text-zinc-400 rounded-full">
+                          {job.category_name || categories.find(c => c.id === job.category_id)?.name}
+                        </span>
+                      )}
+                      {activeTab === 'recommended' && job.match_score !== undefined && (
+                        <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full uppercase ${
+                          job.match_score >= 70
+                            ? 'bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400'
+                            : job.match_score >= 45
+                              ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400'
+                              : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
+                        }`}>
+                          <TrendingUp size={9} />
+                          {job.match_score}% Match
+                        </span>
+                      )}
+                    </div>
+                  </div>
                 </div>
 
-                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed">
+                <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed line-clamp-2">
                   {job.description}
                 </p>
 
@@ -416,30 +426,30 @@ export default function BrowseJobsPage() {
                   </div>
                 )}
 
-                <div className="flex flex-wrap gap-x-6 gap-y-2 text-xs text-zinc-500 pt-1">
-                  <span className="flex items-center gap-1.5 font-semibold text-zinc-800 dark:text-zinc-250">
-                    <DollarSign size={14} className="text-indigo-500" />
-                    {format(job.budget)} {job.is_negotiable && <span className="font-normal text-zinc-400">(Negotiable)</span>}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <MapPin size={14} />
-                    {job.location}
-                    {job.distance_km !== undefined && (
-                      <span className="text-violet-500 font-semibold">· {job.distance_km} km away</span>
-                    )}
-                  </span>
-                  <span className="flex items-center gap-1.5">
-                    <Clock size={14} />
-                    {new Date(job.created_at).toLocaleDateString()}
-                  </span>
+                {/* Stat pills */}
+                <div className="grid grid-cols-3 gap-2 pt-1">
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><DollarSign size={10} /> Budget</p>
+                    <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{format(job.budget)}</p>
+                    {job.is_negotiable && <p className="text-[9px] text-zinc-400">Negotiable</p>}
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><MapPin size={10} /> Location</p>
+                    <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{job.location}</p>
+                    {job.distance_km !== undefined && <p className="text-[9px] text-violet-500 font-semibold">{job.distance_km} km away</p>}
+                  </div>
+                  <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><Clock size={10} /> Posted</p>
+                    <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{new Date(job.created_at).toLocaleDateString()}</p>
+                  </div>
                 </div>
               </div>
 
-              <div className="flex md:flex-col justify-end items-end gap-3 shrink-0 border-t md:border-t-0 pt-4 md:pt-0 border-zinc-100 dark:border-zinc-800">
+              <div className="px-5 py-3.5 border-t border-zinc-100 dark:border-zinc-800 bg-zinc-50/50 dark:bg-white/[0.02] rounded-b-2xl">
                 {job.is_emergency ? (
                   <button
                     onClick={() => handleInstantAccept(job.id)}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center gap-1.5"
+                    className="w-full px-4 py-2.5 bg-rose-600 hover:bg-rose-700 text-white text-xs font-bold rounded-xl shadow transition-all flex items-center justify-center gap-1.5"
                   >
                     <Zap size={12} />
                     Instant Accept
@@ -447,14 +457,15 @@ export default function BrowseJobsPage() {
                 ) : (
                   <button
                     onClick={() => handleOpenBidModal(job)}
-                    className="w-full sm:w-auto px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition-all"
+                    className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition-all"
                   >
                     Place a Bid
                   </button>
                 )}
               </div>
             </div>
-          ))}
+            );
+          })}
         </div>
       )}
 
