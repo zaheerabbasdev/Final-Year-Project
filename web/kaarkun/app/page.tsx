@@ -359,17 +359,17 @@ export default function LandingPage() {
       </section>
 
       {/* 5. AI-Powered Features */}
-      <section id="ai-features" className="relative py-24 bg-zinc-950 overflow-hidden">
+      <section id="ai-features" className="relative py-24 bg-white dark:bg-zinc-950 overflow-hidden">
         <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-violet-400">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">
               <Sparkles size={13} /> Built-in Intelligence
             </span>
-            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-white! sm:text-4xl">
+            <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
               Powered by AI, end to end
             </h2>
-            <p className="mt-4 text-lg text-zinc-400">
+            <p className="mt-4 text-lg text-zinc-600 dark:text-zinc-400">
               Kaarkun isn't just a listings board — AI works behind the scenes to make hiring faster and safer.
             </p>
           </div>
@@ -378,12 +378,12 @@ export default function LandingPage() {
             {AI_FEATURES.map((f) => {
               const Icon = f.icon;
               return (
-                <div key={f.title} className="group p-6 rounded-3xl bg-white/[0.04] border border-white/[0.08] hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300">
+                <div key={f.title} className="group p-6 rounded-3xl bg-white dark:bg-white/[0.04] border border-zinc-200/60 dark:border-white/[0.08] shadow-sm hover:shadow-xl dark:hover:bg-white/[0.07] hover:-translate-y-1 transition-all duration-300">
                   <span className={`inline-flex p-3.5 rounded-2xl bg-gradient-to-br ${f.color} mb-5 shadow-lg`}>
                     <Icon size={22} className="text-white" />
                   </span>
-                  <h3 className="font-bold text-base text-white!">{f.title}</h3>
-                  <p className="mt-2.5 text-sm text-zinc-400 leading-relaxed">{f.desc}</p>
+                  <h3 className="font-bold text-base text-zinc-900 dark:text-white">{f.title}</h3>
+                  <p className="mt-2.5 text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed">{f.desc}</p>
                 </div>
               );
             })}
