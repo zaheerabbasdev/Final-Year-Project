@@ -3,8 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { CurrencyProvider } from "./context/CurrencyContext";
-import Navbar from "./components/Navbar";
-import Sidebar from "./components/Sidebar";
+import AppShell from "./components/AppShell";
 
 export const metadata: Metadata = {
   title: "Kaarkun - Job Marketplace & Service On Demand",
@@ -46,15 +45,7 @@ export default function RootLayout({
         <ThemeProvider>
           <CurrencyProvider>
             <AuthProvider>
-              <div className="flex h-screen w-full overflow-hidden transition-colors duration-300">
-                <Sidebar />
-                <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-                  <Navbar />
-                  <main className="flex-1 overflow-y-auto w-full">
-                    {children}
-                  </main>
-                </div>
-              </div>
+              <AppShell>{children}</AppShell>
             </AuthProvider>
           </CurrencyProvider>
         </ThemeProvider>

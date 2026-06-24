@@ -37,6 +37,7 @@ import {
   BadgeCheck,
   MessageCircle
 } from 'lucide-react';
+import LandingNavbar from './components/LandingNavbar';
 
 const CATEGORIES = [
   { name: 'Plumbing Experts', desc: 'Leaky pipes, faucet installs, complete drain cleaning.', icon: Wrench, color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/30' },
@@ -107,6 +108,7 @@ function FaqItem({ q, a, defaultOpen = false }: { q: string; a: string; defaultO
 export default function LandingPage() {
   return (
     <div className="flex-1 flex flex-col bg-white dark:bg-zinc-950 w-full overflow-x-hidden">
+      <LandingNavbar />
 
       {/* 1. Hero Section */}
       <section className="relative overflow-hidden pt-20 pb-24 lg:pt-28 lg:pb-32 border-b border-zinc-100 dark:border-zinc-900">
