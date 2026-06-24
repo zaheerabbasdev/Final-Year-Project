@@ -133,7 +133,7 @@ export default function LandingPage() {
               </span>
 
               <h1 className="text-4xl font-black tracking-tight text-zinc-900 dark:text-white sm:text-5xl lg:text-6xl leading-tight">
-                Find the right <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-indigo-600 dark:from-blue-400 dark:to-indigo-400">Professional</span> for any job, instantly.
+                Find the right Professional for any job, instantly.
               </h1>
 
               <p className="mt-6 text-lg sm:text-xl text-zinc-600 dark:text-zinc-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
