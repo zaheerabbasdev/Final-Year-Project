@@ -24,3 +24,13 @@ plugins {
 }
 
 include(":app")
+
+// Override NDK version for all subprojects so NDK 28 is never requested
+gradle.afterProject {
+    extensions.findByName("android")?.let { android ->
+        try {
+            val ndkVersionSetter = android.javaClass.methods.firstOrNull { it.name == "setNdkVersion" && it.parameterCount == 1 }
+            ndkVersionSetter?.invoke(android, "25.2.9519653")
+        } catch (e: Exception) {}
+    }
+}
