@@ -41,10 +41,10 @@ function OTPContent() {
         <span className="inline-flex items-center justify-center p-3 rounded-full bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 mb-4">
           <KeyRound size={28} />
         </span>
-        <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-55">
+        <h2 className="text-2xl font-bold text-zinc-100 dark:text-zinc-55">
           Enter Verification Code
         </h2>
-        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
+        <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-100">
           We have sent a 6-digit verification code to <span className="font-semibold text-zinc-800 dark:text-zinc-200">{email}</span>.
         </p>
       </div>
@@ -74,7 +74,7 @@ function OTPContent() {
             maxLength={6}
             value={otp}
             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
-            className="block w-full text-center tracking-widest text-2xl font-mono px-3 py-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-55 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
+            className="block w-full text-center tracking-widest text-2xl font-mono px-3 py-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-100 dark:text-zinc-55 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
             placeholder="000000"
           />
         </div>
