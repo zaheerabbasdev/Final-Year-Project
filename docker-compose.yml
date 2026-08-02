@@ -1,0 +1,51 @@
+version: '3.9'
+services:
+  db:
+    image: mysql
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-rootpass}
+      MYSQL_DATABASE: ${DB_NAME:-kaarkun_db}
+      MYSQL_USER: ${DB_USER:-appuser}
+      MYSQL_PASSWORD: ${DB_PASSWORD:-1234}
+    volumes:
+      - db_data:/var/lib/mysql
+      - ./backend/schema.sql:/docker-entrypoint-initdb.d/schema.sql:ro
+    networks: [fyp]
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-prootpass"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  backend:
+    build: ./backend
+    env_file:
+      - ./backend/.env
+    depends_on:
+      db:
+        condition: service_healthy
+    ports:
+      - "5000:5000"
+    environment:
+      DB_HOST: db
+      PORT: 5000
+    networks: [fyp]
+
+  web:
+    build: ./web/kaarkun
+    depends_on: [backend]
+    ports:
+      - "3000:3000"
+    networks: [fyp]
+
+  admin:
+    build: ./admin
+    ports:
+      - "3001:3000"
+    depends_on: [backend]
+    networks: [fyp]
+
+volumes:
+  db_data:
+networks:
+  fyp:
