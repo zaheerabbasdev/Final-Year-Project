@@ -31,6 +31,7 @@ const server = http.createServer(app);
 initSocket(server);
 
 const suspendedCheck = require('./middleware/suspendedCheck');
+const mailer = require('./utils/mailer');
 
 // CORS — only allow known frontend origins (admin panel, web app, mobile dev tools)
 const allowedOrigins = (process.env.ALLOWED_ORIGINS || '')
@@ -133,8 +134,10 @@ async function initializeDatabase() {
 async function startServer() {
     try {
         await initializeDatabase();
+        await mailer.initializeMailer();
     } catch (error) {
-        console.error('Continuing startup without database initialization due to a failure.');
+        console.error('Startup initialization failed:', error.message);
+        process.exit(1);
     }
 
     const PORT = process.env.PORT || 5000;
