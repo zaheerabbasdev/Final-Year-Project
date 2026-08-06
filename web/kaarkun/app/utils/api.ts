@@ -1,4 +1,7 @@
-const API_URL = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api` : '/api';
+const isDevelopment = process.env.NODE_ENV === 'development';
+const API_URL = isDevelopment && process.env.NEXT_PUBLIC_API_URL
+  ? `${process.env.NEXT_PUBLIC_API_URL}/api`
+  : '/api';
 
 // Origin (no /api suffix) for static asset URLs like /uploads/<file>
 export const fileOrigin = API_URL.replace(/\/api\/?$/, '');
