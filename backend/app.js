@@ -119,8 +119,9 @@ async function initializeDatabase() {
 
         const schemaPath = path.join(__dirname, 'schema.sql');
         const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+        const finalSchemaSql = schemaSql.replace(/@@DB_NAME@@/g, dbName);
 
-        await connection.query(schemaSql);
+        await connection.query(finalSchemaSql);
         console.log('Database schema initialized successfully.');
         await connection.end();
     } catch (error) {
