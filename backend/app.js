@@ -2,6 +2,8 @@ const express = require('express');
 const cors = require('cors');
 const dotenv = require('dotenv');
 const path = require('path');
+const fs = require('fs');
+const mysql = require('mysql2/promise');
 
 dotenv.config();
 
@@ -95,9 +97,51 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).json({ error: 'Something went wrong!' });
 });
 
-const PORT = process.env.PORT || 5000;
-server.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
-});
+async function initializeDatabase() {
+    const dbHost = process.env.DB_HOST;
+    const dbUser = process.env.DB_USER;
+    const dbPassword = process.env.DB_PASSWORD;
+    const dbName = process.env.DB_NAME;
+
+    if (!dbHost || !dbUser || !dbPassword || !dbName) {
+        console.warn('Database environment variables are not fully set. Skipping schema initialization.');
+        return;
+    }
+
+    try {
+        const connection = await mysql.createConnection({
+            host: dbHost,
+            user: dbUser,
+            password: dbPassword,
+            database: dbName,
+            multipleStatements: true
+        });
+
+        const schemaPath = path.join(__dirname, 'schema.sql');
+        const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+
+        await connection.query(schemaSql);
+        console.log('Database schema initialized successfully.');
+        await connection.end();
+    } catch (error) {
+        console.error('Database initialization failed:', error.message);
+        throw error;
+    }
+}
+
+async function startServer() {
+    try {
+        await initializeDatabase();
+    } catch (error) {
+        console.error('Continuing startup without database initialization due to a failure.');
+    }
+
+    const PORT = process.env.PORT || 5000;
+    server.listen(PORT, () => {
+        console.log(`Server is running on port ${PORT}`);
+    });
+}
+
+startServer();
 
 module.exports = app;
