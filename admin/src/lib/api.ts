@@ -18,10 +18,11 @@ async function parseError(res: Response) {
 }
 
 // Origin (no /api suffix) for static asset URLs like /uploads/<file>
-export const fileOrigin = (process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api').replace(/\/api\/?$/, '');
+const baseApiUrl = process.env.NEXT_PUBLIC_API_URL ? `${process.env.NEXT_PUBLIC_API_URL}/api` : '/api';
+export const fileOrigin = baseApiUrl.replace(/\/api\/?$/, '');
 
 export const api = {
-  baseUrl: process.env.NEXT_PUBLIC_API_URL || 'http://localhost:5000/api',
+  baseUrl: baseApiUrl,
 
   async get(endpoint: string, token?: string) {
     const res = await fetch(`${this.baseUrl}${endpoint}`, {
