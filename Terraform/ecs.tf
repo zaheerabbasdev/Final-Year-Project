@@ -72,6 +72,51 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+# Allow ECS tasks (specifically the backend) to read/write the uploads S3 bucket
+resource "aws_iam_role_policy" "ecs_s3_uploads" {
+  name = "${var.project_name}-${var.environment}-s3-uploads"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Effect   = "Allow"
+      Action   = ["s3:PutObject", "s3:GetObject", "s3:DeleteObject"]
+      Resource = "${aws_s3_bucket.uploads.arn}/*"
+    }]
+  })
+}
+
+# S3 bucket for user-uploaded files (avatars, job images, chat attachments)
+resource "aws_s3_bucket" "uploads" {
+  bucket = "${var.project_name}-${var.environment}-uploads"
+}
+
+resource "aws_s3_bucket_public_access_block" "uploads" {
+  bucket = aws_s3_bucket.uploads.id
+
+  block_public_acls       = false
+  block_public_policy     = false
+  ignore_public_acls      = false
+  restrict_public_buckets = false
+}
+
+resource "aws_s3_bucket_policy" "uploads_public_read" {
+  bucket     = aws_s3_bucket.uploads.id
+  depends_on = [aws_s3_bucket_public_access_block.uploads]
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [{
+      Sid       = "PublicRead"
+      Effect    = "Allow"
+      Principal = "*"
+      Action    = "s3:GetObject"
+      Resource  = "${aws_s3_bucket.uploads.arn}/*"
+    }]
+  })
+}
+
 resource "aws_cloudwatch_log_group" "backend" {
   name = "/ecs/${var.project_name}-${var.environment}-backend"
 }
@@ -108,11 +153,13 @@ resource "aws_ecs_task_definition" "backend" {
         protocol      = "tcp"
       }]
       environment = [
-        { name = "PORT", value = tostring(var.backend_container_port) },
-        { name = "DB_HOST", value = aws_db_instance.mysql.address },
-        { name = "DB_NAME", value = var.db_name },
-        { name = "DB_USER", value = var.db_username },
-        { name = "DB_PASSWORD", value = random_password.db_password.result }
+        { name = "PORT",          value = tostring(var.backend_container_port) },
+        { name = "DB_HOST",       value = aws_db_instance.mysql.address },
+        { name = "DB_NAME",       value = var.db_name },
+        { name = "DB_USER",       value = var.db_username },
+        { name = "DB_PASSWORD",   value = random_password.db_password.result },
+        { name = "AWS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
+        { name = "AWS_REGION",    value = var.aws_region }
       ]
       logConfiguration = {
         logDriver = "awslogs"
