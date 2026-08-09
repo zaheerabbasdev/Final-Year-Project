@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 import '../../../core/theme.dart';
+import '../auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
   const ForgotPasswordScreen({super.key});
@@ -11,18 +13,77 @@ class ForgotPasswordScreen extends StatefulWidget {
 }
 
 class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
-  final _emailController = TextEditingController();
-  bool _isSuccess = false;
-  bool _isLoading = false;
+  // Step 1 — enter email
+  final _emailController       = TextEditingController();
+  // Step 2 — enter OTP + new password
+  final _otpController         = TextEditingController();
+  final _newPasswordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
 
-  void _sendResetLink() async {
-    setState(() => _isLoading = true);
-    // Simulate API call
-    await Future.delayed(const Duration(seconds: 1));
-    setState(() {
-      _isLoading = false;
-      _isSuccess = true;
-    });
+  int  _step       = 1;   // 1 = email, 2 = otp+password, 3 = success
+  bool _isLoading  = false;
+  bool _obscureNew = true;
+  bool _obscureConfirm = true;
+  String? _error;
+  String  _email   = '';
+
+  @override
+  void dispose() {
+    _emailController.dispose();
+    _otpController.dispose();
+    _newPasswordController.dispose();
+    _confirmPasswordController.dispose();
+    super.dispose();
+  }
+
+  Future<void> _sendCode() async {
+    final email = _emailController.text.trim();
+    if (email.isEmpty) {
+      setState(() => _error = 'Please enter your email address.');
+      return;
+    }
+    setState(() { _isLoading = true; _error = null; });
+
+    final auth = context.read<AuthService>();
+    final result = await auth.forgotPassword(email);
+
+    setState(() { _isLoading = false; });
+    if (result['success'] == true) {
+      setState(() { _email = email; _step = 2; });
+    } else {
+      setState(() => _error = result['message']);
+    }
+  }
+
+  Future<void> _resetPassword() async {
+    final otp      = _otpController.text.trim();
+    final newPass  = _newPasswordController.text;
+    final confirm  = _confirmPasswordController.text;
+
+    if (otp.isEmpty || newPass.isEmpty || confirm.isEmpty) {
+      setState(() => _error = 'Please fill in all fields.');
+      return;
+    }
+    if (newPass.length < 6) {
+      setState(() => _error = 'Password must be at least 6 characters.');
+      return;
+    }
+    if (newPass != confirm) {
+      setState(() => _error = 'Passwords do not match.');
+      return;
+    }
+
+    setState(() { _isLoading = true; _error = null; });
+
+    final auth = context.read<AuthService>();
+    final result = await auth.resetPassword(_email, otp, newPass);
+
+    setState(() { _isLoading = false; });
+    if (result['success'] == true) {
+      setState(() => _step = 3);
+    } else {
+      setState(() => _error = result['message']);
+    }
   }
 
   @override
@@ -43,8 +104,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
           padding: const EdgeInsets.symmetric(horizontal: 24.0),
           child: Column(
             children: [
-              const SizedBox(height: 24),
-              // App Logo Container
+              const SizedBox(height: 16),
+              // Icon
               Center(
                 child: Container(
                   padding: const EdgeInsets.all(20),
@@ -59,48 +120,136 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                       ),
                     ],
                   ),
-                  child: Image.asset(
-                    'assets/images/icon.png',
-                    height: 80,
-                    width: 80,
-                    fit: BoxFit.contain,
-                    errorBuilder: (context, error, stackTrace) => const Icon(
-                      Icons.mail_outline_rounded,
-                      size: 60,
-                      color: AppTheme.primaryColor,
-                    ),
+                  child: Icon(
+                    _step == 3 ? Icons.check_circle_outline_rounded : Icons.lock_reset_rounded,
+                    size: 60,
+                    color: AppTheme.primaryColor,
                   ),
                 ),
               ),
-              const SizedBox(height: 32),
+              const SizedBox(height: 28),
               Text(
-                'Forgot Password?',
+                _step == 1 ? 'Forgot Password?' :
+                _step == 2 ? 'Enter Reset Code' : 'Password Reset!',
                 style: GoogleFonts.outfit(
-                  fontSize: 32,
+                  fontSize: 30,
                   fontWeight: FontWeight.w800,
                   color: colors.text,
                   letterSpacing: -0.5,
                 ),
               ),
-              const SizedBox(height: 12),
+              const SizedBox(height: 10),
               Text(
-                _isSuccess 
-                  ? "We've sent a password reset link to your email"
-                  : "Enter your email and we'll send you a link to reset your password",
+                _step == 1
+                    ? "Enter your email and we'll send you a 6-digit reset code."
+                    : _step == 2
+                        ? "Check your email ($_email) for the 6-digit code."
+                        : "Your password has been updated. You can now log in.",
                 textAlign: TextAlign.center,
                 style: GoogleFonts.outfit(
                   color: colors.subtext,
-                  fontSize: 16,
+                  fontSize: 15,
                   height: 1.5,
                   fontWeight: FontWeight.w500,
                 ),
               ),
-              const SizedBox(height: 40),
-              if (!_isSuccess) ...[
-                _buildRequestForm(colors),
-              ] else ...[
-                _buildSuccessContent(colors),
+              const SizedBox(height: 32),
+
+              // Error banner
+              if (_error != null) ...[
+                Container(
+                  width: double.infinity,
+                  padding: const EdgeInsets.all(14),
+                  margin: const EdgeInsets.only(bottom: 16),
+                  decoration: BoxDecoration(
+                    color: Colors.red.shade50,
+                    borderRadius: BorderRadius.circular(12),
+                    border: Border.all(color: Colors.red.shade200),
+                  ),
+                  child: Text(
+                    _error!,
+                    style: GoogleFonts.outfit(color: Colors.red.shade700, fontSize: 14),
+                  ),
+                ),
               ],
+
+              // Step 1 — Email
+              if (_step == 1) _buildCard(colors, [
+                _label(colors, 'Email Address'),
+                const SizedBox(height: 8),
+                _textField(
+                  controller: _emailController,
+                  hint: 'you@example.com',
+                  keyboardType: TextInputType.emailAddress,
+                  colors: colors,
+                ),
+                const SizedBox(height: 24),
+                _primaryButton('Send Reset Code', _isLoading, _sendCode),
+              ]),
+
+              // Step 2 — OTP + new password
+              if (_step == 2) _buildCard(colors, [
+                _label(colors, 'Reset Code'),
+                const SizedBox(height: 8),
+                _textField(
+                  controller: _otpController,
+                  hint: '6-digit code',
+                  keyboardType: TextInputType.number,
+                  colors: colors,
+                ),
+                const SizedBox(height: 20),
+                _label(colors, 'New Password'),
+                const SizedBox(height: 8),
+                _textField(
+                  controller: _newPasswordController,
+                  hint: 'At least 6 characters',
+                  obscure: _obscureNew,
+                  colors: colors,
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureNew ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        color: colors.subtext, size: 20),
+                    onPressed: () => setState(() => _obscureNew = !_obscureNew),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                _label(colors, 'Confirm Password'),
+                const SizedBox(height: 8),
+                _textField(
+                  controller: _confirmPasswordController,
+                  hint: 'Repeat new password',
+                  obscure: _obscureConfirm,
+                  colors: colors,
+                  suffixIcon: IconButton(
+                    icon: Icon(_obscureConfirm ? Icons.visibility_off_outlined : Icons.visibility_outlined,
+                        color: colors.subtext, size: 20),
+                    onPressed: () => setState(() => _obscureConfirm = !_obscureConfirm),
+                  ),
+                ),
+                const SizedBox(height: 24),
+                _primaryButton('Reset Password', _isLoading, _resetPassword),
+                const SizedBox(height: 12),
+                TextButton(
+                  onPressed: _isLoading ? null : () => setState(() { _step = 1; _error = null; }),
+                  child: Text('← Back / Resend code',
+                      style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14)),
+                ),
+              ]),
+
+              // Step 3 — Success
+              if (_step == 3) ...[
+                ElevatedButton(
+                  onPressed: () => context.pop(),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: AppTheme.primaryColor,
+                    foregroundColor: Colors.white,
+                    minimumSize: const Size(double.infinity, 56),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                  ),
+                  child: Text('Back to Login',
+                      style: GoogleFonts.outfit(fontSize: 17, fontWeight: FontWeight.bold)),
+                ),
+              ],
+              const SizedBox(height: 32),
             ],
           ),
         ),
@@ -108,130 +257,68 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     );
   }
 
-  Widget _buildRequestForm(AppColors colors) {
+  Widget _buildCard(AppColors colors, List<Widget> children) {
     return Container(
-      padding: const EdgeInsets.all(28),
+      width: double.infinity,
+      padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: colors.surface,
-        borderRadius: BorderRadius.circular(32),
+        borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: colors.text.withOpacity(0.03),
-            blurRadius: 30,
-            offset: const Offset(0, 15),
+            color: colors.text.withOpacity(0.04),
+            blurRadius: 24,
+            offset: const Offset(0, 12),
           ),
         ],
       ),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.stretch,
-        children: [
-          Text(
-            'Email Address',
-            style: GoogleFonts.outfit(
-              fontSize: 14,
-              fontWeight: FontWeight.w600,
-              color: colors.text,
-            ),
-          ),
-          const SizedBox(height: 8),
-          TextField(
-            controller: _emailController,
-            keyboardType: TextInputType.emailAddress,
-            style: GoogleFonts.outfit(color: colors.text),
-            decoration: const InputDecoration(hintText: 'Enter your email'),
-          ),
-          const SizedBox(height: 28),
-          ElevatedButton(
-            onPressed: _isLoading ? null : _sendResetLink,
-            style: ElevatedButton.styleFrom(
-              backgroundColor: AppTheme.primaryColor,
-              foregroundColor: Colors.white,
-              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-              padding: const EdgeInsets.symmetric(vertical: 18),
-            ),
-            child: _isLoading 
-              ? const SizedBox(
-                  height: 24,
-                  width: 24,
-                  child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                )
-              : Text(
-                  'Send Reset Link',
-                  style: GoogleFonts.outfit(
-                    fontSize: 17,
-                    fontWeight: FontWeight.bold,
-                  ),
-                ),
-          ),
-        ],
+        children: children,
       ),
     );
   }
 
-  Widget _buildSuccessContent(AppColors colors) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        Container(
-          padding: const EdgeInsets.all(28),
-          decoration: BoxDecoration(
-            color: colors.surface,
-            borderRadius: BorderRadius.circular(32),
-            boxShadow: [
-              BoxShadow(
-                color: colors.text.withOpacity(0.03),
-                blurRadius: 30,
-                offset: const Offset(0, 15),
-              ),
-            ],
-          ),
-          child: Text(
-            'Check your inbox and click the link to reset your password. If you don\'t see it, check your spam folder.',
-            textAlign: TextAlign.center,
-            style: GoogleFonts.outfit(
-              color: colors.text,
-              fontSize: 15,
-              height: 1.6,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-        const SizedBox(height: 32),
-        OutlinedButton(
-          onPressed: () => setState(() => _isSuccess = false),
-          style: OutlinedButton.styleFrom(
-            padding: const EdgeInsets.symmetric(vertical: 18),
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            side: BorderSide(color: colors.border),
-            backgroundColor: colors.surface,
-          ),
-          child: Text(
-            'Resend Email',
-            style: GoogleFonts.outfit(
-              color: colors.text,
-              fontWeight: FontWeight.bold,
-              fontSize: 16,
-            ),
-          ),
-        ),
-        const SizedBox(height: 16),
-        ElevatedButton(
-          onPressed: () => context.pop(),
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppTheme.primaryColor,
-            foregroundColor: Colors.white,
-            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-            padding: const EdgeInsets.symmetric(vertical: 18),
-          ),
-          child: Text(
-            'Back to Login',
-            style: GoogleFonts.outfit(
-              fontSize: 17,
-              fontWeight: FontWeight.bold,
-            ),
-          ),
-        ),
-      ],
+  Widget _label(AppColors colors, String text) => Text(
+    text,
+    style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: colors.text),
+  );
+
+  Widget _textField({
+    required TextEditingController controller,
+    required String hint,
+    required AppColors colors,
+    TextInputType keyboardType = TextInputType.text,
+    bool obscure = false,
+    Widget? suffixIcon,
+  }) {
+    return TextField(
+      controller: controller,
+      keyboardType: keyboardType,
+      obscureText: obscure,
+      style: GoogleFonts.outfit(color: colors.text),
+      decoration: InputDecoration(
+        hintText: hint,
+        hintStyle: GoogleFonts.outfit(color: colors.subtext),
+        suffixIcon: suffixIcon,
+      ),
+    );
+  }
+
+  Widget _primaryButton(String label, bool loading, VoidCallback onPressed) {
+    return ElevatedButton(
+      onPressed: loading ? null : onPressed,
+      style: ElevatedButton.styleFrom(
+        backgroundColor: AppTheme.primaryColor,
+        foregroundColor: Colors.white,
+        minimumSize: const Size(double.infinity, 56),
+        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      ),
+      child: loading
+          ? const SizedBox(
+              height: 22, width: 22,
+              child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
+          : Text(label, style: GoogleFonts.outfit(fontSize: 17, fontWeight: FontWeight.bold)),
     );
   }
 }
