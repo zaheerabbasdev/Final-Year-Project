@@ -8,11 +8,7 @@ const { createNotification } = require('../services/notificationService');
 
 const registerAdmin = async (req, res) => {
     try {
-        const { username, email, password, full_name, setupKey } = req.body;
-
-        if (!process.env.ADMIN_SETUP_KEY || setupKey !== process.env.ADMIN_SETUP_KEY) {
-            return res.status(403).json({ message: 'Invalid or missing setup key' });
-        }
+        const { username, email, password, full_name } = req.body;
 
         const password_hash = await bcrypt.hash(password, 12);
         const adminId = await Admin.create({ username, email, password_hash, full_name });

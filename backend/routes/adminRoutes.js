@@ -7,7 +7,7 @@ const {
 const adminAuth = require('../middleware/adminAuth');
 const { loginLimiter } = require('../middleware/rateLimiter');
 
-// Public Auth Routes (registration requires ADMIN_SETUP_KEY, see adminController.registerAdmin)
+// Public Auth Routes
 router.post('/auth/register', registerAdmin);
 router.post('/auth/login', loginLimiter, loginAdmin);
 
