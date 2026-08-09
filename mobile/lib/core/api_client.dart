@@ -9,7 +9,7 @@ class ApiClient {
   // flutter run --dart-define=API_BASE_URL=http://<lan-ip-or-domain>:5000/api
   static const String baseUrl = String.fromEnvironment(
     'API_BASE_URL',
-    defaultValue: 'http://10.40.33.234:5000/api',
+    defaultValue: 'http://academy-dev-alb-318446814.ap-south-1.elb.amazonaws.com/api',
   );
 
   static final ApiClient _instance = ApiClient._internal();
