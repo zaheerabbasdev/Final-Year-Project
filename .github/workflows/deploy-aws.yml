@@ -63,4 +63,3 @@ jobs:
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_BACKEND --force-new-deployment
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_FRONTEND --force-new-deployment
           aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_ADMIN --force-new-deployment
-
