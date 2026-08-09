@@ -1,14 +1,13 @@
 const express = require('express');
 const router = express.Router();
-const { 
-    registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus, autoVerifyProvider,
-    getAllJobs, deleteJob, summarizeJobDispute, getAllBids, getAllCategories, createCategory, deleteCategory 
+const {
+    loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus, autoVerifyProvider,
+    getAllJobs, deleteJob, summarizeJobDispute, getAllBids, getAllCategories, createCategory, deleteCategory
 } = require('../controllers/adminController');
 const adminAuth = require('../middleware/adminAuth');
 const { loginLimiter } = require('../middleware/rateLimiter');
 
 // Public Auth Routes
-router.post('/auth/register', registerAdmin);
 router.post('/auth/login', loginLimiter, loginAdmin);
 
 // Protected Admin Routes

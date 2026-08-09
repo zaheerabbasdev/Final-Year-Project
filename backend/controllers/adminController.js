@@ -6,17 +6,6 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { createNotification } = require('../services/notificationService');
 
-const registerAdmin = async (req, res) => {
-    try {
-        const { username, email, password, full_name } = req.body;
-
-        const password_hash = await bcrypt.hash(password, 12);
-        const adminId = await Admin.create({ username, email, password_hash, full_name });
-        res.status(201).json({ message: 'Admin registered successfully', adminId });
-    } catch (error) {
-        res.status(500).json({ message: 'Error registering admin' });
-    }
-};
 
 const loginAdmin = async (req, res) => {
     try {
