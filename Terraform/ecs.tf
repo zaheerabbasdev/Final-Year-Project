@@ -72,6 +72,26 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_iam_role_policy" "ecs_task_execution_ecr_policy" {
+  name = "${var.project_name}-${var.environment}-ecs-ecr-pull"
+  role = aws_iam_role.ecs_task_execution_role.id
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect = "Allow"
+        Action = [
+          "ecr:GetAuthorizationToken",
+          "ecr:BatchGetImage",
+          "ecr:GetDownloadUrlForLayer"
+        ]
+        Resource = "*"
+      }
+    ]
+  })
+}
+
 resource "aws_cloudwatch_log_group" "backend" {
   name = "/ecs/${var.project_name}-${var.environment}-backend"
 }
@@ -92,8 +112,8 @@ resource "aws_ecs_task_definition" "backend" {
   family                   = "${var.project_name}-${var.environment}-backend"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "512"
-  memory                   = "1024"
+  cpu                      = var.ecs_cpu
+  memory                   = var.ecs_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
 
@@ -130,8 +150,8 @@ resource "aws_ecs_task_definition" "frontend" {
   family                   = "${var.project_name}-${var.environment}-frontend"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "512"
-  memory                   = "1024"
+  cpu                      = var.ecs_cpu
+  memory                   = var.ecs_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
 
@@ -165,8 +185,8 @@ resource "aws_ecs_task_definition" "admin" {
   family                   = "${var.project_name}-${var.environment}-admin"
   requires_compatibilities = ["FARGATE"]
   network_mode             = "awsvpc"
-  cpu                      = "512"
-  memory                   = "1024"
+  cpu                      = var.ecs_cpu
+  memory                   = var.ecs_memory
   execution_role_arn       = aws_iam_role.ecs_task_execution_role.arn
   task_role_arn            = aws_iam_role.ecs_task_execution_role.arn
 
@@ -305,7 +325,7 @@ resource "aws_ecs_service" "backend" {
   name            = "${var.project_name}-${var.environment}-backend"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.backend.arn
-  desired_count   = 1
+  desired_count   = var.ecs_desired_count
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -327,7 +347,7 @@ resource "aws_ecs_service" "frontend" {
   name            = "${var.project_name}-${var.environment}-frontend"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.frontend.arn
-  desired_count   = 1
+  desired_count   = var.ecs_desired_count
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -349,7 +369,7 @@ resource "aws_ecs_service" "admin" {
   name            = "${var.project_name}-${var.environment}-admin"
   cluster         = aws_ecs_cluster.main.id
   task_definition = aws_ecs_task_definition.admin.arn
-  desired_count   = 1
+  desired_count   = var.ecs_desired_count
   launch_type     = "FARGATE"
 
   network_configuration {
@@ -365,4 +385,168 @@ resource "aws_ecs_service" "admin" {
   }
 
   depends_on = [aws_lb_listener.http]
+}
+
+resource "aws_appautoscaling_target" "backend" {
+  service_namespace  = "ecs"
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.backend.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  min_capacity       = var.ecs_min_count
+  max_capacity       = var.ecs_max_count
+}
+
+resource "aws_appautoscaling_policy" "backend_cpu" {
+  name               = "${var.project_name}-${var.environment}-backend-cpu"
+  service_namespace  = "ecs"
+  resource_id        = aws_appautoscaling_target.backend.resource_id
+  scalable_dimension = aws_appautoscaling_target.backend.scalable_dimension
+  policy_type        = "TargetTrackingScaling"
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value       = var.ecs_target_cpu_utilization
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+  }
+}
+
+resource "aws_appautoscaling_target" "frontend" {
+  service_namespace  = "ecs"
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.frontend.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  min_capacity       = var.ecs_min_count
+  max_capacity       = var.ecs_max_count
+}
+
+resource "aws_appautoscaling_policy" "frontend_cpu" {
+  name               = "${var.project_name}-${var.environment}-frontend-cpu"
+  service_namespace  = "ecs"
+  resource_id        = aws_appautoscaling_target.frontend.resource_id
+  scalable_dimension = aws_appautoscaling_target.frontend.scalable_dimension
+  policy_type        = "TargetTrackingScaling"
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value       = var.ecs_target_cpu_utilization
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+  }
+}
+
+resource "aws_appautoscaling_target" "admin" {
+  service_namespace  = "ecs"
+  resource_id        = "service/${aws_ecs_cluster.main.name}/${aws_ecs_service.admin.name}"
+  scalable_dimension = "ecs:service:DesiredCount"
+  min_capacity       = var.ecs_min_count
+  max_capacity       = var.ecs_max_count
+}
+
+resource "aws_appautoscaling_policy" "admin_cpu" {
+  name               = "${var.project_name}-${var.environment}-admin-cpu"
+  service_namespace  = "ecs"
+  resource_id        = aws_appautoscaling_target.admin.resource_id
+  scalable_dimension = aws_appautoscaling_target.admin.scalable_dimension
+  policy_type        = "TargetTrackingScaling"
+
+  target_tracking_scaling_policy_configuration {
+    predefined_metric_specification {
+      predefined_metric_type = "ECSServiceAverageCPUUtilization"
+    }
+    target_value       = var.ecs_target_cpu_utilization
+    scale_in_cooldown  = 300
+    scale_out_cooldown = 300
+  }
+}
+
+resource "aws_sns_topic" "alerts" {
+  name = "${var.project_name}-${var.environment}-alerts"
+}
+
+resource "aws_sns_topic_subscription" "email" {
+  count      = var.notification_email != "" ? 1 : 0
+  topic_arn  = aws_sns_topic.alerts.arn
+  protocol   = "email"
+  endpoint   = var.notification_email
+}
+
+resource "aws_cloudwatch_log_metric_filter" "backend_errors" {
+  name           = "${var.project_name}-${var.environment}-backend-errors"
+  log_group_name = aws_cloudwatch_log_group.backend.name
+  pattern        = "ERROR"
+
+  metric_transformation {
+    name      = "BackendErrors"
+    namespace = "${var.project_name}/${var.environment}"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "frontend_errors" {
+  name           = "${var.project_name}-${var.environment}-frontend-errors"
+  log_group_name = aws_cloudwatch_log_group.frontend.name
+  pattern        = "ERROR"
+
+  metric_transformation {
+    name      = "FrontendErrors"
+    namespace = "${var.project_name}/${var.environment}"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_log_metric_filter" "admin_errors" {
+  name           = "${var.project_name}-${var.environment}-admin-errors"
+  log_group_name = aws_cloudwatch_log_group.admin.name
+  pattern        = "ERROR"
+
+  metric_transformation {
+    name      = "AdminErrors"
+    namespace = "${var.project_name}/${var.environment}"
+    value     = "1"
+  }
+}
+
+resource "aws_cloudwatch_metric_alarm" "backend_log_errors" {
+  alarm_name                = "${var.project_name}-${var.environment}-backend-log-errors"
+  alarm_description         = "Triggered when backend logs contain ERROR entries"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = var.alarm_evaluation_periods
+  metric_name               = aws_cloudwatch_log_metric_filter.backend_errors.metric_transformation[0].name
+  namespace                 = aws_cloudwatch_log_metric_filter.backend_errors.metric_transformation[0].namespace
+  period                    = var.alarm_period
+  statistic                 = "Sum"
+  threshold                 = var.alarm_threshold
+  alarm_actions             = [aws_sns_topic.alerts.arn]
+  treat_missing_data        = "notBreaching"
+}
+
+resource "aws_cloudwatch_metric_alarm" "frontend_log_errors" {
+  alarm_name                = "${var.project_name}-${var.environment}-frontend-log-errors"
+  alarm_description         = "Triggered when frontend logs contain ERROR entries"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = var.alarm_evaluation_periods
+  metric_name               = aws_cloudwatch_log_metric_filter.frontend_errors.metric_transformation[0].name
+  namespace                 = aws_cloudwatch_log_metric_filter.frontend_errors.metric_transformation[0].namespace
+  period                    = var.alarm_period
+  statistic                 = "Sum"
+  threshold                 = var.alarm_threshold
+  alarm_actions             = [aws_sns_topic.alerts.arn]
+  treat_missing_data        = "notBreaching"
+}
+
+resource "aws_cloudwatch_metric_alarm" "admin_log_errors" {
+  alarm_name                = "${var.project_name}-${var.environment}-admin-log-errors"
+  alarm_description         = "Triggered when admin logs contain ERROR entries"
+  comparison_operator       = "GreaterThanOrEqualToThreshold"
+  evaluation_periods        = var.alarm_evaluation_periods
+  metric_name               = aws_cloudwatch_log_metric_filter.admin_errors.metric_transformation[0].name
+  namespace                 = aws_cloudwatch_log_metric_filter.admin_errors.metric_transformation[0].namespace
+  period                    = var.alarm_period
+  statistic                 = "Sum"
+  threshold                 = var.alarm_threshold
+  alarm_actions             = [aws_sns_topic.alerts.arn]
+  treat_missing_data        = "notBreaching"
 }
