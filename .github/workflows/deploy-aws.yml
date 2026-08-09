@@ -17,6 +17,7 @@ env:
   ECS_SERVICE_BACKEND: academy-dev-backend
   ECS_SERVICE_FRONTEND: academy-dev-frontend
   ECS_SERVICE_ADMIN: academy-dev-admin
+  S3_BUCKET: academy-dev-uploads
 
 jobs:
   deploy:
@@ -63,8 +64,39 @@ jobs:
             -t $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest ./admin
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest
 
+      - name: Register backend task definition with S3 env vars
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+        run: |
+          # Fetch the current task definition, strip read-only fields, then inject
+          # the updated image and S3 environment variables.
+          TASK_DEF=$(aws ecs describe-task-definition \
+            --task-definition $ECS_SERVICE_BACKEND \
+            --query 'taskDefinition' --output json)
+
+          NEW_TASK_DEF=$(echo "$TASK_DEF" | jq \
+            --arg IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest" \
+            --arg BUCKET "$S3_BUCKET" \
+            --arg REGION "$AWS_REGION" \
+            'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy) |
+             .containerDefinitions[0].image = $IMAGE |
+             .containerDefinitions[0].environment = (
+               (.containerDefinitions[0].environment // []) |
+               map(select(.name != "AWS_S3_BUCKET" and .name != "AWS_REGION")) +
+               [{"name":"AWS_S3_BUCKET","value":$BUCKET},{"name":"AWS_REGION","value":$REGION}]
+             )')
+
+          NEW_ARN=$(aws ecs register-task-definition \
+            --cli-input-json "$NEW_TASK_DEF" \
+            --query 'taskDefinition.taskDefinitionArn' --output text)
+
+          echo "BACKEND_TASK_DEF_ARN=$NEW_ARN" >> $GITHUB_ENV
+
       - name: Update ECS services
         run: |
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_BACKEND --force-new-deployment
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_FRONTEND --force-new-deployment
-          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_ADMIN --force-new-deployment
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_BACKEND \
+            --task-definition $BACKEND_TASK_DEF_ARN
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_FRONTEND \
+            --force-new-deployment
+          aws ecs update-service --cluster $ECS_CLUSTER --service $ECS_SERVICE_ADMIN \
+            --force-new-deployment

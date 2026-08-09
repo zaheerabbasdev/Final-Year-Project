@@ -65,10 +65,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(suspendedCheck);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Also serve under /api/uploads so the ALB path rule (/api/*) forwards
-// static file requests to this container instead of the frontend.
-app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
+// Static file serving removed — uploads are now stored in S3, not on disk.
 
 // Routes
 // ... (routes)

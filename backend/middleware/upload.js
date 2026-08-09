@@ -1,37 +1,31 @@
 const multer = require('multer');
 const path = require('path');
 
-// Set Storage Engine
-const storage = multer.diskStorage({
-    destination: './uploads/',
-    filename: function (req, file, cb) {
-        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
-    }
-});
+// Files are held in memory and streamed to S3 in each controller.
+// No local disk writes — safe for ephemeral ECS Fargate containers.
+const storage = multer.memoryStorage();
 
-// Init Upload
 const upload = multer({
-    storage: storage,
-    limits: { fileSize: 5000000 }, // 5MB limit
+    storage,
+    limits: { fileSize: 5000000 }, // 5 MB
     fileFilter: function (req, file, cb) {
         checkFileType(file, cb);
     }
 });
 
-// Check File Type
 function checkFileType(file, cb) {
-    // Allowed extensions
-    const filetypes = /jpeg|jpg|png|gif|tmp|webp|heic/;
-    // Check extension
+    const filetypes = /jpeg|jpg|png|gif|webp|heic/;
     const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
-    // Check mime (Dio might send application/octet-stream)
-    const mimetype = filetypes.test(file.mimetype) || file.mimetype === 'application/octet-stream' || file.mimetype.startsWith('image/');
+    // Dio (Flutter) sometimes sends application/octet-stream
+    const mimetype =
+        filetypes.test(file.mimetype) ||
+        file.mimetype === 'application/octet-stream' ||
+        file.mimetype.startsWith('image/');
 
-    // Accept if it has a valid image minetype or if it's sent from flutter generically
     if (mimetype) {
         return cb(null, true);
     } else {
-        cb(new Error(`File upload rejected: ${file.originalname} - ${file.mimetype}`));
+        cb(new Error(`File upload rejected: ${file.originalname} — ${file.mimetype}`));
     }
 }
 

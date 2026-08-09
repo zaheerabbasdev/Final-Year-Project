@@ -4,6 +4,7 @@ const ProviderProfile = require('../models/providerModel');
 const Booking = require('../models/bookingModel');
 const db = require('../config/db');
 const { createNotification } = require('../services/notificationService');
+const { uploadToS3 } = require('../utils/s3');
 
 // ... rest of imports if any ...
 
@@ -28,9 +29,11 @@ const createJob = async (req, res) => {
             }
         });
 
-        // If images were uploaded, add them to jobData
-        if (req.files) {
-            jobData.images = req.files.map(file => `/uploads/${file.filename}`);
+        // If images were uploaded, stream them to S3
+        if (req.files && req.files.length > 0) {
+            jobData.images = await Promise.all(
+                req.files.map(file => uploadToS3(file.buffer, file.originalname, 'job'))
+            );
         }
         
         const jobId = await Job.create(jobData);

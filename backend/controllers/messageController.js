@@ -1,6 +1,7 @@
 const Message = require('../models/messageModel');
 const { getIO } = require('../socketManager');
 const db = require('../config/db');
+const { uploadToS3 } = require('../utils/s3');
 
 
 
@@ -37,7 +38,7 @@ const sendMessage = async (req, res) => {
         let image_url = null;
 
         if (req.file) {
-            image_url = `uploads/${req.file.filename}`;
+            image_url = await uploadToS3(req.file.buffer, req.file.originalname, 'message');
         }
 
         // Authorize: one side must be the job's customer, the other must be a

@@ -2,10 +2,17 @@
 // Falls back to the relative /api path when not set (ALB routes /api/* to backend).
 const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '/api';
 
-// Prepend this to stored file paths (e.g. /uploads/avatar.jpg) to get a
-// browser-fetchable URL.  We keep the /api suffix so the result becomes
-// /api/uploads/avatar.jpg — the ALB path rule (/api/*) then forwards the
-// request to the backend container, which serves /api/uploads as a static dir.
+// Resolve any stored file path to a browser-fetchable URL.
+// New uploads return a full S3 https:// URL — return those as-is.
+// Legacy paths (e.g. /uploads/avatar.jpg) are prefixed with the API root so
+// the ALB rule (/api/*) routes the request to the backend container.
+export function getFileUrl(p: string | null | undefined): string {
+  if (!p) return '';
+  if (p.startsWith('http')) return p;          // S3 absolute URL
+  return `${API_URL}${p.startsWith('/') ? p : '/' + p}`;  // legacy relative path
+}
+
+// Kept for any remaining template-literal callers; new code should use getFileUrl().
 export const fileOrigin = API_URL;
 
 interface RequestOptions extends RequestInit {
