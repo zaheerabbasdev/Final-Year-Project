@@ -189,7 +189,7 @@ function ChatContent() {
                 >
                   <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex-shrink-0 overflow-hidden flex items-center justify-center">
                     {chat.other_user_avatar ? (
-                      <img src={{getFileUrl(chat.other_user_avatar)}} alt={chat.other_user_name} className="w-full h-full object-cover" />
+                      <img src={getFileUrl(chat.other_user_avatar)} alt={chat.other_user_name} className="w-full h-full object-cover" />
                     ) : (
                       <UserIcon size={20} className="text-zinc-500" />
                     )}
@@ -238,7 +238,7 @@ function ChatContent() {
                 </button>
                 <div className="w-10 h-10 rounded-full bg-zinc-200 dark:bg-zinc-800 flex-shrink-0 overflow-hidden flex items-center justify-center">
                   {activeChatDetails?.other_user_avatar ? (
-                    <img src={{getFileUrl(activeChatDetails.other_user_avatar)}} alt={activeChatDetails?.other_user_name} className="w-full h-full object-cover" />
+                    <img src={getFileUrl(activeChatDetails.other_user_avatar)} alt={activeChatDetails?.other_user_name} className="w-full h-full object-cover" />
                   ) : (
                     <UserIcon size={20} className="text-zinc-500" />
                   )}
@@ -271,7 +271,7 @@ function ChatContent() {
                         }`}>
                           <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
                           {msg.image_url && (
-                            <img src={{getFileUrl(msg.image_url)}} alt="attachment" className="mt-2 rounded-lg max-h-48 object-cover" />
+                            <img src={getFileUrl(msg.image_url)} alt="attachment" className="mt-2 rounded-lg max-h-48 object-cover" />
                           )}
                           <div className={`text-[10px] mt-1 text-right ${isMine ? 'text-indigo-200' : 'text-zinc-400'}`}>
                             {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
