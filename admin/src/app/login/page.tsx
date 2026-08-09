@@ -1,16 +1,14 @@
 'use client';
-import { useState, Suspense } from 'react';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 
-function LoginContent() {
+export default function LoginPage() {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const signupSuccess = searchParams.get('signup') === 'success';
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -54,11 +52,6 @@ function LoginContent() {
           </p>
         </div>
         <form className="mt-8 space-y-6" onSubmit={handleLogin}>
-          {signupSuccess && (
-            <div className="bg-green-50 text-green-600 p-3 rounded-lg text-sm text-center font-medium">
-              Account created! Please sign in.
-            </div>
-          )}
           {error && (
             <div className="bg-red-50 text-red-600 p-3 rounded-lg text-sm text-center">
               {error}
@@ -98,30 +91,8 @@ function LoginContent() {
               {loading ? 'Authenticating...' : 'Sign In'}
             </button>
           </div>
-
-          <div className="text-center mt-4">
-            <p className="text-sm text-gray-600">
-              Don't have an admin account?{' '}
-              <a href="/signup" className="font-bold text-indigo-600 hover:text-indigo-500">
-                Sign Up
-              </a>
-            </p>
-          </div>
         </form>
       </div>
     </div>
   );
 }
-
-export default function LoginPage() {
-  return (
-    <Suspense fallback={
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="text-gray-500 font-medium">Loading login...</div>
-      </div>
-    }>
-      <LoginContent />
-    </Suspense>
-  );
-}
-

@@ -7,6 +7,11 @@ ENV npm_config_fetch_retries=5 \
 COPY package*.json ./
 RUN npm ci --no-audit --no-fund --progress=false
 COPY . .
+# Inject public env vars at build time so Next.js bakes the correct URLs
+ARG NEXT_PUBLIC_API_URL
+ARG NEXT_PUBLIC_WS_URL
+ENV NEXT_PUBLIC_API_URL=$NEXT_PUBLIC_API_URL
+ENV NEXT_PUBLIC_WS_URL=$NEXT_PUBLIC_WS_URL
 RUN npm run build
 
 FROM node:20-alpine AS runner

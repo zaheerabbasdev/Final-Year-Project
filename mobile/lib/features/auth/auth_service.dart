@@ -162,6 +162,34 @@ class AuthService extends ChangeNotifier {
     return {'success': false, 'requiresOTP': false};
   }
 
+  Future<Map<String, dynamic>> forgotPassword(String email) async {
+    try {
+      final response = await _apiClient.dio.post('/auth/forgot-password', data: {'email': email});
+      return {'success': true, 'message': response.data['message']};
+    } catch (e) {
+      if (e is DioException) {
+        return {'success': false, 'message': e.response?.data['message'] ?? 'Request failed.'};
+      }
+      return {'success': false, 'message': 'Network error. Check your connection.'};
+    }
+  }
+
+  Future<Map<String, dynamic>> resetPassword(String email, String otp, String newPassword) async {
+    try {
+      final response = await _apiClient.dio.post('/auth/reset-password', data: {
+        'email': email,
+        'otp': otp,
+        'newPassword': newPassword,
+      });
+      return {'success': true, 'message': response.data['message']};
+    } catch (e) {
+      if (e is DioException) {
+        return {'success': false, 'message': e.response?.data['message'] ?? 'Reset failed.'};
+      }
+      return {'success': false, 'message': 'Network error. Check your connection.'};
+    }
+  }
+
   Future<bool> verifyOTP(String email, String otp) async {
     try {
       final response = await _apiClient.dio.post('/auth/verify-otp', data: {

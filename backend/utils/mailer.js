@@ -148,4 +148,31 @@ async function sendStatusNotification(to, status, reason) {
     }
 }
 
-module.exports = { initializeMailer, sendOTP, sendStatusNotification };
+async function sendPasswordResetOTP(to, code) {
+    try {
+        await initializeMailer();
+        const senderEmail = process.env.EMAIL_USER;
+        const info = await transporter.sendMail({
+            from: `"Kaarkun" <${senderEmail}>`,
+            to,
+            subject: 'Password Reset Code – Kaarkun',
+            text: `Your password reset code is: ${code}\n\nIt expires in 10 minutes. If you did not request this, ignore this email.`,
+            html: `
+              <div style="font-family:sans-serif;max-width:480px;margin:auto;padding:32px;border:1px solid #e5e7eb;border-radius:12px;">
+                <h2 style="color:#4f46e5;margin-bottom:8px;">Password Reset</h2>
+                <p style="color:#374151;font-size:15px;">Use the code below to reset your Kaarkun password. It expires in <strong>10 minutes</strong>.</p>
+                <div style="text-align:center;margin:28px 0;">
+                  <span style="font-size:36px;font-weight:800;letter-spacing:10px;color:#111827;">${code}</span>
+                </div>
+                <p style="color:#6b7280;font-size:13px;">If you didn't request this, you can safely ignore this email.</p>
+              </div>`,
+        });
+        console.log('[mailer] Password reset OTP sent', { messageId: info.messageId });
+        return true;
+    } catch (error) {
+        console.error('[mailer] Error sending password reset OTP', formatError(error));
+        return false;
+    }
+}
+
+module.exports = { initializeMailer, sendOTP, sendStatusNotification, sendPasswordResetOTP };

@@ -48,14 +48,19 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest ./web/kaarkun
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-318446814.ap-south-1.elb.amazonaws.com/api \
+            --build-arg NEXT_PUBLIC_WS_URL=http://academy-dev-alb-318446814.ap-south-1.elb.amazonaws.com \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest ./web/kaarkun
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
 
       - name: Build and push admin image
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
-          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest ./admin
+          docker build \
+            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-318446814.ap-south-1.elb.amazonaws.com/api \
+            -t $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest ./admin
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest
 
       - name: Update ECS services

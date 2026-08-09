@@ -10,6 +10,12 @@ const nextConfig: NextConfig = {
         port: '5000',
         pathname: '/uploads/**',
       },
+      {
+        // AWS ALB — avatars and attachments served at /api/uploads/**
+        protocol: 'http',
+        hostname: 'academy-dev-alb-318446814.ap-south-1.elb.amazonaws.com',
+        pathname: '/api/uploads/**',
+      },
     ],
   },
 };

@@ -1,10 +1,12 @@
-const isDevelopment = process.env.NODE_ENV === 'development';
-const API_URL = isDevelopment && process.env.NEXT_PUBLIC_API_URL
-  ? `${process.env.NEXT_PUBLIC_API_URL}/api`
-  : '/api';
+// NEXT_PUBLIC_API_URL is baked in at build time (both dev and prod Docker builds).
+// Falls back to the relative /api path when not set (ALB routes /api/* to backend).
+const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '/api';
 
-// Origin (no /api suffix) for static asset URLs like /uploads/<file>
-export const fileOrigin = API_URL.replace(/\/api\/?$/, '');
+// Prepend this to stored file paths (e.g. /uploads/avatar.jpg) to get a
+// browser-fetchable URL.  We keep the /api suffix so the result becomes
+// /api/uploads/avatar.jpg — the ALB path rule (/api/*) then forwards the
+// request to the backend container, which serves /api/uploads as a static dir.
+export const fileOrigin = API_URL;
 
 interface RequestOptions extends RequestInit {
   body?: any;

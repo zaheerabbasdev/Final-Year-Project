@@ -147,4 +147,72 @@ const login = async (req, res) => {
     }
 };
 
-module.exports = { register, login, verifyOTP };
+// ── Forgot Password ────────────────────────────────────────────────────────
+const forgotPassword = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ message: 'Email is required.' });
+
+        const user = await User.findByEmail(email);
+        if (!user) {
+            // Return 200 so we don't leak which emails are registered
+            return res.json({ message: 'If that email exists, a reset code has been sent.' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiry = new Date(Date.now() + 10 * 60000); // 10 mins
+
+        await db.execute(
+            'UPDATE users SET otp_code=?, otp_expiry=? WHERE id=?',
+            [otp, expiry, user.id]
+        );
+
+        await mailer.sendPasswordResetOTP(email, otp);
+
+        res.json({ message: 'If that email exists, a reset code has been sent.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error.' });
+    }
+};
+
+// ── Reset Password ─────────────────────────────────────────────────────────
+const resetPassword = async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({ message: 'Email, OTP and new password are required.' });
+        }
+        if (newPassword.length < 6) {
+            return res.status(400).json({ message: 'Password must be at least 6 characters.' });
+        }
+
+        const [rows] = await db.execute(
+            'SELECT id, otp_code, otp_expiry FROM users WHERE LOWER(email)=LOWER(?)',
+            [email]
+        );
+        const user = rows[0];
+
+        if (!user || user.otp_code !== otp) {
+            return res.status(400).json({ message: 'Invalid or expired reset code.' });
+        }
+        if (new Date() > new Date(user.otp_expiry)) {
+            return res.status(400).json({ message: 'Reset code has expired. Please request a new one.' });
+        }
+
+        const salt = await bcrypt.genSalt(12);
+        const password_hash = await bcrypt.hash(newPassword, salt);
+
+        await db.execute(
+            'UPDATE users SET password_hash=?, otp_code=NULL, otp_expiry=NULL WHERE id=?',
+            [password_hash, user.id]
+        );
+
+        res.json({ message: 'Password reset successfully. You can now log in.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error.' });
+    }
+};
+
+module.exports = { register, login, verifyOTP, forgotPassword, resetPassword };
