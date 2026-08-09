@@ -131,9 +131,29 @@ async function initializeDatabase() {
     }
 }
 
+async function seedDefaultAdmin() {
+    try {
+        const db = require('./config/db');
+        const bcrypt = require('bcryptjs');
+
+        const [[{ count }]] = await db.execute('SELECT COUNT(*) AS count FROM admins');
+        if (parseInt(count) > 0) return; // already seeded
+
+        const hash = await bcrypt.hash('Admin@1234', 12);
+        await db.execute(
+            'INSERT INTO admins (username, email, password_hash, full_name) VALUES (?, ?, ?, ?)',
+            ['zaheer_admin', 'learntechdigital@gmail.com', hash, 'Zaheer Abbas']
+        );
+        console.log('Default admin seeded — email: learntechdigital@gmail.com  password: Admin@1234');
+    } catch (err) {
+        console.error('Admin seed failed:', err.message);
+    }
+}
+
 async function startServer() {
     try {
         await initializeDatabase();
+        await seedDefaultAdmin();
         await mailer.initializeMailer();
     } catch (error) {
         console.error('Startup initialization failed:', error.message);
