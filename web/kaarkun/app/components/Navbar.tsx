@@ -15,21 +15,32 @@ import {
   X,
   CheckCheck,
   Sparkles,
-  Globe
+  Globe,
+  LayoutDashboard,
+  ClipboardList,
+  Briefcase,
+  CalendarDays,
+  Search,
+  Scale,
+  MessageCircle,
+  User,
+  Bot,
+  Zap,
 } from 'lucide-react';
 
-const PAGE_META: Record<string, { title: string; sub: string; icon: string }> = {
-  '/customer/dashboard':   { title: 'Dashboard',       sub: 'Overview & analytics',       icon: '⚡' },
-  '/customer/post-job':    { title: 'Post a Job',      sub: 'Create a new job listing',    icon: '📋' },
-  '/customer/jobs':        { title: 'My Jobs',         sub: 'Manage your job posts',       icon: '💼' },
-  '/customer/bookings':    { title: 'My Bookings',     sub: 'Active & past service hires', icon: '📅' },
-  '/provider/dashboard':   { title: 'Dashboard',       sub: 'Performance & activity',      icon: '⚡' },
-  '/provider/browse-jobs': { title: 'Browse Jobs',     sub: 'Find jobs that match you',    icon: '🔍' },
-  '/provider/bids':        { title: 'My Bids',         sub: 'Track your proposals',        icon: '⚖️' },
-  '/chat':                 { title: 'Messages',         sub: 'Chat with clients & providers', icon: '💬' },
-  '/notifications':        { title: 'Notifications',   sub: 'Alerts and updates',          icon: '🔔' },
-  '/profile':              { title: 'My Profile',      sub: 'Edit your information',       icon: '👤' },
-  '/support-chatbot':      { title: 'AI Assistant',    sub: 'Get smart help',              icon: '🤖' },
+type PageIcon = React.ComponentType<{ size?: number; className?: string }>;
+const PAGE_META: Record<string, { title: string; sub: string; icon: PageIcon }> = {
+  '/customer/dashboard':   { title: 'Dashboard',       sub: 'Overview & analytics',          icon: LayoutDashboard },
+  '/customer/post-job':    { title: 'Post a Job',      sub: 'Create a new job listing',      icon: ClipboardList   },
+  '/customer/jobs':        { title: 'My Jobs',         sub: 'Manage your job posts',         icon: Briefcase       },
+  '/customer/bookings':    { title: 'My Bookings',     sub: 'Active & past service hires',   icon: CalendarDays    },
+  '/provider/dashboard':   { title: 'Dashboard',       sub: 'Performance & activity',        icon: LayoutDashboard },
+  '/provider/browse-jobs': { title: 'Browse Jobs',     sub: 'Find jobs that match you',      icon: Search          },
+  '/provider/bids':        { title: 'My Bids',         sub: 'Track your proposals',          icon: Scale           },
+  '/chat':                 { title: 'Messages',         sub: 'Chat with clients & providers', icon: MessageCircle   },
+  '/notifications':        { title: 'Notifications',   sub: 'Alerts and updates',            icon: Bell            },
+  '/profile':              { title: 'My Profile',      sub: 'Edit your information',         icon: User            },
+  '/support-chatbot':      { title: 'AI Assistant',    sub: 'Get smart help',                icon: Bot             },
 };
 
 export default function Navbar() {
@@ -103,10 +114,11 @@ export default function Navbar() {
     for (const [key, val] of Object.entries(PAGE_META)) {
       if (pathname === key || pathname.startsWith(key + '/')) return val;
     }
-    return { title: 'Kaarkun', sub: '', icon: '⚡' };
+    return { title: 'Kaarkun', sub: '', icon: Zap };
   };
 
   const meta = getPageMeta();
+  const PageIcon = meta.icon;
   const avatarInitial = user?.full_name?.charAt(0)?.toUpperCase() || '?';
   const isCustomer = user?.role === 'customer';
   const roleGradient = isCustomer ? 'from-blue-500 to-cyan-400' : 'from-violet-500 to-indigo-500';
@@ -138,7 +150,7 @@ export default function Navbar() {
 
           {user && (
             <div className="hidden sm:flex items-center gap-3 min-w-0">
-              <div className="text-2xl shrink-0 leading-none">{meta.icon}</div>
+              <PageIcon size={22} className="text-indigo-500 shrink-0" />
               <div className="min-w-0">
                 <h1 className="text-lg font-bold text-zinc-900 dark:text-white leading-tight truncate">
                   {meta.title}
@@ -245,7 +257,7 @@ export default function Navbar() {
                     <div className="max-h-[360px] overflow-y-auto">
                       {notifications.length === 0 ? (
                         <div className="p-8 text-center">
-                          <div className="text-3xl mb-2">🔔</div>
+                          <Bell size={32} className="text-zinc-300 dark:text-zinc-600 mb-2 mx-auto" />
                           <p className="text-sm text-zinc-400">You're all caught up!</p>
                         </div>
                       ) : (

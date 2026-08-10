@@ -164,4 +164,15 @@ const updateOnlineStatus = async (req, res) => {
     }
 };
 
-module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders, getUserById, updateOnlineStatus };
+const deleteAccount = async (req, res) => {
+    try {
+        const deleted = await User.deleteById(req.user.id);
+        if (!deleted) return res.status(404).json({ message: 'User not found' });
+        res.json({ message: 'Account deleted successfully' });
+    } catch (error) {
+        console.error('Delete account error:', error);
+        res.status(500).json({ message: 'Error deleting account' });
+    }
+};
+
+module.exports = { getProfile, updateProfile, uploadAvatar, getTopProviders, getProviders, getUserById, updateOnlineStatus, deleteAccount };

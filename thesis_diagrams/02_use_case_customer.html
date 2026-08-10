@@ -1,0 +1,204 @@
+<title>Use Case Diagram – Customer Actor | Kaarkun</title>
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Times New Roman', Times, serif;
+    background: #fff;
+    color: #000;
+    padding: 24px 32px;
+  }
+  h1 {
+    text-align: center;
+    font-size: 17px;
+    font-weight: bold;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+  }
+  p.sub {
+    text-align: center;
+    font-size: 12px;
+    margin-bottom: 20px;
+    font-style: italic;
+  }
+  figure { margin: 0; }
+  svg { display: block; max-width: 100%; height: auto; }
+  figcaption {
+    margin-top: 14px;
+    font-size: 12px;
+    font-style: italic;
+    text-align: center;
+    color: #222;
+  }
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 28px;
+    font-size: 11.5px;
+  }
+  th {
+    border: 1px solid #000;
+    padding: 5px 8px;
+    background: #f0f0f0;
+    font-weight: bold;
+    text-align: left;
+  }
+  td {
+    border: 1px solid #000;
+    padding: 4px 8px;
+    vertical-align: top;
+  }
+  tr:nth-child(even) td { background: #fafafa; }
+  h2 { font-size: 13px; margin: 24px 0 8px; text-transform: uppercase; letter-spacing: 0.05em; }
+  @media print {
+    @page { size: A4 portrait; margin: 12mm 14mm; }
+    body { padding: 0; }
+  }
+</style>
+
+<h1>Use Case Diagram — Customer Actor</h1>
+<p class="sub">Kaarkun Service Marketplace Platform</p>
+
+<figure>
+<svg viewBox="0 0 820 762" role="img"
+     aria-label="Use Case Diagram: Customer actor with 15 use cases inside the Kaarkun Platform system boundary">
+  <defs>
+    <!-- open arrowhead for association lines -->
+    <marker id="assoc" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </marker>
+    <!-- open arrowhead for include dashed lines -->
+    <marker id="inc" markerWidth="9" markerHeight="9" refX="7" refY="3.5" orient="auto">
+      <path d="M0,0 L7,3.5 L0,7" fill="none" stroke="currentColor" stroke-width="1.2"/>
+    </marker>
+  </defs>
+
+  <!-- ── System boundary ────────────────────────────── -->
+  <rect x="125" y="22" width="686" height="730"
+        fill="none" stroke="currentColor" stroke-width="1.8"/>
+  <text x="468" y="40"  text-anchor="middle" font-size="11" font-style="italic">«system»</text>
+  <text x="468" y="58"  text-anchor="middle" font-size="14" font-weight="bold">Kaarkun Platform</text>
+
+  <!-- ── Actor – stick figure ───────────────────────── -->
+  <!-- head -->
+  <circle cx="66" cy="290" r="21" fill="none" stroke="currentColor" stroke-width="1.5"/>
+  <!-- body -->
+  <line x1="66" y1="311" x2="66" y2="378" stroke="currentColor" stroke-width="1.5"/>
+  <!-- arms -->
+  <line x1="22" y1="340" x2="110" y2="340" stroke="currentColor" stroke-width="1.5"/>
+  <!-- left leg -->
+  <line x1="66" y1="378" x2="26"  y2="426" stroke="currentColor" stroke-width="1.5"/>
+  <!-- right leg -->
+  <line x1="66" y1="378" x2="106" y2="426" stroke="currentColor" stroke-width="1.5"/>
+  <!-- label -->
+  <text x="66" y="448" text-anchor="middle" font-size="13" font-weight="bold">Customer</text>
+
+  <!-- ── Use-case ellipses ──────────────────────────── -->
+  <!-- UC1 --> <ellipse cx="468" cy="95"  rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" cy="95"  y="99"  text-anchor="middle" font-size="11.5">Register Account</text>
+
+  <!-- UC2 --> <ellipse cx="468" cy="141" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="145" text-anchor="middle" font-size="11.5">Login</text>
+
+  <!-- UC3 --> <ellipse cx="468" cy="187" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="191" text-anchor="middle" font-size="11.5">Forgot / Reset Password</text>
+
+  <!-- UC4 --> <ellipse cx="468" cy="233" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="237" text-anchor="middle" font-size="11.5">Update Profile</text>
+
+  <!-- UC5 --> <ellipse cx="468" cy="279" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="283" text-anchor="middle" font-size="11.5">Upload Profile Photo</text>
+
+  <!-- UC6 --> <ellipse cx="468" cy="325" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="329" text-anchor="middle" font-size="11.5">Post a Job</text>
+
+  <!-- UC7 --> <ellipse cx="468" cy="371" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="375" text-anchor="middle" font-size="11.5">View My Jobs</text>
+
+  <!-- UC8 --> <ellipse cx="468" cy="417" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="421" text-anchor="middle" font-size="11.5">Browse Service Providers</text>
+
+  <!-- UC9 --> <ellipse cx="468" cy="463" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="467" text-anchor="middle" font-size="11.5">View Provider Profile</text>
+
+  <!-- UC10 --> <ellipse cx="468" cy="509" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="513" text-anchor="middle" font-size="11.5">View Bids on Job</text>
+
+  <!-- UC11 --> <ellipse cx="468" cy="555" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="559" text-anchor="middle" font-size="11.5">Accept a Bid</text>
+
+  <!-- UC12 --> <ellipse cx="468" cy="601" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="605" text-anchor="middle" font-size="11.5">View My Bookings</text>
+
+  <!-- UC13 --> <ellipse cx="468" cy="647" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="651" text-anchor="middle" font-size="11.5">Complete Booking</text>
+
+  <!-- UC14 --> <ellipse cx="468" cy="693" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="697" text-anchor="middle" font-size="11.5">Submit Review &amp; Rating</text>
+
+  <!-- UC15 --> <ellipse cx="468" cy="739" rx="170" ry="17" fill="none" stroke="currentColor" stroke-width="1.2"/>
+  <text x="468" y="743" text-anchor="middle" font-size="11.5">Chat with Provider</text>
+
+  <!-- ── Association lines (actor → each UC) ─────────
+       All lines start from the actor right-side at (90, 383)
+       and end at the left edge of each ellipse (468-170 = 298, cy).  -->
+  <line x1="90" y1="383" x2="298" y2="95"  stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="141" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="187" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="233" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="279" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="325" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="371" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="417" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="463" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="509" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="555" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="601" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="647" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="693" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+  <line x1="90" y1="383" x2="298" y2="739" stroke="currentColor" stroke-width="1" marker-end="url(#assoc)"/>
+
+  <!-- ── «include» relationships ─────────────────────
+       Accept a Bid (UC11, cy=555)  →«include»→  View My Bookings (UC12, cy=601)
+       Complete Booking (UC13, cy=647) →«include»→ Submit Review (UC14, cy=693)
+       Drawn on the right side of the ellipses (x = 468+170+18 = 656)           -->
+
+  <!-- include arc: UC11 → UC12 -->
+  <line x1="638" y1="555" x2="656" y2="555"  stroke="currentColor" stroke-width="1"/>
+  <line x1="656" y1="555" x2="656" y2="601"  stroke="currentColor" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="656" y1="601" x2="638" y2="601"  stroke="currentColor" stroke-width="1" marker-end="url(#inc)"/>
+  <text x="660" y="582" font-size="9.5" font-style="italic">«include»</text>
+
+  <!-- include arc: UC13 → UC14 -->
+  <line x1="638" y1="647" x2="672" y2="647"  stroke="currentColor" stroke-width="1"/>
+  <line x1="672" y1="647" x2="672" y2="693"  stroke="currentColor" stroke-width="1" stroke-dasharray="5,3"/>
+  <line x1="672" y1="693" x2="638" y2="693"  stroke="currentColor" stroke-width="1" marker-end="url(#inc)"/>
+  <text x="676" y="674" font-size="9.5" font-style="italic">«include»</text>
+
+</svg>
+<figcaption>Figure 1 — Use Case Diagram: Customer Actor. Lines represent associations between the Customer and each use case within the Kaarkun Platform boundary. Dashed arrows denote «include» relationships.</figcaption>
+</figure>
+
+<h2>Customer Use Case Descriptions</h2>
+<table>
+  <thead>
+    <tr><th>#</th><th>Use Case</th><th>Description</th></tr>
+  </thead>
+  <tbody>
+    <tr><td>UC1</td><td>Register Account</td><td>Customer signs up with name, email, phone and password. An OTP is sent to verify the email address.</td></tr>
+    <tr><td>UC2</td><td>Login</td><td>Authenticated access using email and password; JWT token issued on success.</td></tr>
+    <tr><td>UC3</td><td>Forgot / Reset Password</td><td>Customer requests a 6-digit OTP via email, then sets a new password.</td></tr>
+    <tr><td>UC4</td><td>Update Profile</td><td>Edit full name, phone number and location details.</td></tr>
+    <tr><td>UC5</td><td>Upload Profile Photo</td><td>Choose and upload an avatar image stored on AWS S3.</td></tr>
+    <tr><td>UC6</td><td>Post a Job</td><td>Create a service request with title, description, category, budget, location and urgency flag.</td></tr>
+    <tr><td>UC7</td><td>View My Jobs</td><td>List all job postings created by the customer with their current status.</td></tr>
+    <tr><td>UC8</td><td>Browse Service Providers</td><td>Discover registered service providers on the platform.</td></tr>
+    <tr><td>UC9</td><td>View Provider Profile</td><td>Inspect a provider's experience, skills, availability, location and reviews.</td></tr>
+    <tr><td>UC10</td><td>View Bids on Job</td><td>See all bids submitted by providers for a specific job posting.</td></tr>
+    <tr><td>UC11</td><td>Accept a Bid</td><td>Select a provider's bid; a booking record is automatically created. «include» UC12.</td></tr>
+    <tr><td>UC12</td><td>View My Bookings</td><td>List all active and historical bookings with status tracking.</td></tr>
+    <tr><td>UC13</td><td>Complete Booking</td><td>Mark a booking as finished once the service is delivered. «include» UC14.</td></tr>
+    <tr><td>UC14</td><td>Submit Review &amp; Rating</td><td>Write a review and assign a star rating to the service provider.</td></tr>
+    <tr><td>UC15</td><td>Chat with Provider</td><td>Exchange real-time text and image messages with the assigned provider via WebSocket.</td></tr>
+  </tbody>
+</table>

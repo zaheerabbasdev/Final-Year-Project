@@ -225,7 +225,10 @@ export default function ProviderDashboard() {
 
             {bookings.length === 0 ? (
               <div className="px-6 py-14 text-center">
-                <div className="text-4xl mb-3">{isVerified ? '🔍' : '⏳'}</div>
+                {isVerified
+                  ? <Search size={40} className="text-zinc-300 dark:text-zinc-600 mb-3 mx-auto" />
+                  : <Clock  size={40} className="text-zinc-300 dark:text-zinc-600 mb-3 mx-auto" />
+                }
                 <p className="text-zinc-500 dark:text-zinc-400 font-medium">
                   {isVerified ? 'No active tasks yet' : 'Pending verification'}
                 </p>

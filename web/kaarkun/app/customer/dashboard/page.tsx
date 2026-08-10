@@ -23,7 +23,8 @@ import {
   Layers,
   CalendarCheck,
   TrendingUp,
-  Sparkles
+  Sparkles,
+  ClipboardList,
 } from 'lucide-react';
 
 interface Job {
@@ -209,7 +210,7 @@ export default function CustomerDashboard() {
 
           {jobs.length === 0 ? (
             <div className="px-6 py-14 text-center">
-              <div className="text-4xl mb-3">📋</div>
+              <ClipboardList size={40} className="text-zinc-300 dark:text-zinc-600 mb-3 mx-auto" />
               <p className="text-zinc-500 dark:text-zinc-400 font-medium">No jobs posted yet</p>
               <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
                 <Sparkles size={14} />

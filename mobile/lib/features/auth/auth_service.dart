@@ -248,6 +248,24 @@ class AuthService extends ChangeNotifier {
     notifyListeners();
   }
 
+  Future<Map<String, dynamic>> deleteAccount() async {
+    try {
+      final response = await _apiClient.dio.delete('/users/me');
+      if (response.statusCode == 200) {
+        await logout();
+        return {'success': true};
+      }
+    } catch (e) {
+      if (e is DioException) {
+        return {
+          'success': false,
+          'message': e.response?.data['message'] ?? 'Failed to delete account.',
+        };
+      }
+    }
+    return {'success': false, 'message': 'Network error. Check your connection.'};
+  }
+
   Future<void> logout() async {
     final prefs = await SharedPreferences.getInstance();
     await TokenStorage.clearToken();

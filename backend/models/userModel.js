@@ -35,6 +35,11 @@ const User = {
         return result.affectedRows > 0;
     },
 
+    deleteById: async (id) => {
+        const [result] = await db.execute('DELETE FROM users WHERE id = ?', [id]);
+        return result.affectedRows > 0;
+    },
+
     verifyOTP: async (email, otpCode) => {
         const [rows] = await db.execute(
             'SELECT * FROM users WHERE email = ? AND otp_code = ? AND otp_expiry > NOW()',

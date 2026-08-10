@@ -21,7 +21,8 @@ import {
   BadgeCheck,
   Layers,
   Award,
-  ChevronRight
+  ChevronRight,
+  Trash2
 } from 'lucide-react';
 import LocationInput from '../components/LocationInput';
 
@@ -62,6 +63,9 @@ export default function ProfilePage() {
   const [skills, setSkills] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [isOnline, setIsOnline] = useState(false);
+  const [deleteLoading, setDeleteLoading] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteConfirmInput, setDeleteConfirmInput] = useState('');
 
   // Stats / Reviews states
   const [stats, setStats] = useState<any>({});
@@ -246,6 +250,22 @@ export default function ProfilePage() {
       </div>
     );
   }
+
+  const handleDeleteAccount = async () => {
+    if (deleteConfirmInput !== 'DELETE') return;
+    try {
+      setDeleteLoading(true);
+      await api.delete('/users/me');
+      logout();
+    } catch (err) {
+      console.error('Delete account error:', err);
+      setError('Failed to delete account. Please try again.');
+      setShowDeleteModal(false);
+      setDeleteConfirmInput('');
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
 
   const roleName = user?.role === 'provider' ? 'Service Provider' : 'Customer';
   const providerCategory = categories.find(c => c.id === parseInt(categoryId))?.name || 'Provider';
@@ -658,7 +678,74 @@ export default function ProfilePage() {
           )}
         </div>
 
+        {/* ── Danger Zone ──────────────────────────────── */}
+        <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-red-200 dark:border-red-900/40 shadow-sm">
+          <div className="flex items-center gap-3 mb-4">
+            <div className="w-9 h-9 rounded-xl bg-red-100 dark:bg-red-950/40 flex items-center justify-center shrink-0">
+              <Trash2 size={16} className="text-red-500" />
+            </div>
+            <div>
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Danger Zone</h3>
+              <p className="text-xs text-zinc-400">Permanently delete your account and all associated data</p>
+            </div>
+          </div>
+          <button
+            onClick={() => setShowDeleteModal(true)}
+            className="w-full py-2.5 text-sm font-semibold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
+          >
+            Delete My Account
+          </button>
+        </div>
+
       </div>
+
+      {/* ── Delete-account confirmation modal ───────────── */}
+      {showDeleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm animate-in fade-in duration-200">
+          <div className="w-full max-w-md bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-2xl overflow-hidden p-6 animate-in zoom-in-95 duration-200">
+            <div className="flex items-start gap-3 mb-4">
+              <div className="p-2.5 bg-red-100 dark:bg-red-950/40 rounded-xl shrink-0">
+                <Trash2 size={20} className="text-red-600 dark:text-red-400" />
+              </div>
+              <div>
+                <h3 className="font-bold text-zinc-900 dark:text-white text-base leading-tight">Delete Account</h3>
+                <p className="text-xs text-zinc-400 mt-0.5">This action cannot be undone</p>
+              </div>
+            </div>
+
+            <p className="text-sm text-zinc-600 dark:text-zinc-400 leading-relaxed mb-4">
+              All your data — jobs, bookings, messages, and reviews — will be
+              <span className="font-bold text-zinc-900 dark:text-white"> permanently deleted</span>.
+              Type <span className="font-bold font-mono text-red-600 dark:text-red-400">DELETE</span> to confirm.
+            </p>
+
+            <input
+              type="text"
+              value={deleteConfirmInput}
+              onChange={(e) => setDeleteConfirmInput(e.target.value)}
+              placeholder="Type DELETE to confirm"
+              className="block w-full px-3 py-2.5 mb-4 border border-zinc-200 dark:border-zinc-700 rounded-xl bg-zinc-50 dark:bg-zinc-800 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 text-sm focus:outline-none focus:ring-2 focus:ring-red-500/30 focus:border-red-500 transition-all"
+            />
+
+            <div className="flex gap-3">
+              <button
+                onClick={() => { setShowDeleteModal(false); setDeleteConfirmInput(''); }}
+                className="flex-1 py-2.5 text-sm font-semibold border border-zinc-200 dark:border-zinc-700 text-zinc-700 dark:text-zinc-300 rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                disabled={deleteConfirmInput !== 'DELETE' || deleteLoading}
+                onClick={handleDeleteAccount}
+                className="flex-1 py-2.5 text-sm font-semibold bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
+              >
+                {deleteLoading ? 'Deleting…' : 'Delete Account'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
