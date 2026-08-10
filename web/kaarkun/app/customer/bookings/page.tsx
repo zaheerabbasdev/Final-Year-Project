@@ -16,7 +16,8 @@ import {
   Star,
   CheckCheck,
   AlertCircle,
-  KeyRound
+  KeyRound,
+  BookOpen,
 } from 'lucide-react';
 
 interface Booking {
@@ -115,13 +116,18 @@ export default function CustomerBookingsPage() {
   return (
     <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Page Header */}
-      <div className="mb-8">
-        <h1 className="text-2xl sm:text-3xl font-extrabold text-zinc-900 dark:text-white tracking-tight">
-          My Bookings
-        </h1>
-        <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-1">
-          Track and manage your service bookings
-        </p>
+      <div className="mb-8 flex items-center gap-3">
+        <div className="p-2 rounded-xl bg-emerald-50 dark:bg-emerald-900/30">
+          <BookOpen size={20} className="text-emerald-600 dark:text-emerald-400" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">
+            My Bookings
+          </h1>
+          <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-0.5">
+            Track and manage your service bookings
+          </p>
+        </div>
       </div>
 
       {error && (

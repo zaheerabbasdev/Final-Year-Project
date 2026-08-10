@@ -272,6 +272,18 @@ export default function ProfilePage() {
 
   return (
     <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
+
+      {/* Page title */}
+      <div className="mb-6 flex items-center gap-3">
+        <div className="p-2 rounded-xl bg-violet-50 dark:bg-violet-900/30">
+          <UserIcon size={20} className="text-violet-600 dark:text-violet-400" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">My Profile</h1>
+          <p className="text-xs text-zinc-400 mt-0.5">Manage your account details and preferences</p>
+        </div>
+      </div>
+
       {error && (
         <div className="mb-6 p-4 rounded-xl bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-sm flex items-start gap-2 animate-in fade-in">
           <AlertCircle size={18} className="shrink-0 mt-0.5" />

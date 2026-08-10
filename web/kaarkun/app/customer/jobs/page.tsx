@@ -20,7 +20,8 @@ import {
   ChevronRight,
   AlertTriangle,
   Wrench,
-  Users
+  Users,
+  ClipboardList,
 } from 'lucide-react';
 
 interface Job {
@@ -153,9 +154,14 @@ export default function CustomerJobsPage() {
     <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       {/* Header */}
       <div className="mb-6 flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">My Jobs</h1>
-          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">Track all your posted jobs and their statuses.</p>
+        <div className="flex items-center gap-3">
+          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
+            <ClipboardList size={20} className="text-indigo-600 dark:text-indigo-400" />
+          </div>
+          <div>
+            <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">My Jobs</h1>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">Track all your posted jobs and their statuses.</p>
+          </div>
         </div>
         <Link
           href="/customer/post-job"

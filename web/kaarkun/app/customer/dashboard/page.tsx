@@ -143,6 +143,17 @@ export default function CustomerDashboard() {
   return (
     <div className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-enter">
 
+      {/* Page title */}
+      <div className="mb-6 flex items-center gap-3">
+        <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
+          <LayoutDashboard size={20} className="text-indigo-600 dark:text-indigo-400" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">Dashboard</h1>
+          <p className="text-xs text-zinc-400 mt-0.5">Overview of your jobs and bookings</p>
+        </div>
+      </div>
+
       {/* Welcome hero */}
       <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-7 shadow-xl shadow-indigo-500/20">
         {/* Decorative circles */}
