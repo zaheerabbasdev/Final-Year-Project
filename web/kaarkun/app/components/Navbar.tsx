@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useCurrency, SUPPORTED_CURRENCIES } from '../context/CurrencyContext';
@@ -16,38 +15,12 @@ import {
   CheckCheck,
   Sparkles,
   Globe,
-  LayoutDashboard,
-  ClipboardList,
-  Briefcase,
-  CalendarDays,
-  Search,
-  Scale,
-  MessageCircle,
-  User,
-  Bot,
-  Zap,
 } from 'lucide-react';
-
-type PageIcon = React.ComponentType<{ size?: number; className?: string }>;
-const PAGE_META: Record<string, { title: string; sub: string; icon: PageIcon }> = {
-  '/customer/dashboard':   { title: 'Dashboard',       sub: 'Overview & analytics',          icon: LayoutDashboard },
-  '/customer/post-job':    { title: 'Post a Job',      sub: 'Create a new job listing',      icon: ClipboardList   },
-  '/customer/jobs':        { title: 'My Jobs',         sub: 'Manage your job posts',         icon: Briefcase       },
-  '/customer/bookings':    { title: 'My Bookings',     sub: 'Active & past service hires',   icon: CalendarDays    },
-  '/provider/dashboard':   { title: 'Dashboard',       sub: 'Performance & activity',        icon: LayoutDashboard },
-  '/provider/browse-jobs': { title: 'Browse Jobs',     sub: 'Find jobs that match you',      icon: Search          },
-  '/provider/bids':        { title: 'My Bids',         sub: 'Track your proposals',          icon: Scale           },
-  '/chat':                 { title: 'Messages',         sub: 'Chat with clients & providers', icon: MessageCircle   },
-  '/notifications':        { title: 'Notifications',   sub: 'Alerts and updates',            icon: Bell            },
-  '/profile':              { title: 'My Profile',      sub: 'Edit your information',         icon: User            },
-  '/support-chatbot':      { title: 'AI Assistant',    sub: 'Get smart help',                icon: Bot             },
-};
 
 export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { selectedCurrency, setCurrency } = useCurrency();
-  const pathname = usePathname();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
@@ -110,15 +83,6 @@ export default function Navbar() {
 
   const toggleSidebar = () => window.dispatchEvent(new Event('toggle-sidebar'));
 
-  const getPageMeta = () => {
-    for (const [key, val] of Object.entries(PAGE_META)) {
-      if (pathname === key || pathname.startsWith(key + '/')) return val;
-    }
-    return { title: 'Kaarkun', sub: '', icon: Zap };
-  };
-
-  const meta = getPageMeta();
-  const PageIcon = meta.icon;
   const avatarInitial = user?.full_name?.charAt(0)?.toUpperCase() || '?';
   const isCustomer = user?.role === 'customer';
   const roleGradient = isCustomer ? 'from-blue-500 to-cyan-400' : 'from-violet-500 to-indigo-500';
@@ -148,19 +112,6 @@ export default function Navbar() {
             </Link>
           )}
 
-          {user && (
-            <div className="hidden sm:flex items-center gap-3 min-w-0">
-              <PageIcon size={22} className="text-indigo-500 shrink-0" />
-              <div className="min-w-0">
-                <h1 className="text-lg font-bold text-zinc-900 dark:text-white leading-tight truncate">
-                  {meta.title}
-                </h1>
-                {meta.sub && (
-                  <p className="text-xs text-zinc-400 leading-tight truncate">{meta.sub}</p>
-                )}
-              </div>
-            </div>
-          )}
         </div>
 
         {/* Right actions */}

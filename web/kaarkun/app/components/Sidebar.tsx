@@ -21,7 +21,6 @@ import {
   BookOpen,
   ClipboardList,
   ChevronRight,
-  Zap
 } from 'lucide-react';
 
 type NavItem = {
@@ -153,8 +152,8 @@ export default function Sidebar() {
         {/* Logo / Brand */}
         <div className="h-[70px] px-4 flex items-center justify-between border-b border-zinc-100 dark:border-white/[0.06] shrink-0">
           <div className="flex items-center gap-2.5">
-            <div className={`w-8 h-8 rounded-xl bg-gradient-to-br ${roleColor} flex items-center justify-center shadow-md shrink-0`}>
-              <Zap size={15} className="text-white" />
+            <div className="w-8 h-8 rounded-xl overflow-hidden shadow-md shrink-0">
+              <img src="/icon.png" alt="Kaarkun" className="w-full h-full object-cover" />
             </div>
             <div>
               <p className="font-black text-base text-zinc-900 dark:text-white tracking-tight leading-none">

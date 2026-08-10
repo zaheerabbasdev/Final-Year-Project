@@ -12,7 +12,6 @@ import {
   DollarSign,
   Calendar,
   Clock,
-  AlertTriangle,
   Upload,
   AlertCircle,
   CheckCircle,
@@ -248,17 +247,14 @@ export default function PostJobPage() {
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
                 Budget ({currencyInfo.code})
               </label>
-              <div className="mt-1 relative">
-                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                  <DollarSign size={16} />
-                </div>
+              <div className="mt-1">
                 <input
                   type="number"
                   required
                   min="1"
                   value={budget}
                   onChange={(e) => setBudget(e.target.value)}
-                  className="block w-full pl-8 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                  className="block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
                   placeholder="e.g. 1500"
                 />
               </div>
@@ -342,7 +338,7 @@ export default function PostJobPage() {
                 className="w-4 h-4 rounded text-rose-600 border-zinc-300 focus:ring-rose-500"
               />
               <div className="flex gap-1.5 items-start">
-                <AlertTriangle size={16} className="text-rose-500 shrink-0 mt-0.5" />
+              
                 <div>
                   <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Emergency Job</span>
                   <p className="text-xs text-zinc-500">Providers can accept this job instantly without bidding</p>
