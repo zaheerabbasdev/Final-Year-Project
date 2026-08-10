@@ -128,18 +128,18 @@ export default function LoginPage() {
       </div>
 
       {/* Right Column: Visual Brand Block */}
-      <div className="hidden lg:flex flex-1 relative dark:bg-zinc-900 overflow-hidden items-center justify-center">
-        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-900/60 via-zinc-950 to-zinc-950"></div>
+      <div className="hidden lg:flex flex-1 relative bg-zinc-950 overflow-hidden items-center justify-center">
+        <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-indigo-700/40 via-zinc-950 to-zinc-950"></div>
         <div className="relative z-10 max-w-md text-center px-6">
           <h1 className="text-4xl font-extrabold tracking-tight text-white sm:text-5xl">
-            Get Professional Help instantly
+            Get Professional Help Instantly
           </h1>
-          <p className="mt-4 text-lg text-zinc-800 dark:text-white">
+          <p className="mt-4 text-lg text-zinc-300">
             Post jobs, browse rates, message experts, and get services completed effortlessly with the Kaarkun marketplace.
           </p>
         </div>
         {/* Glow effect decoration */}
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl pointer-events-none"></div>
       </div>
     </div>
   );
