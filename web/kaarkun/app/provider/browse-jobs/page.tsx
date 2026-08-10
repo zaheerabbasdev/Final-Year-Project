@@ -556,19 +556,14 @@ export default function BrowseJobsPage() {
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
                   Your Bid Amount ({currencyInfo.code})
                 </label>
-                <div className="relative">
-                  <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
-                    <DollarSign size={14} />
-                  </div>
-                  <input
-                    type="number"
-                    required
-                    min="1"
-                    value={bidAmount}
-                    onChange={(e) => setBidAmount(e.target.value)}
-                    className="block w-full pl-8 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 text-sm"
-                  />
-                </div>
+                <input
+                  type="number"
+                  required
+                  min="1"
+                  value={bidAmount}
+                  onChange={(e) => setBidAmount(e.target.value)}
+                  className="block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 text-sm"
+                />
               </div>
 
               <div>
