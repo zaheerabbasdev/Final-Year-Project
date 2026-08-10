@@ -23,7 +23,9 @@ import {
   Activity,
   Award,
   Zap,
-  KeyRound
+  KeyRound,
+  LayoutDashboard,
+  Phone,
 } from 'lucide-react';
 
 interface Booking {
@@ -114,6 +116,17 @@ export default function ProviderDashboard() {
 
   return (
     <div className="flex-grow w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 page-enter">
+
+      {/* Page title */}
+      <div className="mb-6 flex items-center gap-3">
+        <div className="p-2 rounded-xl bg-violet-50 dark:bg-violet-900/30">
+          <LayoutDashboard size={20} className="text-violet-600 dark:text-violet-400" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">Dashboard</h1>
+          <p className="text-xs text-zinc-400 mt-0.5">Overview of your bookings and performance</p>
+        </div>
+      </div>
 
       {/* Verification Banner */}
       {user?.status === 'pending' && (
@@ -271,7 +284,11 @@ export default function ProviderDashboard() {
                     </div>
 
                     <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06] text-[11px] text-zinc-400">
-                      {booking.customer_phone ? <span>📞 {booking.customer_phone}</span> : <span />}
+                      {booking.customer_phone ? (
+                        <span className="flex items-center gap-1">
+                          <Phone size={11} className="shrink-0" />{booking.customer_phone}
+                        </span>
+                      ) : <span />}
                       <span className="flex items-center gap-1">
                         <Clock size={11} />{new Date(booking.created_at).toLocaleDateString()}
                       </span>

@@ -134,13 +134,18 @@ export default function ProviderBidsPage() {
 
   return (
     <div className="flex-grow max-w-57xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <div className="mb-6">
-        <h1 className="text-3xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-          My Placed Bids
-        </h1>
-        <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-          Monitor your quotes, active jobs, and completed work.
-        </p>
+      <div className="mb-6 flex items-center gap-3">
+        <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
+          <Scale size={20} className="text-indigo-600 dark:text-indigo-400" />
+        </div>
+        <div>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
+            My Placed Bids
+          </h1>
+          <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
+            Monitor your quotes, active jobs, and completed work.
+          </p>
+        </div>
       </div>
 
       {error && (
