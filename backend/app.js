@@ -25,6 +25,9 @@ const http = require('http');
 const { initSocket } = require('./socketManager');
 
 const app = express();
+// Trust the first proxy hop (Docker / nginx / load balancer) so that
+// express-rate-limit can correctly identify clients via X-Forwarded-For.
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 
 // Initialize Socket.io
@@ -98,7 +101,7 @@ app.use((err, req, res, next) => {
     res.status(err.status || 500).json({ error: 'Something went wrong!' });
 });
 
-async function initializeDatabase() {
+async function initializeDatabase(retries = 5, delayMs = 3000) {
     const dbHost = process.env.DB_HOST;
     const dbUser = process.env.DB_USER;
     const dbPassword = process.env.DB_PASSWORD;
@@ -109,25 +112,33 @@ async function initializeDatabase() {
         return;
     }
 
-    try {
-        const connection = await mysql.createConnection({
-            host: dbHost,
-            user: dbUser,
-            password: dbPassword,
-            database: dbName,
-            multipleStatements: true
-        });
+    for (let i = 1; i <= retries; i++) {
+        try {
+            console.log(`Connecting to database at ${dbHost} (attempt ${i}/${retries})...`);
+            const connection = await mysql.createConnection({
+                host: dbHost,
+                user: dbUser,
+                password: dbPassword,
+                database: dbName,
+                multipleStatements: true
+            });
 
-        const schemaPath = path.join(__dirname, 'schema.sql');
-        const schemaSql = fs.readFileSync(schemaPath, 'utf8');
-        const finalSchemaSql = schemaSql.replace(/@@DB_NAME@@/g, dbName);
+            const schemaPath = path.join(__dirname, 'schema.sql');
+            const schemaSql = fs.readFileSync(schemaPath, 'utf8');
+            const finalSchemaSql = schemaSql.replace(/@@DB_NAME@@/g, dbName);
 
-        await connection.query(finalSchemaSql);
-        console.log('Database schema initialized successfully.');
-        await connection.end();
-    } catch (error) {
-        console.error('Database initialization failed:', error.message);
-        throw error;
+            await connection.query(finalSchemaSql);
+            console.log('Database schema initialized successfully.');
+            await connection.end();
+            return;
+        } catch (error) {
+            console.error(`Database initialization attempt ${i}/${retries} failed:`, error.message);
+            if (i === retries) {
+                console.warn('Database initialization retries exhausted. Server will start, but database operations may fail if DB is unreachable.');
+            } else {
+                await new Promise(res => setTimeout(res, delayMs));
+            }
+        }
     }
 }
 
@@ -154,10 +165,14 @@ async function startServer() {
     try {
         await initializeDatabase();
         await seedDefaultAdmin();
+    } catch (error) {
+        console.warn('Database initialization warning:', error.message);
+    }
+
+    try {
         await mailer.initializeMailer();
     } catch (error) {
-        console.error('Startup initialization failed:', error.message);
-        process.exit(1);
+        console.warn('Mailer initialization warning:', error.message);
     }
 
     const PORT = process.env.PORT || 5000;

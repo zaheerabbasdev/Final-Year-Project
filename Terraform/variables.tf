@@ -43,3 +43,15 @@ variable "admin_container_port" {
   type    = number
   default = 3000
 }
+
+variable "email_user" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
+
+variable "email_pass" {
+  type      = string
+  sensitive = true
+  default   = ""
+}
