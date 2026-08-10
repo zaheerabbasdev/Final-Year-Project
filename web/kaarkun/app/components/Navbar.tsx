@@ -26,6 +26,7 @@ export default function Navbar() {
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
+  const [avatarBroken, setAvatarBroken] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
@@ -49,6 +50,9 @@ export default function Navbar() {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
+
+  // Reset broken flag when avatar URL changes (e.g. after upload or login switch)
+  useEffect(() => { setAvatarBroken(false); }, [user?.avatar]);
 
   const fetchNotifications = async () => {
     try {
@@ -259,11 +263,12 @@ export default function Navbar() {
                     {user.email}
                   </p>
                 </div>
-                {user.avatar ? (
+                {user.avatar && !avatarBroken ? (
                   <img
                     src={getFileUrl(user.avatar)}
                     alt={user.full_name}
                     className="w-9 h-9 rounded-full object-cover ring-2 ring-indigo-500/30"
+                    onError={() => setAvatarBroken(true)}
                   />
                 ) : (
                   <div className={`w-9 h-9 rounded-full bg-gradient-to-br ${roleGradient} flex items-center justify-center text-white font-bold text-sm shadow-md`}>

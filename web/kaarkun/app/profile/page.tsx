@@ -51,6 +51,10 @@ export default function ProfilePage() {
   const [saveLoading, setSaveLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [avatarBroken, setAvatarBroken] = useState(false);
+
+  // Reset broken flag whenever the avatar URL changes (e.g. after upload)
+  useEffect(() => { setAvatarBroken(false); }, [user?.avatar]);
 
   // Form states
   const [fullName, setFullName] = useState('');
@@ -306,11 +310,12 @@ export default function ProfilePage() {
             <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
 
             <div className="relative w-32 h-32 mx-auto mt-4">
-              {user?.avatar ? (
+              {user?.avatar && !avatarBroken ? (
                 <img
                   src={getFileUrl(user.avatar)}
                   alt={user.full_name}
                   className="w-full h-full rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-md"
+                  onError={() => setAvatarBroken(true)}
                 />
               ) : (
                 <div className="w-full h-full rounded-full bg-gradient-to-tr from-violet-100 to-indigo-100 dark:from-violet-950/40 dark:to-indigo-950/40 border-4 border-white dark:border-zinc-900 flex items-center justify-center text-4xl font-extrabold text-indigo-700 dark:text-indigo-400 shadow-md">

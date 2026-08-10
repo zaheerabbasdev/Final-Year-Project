@@ -64,6 +64,9 @@ export default function ProviderDashboard() {
   const [error, setError] = useState<string | null>(null);
   const [handshakeTokens, setHandshakeTokens] = useState<Record<number, string>>({});
   const [handshakeLoading, setHandshakeLoading] = useState<number | null>(null);
+  const [avatarBroken, setAvatarBroken] = useState(false);
+
+  useEffect(() => { setAvatarBroken(false); }, [user?.avatar]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -154,11 +157,12 @@ export default function ProviderDashboard() {
 
         <div className="relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            {user?.avatar ? (
+            {user?.avatar && !avatarBroken ? (
               <img
                 src={getFileUrl(user.avatar)}
                 alt={user.full_name}
                 className="w-16 h-16 rounded-2xl object-cover ring-2 ring-white/30 shadow-xl"
+                onError={() => setAvatarBroken(true)}
               />
             ) : (
               <div className="w-16 h-16 rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center text-white font-black text-2xl shadow-xl">
