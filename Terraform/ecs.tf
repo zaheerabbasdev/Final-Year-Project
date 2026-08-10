@@ -72,7 +72,6 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
-<<<<<<< HEAD
 resource "aws_secretsmanager_secret" "backend_secrets" {
   name                    = "${var.project_name}-${var.environment}-backend-secrets"
   recovery_window_in_days = 0
@@ -109,7 +108,8 @@ resource "aws_iam_policy" "ecs_secrets_policy" {
 resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
   role       = aws_iam_role.ecs_task_execution_role.name
   policy_arn = aws_iam_policy.ecs_secrets_policy.arn
-=======
+}
+
 # Allow ECS tasks (specifically the backend) to read/write the uploads S3 bucket
 resource "aws_iam_role_policy" "ecs_s3_uploads" {
   name = "${var.project_name}-${var.environment}-s3-uploads"
@@ -153,7 +153,6 @@ resource "aws_s3_bucket_policy" "uploads_public_read" {
       Resource  = "${aws_s3_bucket.uploads.arn}/*"
     }]
   })
->>>>>>> 80de9194d2af280adb9ad524e94bbad0166caa1e
 }
 
 resource "aws_cloudwatch_log_group" "backend" {
@@ -192,11 +191,12 @@ resource "aws_ecs_task_definition" "backend" {
         protocol      = "tcp"
       }]
       environment = [
-<<<<<<< HEAD
         { name = "PORT", value = tostring(var.backend_container_port) },
         { name = "DB_HOST", value = aws_db_instance.mysql.address },
         { name = "DB_NAME", value = var.db_name },
-        { name = "DB_USER", value = var.db_username }
+        { name = "DB_USER", value = var.db_username },
+        { name = "AWS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
+        { name = "AWS_REGION", value = var.aws_region }
       ]
       secrets = [
         {
@@ -223,15 +223,6 @@ resource "aws_ecs_task_definition" "backend" {
           name      = "EMAIL_PASS"
           valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:EMAIL_PASS::"
         }
-=======
-        { name = "PORT",          value = tostring(var.backend_container_port) },
-        { name = "DB_HOST",       value = aws_db_instance.mysql.address },
-        { name = "DB_NAME",       value = var.db_name },
-        { name = "DB_USER",       value = var.db_username },
-        { name = "DB_PASSWORD",   value = random_password.db_password.result },
-        { name = "AWS_S3_BUCKET", value = aws_s3_bucket.uploads.bucket },
-        { name = "AWS_REGION",    value = var.aws_region }
->>>>>>> 80de9194d2af280adb9ad524e94bbad0166caa1e
       ]
       logConfiguration = {
         logDriver = "awslogs"

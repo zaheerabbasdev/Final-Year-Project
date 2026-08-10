@@ -161,15 +161,12 @@ async function seedDefaultAdmin() {
 async function startServer() {
     try {
         await initializeDatabase();
-<<<<<<< HEAD
+        await seedDefaultAdmin();
     } catch (error) {
         console.warn('Database initialization warning:', error.message);
     }
 
     try {
-=======
-        await seedDefaultAdmin();
->>>>>>> 80de9194d2af280adb9ad524e94bbad0166caa1e
         await mailer.initializeMailer();
     } catch (error) {
         console.warn('Mailer initialization warning:', error.message);
