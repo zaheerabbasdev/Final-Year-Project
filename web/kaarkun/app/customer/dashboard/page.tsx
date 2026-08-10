@@ -25,6 +25,7 @@ import {
   TrendingUp,
   Sparkles,
   ClipboardList,
+  LayoutDashboard,
 } from 'lucide-react';
 
 interface Job {
