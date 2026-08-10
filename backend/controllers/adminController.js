@@ -16,14 +16,14 @@ const loginAdmin = async (req, res) => {
         }
 
         const token = jwt.sign({ id: admin.id, role: 'admin' }, process.env.JWT_SECRET, { expiresIn: '1d' });
-        res.json({ 
-            token, 
-            admin: { 
-                id: admin.id, 
-                username: admin.username, 
+        res.json({
+            token,
+            admin: {
+                id: admin.id,
+                username: admin.username,
                 full_name: admin.full_name,
-                email: admin.email 
-            } 
+                email: admin.email
+            }
         });
     } catch (error) {
         res.status(500).json({ message: 'Login failed' });
@@ -74,15 +74,15 @@ const getAllUsers = async (req, res) => {
     try {
         const { role } = req.query;
         console.log(`ADMIN_DEBUG: Fetching users with role filter: [${role}]`);
-        
+
         let query = 'SELECT id, full_name, email, role, status, created_at FROM users';
         const params = [];
-        
+
         if (role && role !== 'all') {
             query += ' WHERE role = ?';
             params.push(role);
         }
-        
+
         const [rows] = await db.execute(query, params);
         res.json(rows);
     } catch (error) {
@@ -105,13 +105,13 @@ const getUserDetails = async (req, res) => {
     try {
         const { id } = req.params;
         const [users] = await db.execute('SELECT id, full_name, email, phone, role, status, avatar, created_at FROM users WHERE id = ?', [id]);
-        
+
         if (users.length === 0) {
             return res.status(404).json({ message: 'User not found' });
         }
-        
+
         const user = users[0];
-        
+
         if (user.role === 'provider') {
             const [profiles] = await db.execute(`
                 SELECT p.*, c.name as category_name 
@@ -123,7 +123,7 @@ const getUserDetails = async (req, res) => {
                 user.profile = profiles[0];
             }
         }
-        
+
         res.json(user);
     } catch (error) {
         console.error("ADMIN_DEBUG_ERROR:", error);
@@ -135,11 +135,11 @@ const updateUserStatus = async (req, res) => {
     try {
         const { id } = req.params;
         const { status, reason } = req.body;
-        
+
         if (!['pending', 'verified', 'rejected', 'blocked'].includes(status)) {
             return res.status(400).json({ message: 'Invalid status' });
         }
-        
+
         await db.execute('UPDATE users SET status = ?, status_reason = ? WHERE id = ?', [status, reason || null, id]);
 
         // Send email notification (Non-blocking)
@@ -185,11 +185,11 @@ const autoVerifyProvider = async (req, res) => {
     try {
         const { id } = req.params;
         const [users] = await db.execute('SELECT full_name, email FROM users WHERE id = ? AND role = "provider"', [id]);
-        
+
         if (users.length === 0) {
             return res.status(404).json({ message: 'Provider not found' });
         }
-        
+
         const [profiles] = await db.execute('SELECT cnic_url FROM provider_profiles WHERE user_id = ?', [id]);
         if (profiles.length === 0 || !profiles[0].cnic_url) {
             return res.status(400).json({ message: 'No CNIC document uploaded' });
@@ -209,8 +209,8 @@ const autoVerifyProvider = async (req, res) => {
             [verificationResult.confidence, verificationResult.notes, id]
         );
 
-        res.json({ 
-            message: 'AI verification completed', 
+        res.json({
+            message: 'AI verification completed',
             confidence: verificationResult.confidence,
             notes: verificationResult.notes
         });
@@ -248,13 +248,13 @@ const deleteJob = async (req, res) => {
 const summarizeJobDispute = async (req, res) => {
     try {
         const { id } = req.params;
-        
+
         // Check if summary already exists
         const [jobs] = await db.execute('SELECT ai_dispute_summary FROM jobs WHERE id = ?', [id]);
         if (jobs.length === 0) {
             return res.status(404).json({ message: 'Job not found' });
         }
-        
+
         if (jobs[0].ai_dispute_summary) {
             return res.json({ summary: jobs[0].ai_dispute_summary });
         }
@@ -317,7 +317,7 @@ const deleteCategory = async (req, res) => {
     }
 };
 
-module.exports = { 
+module.exports = {
     registerAdmin, loginAdmin, getStats, getAllUsers, deleteUser, getUserDetails, updateUserStatus, autoVerifyProvider,
-    getAllJobs, deleteJob, summarizeJobDispute, getAllBids, getAllCategories, createCategory, deleteCategory 
+    getAllJobs, deleteJob, summarizeJobDispute, getAllBids, getAllCategories, createCategory, deleteCategory
 };

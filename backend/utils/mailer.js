@@ -68,17 +68,16 @@ async function initializeMailer() {
     }
 
     initPromise = (async () => {
-        validateConfig();
-        logConfig();
-
         try {
+            validateConfig();
+            logConfig();
             await transporter.verify();
             console.log('[mailer] SMTP verification successful');
             initialized = true;
             return transporter;
         } catch (error) {
-            console.error('[mailer] SMTP verification failed', formatError(error));
-            throw new Error(`[mailer] SMTP verification failed. Check Gmail app password and SMTP settings. ${error.message}`);
+            console.warn('[mailer] SMTP initialization warning (email sending disabled until valid credentials provided):', error.message);
+            return null;
         }
     })();
 

@@ -72,6 +72,44 @@ resource "aws_iam_role_policy_attachment" "ecs_task_execution_role_policy" {
   policy_arn = "arn:aws:iam::aws:policy/service-role/AmazonECSTaskExecutionRolePolicy"
 }
 
+resource "aws_secretsmanager_secret" "backend_secrets" {
+  name                    = "${var.project_name}-${var.environment}-backend-secrets"
+  recovery_window_in_days = 0
+}
+
+resource "aws_secretsmanager_secret_version" "backend_secrets_version" {
+  secret_id = aws_secretsmanager_secret.backend_secrets.id
+  secret_string = jsonencode({
+    DB_PASSWORD        = random_password.db_password.result
+    JWT_SECRET         = "super_secret_jwt_key_change_me_in_prod"
+    JWT_REFRESH_SECRET = "super_secret_refresh_jwt_key_change_me_in_prod"
+    ADMIN_SETUP_KEY    = "admin_setup_key_kaarkun_2026"
+    EMAIL_USER         = ""
+    EMAIL_PASS         = ""
+  })
+}
+
+resource "aws_iam_policy" "ecs_secrets_policy" {
+  name        = "${var.project_name}-${var.environment}-ecs-secrets-policy"
+  description = "Allows ECS Task Execution role to read backend secrets from AWS Secrets Manager"
+
+  policy = jsonencode({
+    Version = "2012-10-17"
+    Statement = [
+      {
+        Effect   = "Allow"
+        Action   = ["secretsmanager:GetSecretValue"]
+        Resource = [aws_secretsmanager_secret.backend_secrets.arn]
+      }
+    ]
+  })
+}
+
+resource "aws_iam_role_policy_attachment" "ecs_secrets_policy_attachment" {
+  role       = aws_iam_role.ecs_task_execution_role.name
+  policy_arn = aws_iam_policy.ecs_secrets_policy.arn
+}
+
 resource "aws_cloudwatch_log_group" "backend" {
   name = "/ecs/${var.project_name}-${var.environment}-backend"
 }
@@ -111,8 +149,33 @@ resource "aws_ecs_task_definition" "backend" {
         { name = "PORT", value = tostring(var.backend_container_port) },
         { name = "DB_HOST", value = aws_db_instance.mysql.address },
         { name = "DB_NAME", value = var.db_name },
-        { name = "DB_USER", value = var.db_username },
-        { name = "DB_PASSWORD", value = random_password.db_password.result }
+        { name = "DB_USER", value = var.db_username }
+      ]
+      secrets = [
+        {
+          name      = "DB_PASSWORD"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:DB_PASSWORD::"
+        },
+        {
+          name      = "JWT_SECRET"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:JWT_SECRET::"
+        },
+        {
+          name      = "JWT_REFRESH_SECRET"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:JWT_REFRESH_SECRET::"
+        },
+        {
+          name      = "ADMIN_SETUP_KEY"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:ADMIN_SETUP_KEY::"
+        },
+        {
+          name      = "EMAIL_USER"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:EMAIL_USER::"
+        },
+        {
+          name      = "EMAIL_PASS"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:EMAIL_PASS::"
+        }
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -181,7 +244,8 @@ resource "aws_ecs_task_definition" "admin" {
         protocol      = "tcp"
       }]
       environment = [
-        { name = "PORT", value = tostring(var.admin_container_port) }
+        { name = "PORT", value = tostring(var.admin_container_port) },
+        { name = "HOSTNAME", value = "0.0.0.0" }
       ]
       logConfiguration = {
         logDriver = "awslogs"
@@ -245,8 +309,8 @@ resource "aws_lb_target_group" "admin" {
   target_type = "ip"
 
   health_check {
-    path                = "/admin"
-    matcher             = "200,302"
+    path                = "/admin/login"
+    matcher             = "200-399"
     interval            = 30
     timeout             = 5
     healthy_threshold   = 2
