@@ -84,8 +84,8 @@ resource "aws_secretsmanager_secret_version" "backend_secrets_version" {
     JWT_SECRET         = "super_secret_jwt_key_change_me_in_prod"
     JWT_REFRESH_SECRET = "super_secret_refresh_jwt_key_change_me_in_prod"
     ADMIN_SETUP_KEY    = "admin_setup_key_kaarkun_2026"
-    EMAIL_USER         = ""
-    EMAIL_PASS         = ""
+    EMAIL_USER         = var.email_user
+    EMAIL_PASS         = var.email_pass
   })
 }
 

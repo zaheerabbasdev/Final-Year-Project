@@ -25,6 +25,9 @@ const http = require('http');
 const { initSocket } = require('./socketManager');
 
 const app = express();
+// Trust the first proxy hop (Docker / nginx / load balancer) so that
+// express-rate-limit can correctly identify clients via X-Forwarded-For.
+app.set('trust proxy', 1);
 const server = http.createServer(app);
 
 // Initialize Socket.io
