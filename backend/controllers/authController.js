@@ -4,6 +4,7 @@ const User = require('../models/userModel');
 const ProviderProfile = require('../models/providerModel');
 const db = require('../config/db');
 const mailer = require('../utils/mailer');
+const { uploadToS3 } = require('../utils/s3');
 
 const register = async (req, res) => {
     try {
@@ -24,11 +25,12 @@ const register = async (req, res) => {
         let certificatesUrl = null;
 
         if (req.files && Array.isArray(req.files)) {
-            req.files.forEach(file => {
-                if (file.fieldname === 'avatar') avatarUrl = `/uploads/${file.filename}`;
-                if (file.fieldname === 'cnic') cnicUrl = `/uploads/${file.filename}`;
-                if (file.fieldname === 'certificates') certificatesUrl = `/uploads/${file.filename}`;
-            });
+            for (const file of req.files) {
+                const url = await uploadToS3(file.buffer, file.originalname, file.fieldname);
+                if (file.fieldname === 'avatar')       avatarUrl       = url;
+                if (file.fieldname === 'cnic')         cnicUrl         = url;
+                if (file.fieldname === 'certificates') certificatesUrl = url;
+            }
         }
 
         let otpCode = null;

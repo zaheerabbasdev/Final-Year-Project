@@ -65,10 +65,7 @@ app.use((req, res, next) => {
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(suspendedCheck);
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
-// Also serve under /api/uploads so the ALB path rule (/api/*) forwards
-// static file requests to this container instead of the frontend.
-app.use('/api/uploads', express.static(path.join(__dirname, 'uploads')));
+// Static file serving removed — uploads are now stored in S3, not on disk.
 
 // Routes
 // ... (routes)
@@ -142,14 +139,37 @@ async function initializeDatabase(retries = 5, delayMs = 3000) {
     }
 }
 
+async function seedDefaultAdmin() {
+    try {
+        const db = require('./config/db');
+        const bcrypt = require('bcryptjs');
+
+        const [[{ count }]] = await db.execute('SELECT COUNT(*) AS count FROM admins');
+        if (parseInt(count) > 0) return; // already seeded
+
+        const hash = await bcrypt.hash('Admin@1234', 12);
+        await db.execute(
+            'INSERT INTO admins (username, email, password_hash, full_name) VALUES (?, ?, ?, ?)',
+            ['zaheer_admin', 'learntechdigital@gmail.com', hash, 'Zaheer Abbas']
+        );
+        console.log('Default admin seeded — email: learntechdigital@gmail.com  password: Admin@1234');
+    } catch (err) {
+        console.error('Admin seed failed:', err.message);
+    }
+}
+
 async function startServer() {
     try {
         await initializeDatabase();
+<<<<<<< HEAD
     } catch (error) {
         console.warn('Database initialization warning:', error.message);
     }
 
     try {
+=======
+        await seedDefaultAdmin();
+>>>>>>> 80de9194d2af280adb9ad524e94bbad0166caa1e
         await mailer.initializeMailer();
     } catch (error) {
         console.warn('Mailer initialization warning:', error.message);

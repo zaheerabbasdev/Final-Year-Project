@@ -1,5 +1,6 @@
 const User = require('../models/userModel');
 const ProviderProfile = require('../models/providerModel');
+const { uploadToS3 } = require('../utils/s3');
 
 const getProfile = async (req, res) => {
     try {
@@ -71,13 +72,13 @@ const updateProfile = async (req, res) => {
 const uploadAvatar = async (req, res) => {
     try {
         if (!req.file) return res.status(400).json({ message: 'No file uploaded' });
-        
-        const avatarUrl = `/uploads/${req.file.filename}`;
-        console.log(`Updating avatar for user ${req.user.id} to ${avatarUrl}`);
+
+        const avatarUrl = await uploadToS3(req.file.buffer, req.file.originalname, 'avatar');
         await User.update(req.user.id, { avatar: avatarUrl });
-        
+
         res.json({ message: 'Avatar uploaded successfully', avatarUrl });
     } catch (error) {
+        console.error('Avatar upload error:', error);
         res.status(500).json({ message: 'Error uploading avatar' });
     }
 };
