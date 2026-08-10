@@ -40,7 +40,7 @@ interface Category {
 }
 
 export default function ProfilePage() {
-  const { user, updateUser, loading: authLoading } = useAuth();
+  const { user, updateUser, logout, loading: authLoading } = useAuth();
   const router = useRouter();
   // Use a ref so updateUser doesn't trigger the effect
   const updateUserRef = useRef(updateUser);
