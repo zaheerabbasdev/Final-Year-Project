@@ -9,7 +9,6 @@ import { useCurrency } from '../../context/CurrencyContext';
 import {
   Briefcase,
   MapPin,
-  DollarSign,
   Calendar,
   Clock,
   Upload,

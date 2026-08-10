@@ -434,7 +434,7 @@ export default function BrowseJobsPage() {
                 {/* Stat pills */}
                 <div className="grid grid-cols-3 gap-2 pt-1">
                   <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
-                    <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><DollarSign size={10} /> Budget</p>
+                    <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Budget</p>
                     <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{format(job.budget)}</p>
                     {job.is_negotiable && <p className="text-[9px] text-zinc-400">Negotiable</p>}
                   </div>

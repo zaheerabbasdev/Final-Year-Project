@@ -254,8 +254,8 @@ export default function CustomerDashboard() {
                   </div>
 
                   <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06]">
-                    <span className="flex items-center gap-1 text-base font-black text-zinc-900 dark:text-white">
-                      <DollarSign size={14} className="text-indigo-500" />{format(job.budget)}
+                    <span className="text-base font-black text-zinc-900 dark:text-white">
+                      {format(job.budget)}
                     </span>
                     {job.status === 'open' ? (
                       <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-lg">

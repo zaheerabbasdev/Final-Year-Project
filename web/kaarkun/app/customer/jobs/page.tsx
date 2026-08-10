@@ -260,7 +260,7 @@ export default function CustomerJobsPage() {
                   {/* Stat pills */}
                   <div className="grid grid-cols-3 gap-2">
                     <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] p-2.5">
-                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><DollarSign size={10} /> Budget</p>
+                      <p className="text-[10px] text-zinc-400 uppercase font-semibold tracking-wide">Budget</p>
                       <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5 truncate">
                         {format(job.budget)}{job.is_negotiable && <span className="text-[10px] font-normal text-zinc-400"> (Neg.)</span>}
                       </p>
