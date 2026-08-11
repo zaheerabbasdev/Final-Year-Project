@@ -12,6 +12,23 @@ resource "aws_ecr_repository" "backend" {
   }
 }
 
+resource "aws_ecr_lifecycle_policy" "backend" {
+  repository = aws_ecr_repository.backend.name
+
+  policy = jsonencode({
+    rules = [{
+      rulePriority = 1
+      description  = "Keep last 5 images"
+      selection = {
+        tagStatus   = "any"
+        countType   = "imageCountMoreThan"
+        countNumber = 5
+      }
+      action = { type = "expire" }
+    }]
+  })
+}
+
 resource "aws_ecr_repository" "frontend" {
   name = "${var.project_name}-${var.environment}-frontend"
 
@@ -20,12 +37,46 @@ resource "aws_ecr_repository" "frontend" {
   }
 }
 
+resource "aws_ecr_lifecycle_policy" "frontend" {
+  repository = aws_ecr_repository.frontend.name
+
+  policy = jsonencode({
+    rules = [{
+      rulePriority = 1
+      description  = "Keep last 5 images"
+      selection = {
+        tagStatus   = "any"
+        countType   = "imageCountMoreThan"
+        countNumber = 5
+      }
+      action = { type = "expire" }
+    }]
+  })
+}
+
 resource "aws_ecr_repository" "admin" {
   name = "${var.project_name}-${var.environment}-admin"
 
   image_scanning_configuration {
     scan_on_push = true
   }
+}
+
+resource "aws_ecr_lifecycle_policy" "admin" {
+  repository = aws_ecr_repository.admin.name
+
+  policy = jsonencode({
+    rules = [{
+      rulePriority = 1
+      description  = "Keep last 5 images"
+      selection = {
+        tagStatus   = "any"
+        countType   = "imageCountMoreThan"
+        countNumber = 5
+      }
+      action = { type = "expire" }
+    }]
+  })
 }
 
 resource "aws_db_subnet_group" "main" {
@@ -156,19 +207,35 @@ resource "aws_s3_bucket_policy" "uploads_public_read" {
 }
 
 resource "aws_cloudwatch_log_group" "backend" {
-  name = "/ecs/${var.project_name}-${var.environment}-backend"
+  name              = "/ecs/${var.project_name}-${var.environment}-backend"
+  retention_in_days = 7 # Cost optimized: auto-expire dev logs after 7 days
 }
 
 resource "aws_cloudwatch_log_group" "frontend" {
-  name = "/ecs/${var.project_name}-${var.environment}-frontend"
+  name              = "/ecs/${var.project_name}-${var.environment}-frontend"
+  retention_in_days = 7
 }
 
 resource "aws_cloudwatch_log_group" "admin" {
-  name = "/ecs/${var.project_name}-${var.environment}-admin"
+  name              = "/ecs/${var.project_name}-${var.environment}-admin"
+  retention_in_days = 7
 }
 
 resource "aws_ecs_cluster" "main" {
   name = "${var.project_name}-${var.environment}-cluster"
+}
+
+# Enable Fargate Spot capacity provider for cost savings (~50-70% cheaper than standard Fargate)
+resource "aws_ecs_cluster_capacity_providers" "main" {
+  cluster_name = aws_ecs_cluster.main.name
+
+  capacity_providers = ["FARGATE", "FARGATE_SPOT"]
+
+  default_capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+    base              = 0
+  }
 }
 
 resource "aws_ecs_task_definition" "backend" {
@@ -413,16 +480,30 @@ resource "aws_lb_listener_rule" "admin" {
 }
 
 resource "aws_ecs_service" "backend" {
-  name            = "${var.project_name}-${var.environment}-backend"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.backend.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                   = "${var.project_name}-${var.environment}-backend"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.backend.arn
+  desired_count          = 1
+  force_new_deployment   = true # Required when switching capacity_provider_strategy
+
+  # Use Fargate Spot with standard Fargate as fallback (~50-70% cost saving)
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+    base              = 0
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    weight            = 0
+    base              = 0
+  }
 
   network_configuration {
-    subnets          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    # Public subnets + assign_public_ip replaces the NAT Gateway (saves ~$35+/mo)
+    subnets          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
     security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -435,16 +516,28 @@ resource "aws_ecs_service" "backend" {
 }
 
 resource "aws_ecs_service" "frontend" {
-  name            = "${var.project_name}-${var.environment}-frontend"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.frontend.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                   = "${var.project_name}-${var.environment}-frontend"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.frontend.arn
+  desired_count          = 1
+  force_new_deployment   = true
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+    base              = 0
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    weight            = 0
+    base              = 0
+  }
 
   network_configuration {
-    subnets          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    subnets          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
     security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
@@ -457,16 +550,28 @@ resource "aws_ecs_service" "frontend" {
 }
 
 resource "aws_ecs_service" "admin" {
-  name            = "${var.project_name}-${var.environment}-admin"
-  cluster         = aws_ecs_cluster.main.id
-  task_definition = aws_ecs_task_definition.admin.arn
-  desired_count   = 1
-  launch_type     = "FARGATE"
+  name                   = "${var.project_name}-${var.environment}-admin"
+  cluster                = aws_ecs_cluster.main.id
+  task_definition        = aws_ecs_task_definition.admin.arn
+  desired_count          = 1
+  force_new_deployment   = true
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE_SPOT"
+    weight            = 1
+    base              = 0
+  }
+
+  capacity_provider_strategy {
+    capacity_provider = "FARGATE"
+    weight            = 0
+    base              = 0
+  }
 
   network_configuration {
-    subnets          = [aws_subnet.private_a.id, aws_subnet.private_b.id]
+    subnets          = [aws_subnet.public_a.id, aws_subnet.public_b.id]
     security_groups  = [aws_security_group.ecs.id]
-    assign_public_ip = false
+    assign_public_ip = true
   }
 
   load_balancer {
