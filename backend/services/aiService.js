@@ -395,104 +395,165 @@ Respond ONLY with a raw JSON object (no markdown, no code fences, no extra text)
      * General Support Chatbot API
      */
     supportChatbot: async (message, history = [], user = null) => {
-        let statsContext = '';
+        // ── 1. Fetch live platform stats from DB ─────────────────────────────
+        let stats = { onlineProviders: 0, totalCustomers: 0, availableJobs: 0, categoryBreakdown: '', topProvidersStr: '' };
         let userContext = '';
+
         try {
             const [[{ onlineProviders }]] = await db.execute('SELECT COUNT(*) as onlineProviders FROM provider_profiles WHERE is_online = 1');
             const [[{ totalCustomers }]] = await db.execute('SELECT COUNT(*) as totalCustomers FROM users WHERE role = "customer"');
             const [[{ availableJobs }]] = await db.execute('SELECT COUNT(*) as availableJobs FROM jobs WHERE status = "open"');
-            
-            const [categories] = await db.execute(`
-                SELECT c.name, COUNT(p.user_id) as count 
-                FROM categories c 
-                JOIN provider_profiles p ON c.id = p.category_id 
-                GROUP BY c.id
-            `);
-            const categoryBreakdown = categories.map(c => `${c.name}s: ${c.count}`).join(', ');
+            const [[{ totalJobs }]] = await db.execute('SELECT COUNT(*) as totalJobs FROM jobs');
+            const [[{ completedJobs }]] = await db.execute('SELECT COUNT(*) as completedJobs FROM jobs WHERE status = "completed"');
+            const [[{ totalProviders }]] = await db.execute('SELECT COUNT(*) as totalProviders FROM provider_profiles');
 
-            // Fetch Top 5 providers
+            const [categories] = await db.execute(`
+                SELECT c.name, COUNT(p.user_id) as count
+                FROM categories c
+                JOIN provider_profiles p ON c.id = p.category_id
+                GROUP BY c.id ORDER BY count DESC
+            `);
             const [topProviders] = await db.execute(`
-                SELECT u.full_name, p.rating, c.name as category 
-                FROM provider_profiles p 
-                JOIN users u ON p.user_id = u.id 
-                LEFT JOIN categories c ON p.category_id = c.id 
+                SELECT u.full_name, p.rating, c.name as category
+                FROM provider_profiles p
+                JOIN users u ON p.user_id = u.id
+                LEFT JOIN categories c ON p.category_id = c.id
+                WHERE u.status = 'active'
                 ORDER BY p.rating DESC LIMIT 5
             `);
-            const topProvidersStr = topProviders.map(p => `- ${p.full_name} (${p.category || 'No Category'}, Rating: ${p.rating})`).join('\n');
 
-            statsContext = `\nReal-time App Statistics:
-- Online Providers: ${onlineProviders}
-- Registered Customers: ${totalCustomers}
-- Available Open Jobs: ${availableJobs}
-- Provider Breakdown: ${categoryBreakdown}
-- Top Rated Providers:\n${topProvidersStr}`;
+            stats = {
+                onlineProviders,
+                totalCustomers,
+                availableJobs,
+                totalJobs,
+                completedJobs,
+                totalProviders,
+                categoryBreakdown: categories.map(c => `${c.name}: ${c.count} providers`).join(', '),
+                topProvidersStr: topProviders.map(p => `${p.full_name} (${p.category || 'General'}, ★${p.rating})`).join('; '),
+            };
+        } catch (error) {
+            console.error('[Chatbot] Error fetching stats:', error.message);
+        }
 
+        try {
             if (user && user.id) {
                 const [userData] = await db.execute('SELECT full_name, email, role FROM users WHERE id = ?', [user.id]);
                 if (userData.length > 0) {
                     const u = userData[0];
-                    userContext = `\n\nInformation about the current user you are chatting with:
-- Name: ${u.full_name}
-- Email: ${u.email}
-- Role: ${u.role}`;
-
+                    userContext = `\nCurrent user: ${u.full_name} (${u.role})`;
                     if (u.role === 'provider') {
                         const [profileData] = await db.execute(`
                             SELECT p.rating, p.total_jobs, c.name as category, p.is_online
-                            FROM provider_profiles p
-                            LEFT JOIN categories c ON p.category_id = c.id
-                            WHERE p.user_id = ?
-                        `, [user.id]);
+                            FROM provider_profiles p LEFT JOIN categories c ON p.category_id = c.id
+                            WHERE p.user_id = ?`, [user.id]);
                         if (profileData.length > 0) {
                             const p = profileData[0];
-                            userContext += `\n- Category: ${p.category || 'Not set'}
-- Rating: ${p.rating}
-- Total Jobs Done: ${p.total_jobs}
-- Currently Online: ${p.is_online ? 'Yes' : 'No'}`;
+                            userContext += `, Category: ${p.category || 'Not set'}, Rating: ${p.rating}, Jobs done: ${p.total_jobs}, Online: ${p.is_online ? 'Yes' : 'No'}`;
                         }
-                    } else if (u.role === 'customer') {
+                    } else {
                         const [[{ jobsPosted }]] = await db.execute('SELECT COUNT(*) as jobsPosted FROM jobs WHERE customer_id = ?', [user.id]);
-                        userContext += `\n- Total Jobs Posted: ${jobsPosted}`;
+                        userContext += `, Jobs posted: ${jobsPosted}`;
                     }
                 }
             }
         } catch (error) {
-            console.error('Error fetching stats for AI:', error);
+            console.error('[Chatbot] Error fetching user context:', error.message);
         }
 
-        const systemPrompt = `You are Kaarkun Support AI, a friendly customer helper for the Kaarkun app.
-Kaarkun is a mobile marketplace matching customers with local service providers (Plumbers, Electricians, Carpenters, Painters, etc.).
-- Customers post jobs with details and budgets.
-- Providers place bids on jobs with price estimates.
-- Once accepted, a Booking is formed.
-- Users verify booking completion and write reviews.
-- Accounts are marked "pending" until admin approves CNIC and certificates.${statsContext}${userContext}
-Keep your answers brief, friendly, helpful and directly related to Kaarkun. Maximum 3 sentences. Do NOT use markdown, bullet points or asterisks.`;
+        // ── 2. Build system prompt with all live data ────────────────────────
+        const systemPrompt = `You are Kaarkun AI Support, a helpful assistant embedded in the Kaarkun service marketplace app.
 
-        // Only send last 6 messages to avoid huge prompts
-        const recentHistory = history.slice(-6);
-        const llmResult = await AIService.callLLM(systemPrompt, `User message: "${message}"\nRecent conversation: ${JSON.stringify(recentHistory)}`);
+HOW KAARKUN WORKS:
+- Customers post jobs (title, description, category, budget, location, preferred date/time).
+- Service providers browse open jobs and submit price bids.
+- The customer reviews bids and accepts one, creating a Booking.
+- After the job is done, both parties confirm completion and leave reviews.
+- New provider accounts are "pending" until an admin verifies their CNIC and certificates (usually 24-48 hours).
+- Categories: Plumber, Electrician, Carpenter, Painter, Cleaner, Gardener, AC Repair, Appliance Repair.
+
+LIVE PLATFORM STATISTICS (answer questions using these exact numbers):
+- Active/Open jobs right now: ${stats.availableJobs}
+- Total jobs ever posted: ${stats.totalJobs}
+- Completed jobs: ${stats.completedJobs}
+- Registered customers: ${stats.totalCustomers}
+- Total service providers: ${stats.totalProviders}
+- Providers currently online: ${stats.onlineProviders}
+- Provider breakdown by category: ${stats.categoryBreakdown || 'Data unavailable'}
+- Top rated providers: ${stats.topProvidersStr || 'None yet'}
+${userContext}
+
+INSTRUCTIONS:
+- Always answer directly using the live statistics above when the user asks about numbers, counts, or availability.
+- Be friendly, concise (2-4 sentences max), and specific to Kaarkun.
+- Do NOT use markdown, asterisks, bullet points, or code blocks in your response.
+- Do NOT make up numbers — use only the statistics provided above.
+- If you cannot answer, say so honestly and suggest they contact support@kaarkun.com.`;
+
+        // ── 3. Build proper multi-turn message array ─────────────────────────
+        // Pass history as actual chat messages, not as JSON text — this gives
+        // the LLM real conversation context so follow-up questions work.
+        const chatMessages = [
+            ...history.slice(-8).map(h => ({
+                role: h.role === 'assistant' ? 'assistant' : 'user',
+                content: String(h.content)
+            })),
+            { role: 'user', content: message }
+        ];
+
+        // ── 4. Call LLM with proper chat format ──────────────────────────────
+        const llmResult = await AIService.callChatLLM(systemPrompt, chatMessages);
         if (llmResult) {
-            // Strip any surrounding quotes and markdown artifacts
-            return llmResult.replace(/^["'`]+|["'`]+$/g, '').replace(/\*\*/g, '').trim();
+            return llmResult.replace(/^["'`]+|["'`]+$/g, '').replace(/\*\*/g, '').replace(/\*/g, '').trim();
         }
 
-        // Rule-based offline support FAQ responder
-        const query = message.toLowerCase();
-        if (query.includes('pending') || query.includes('verify') || query.includes('approve')) {
-            return "Your account stays pending until an administrator reviews your uploaded CNIC and certificates. This usually takes 24 to 48 hours. Thank you for your patience!";
+        // ── 5. Rule-based fallback when all LLMs are unavailable ─────────────
+        const q = message.toLowerCase();
+
+        // Stats questions
+        if (q.match(/how many|number of|count of|total/) && q.match(/job|work|task/)) {
+            return `There are currently ${stats.availableJobs} open jobs available on Kaarkun. A total of ${stats.totalJobs} jobs have been posted, of which ${stats.completedJobs} have been completed.`;
         }
-        if (query.includes('post') || query.includes('book') || query.includes('customer')) {
-            return "To post a job, open the Kaarkun app as a customer, click 'Post a Job', fill in the title, description, category, and budget, then click submit to receive bids.";
+        if (q.match(/how many|number of|count of|total/) && q.match(/provider|worker|service/)) {
+            return `Kaarkun has ${stats.totalProviders} registered service providers, with ${stats.onlineProviders} currently online and ready to accept jobs.`;
         }
-        if (query.includes('bid') || query.includes('provider') || query.includes('earn')) {
-            return "As a service provider, you can browse open jobs matching your skills, tap on a job details screen, enter your price bid with an estimated time, and submit it.";
+        if (q.match(/how many|number of|count of|total/) && q.match(/customer|user/)) {
+            return `There are ${stats.totalCustomers} registered customers on Kaarkun right now.`;
         }
-        if (query.includes('charge') || query.includes('free') || query.includes('fee')) {
-            return "Kaarkun is free to download! We charge a minimal platform commission on completed bookings to maintain the service, which is automatically calculated.";
+        if (q.match(/online|available|active/) && q.match(/provider|worker/)) {
+            return `There are ${stats.onlineProviders} providers currently online on Kaarkun. You can post a job and they will be notified immediately.`;
         }
 
-        return "Welcome to Kaarkun! You can post jobs as a customer, place competitive bids as a provider, and build trusted relationships through ratings. How else can I assist you today?";
+        // How-to questions
+        if (q.includes('post') && q.includes('job')) {
+            return "To post a job, open the app as a customer, tap 'Post a Job', fill in the title, description, category, and budget, then tap Submit to start receiving bids.";
+        }
+        if (q.includes('pending') || q.includes('verify') || q.includes('approve') || q.includes('rejected')) {
+            return "Your account stays pending until an admin reviews your CNIC and certificates. This usually takes 24 to 48 hours. Please ensure your uploaded documents are clear and readable.";
+        }
+        if (q.includes('bid') || (q.includes('provider') && q.includes('job'))) {
+            return "As a provider, go to 'Find Jobs', tap on a job that matches your skills, then tap 'Place Bid' to enter your price and estimated completion time.";
+        }
+        if (q.includes('cancel') || q.includes('booking')) {
+            return "To cancel a booking, open the booking details and tap 'Cancel'. Note that cancellations close to the job start time may affect your rating.";
+        }
+        if (q.includes('rating') || q.includes('review') || q.includes('star')) {
+            return "After a job is marked complete, both the customer and provider can leave a star rating and written review for each other. Ratings build trust on the platform.";
+        }
+        if (q.includes('fee') || q.includes('charge') || q.includes('free') || q.includes('price') || q.includes('cost')) {
+            return "Kaarkun is free to download and use. A small platform fee is applied to completed bookings, which is shown transparently before you confirm.";
+        }
+        if (q.includes('password') || q.includes('forgot') || q.includes('reset')) {
+            return "On the login screen, tap 'Forgot Password', enter your email address, and we will send you a 6-digit OTP code to reset your password.";
+        }
+        if (q.includes('category') || q.includes('service') || q.includes('type')) {
+            return "Kaarkun supports: Plumber, Electrician, Carpenter, Painter, Cleaner, Gardener, AC Repair, and Appliance Repair. More categories are coming soon!";
+        }
+        if (q.includes('contact') || q.includes('support') || q.includes('help') || q.includes('email')) {
+            return "For further support, email us at support@kaarkun.com. Our team is available Monday to Saturday, 9 AM to 6 PM PKT.";
+        }
+
+        return `I'm here to help with Kaarkun! Currently there are ${stats.availableJobs} open jobs and ${stats.onlineProviders} providers online. What would you like to know?`;
     },
 
     /**
@@ -725,6 +786,99 @@ Please provide a 3-part summary using the exact structure below. Be concise and 
         }
 
         console.log('[AI] No LLM available — using rule-based fallback.');
+        return null;
+    },
+
+    /**
+     * Multi-turn chat LLM caller.
+     * Accepts a properly-formatted messages array (role/content pairs) so the
+     * LLM has real conversation context rather than a JSON-encoded string.
+     */
+    callChatLLM: async (systemPrompt, messages) => {
+        const GROQ_KEY   = process.env.GROQ_API_KEY;
+        const GEMINI_KEY = process.env.GEMINI_API_KEY;
+        const CLAUDE_KEY = process.env.CLAUDE_API_KEY;
+
+        // ─── 1. Groq — preferred for chat (multi-turn natively supported) ──────
+        if (GROQ_KEY && !GROQ_KEY.includes('your_groq_api_key')) {
+            try {
+                console.log('[ChatBot] Calling Groq (llama-3.3-70b-versatile)...');
+                const response = await axios.post(
+                    'https://api.groq.com/openai/v1/chat/completions',
+                    {
+                        model: 'llama-3.3-70b-versatile',
+                        messages: [
+                            { role: 'system', content: systemPrompt },
+                            ...messages   // real conversation history
+                        ],
+                        max_tokens: 300,
+                        temperature: 0.5
+                    },
+                    {
+                        headers: { 'Authorization': `Bearer ${GROQ_KEY}`, 'Content-Type': 'application/json' },
+                        timeout: 15000
+                    }
+                );
+                const text = response.data?.choices?.[0]?.message?.content;
+                if (text) { console.log('[ChatBot] Groq responded.'); return text; }
+            } catch (err) {
+                const status = err.response?.status;
+                if (status === 429) console.log('[ChatBot] Groq rate-limited, trying Gemini...');
+                else console.error('[ChatBot] Groq error:', JSON.stringify(err.response?.data || err.message));
+            }
+        }
+
+        // ─── 2. Gemini — inject history into contents array ───────────────────
+        if (GEMINI_KEY && !GEMINI_KEY.includes('your_gemini_api_key')) {
+            const geminiModels = ['gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'];
+            for (const model of geminiModels) {
+                try {
+                    console.log(`[ChatBot] Calling Gemini (${model})...`);
+                    // Gemini uses 'model' instead of 'assistant'
+                    const contents = messages.map(m => ({
+                        role: m.role === 'assistant' ? 'model' : 'user',
+                        parts: [{ text: m.content }]
+                    }));
+                    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_KEY}`;
+                    const response = await axios.post(url, {
+                        system_instruction: { parts: [{ text: systemPrompt }] },
+                        contents,
+                        generationConfig: { maxOutputTokens: 300, temperature: 0.5 }
+                    }, { timeout: 15000 });
+                    const text = response.data?.candidates?.[0]?.content?.parts?.[0]?.text;
+                    if (text) { console.log(`[ChatBot] Gemini (${model}) responded.`); return text; }
+                } catch (err) {
+                    if (err.response?.status === 429) console.log(`[ChatBot] Gemini (${model}) quota exhausted...`);
+                    else console.error(`[ChatBot] Gemini (${model}) error:`, JSON.stringify(err.response?.data || err.message));
+                }
+            }
+        }
+
+        // ─── 3. Claude — multi-turn via messages array ────────────────────────
+        if (CLAUDE_KEY && !CLAUDE_KEY.includes('your_claude_api_key')) {
+            try {
+                console.log('[ChatBot] Calling Claude...');
+                const response = await axios.post('https://api.anthropic.com/v1/messages', {
+                    model: 'claude-3-haiku-20240307',
+                    max_tokens: 300,
+                    system: systemPrompt,
+                    messages  // Claude accepts the same role/content array
+                }, {
+                    headers: {
+                        'x-api-key': CLAUDE_KEY,
+                        'anthropic-version': '2023-06-01',
+                        'content-type': 'application/json'
+                    },
+                    timeout: 15000
+                });
+                const text = response.data?.content?.[0]?.text;
+                if (text) { console.log('[ChatBot] Claude responded.'); return text; }
+            } catch (err) {
+                console.error('[ChatBot] Claude error:', JSON.stringify(err.response?.data || err.message));
+            }
+        }
+
+        console.log('[ChatBot] All LLMs unavailable — using rule-based fallback.');
         return null;
     }
 };
