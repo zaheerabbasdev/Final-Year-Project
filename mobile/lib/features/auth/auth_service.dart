@@ -203,6 +203,18 @@ class AuthService extends ChangeNotifier {
     }
   }
 
+  Future<Map<String, dynamic>> resendOTP(String email) async {
+    try {
+      final response = await _apiClient.dio.post('/auth/resend-otp', data: {'email': email});
+      return {'success': true, 'message': response.data['message']};
+    } catch (e) {
+      if (e is DioException) {
+        return {'success': false, 'message': e.response?.data['message'] ?? 'Failed to resend code.'};
+      }
+      return {'success': false, 'message': 'Network error. Check your connection.'};
+    }
+  }
+
   Future<bool> updateAvatar(XFile file) async {
     try {
       logDebug('Starting avatar upload for ${file.name}');

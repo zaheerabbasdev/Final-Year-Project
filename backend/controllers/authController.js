@@ -217,4 +217,37 @@ const resetPassword = async (req, res) => {
     }
 };
 
-module.exports = { register, login, verifyOTP, forgotPassword, resetPassword };
+// ── Resend OTP ─────────────────────────────────────────────────────────────
+const resendOTP = async (req, res) => {
+    try {
+        const { email } = req.body;
+        if (!email) return res.status(400).json({ message: 'Email is required.' });
+
+        const user = await User.findByEmail(email);
+        if (!user) {
+            // Don't reveal whether the email exists
+            return res.json({ message: 'If that email exists and is unverified, a new code has been sent.' });
+        }
+
+        if (user.status !== 'pending' || user.role !== 'customer') {
+            return res.status(400).json({ message: 'This account does not require email verification.' });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000).toString();
+        const expiry = new Date(Date.now() + 10 * 60000); // 10 mins
+
+        await db.execute(
+            'UPDATE users SET otp_code=?, otp_expiry=? WHERE id=?',
+            [otp, expiry, user.id]
+        );
+
+        await mailer.sendOTP(email, otp);
+
+        res.json({ message: 'A new verification code has been sent to your email.' });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: 'Server error.' });
+    }
+};
+
+module.exports = { register, login, verifyOTP, forgotPassword, resetPassword, resendOTP };

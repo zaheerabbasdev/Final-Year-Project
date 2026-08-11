@@ -70,6 +70,8 @@ jobs:
         run: |
           # Fetch the current task definition, strip read-only fields, then inject
           # the updated image and S3 environment variables.
+          # NOTE: EMAIL_USER / EMAIL_PASS are managed via AWS Secrets Manager
+          # through Terraform — do NOT inject them here as plain env vars.
           TASK_DEF=$(aws ecs describe-task-definition \
             --task-definition $ECS_SERVICE_BACKEND \
             --query 'taskDefinition' --output json)

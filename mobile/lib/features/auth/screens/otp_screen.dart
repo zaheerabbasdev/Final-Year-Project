@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -18,6 +19,56 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   final _otpController = TextEditingController();
   bool _isLoading = false;
+  bool _isResending = false;
+
+  // Countdown so the user can't spam resend
+  int _resendCooldown = 60;
+  Timer? _cooldownTimer;
+
+  @override
+  void initState() {
+    super.initState();
+    _startCooldown();
+  }
+
+  @override
+  void dispose() {
+    _cooldownTimer?.cancel();
+    _otpController.dispose();
+    super.dispose();
+  }
+
+  void _startCooldown() {
+    _resendCooldown = 60;
+    _cooldownTimer?.cancel();
+    _cooldownTimer = Timer.periodic(const Duration(seconds: 1), (t) {
+      if (!mounted) { t.cancel(); return; }
+      setState(() {
+        if (_resendCooldown > 0) {
+          _resendCooldown--;
+        } else {
+          t.cancel();
+        }
+      });
+    });
+  }
+
+  void _resend() async {
+    if (_resendCooldown > 0 || _isResending) return;
+    setState(() => _isResending = true);
+    final result = await context.read<AuthService>().resendOTP(widget.email);
+    setState(() => _isResending = false);
+
+    Fluttertoast.showToast(
+      msg: result['message'] ?? (result['success'] ? 'Code sent!' : 'Failed to send code.'),
+      backgroundColor: result['success'] == true ? AppTheme.successColor : AppTheme.errorColor,
+      textColor: Colors.white,
+    );
+
+    if (result['success'] == true) {
+      _startCooldown();
+    }
+  }
 
   void _verify() async {
     if (_otpController.text.length != 6) {
@@ -170,7 +221,7 @@ class _OtpScreenState extends State<OtpScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                       padding: const EdgeInsets.symmetric(vertical: 18),
                     ),
-                    child: _isLoading 
+                    child: _isLoading
                       ? const SizedBox(
                           height: 24,
                           width: 24,
@@ -178,11 +229,42 @@ class _OtpScreenState extends State<OtpScreen> {
                         )
                       : Text(
                           'Verify Account',
-                          style: GoogleFonts.outfit(
-                            fontSize: 18,
-                            fontWeight: FontWeight.bold,
-                          ),
+                          style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
+                  ),
+                  const SizedBox(height: 20),
+                  // ── Resend OTP ────────────────────────────────────────
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Didn't receive the code? ",
+                        style: GoogleFonts.outfit(
+                          color: Theme.of(context).appColors.subtext,
+                          fontSize: 14,
+                        ),
+                      ),
+                      _isResending
+                        ? const SizedBox(
+                            width: 16, height: 16,
+                            child: CircularProgressIndicator(strokeWidth: 2, color: AppTheme.secondaryColor),
+                          )
+                        : GestureDetector(
+                            onTap: _resendCooldown == 0 ? _resend : null,
+                            child: Text(
+                              _resendCooldown > 0
+                                ? 'Resend in ${_resendCooldown}s'
+                                : 'Resend Code',
+                              style: GoogleFonts.outfit(
+                                color: _resendCooldown > 0
+                                  ? Theme.of(context).appColors.subtext
+                                  : AppTheme.secondaryColor,
+                                fontWeight: FontWeight.bold,
+                                fontSize: 14,
+                              ),
+                            ),
+                          ),
+                    ],
                   ),
                 ],
               ),
