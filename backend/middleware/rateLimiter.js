@@ -2,11 +2,11 @@ const rateLimit = require('express-rate-limit');
 
 // Brute-force protection for login/credential-checking endpoints
 const loginLimiter = rateLimit({
-    windowMs: 15 * 60 * 1000, // 15 minutes
+    windowMs: 5 * 60 * 1000, // 5 minutes
     max: 10,
     standardHeaders: true,
     legacyHeaders: false,
-    message: { message: 'Too many login attempts. Please try again later.' }
+    message: { message: 'Too many login attempts. Please try again in 5 minutes.' }
 });
 
 // OTP is a 6-digit code — limit guesses per window
