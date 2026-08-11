@@ -684,9 +684,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
     // primaryColor (#003B95) is too dark to see on dark surfaces —
     // use the brighter secondaryColor (#0A84FF) in dark mode.
     final btnColor = isDark ? AppTheme.secondaryColor : AppTheme.primaryColor;
+    // Account for the Android/iOS system navigation bar so buttons
+    // are never hidden behind it.
+    final navBarHeight = MediaQuery.of(context).padding.bottom;
 
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
+      padding: EdgeInsets.fromLTRB(24, 16, 24, 16 + navBarHeight),
       decoration: BoxDecoration(
         color: colors.surface,
         border: Border(top: BorderSide(color: colors.border, width: 1)),

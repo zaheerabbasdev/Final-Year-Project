@@ -354,13 +354,14 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
 
                     // ─── My Location Button ────────────
                     Positioned(
-                      bottom: 96,
+                      // Lift above the nav bar + extra breathing room
+                      bottom: MediaQuery.of(context).padding.bottom + 100,
                       left: 16,
                       child: GestureDetector(
                         onTap: _isLoadingCurrentLocation ? null : _getUserLocation,
                         child: Container(
-                          width: 48,
-                          height: 48,
+                          width: 52,
+                          height: 52,
                           decoration: BoxDecoration(
                             color: colors.surface,
                             shape: BoxShape.circle,
@@ -383,9 +384,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                                 )
                               : Icon(
                                   Icons.my_location,
-                                  // Use theme-aware color so icon is visible in dark mode
+                                  // Theme-aware so icon is visible in dark mode
                                   color: colors.text,
-                                  size: 24,
+                                  size: 26,
                                 ),
                         ),
                       ),
@@ -393,7 +394,8 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
 
                     // ─── Confirm Button ───────────────────
                     Positioned(
-                      bottom: 24,
+                      // Lift above the nav bar
+                      bottom: MediaQuery.of(context).padding.bottom + 32,
                       right: 16,
                       child: GestureDetector(
                         onTap: _pickedLocation != null
@@ -401,12 +403,12 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                             : null,
                         child: AnimatedContainer(
                           duration: const Duration(milliseconds: 200),
-                          width: 60,
-                          height: 60,
+                          width: 64,
+                          height: 64,
                           decoration: BoxDecoration(
                             color: _pickedLocation != null
                                 ? AppTheme.secondaryColor
-                                : colors.border, // theme-aware disabled color
+                                : colors.border,
                             shape: BoxShape.circle,
                             boxShadow: _pickedLocation != null
                                 ? [
@@ -421,7 +423,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                           child: const Icon(
                             Icons.done_all,
                             color: Colors.white,
-                            size: 28,
+                            size: 30,
                           ),
                         ),
                       ),
