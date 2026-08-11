@@ -75,10 +75,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
         final categories = context.read<CategoryService>().categories;
 
         // Helper: find a category by fuzzy match against a search string
-        Map<String, dynamic>? _findCategory(String search) {
+        Map<String, dynamic>? findCategory(String search) {
           final s = search.toLowerCase().trim();
           if (s.isEmpty) return null;
-          // 1. Exact
+          // 1. Exact match
           Map<String, dynamic>? m = categories.firstWhere(
             (c) => c['name'].toString().toLowerCase() == s,
             orElse: () => null,
@@ -94,21 +94,29 @@ class _PostJobScreenState extends State<PostJobScreen> {
           return m;
         }
 
-        // Step A: Try to match using the AI-returned category name
         Map<String, dynamic>? matchedCat;
-        final aiCatStr = suggestion['category']?.toString() ?? '';
-        if (aiCatStr.isNotEmpty && aiCatStr != 'Other' && aiCatStr != 'null') {
-          matchedCat = _findCategory(aiCatStr);
+
+        // Priority 1: If the job TITLE directly matches a real category name,
+        // always use that — it's more reliable than the AI result.
+        // e.g. user typed "Gardener" → use Gardener category
+        //      user typed "Cleaner"  → use Cleaner category (not "AC Repair")
+        final titleText = _titleController.text.trim();
+        if (titleText.isNotEmpty) {
+          matchedCat = findCategory(titleText);
         }
 
-        // Step B: If AI category didn't match (or was wrong), fall back to
-        // matching directly from the job TITLE the user typed.
-        // e.g. "Gardener" → Gardener category, "Cleaner" → Cleaning category.
+        // Priority 2: If the title didn't directly identify a category,
+        // try the AI-returned category name with fuzzy matching.
         if (matchedCat == null) {
-          final titleText = _titleController.text.trim();
-          if (titleText.isNotEmpty) {
-            matchedCat = _findCategory(titleText);
+          final aiCatStr = suggestion['category']?.toString() ?? '';
+          if (aiCatStr.isNotEmpty && aiCatStr != 'Other' && aiCatStr != 'null') {
+            matchedCat = findCategory(aiCatStr);
           }
+        }
+
+        // Priority 3: Try matching from the full input text (title + any desc)
+        if (matchedCat == null && inputText.isNotEmpty) {
+          matchedCat = findCategory(inputText);
         }
 
         if (matchedCat != null) {
