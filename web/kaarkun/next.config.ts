@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
       {
         // AWS ALB — avatars and attachments served at /api/uploads/**
         protocol: 'http',
-        hostname: 'academy-dev-alb-318446814.ap-south-1.elb.amazonaws.com',
+        hostname: 'academy-dev-alb-781908784.ap-south-1.elb.amazonaws.com',
         pathname: '/api/uploads/**',
       },
     ],
