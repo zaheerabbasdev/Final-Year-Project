@@ -680,26 +680,31 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Widget _buildFooter(AppColors colors) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    // primaryColor (#003B95) is too dark to see on dark surfaces —
+    // use the brighter secondaryColor (#0A84FF) in dark mode.
+    final btnColor = isDark ? AppTheme.secondaryColor : AppTheme.primaryColor;
+
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
       decoration: BoxDecoration(
         color: colors.surface,
-        boxShadow: [
-          BoxShadow(
-            color: colors.text.withOpacity(0.05),
-            blurRadius: 10,
-            offset: const Offset(0, -4),
-          ),
-        ],
+        border: Border(top: BorderSide(color: colors.border, width: 1)),
       ),
       child: Row(
         children: [
           Expanded(
-            child: TextButton(
+            child: OutlinedButton(
               onPressed: () => Navigator.pop(context),
+              style: OutlinedButton.styleFrom(
+                foregroundColor: colors.text,
+                side: BorderSide(color: colors.border, width: 1.5),
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+                padding: const EdgeInsets.symmetric(vertical: 18),
+              ),
               child: Text(
                 'Cancel',
-                style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold, fontSize: 16),
+                style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
           ),
@@ -709,17 +714,17 @@ class _PostJobScreenState extends State<PostJobScreen> {
             child: ElevatedButton(
               onPressed: _isLoading ? null : _submit,
               style: ElevatedButton.styleFrom(
-                backgroundColor: AppTheme.primaryColor,
+                backgroundColor: btnColor,
                 foregroundColor: Colors.white,
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 padding: const EdgeInsets.symmetric(vertical: 18),
               ),
-              child: _isLoading 
+              child: _isLoading
                 ? const SizedBox(
                     width: 24,
                     height: 24,
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
-                  ) 
+                  )
                 : Text(
                     'Post Job',
                     style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),

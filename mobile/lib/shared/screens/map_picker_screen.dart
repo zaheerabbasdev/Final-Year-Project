@@ -364,22 +364,27 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                           decoration: BoxDecoration(
                             color: colors.surface,
                             shape: BoxShape.circle,
+                            border: Border.all(color: colors.border, width: 1),
                             boxShadow: [
                               BoxShadow(
-                                color: Colors.black.withOpacity(0.15),
+                                color: Colors.black.withOpacity(0.25),
                                 blurRadius: 8,
                                 offset: const Offset(0, 3),
                               ),
                             ],
                           ),
                           child: _isLoadingCurrentLocation
-                              ? const Padding(
-                                  padding: EdgeInsets.all(12),
-                                  child: CircularProgressIndicator(strokeWidth: 2),
+                              ? Padding(
+                                  padding: const EdgeInsets.all(12),
+                                  child: CircularProgressIndicator(
+                                    strokeWidth: 2,
+                                    color: AppTheme.secondaryColor,
+                                  ),
                                 )
-                              : const Icon(
+                              : Icon(
                                   Icons.my_location,
-                                  color: Color(0xFF475569),
+                                  // Use theme-aware color so icon is visible in dark mode
+                                  color: colors.text,
                                   size: 24,
                                 ),
                         ),
@@ -400,13 +405,13 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                           height: 60,
                           decoration: BoxDecoration(
                             color: _pickedLocation != null
-                                ? const Color(0xFF6366F1)
-                                : const Color(0xFFCBD5E1),
+                                ? AppTheme.secondaryColor
+                                : colors.border, // theme-aware disabled color
                             shape: BoxShape.circle,
                             boxShadow: _pickedLocation != null
                                 ? [
                                     BoxShadow(
-                                      color: const Color(0xFF6366F1).withOpacity(0.4),
+                                      color: AppTheme.secondaryColor.withOpacity(0.4),
                                       blurRadius: 16,
                                       offset: const Offset(0, 6),
                                     ),
@@ -474,18 +479,19 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
 
   Widget _buildMapTypeButton(String label, MapType type) {
     final bool isActive = _currentMapType == type;
+    final colors = Theme.of(context).appColors;
     return GestureDetector(
       onTap: () => setState(() => _currentMapType = type),
       child: Container(
         padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
         decoration: BoxDecoration(
-          color: isActive ? const Color(0xFF1E293B) : Colors.white,
+          color: isActive ? AppTheme.secondaryColor : colors.surface,
           borderRadius: BorderRadius.circular(8),
         ),
         child: Text(
           label,
           style: TextStyle(
-            color: isActive ? Colors.white : const Color(0xFF64748B),
+            color: isActive ? Colors.white : colors.text,
             fontWeight: FontWeight.w600,
             fontSize: 13,
           ),

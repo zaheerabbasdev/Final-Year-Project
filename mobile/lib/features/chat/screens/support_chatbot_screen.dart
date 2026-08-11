@@ -230,49 +230,56 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
   }
 
   Widget _buildInputBar(AppColors colors) {
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final btnColor = isDark ? AppTheme.secondaryColor : AppTheme.primaryColor;
+
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
       decoration: BoxDecoration(
         color: colors.surface,
-        border: Border(top: BorderSide(color: colors.border)),
+        border: Border(top: BorderSide(color: colors.border, width: 1)),
       ),
-      child: Row(
-        children: [
-          Expanded(
-            child: TextField(
-              controller: _messageController,
-              style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
-              decoration: InputDecoration(
-                hintText: 'Ask anything...',
-                hintStyle: GoogleFonts.outfit(color: colors.subtext.withOpacity(0.7)),
-                filled: true,
-                fillColor: colors.card,
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: colors.border),
+      child: SafeArea(
+        top: false,
+        child: Row(
+          children: [
+            Expanded(
+              child: TextField(
+                controller: _messageController,
+                style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
+                decoration: InputDecoration(
+                  hintText: 'Ask anything...',
+                  hintStyle: GoogleFonts.outfit(color: colors.subtext),
+                  filled: true,
+                  // Use a clearly different fill than the bar background
+                  fillColor: colors.background,
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: colors.border, width: 1.5),
+                  ),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: colors.border, width: 1.5),
+                  ),
+                  focusedBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(24),
+                    borderSide: BorderSide(color: btnColor, width: 2),
+                  ),
+                  contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
                 ),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: BorderSide(color: colors.border),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(20),
-                  borderSide: const BorderSide(color: AppTheme.primaryColor, width: 1.5),
-                ),
-                contentPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
+                onSubmitted: _sendMessage,
               ),
-              onSubmitted: _sendMessage,
             ),
-          ),
-          const SizedBox(width: 12),
-          FloatingActionButton(
-            mini: true,
-            backgroundColor: AppTheme.primaryColor,
-            elevation: 0,
-            onPressed: () => _sendMessage(_messageController.text),
-            child: const Icon(Icons.send, color: Colors.white, size: 18),
-          ),
-        ],
+            const SizedBox(width: 10),
+            FloatingActionButton(
+              mini: true,
+              backgroundColor: btnColor,
+              elevation: 2,
+              onPressed: () => _sendMessage(_messageController.text),
+              child: const Icon(Icons.send, color: Colors.white, size: 18),
+            ),
+          ],
+        ),
       ),
     );
   }

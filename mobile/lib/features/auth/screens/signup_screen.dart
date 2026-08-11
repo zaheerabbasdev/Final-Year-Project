@@ -517,28 +517,38 @@ class _SignupScreenState extends State<SignupScreen> {
                   ],
                 ),
               ),
-              const SizedBox(height: 32),
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text(
-                    "Already have an account? ",
-                    style: GoogleFonts.outfit(color: colors.subtext, fontSize: 15, fontWeight: FontWeight.w500),
-                  ),
-                  TextButton(
-                    onPressed: () => context.pop(),
-                    style: TextButton.styleFrom(
-                      padding: EdgeInsets.zero,
-                      minimumSize: Size.zero,
-                      tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              const SizedBox(height: 28),
+              // ── Already have an account row ──────────────────────────────
+              Container(
+                padding: const EdgeInsets.symmetric(vertical: 16),
+                decoration: BoxDecoration(
+                  border: Border(top: BorderSide(color: colors.border, width: 1)),
+                ),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text(
+                      "Already have an account? ",
+                      // Use colors.text (near-white in dark) for high contrast
+                      style: GoogleFonts.outfit(color: colors.text, fontSize: 15, fontWeight: FontWeight.w500),
                     ),
-                    child: Text(
-                      'Sign In',
-                      style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 15),
+                    GestureDetector(
+                      onTap: () => context.pop(),
+                      child: Text(
+                        'Sign In',
+                        style: GoogleFonts.outfit(
+                          color: Theme.of(context).brightness == Brightness.dark
+                              ? AppTheme.secondaryColor   // bright blue visible on dark
+                              : AppTheme.primaryColor,    // dark navy visible on light
+                          fontWeight: FontWeight.bold,
+                          fontSize: 15,
+                        ),
+                      ),
                     ),
-                  ),
-                ],
+                  ],
+                ),
               ),
+              const SizedBox(height: 8),
             ],
           ),
         ),
