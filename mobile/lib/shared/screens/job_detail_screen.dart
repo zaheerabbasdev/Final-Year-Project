@@ -644,10 +644,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           CircleAvatar(
             radius: 30,
             backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-            child: avatarUrl == null 
-                ? Text(initials, style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 20)) 
-                : null,
+            child: avatarUrl != null
+                ? ClipOval(
+                    child: Image.network(
+                      avatarUrl,
+                      width: 60,
+                      height: 60,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Text(
+                        initials,
+                        style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 20),
+                      ),
+                    ),
+                  )
+                : Text(initials, style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 20)),
           ),
           const SizedBox(width: 16),
           Expanded(
@@ -1126,13 +1136,38 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             margin: const EdgeInsets.only(right: 12),
             decoration: BoxDecoration(
               borderRadius: BorderRadius.circular(16),
-              image: DecorationImage(
-                image: imageUrl != null 
-                    ? NetworkImage(imageUrl) 
-                    : const NetworkImage('https://i.ibb.co/vzR0y6M/sink.jpg'),
-                fit: BoxFit.cover,
-              ),
+              color: colors.background,
             ),
+            clipBehavior: Clip.antiAlias,
+            child: imageUrl != null
+                ? Image.network(
+                    imageUrl,
+                    width: 140,
+                    fit: BoxFit.cover,
+                    loadingBuilder: (_, child, progress) {
+                      if (progress == null) return child;
+                      return Center(
+                        child: CircularProgressIndicator(
+                          strokeWidth: 2,
+                          color: AppTheme.primaryColor,
+                          value: progress.expectedTotalBytes != null
+                              ? progress.cumulativeBytesLoaded / progress.expectedTotalBytes!
+                              : null,
+                        ),
+                      );
+                    },
+                    errorBuilder: (_, __, ___) => Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(Icons.broken_image_outlined, color: colors.subtext, size: 28),
+                        const SizedBox(height: 4),
+                        Text('Failed', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 10)),
+                      ],
+                    ),
+                  )
+                : Center(
+                    child: Icon(Icons.image_not_supported_outlined, color: colors.subtext, size: 28),
+                  ),
           );
         },
       ),
@@ -1155,10 +1190,20 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           CircleAvatar(
             radius: 24,
             backgroundColor: AppTheme.primaryColor.withOpacity(0.1),
-            backgroundImage: avatarUrl != null ? NetworkImage(avatarUrl) : null,
-            child: avatarUrl == null 
-                ? Text(initials, style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)) 
-                : null,
+            child: avatarUrl != null
+                ? ClipOval(
+                    child: Image.network(
+                      avatarUrl,
+                      width: 48,
+                      height: 48,
+                      fit: BoxFit.cover,
+                      errorBuilder: (_, __, ___) => Text(
+                        initials,
+                        style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  )
+                : Text(initials, style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold)),
           ),
           const SizedBox(width: 16),
           Expanded(
