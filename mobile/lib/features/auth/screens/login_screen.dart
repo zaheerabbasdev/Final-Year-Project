@@ -20,7 +20,7 @@ class _LoginScreenState extends State<LoginScreen> {
   bool _isPasswordVisible = false;
   bool _rememberMe = false;
 
-  void _login() async {
+  Future<void> _login() async {
     setState(() => _isLoading = true);
     final response = await context.read<AuthService>().login(
       _emailController.text,
@@ -38,6 +38,34 @@ class _LoginScreenState extends State<LoginScreen> {
         );
       }
       if (mounted) context.go('/main');
+    } else if (response['requiresOTP'] == true) {
+      // Customer's email is not verified yet.
+      // Try to send a fresh OTP so they don't wait on an expired one.
+      final email = _emailController.text.trim();
+      final resendResult = await context.read<AuthService>().resendOTP(email);
+
+      if (mounted) {
+        if (resendResult['success'] == true) {
+          Fluttertoast.showToast(
+            msg: 'Verification code sent to $email',
+            backgroundColor: AppTheme.successColor,
+            textColor: Colors.white,
+            timeInSecForIosWeb: 4,
+          );
+        } else {
+          // Resend failed (route may not be deployed yet, or rate-limited).
+          // Still navigate — user can tap Resend on the OTP screen.
+          Fluttertoast.showToast(
+            msg: 'Please check your email for the verification code, or tap Resend.',
+            backgroundColor: AppTheme.warningColor,
+            textColor: Colors.white,
+            timeInSecForIosWeb: 4,
+          );
+        }
+        // Pass resendResult success as extra so OTP screen knows
+        // whether to start the cooldown immediately or skip it.
+        context.push('/verify-otp', extra: email);
+      }
     } else {
       String errorMessage = 'Login failed. Please check your credentials.';
       String? backendMessage = response['message'];

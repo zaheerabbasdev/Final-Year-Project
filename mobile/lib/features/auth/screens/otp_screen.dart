@@ -21,14 +21,17 @@ class _OtpScreenState extends State<OtpScreen> {
   bool _isLoading = false;
   bool _isResending = false;
 
-  // Countdown so the user can't spam resend
-  int _resendCooldown = 60;
+  // Countdown so the user can't spam resend.
+  // Starts at 0 so the Resend button is immediately available —
+  // useful when the user arrives here from a failed login attempt
+  // where the auto-resend may not have worked.
+  int _resendCooldown = 0;
   Timer? _cooldownTimer;
 
   @override
   void initState() {
     super.initState();
-    _startCooldown();
+    // No initial countdown — user can resend right away if needed.
   }
 
   @override

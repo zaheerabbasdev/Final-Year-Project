@@ -93,15 +93,19 @@ class AuthService extends ChangeNotifier {
     } catch (e) {
       logDebug(e);
       if (e is DioException) {
+        final data = e.response?.data;
         return {
           'success': false,
-          'message': e.response?.data['message'] ?? 'Login failed',
+          'message': data?['message'] ?? 'Login failed',
+          // Forward requiresOTP so the login screen can redirect to OTP page
+          'requiresOTP': data?['requiresOTP'] == true,
         };
       }
     }
     return {
       'success': false,
       'message': 'Login failed. Please check your connection.',
+      'requiresOTP': false,
     };
   }
 

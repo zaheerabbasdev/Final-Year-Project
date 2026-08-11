@@ -221,15 +221,20 @@ const resetPassword = async (req, res) => {
 const resendOTP = async (req, res) => {
     try {
         const { email } = req.body;
+        console.log(`[resendOTP] Request for email: ${email}`);
+
         if (!email) return res.status(400).json({ message: 'Email is required.' });
 
         const user = await User.findByEmail(email);
         if (!user) {
-            // Don't reveal whether the email exists
+            console.log(`[resendOTP] No user found for: ${email}`);
             return res.json({ message: 'If that email exists and is unverified, a new code has been sent.' });
         }
 
+        console.log(`[resendOTP] User found: id=${user.id}, status=${user.status}, role=${user.role}`);
+
         if (user.status !== 'pending' || user.role !== 'customer') {
+            console.log(`[resendOTP] Skipped — status=${user.status}, role=${user.role}`);
             return res.status(400).json({ message: 'This account does not require email verification.' });
         }
 
@@ -241,11 +246,16 @@ const resendOTP = async (req, res) => {
             [otp, expiry, user.id]
         );
 
-        await mailer.sendOTP(email, otp);
+        const sent = await mailer.sendOTP(email, otp);
+        if (!sent) {
+            console.error(`[resendOTP] mailer.sendOTP returned false for: ${email}`);
+            return res.status(500).json({ message: 'Failed to send verification email. Please try again.' });
+        }
 
+        console.log(`[resendOTP] OTP sent successfully to: ${email}`);
         res.json({ message: 'A new verification code has been sent to your email.' });
     } catch (error) {
-        console.error(error);
+        console.error('[resendOTP] Error:', error);
         res.status(500).json({ message: 'Server error.' });
     }
 };
