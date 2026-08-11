@@ -71,18 +71,50 @@ class _PostJobScreenState extends State<PostJobScreen> {
         if (suggestion['completion'] != null && suggestion['completion'].toString().isNotEmpty) {
           _descController.text = suggestion['completion'];
         }
-        
-        if (suggestion['category'] != null) {
-          final categories = context.read<CategoryService>().categories;
-          final matchedCat = categories.firstWhere(
-            (c) => c['name'].toString().toLowerCase() == suggestion['category'].toString().toLowerCase(),
+
+        final categories = context.read<CategoryService>().categories;
+
+        // Helper: find a category by fuzzy match against a search string
+        Map<String, dynamic>? _findCategory(String search) {
+          final s = search.toLowerCase().trim();
+          if (s.isEmpty) return null;
+          // 1. Exact
+          Map<String, dynamic>? m = categories.firstWhere(
+            (c) => c['name'].toString().toLowerCase() == s,
             orElse: () => null,
           );
-          if (matchedCat != null) {
-            _selectedCategoryId = matchedCat['id'];
+          // 2. Fuzzy: DB name contains search OR search contains DB name
+          m ??= categories.firstWhere(
+            (c) {
+              final cn = c['name'].toString().toLowerCase();
+              return cn.contains(s) || s.contains(cn);
+            },
+            orElse: () => null,
+          );
+          return m;
+        }
+
+        // Step A: Try to match using the AI-returned category name
+        Map<String, dynamic>? matchedCat;
+        final aiCatStr = suggestion['category']?.toString() ?? '';
+        if (aiCatStr.isNotEmpty && aiCatStr != 'Other' && aiCatStr != 'null') {
+          matchedCat = _findCategory(aiCatStr);
+        }
+
+        // Step B: If AI category didn't match (or was wrong), fall back to
+        // matching directly from the job TITLE the user typed.
+        // e.g. "Gardener" → Gardener category, "Cleaner" → Cleaning category.
+        if (matchedCat == null) {
+          final titleText = _titleController.text.trim();
+          if (titleText.isNotEmpty) {
+            matchedCat = _findCategory(titleText);
           }
         }
-        
+
+        if (matchedCat != null) {
+          _selectedCategoryId = matchedCat['id'];
+        }
+
         if (suggestion['suggestedBudget'] != null) {
           _budgetController.text = suggestion['suggestedBudget'].toString();
         }
@@ -171,7 +203,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Future<void> _pickDate() async {
-    final colors = Theme.of(context).appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showDatePicker(
       context: context,
       initialDate: DateTime.now(),
@@ -180,13 +212,21 @@ class _PostJobScreenState extends State<PostJobScreen> {
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppTheme.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: colors.text,
-            ),
+            colorScheme: isDark
+                ? ColorScheme.dark(
+                    primary: AppTheme.primaryColor,
+                    onPrimary: Colors.white,
+                    surface: const Color(0xFF1E293B),
+                    onSurface: Colors.white,
+                  )
+                : ColorScheme.light(
+                    primary: AppTheme.primaryColor,
+                    onPrimary: Colors.white,
+                    onSurface: Colors.black87,
+                  ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
+                foregroundColor: AppTheme.primaryColor,
                 textStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
               ),
             ),
@@ -199,20 +239,28 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   Future<void> _pickTime() async {
-    final colors = Theme.of(context).appColors;
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final picked = await showTimePicker(
       context: context,
       initialTime: TimeOfDay.now(),
       builder: (context, child) {
         return Theme(
           data: Theme.of(context).copyWith(
-            colorScheme: ColorScheme.light(
-              primary: AppTheme.primaryColor,
-              onPrimary: Colors.white,
-              onSurface: colors.text,
-            ),
+            colorScheme: isDark
+                ? ColorScheme.dark(
+                    primary: AppTheme.primaryColor,
+                    onPrimary: Colors.white,
+                    surface: const Color(0xFF1E293B),
+                    onSurface: Colors.white,
+                  )
+                : ColorScheme.light(
+                    primary: AppTheme.primaryColor,
+                    onPrimary: Colors.white,
+                    onSurface: Colors.black87,
+                  ),
             textButtonTheme: TextButtonThemeData(
               style: TextButton.styleFrom(
+                foregroundColor: AppTheme.primaryColor,
                 textStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold),
               ),
             ),
@@ -502,7 +550,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   Widget _buildPickerField(String value, IconData icon, VoidCallback onTap) {
     final colors = Theme.of(context).appColors;
-    final hasVal = value.contains('/') || value.contains(':');
+    // Treat placeholder strings as "no value selected"
+    final hasVal = value != 'mm/dd/yyyy' && value != '--:-- --';
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),

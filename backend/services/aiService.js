@@ -228,73 +228,156 @@ const AIService = {
             return { completion: "", suggestions: [] };
         }
 
+        // Fetch real categories from DB so the AI uses exact names
+        let categoryList = 'Plumber, Electrician, Carpenter, Painter, Cleaning, AC Repair, Appliance Repair, Gardener';
+        let dbCategories = [];
+        try {
+            const [rows] = await db.execute('SELECT id, name FROM categories ORDER BY name');
+            if (rows.length > 0) {
+                dbCategories = rows;
+                categoryList = rows.map(c => c.name).join(', ');
+            }
+        } catch (e) {
+            console.warn('[AI] Could not fetch categories from DB, using defaults:', e.message);
+        }
+
         const fallbackTemplates = [
             {
-                keywords: ['leak', 'pipe', 'water', 'plumber', 'tap', 'sink'],
+                keywords: ['leak', 'pipe', 'water', 'plumber', 'tap', 'sink', 'drain', 'toilet'],
                 completion: 'Fixing a leaking pipe/faucet under the kitchen counter. Need to replace the washer or seal to stop the slow drip. Should inspect surrounding joints for wear.',
-                category: 'Plumber',
+                categoryKeyword: 'plumb',
                 suggested_budget: '1500'
             },
             {
-                keywords: ['fan', 'light', 'wire', 'switch', 'electricity', 'electrician'],
+                keywords: ['fan', 'light', 'wire', 'switch', 'electricity', 'electrician', 'socket', 'wiring', 'power'],
                 completion: 'Installing a new ceiling fan and replacing a faulty wall switch. The wiring is already in place, but need someone to mount it and check connections.',
-                category: 'Electrician',
+                categoryKeyword: 'electri',
                 suggested_budget: '2000'
             },
             {
-                keywords: ['ac', 'cool', 'repair', 'split', 'gas', 'compressor'],
+                keywords: ['ac', 'cool', 'repair', 'split', 'gas', 'compressor', 'air condition'],
                 completion: 'AC general cleaning and gas charging. The indoor unit is blowing air but not cooling properly. Need filter cleaning and pressure check.',
-                category: 'AC Repair',
+                categoryKeyword: 'ac',
                 suggested_budget: '3500'
             },
             {
-                keywords: ['door', 'wood', 'lock', 'hinge', 'cabinet', 'carpenter'],
+                keywords: ['door', 'wood', 'lock', 'hinge', 'cabinet', 'carpenter', 'furniture', 'shelf'],
                 completion: 'Repairing a sagging kitchen cabinet door and fitting a new lock on the main bedroom door. Will need new hinges and screws.',
-                category: 'Carpenter',
+                categoryKeyword: 'carpen',
                 suggested_budget: '1800'
             },
             {
-                keywords: ['paint', 'wall', 'room', 'brush', 'color'],
+                keywords: ['paint', 'wall', 'room', 'brush', 'color', 'whitewash'],
                 completion: 'Minor touch-up paint job on one bedroom wall. There are water damage stains. Need scraping, primer coating, and two coats of off-white paint.',
-                category: 'Painter',
+                categoryKeyword: 'paint',
                 suggested_budget: '4500'
+            },
+            {
+                keywords: ['clean', 'sweep', 'mop', 'dust', 'wash', 'hygiene', 'sanitize'],
+                completion: 'Deep cleaning of the living room and kitchen area. Need scrubbing of tiles, mopping floors, wiping surfaces and cleaning windows.',
+                categoryKeyword: 'clean',
+                suggested_budget: '2500'
+            },
+            {
+                keywords: ['garden', 'plant', 'lawn', 'grass', 'trim', 'tree', 'hedge'],
+                completion: 'Trimming overgrown hedges and mowing the front lawn. Also need to remove some dead branches from the garden trees.',
+                categoryKeyword: 'garden',
+                suggested_budget: '1200'
+            },
+            {
+                keywords: ['washing machine', 'fridge', 'refrigerator', 'appliance', 'microwave', 'oven', 'dishwasher'],
+                completion: 'Repairing a washing machine that is not spinning properly. Need to inspect the drum motor and belt for wear and replace if required.',
+                categoryKeyword: 'appliance',
+                suggested_budget: '2200'
             }
         ];
 
-        // Try LLM call if environment key is defined
-        const systemPrompt = `You are a helpful AI assistant for Kaarkun, an on-demand home service app.
-Given a partial job description, return a complete, professional version of the job description, recommend the category (e.g. Plumber, Electrician, Carpenter, Painter, Cleaner, Gardener, AC Repair, Appliance Repair), and a suggested budget in PKR. Respond ONLY with a raw JSON object (no markdown, no code fences):
-{"completedDescription": "full description text...", "category": "categoryName", "suggestedBudget": 1500}`;
+        // Helper: find best matching DB category by keyword
+        const findCategoryByKeyword = (keyword) => {
+            if (!keyword) return null;
+            const kw = keyword.toLowerCase();
+            return dbCategories.find(c =>
+                c.name.toLowerCase().includes(kw) || kw.includes(c.name.toLowerCase())
+            ) || null;
+        };
 
-        const llmResult = await AIService.callLLM(systemPrompt, `Partial description: "${partialText}"`);
+        // Pre-screen: if the title exactly matches (or closely matches) a real
+        // category name, lock that category before calling the LLM so it can't
+        // hallucinate a different one (e.g. user types "Gardener" → lock "Gardener").
+        let lockedCategory = null;
+        if (dbCategories.length > 0) {
+            const lowerInput = partialText.toLowerCase().trim();
+            const directMatch = dbCategories.find(c => {
+                const cn = c.name.toLowerCase();
+                return cn === lowerInput || cn.includes(lowerInput) || lowerInput.includes(cn);
+            });
+            if (directMatch) lockedCategory = directMatch.name;
+        }
+
+        // Try LLM call — give it the exact category names from the DB
+        const categoryInstruction = lockedCategory
+            ? `The category is already determined to be "${lockedCategory}" — use it exactly.`
+            : `Pick EXACTLY one category from this list: [${categoryList}]`;
+
+        const systemPrompt = `You are a helpful AI assistant for Kaarkun, an on-demand home service app in Pakistan.
+Given a partial job title or description, return:
+1. A complete, professional job description (2-3 sentences) relevant to the identified service type
+2. The most appropriate category — ${categoryInstruction}
+3. A suggested budget in PKR (Pakistani Rupees)
+
+Respond ONLY with a raw JSON object (no markdown, no code fences, no extra text):
+{"completedDescription": "full description text...", "category": "ExactCategoryNameFromList", "suggestedBudget": 1500}`;
+
+        const llmResult = await AIService.callLLM(systemPrompt, `Job title/description: "${partialText}"`);
         if (llmResult) {
             try {
                 // Strip markdown code fences if LLM wraps JSON in ```json ... ```
                 const cleaned = llmResult.replace(/^```(?:json)?\s*/i, '').replace(/\s*```$/i, '').trim();
                 const data = JSON.parse(cleaned);
+
+                // If we pre-locked a category, always use it regardless of what LLM returned
+                let resolvedCategory = lockedCategory || data.category;
+
+                if (!lockedCategory && dbCategories.length > 0) {
+                    // Validate/fix LLM's choice against real DB names
+                    const exactMatch = dbCategories.find(
+                        c => c.name.toLowerCase() === (data.category || '').toLowerCase()
+                    );
+                    if (!exactMatch) {
+                        const fuzzy = dbCategories.find(c => {
+                            const cn = c.name.toLowerCase();
+                            const ai = (data.category || '').toLowerCase();
+                            return cn.includes(ai) || ai.includes(cn);
+                        });
+                        resolvedCategory = fuzzy ? fuzzy.name : null;
+                    } else {
+                        resolvedCategory = exactMatch.name; // use DB casing
+                    }
+                }
+
                 return {
                     completion: data.completedDescription,
-                    category: data.category,
+                    category: resolvedCategory,
                     suggestedBudget: data.suggestedBudget
                 };
             } catch (e) {
                 console.error("Failed to parse LLM JSON response. Raw:", llmResult, "Error:", e.message);
-                // Return raw text as completion if JSON parsing fails
                 return {
                     completion: llmResult.trim(),
-                    category: 'Other',
+                    category: null,
                     suggestedBudget: '1500'
                 };
             }
         }
 
-        // Offline Rule-based search fallback
+        // Offline rule-based fallback — match by keyword then find real DB category
         const lowerText = partialText.toLowerCase();
         for (const item of fallbackTemplates) {
             if (item.keywords.some(kw => lowerText.includes(kw))) {
+                const dbCat = findCategoryByKeyword(item.categoryKeyword);
                 return {
                     completion: item.completion,
-                    category: item.category,
+                    category: dbCat ? dbCat.name : item.categoryKeyword,
                     suggestedBudget: item.suggested_budget
                 };
             }
@@ -302,8 +385,8 @@ Given a partial job description, return a complete, professional version of the 
 
         // Absolute generic fallback
         return {
-            completion: partialText + ' (Please specify details like specific issues, location inside property, tools needed, and material availability to help providers bid accurately.)',
-            category: 'Other',
+            completion: partialText + ' — Please specify details like the specific issue, which room/area, tools or materials needed, and any time constraints so providers can bid accurately.',
+            category: null,
             suggestedBudget: '1500'
         };
     },
