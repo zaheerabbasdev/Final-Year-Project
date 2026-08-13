@@ -151,6 +151,13 @@ function ChatContent() {
 
   const activeChatDetails = chatList.find(c => c.job_id === activeChat?.jobId && c.other_user_id === activeChat?.userId);
 
+  // Safe date formatter — returns empty string instead of "Invalid Date"
+  const formatDate = (t: string | null | undefined) => {
+    if (!t) return '';
+    const d = new Date(t);
+    return isNaN(d.getTime()) ? '' : d.toLocaleDateString();
+  };
+
   return (
     <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-6 h-[calc(100vh-64px)] flex flex-col">
       {error && (
@@ -198,7 +205,7 @@ function ChatContent() {
                     <div className="flex justify-between items-baseline mb-0.5">
                       <h4 className="font-semibold text-sm text-zinc-900 dark:text-zinc-50 truncate">{chat.other_user_name}</h4>
                       <span className="text-[10px] text-zinc-500 shrink-0">
-                        {new Date(chat.last_message_time).toLocaleDateString()}
+                        {formatDate(chat.last_message_time)}
                       </span>
                     </div>
                     <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium truncate mb-0.5">

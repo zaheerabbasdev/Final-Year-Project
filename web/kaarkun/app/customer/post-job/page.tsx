@@ -54,7 +54,8 @@ export default function PostJobPage() {
 
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
-  const [localLoading, setLocalLoading] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [submitLoading, setSubmitLoading] = useState(false);
 
   useEffect(() => {
     if (authLoading) return;
@@ -71,31 +72,50 @@ export default function PostJobPage() {
       .catch(err => console.log('Could not fetch categories, using fallback', err));
   }, [user, authLoading, router]);
 
+  // Fuzzy category match: exact first, then contains in either direction
+  const findCategory = (search: string) => {
+    const s = search.toLowerCase().trim();
+    if (!s) return undefined;
+    return categories.find(c => c.name.toLowerCase() === s)
+      ?? categories.find(c => {
+        const cn = c.name.toLowerCase();
+        return cn.includes(s) || s.includes(cn);
+      });
+  };
+
   const handleAIAutocomplete = async () => {
-    if (!description.trim() || description.length < 5) return;
+    const inputText = title.trim() || description.trim();
+    if (inputText.length < 3) return;
     setError(null);
     setSuccess(null);
-    setLocalLoading(true);
+    setAiLoading(true);
     try {
       const result = await api.post('/ai/autocomplete', {
-        partialDescription: description
+        partialDescription: inputText
       });
       if (result) {
         if (result.completion) setDescription(result.completion);
-        if (result.suggestedBudget) setBudget(convertFromPkr(result.suggestedBudget).toFixed(currencyInfo.code === 'PKR' ? 0 : 2));
-        if (result.category) {
-          const matchedCategory = categories.find(c => c.name.toLowerCase() === result.category.toLowerCase());
-          if (matchedCategory) {
-            setCategoryId(matchedCategory.id.toString());
-          }
+
+        // Budget: round to whole number — PKR amounts are always integers
+        if (result.suggestedBudget) {
+          setBudget(String(Math.round(convertFromPkr(Number(result.suggestedBudget)))));
         }
+
+        // Category: Priority 1 — title directly matches a category
+        let matched = findCategory(title.trim());
+        // Priority 2 — AI-returned category name (fuzzy)
+        if (!matched && result.category) {
+          matched = findCategory(result.category);
+        }
+        if (matched) setCategoryId(matched.id.toString());
+
         setSuccess('AI suggestions applied! Budget, Category & Description updated.');
       }
     } catch (err: any) {
       console.error(err);
       setError(err.message || 'AI Autocomplete request failed.');
     } finally {
-      setLocalLoading(false);
+      setAiLoading(false);
     }
   };
 
@@ -114,12 +134,12 @@ export default function PostJobPage() {
     e.preventDefault();
     setError(null);
     setSuccess(null);
-    setLocalLoading(true);
+    setSubmitLoading(true);
 
     const formData = new FormData();
     formData.append('title', title);
     formData.append('description', description);
-    formData.append('budget', String(convertToPkr(budget)));
+    formData.append('budget', String(convertToPkr(Number(budget))));
     formData.append('category_id', categoryId);
     formData.append('location', location);
     formData.append('preferred_date', prefDate || '');
@@ -142,7 +162,7 @@ export default function PostJobPage() {
     } catch (err: any) {
       setError(err.message || 'Failed to post job. Please try again.');
     } finally {
-      setLocalLoading(false);
+      setSubmitLoading(false);
     }
   };
 
@@ -205,11 +225,15 @@ export default function PostJobPage() {
               <button
                 type="button"
                 onClick={handleAIAutocomplete}
-                disabled={localLoading || !description.trim() || description.length < 5}
+                disabled={aiLoading || (title.trim().length < 3 && description.trim().length < 3)}
                 className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 flex items-center gap-1 bg-violet-50 dark:bg-violet-950/30 px-2.5 py-1 rounded-lg border border-violet-100 dark:border-violet-900/50 disabled:opacity-50 transition-all cursor-pointer"
               >
-                <Sparkles size={12} />
-                Improve with AI
+                {aiLoading ? (
+                  <span className="inline-block w-3 h-3 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                ) : (
+                  <Sparkles size={12} />
+                )}
+                {aiLoading ? 'Analyzing...' : 'Improve with AI'}
               </button>
             </div>
             <textarea
@@ -384,10 +408,13 @@ export default function PostJobPage() {
 
           <button
             type="submit"
-            disabled={localLoading}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl shadow-sm text-sm font-semibold transition-all"
+            disabled={submitLoading}
+            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl shadow-sm text-sm font-semibold transition-all flex items-center justify-center gap-2"
           >
-            {localLoading ? 'Posting Job...' : 'Submit Job Post'}
+            {submitLoading && (
+              <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
+            )}
+            {submitLoading ? 'Posting Job...' : 'Submit Job Post'}
           </button>
 
         </form>

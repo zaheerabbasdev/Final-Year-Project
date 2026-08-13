@@ -158,7 +158,7 @@ export default function BrowseJobsPage() {
 
   const handleOpenBidModal = async (job: Job) => {
     setBiddingJob(job);
-    setBidAmount(convertFromPkr(job.budget).toFixed(currencyInfo.code === 'PKR' ? 0 : 2));
+    setBidAmount(String(Math.round(convertFromPkr(job.budget))));
     setEstimatedTime('');
     setCoverLetter('');
     setBidError(null);
@@ -526,7 +526,7 @@ export default function BrowseJobsPage() {
                   </p>
                   <button
                     type="button"
-                    onClick={() => setBidAmount(convertFromPkr(aiSuggestion.averagePrice).toFixed(currencyInfo.code === 'PKR' ? 0 : 2))}
+                    onClick={() => setBidAmount(String(Math.round(convertFromPkr(aiSuggestion.averagePrice))))}
                     className="mt-2 w-full text-[10px] font-bold text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-800/50 rounded-lg py-1 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-colors"
                   >
                     Use AI Average ({format(aiSuggestion.averagePrice)})

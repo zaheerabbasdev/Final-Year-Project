@@ -6,17 +6,18 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
 import { useCurrency } from '../../../context/CurrencyContext';
 import { api } from '../../../utils/api';
-import { 
-  Briefcase, 
-  MapPin, 
-  DollarSign, 
-  Clock, 
-  User as UserIcon, 
-  Star, 
-  Check, 
+import {
+  Briefcase,
+  MapPin,
+  DollarSign,
+  Clock,
+  User as UserIcon,
+  Star,
+  Check,
   AlertCircle,
   MessageSquare
 } from 'lucide-react';
+import { getFileUrl } from '../../../utils/api';
 
 interface Bid {
   id: number;
@@ -167,15 +168,40 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
                 </div>
               </div>
 
-              {job.images && (
-                <div className="pt-4">
-                  <h3 className="font-semibold text-sm text-zinc-800 dark:text-zinc-200 mb-2">Attached Images</h3>
-                  <div className="flex gap-4">
-                    {/* Render images if any */}
-                    <p className="text-xs text-zinc-400">Images attached to job.</p>
+              {job.images && (() => {
+                // images may be a JSON array string, a comma list, or already an array
+                let imgs: string[] = [];
+                if (Array.isArray(job.images)) {
+                  imgs = job.images;
+                } else if (typeof job.images === 'string') {
+                  try { imgs = JSON.parse(job.images); } catch {
+                    imgs = job.images.split(',').map((s: string) => s.trim()).filter(Boolean);
+                  }
+                }
+                if (imgs.length === 0) return null;
+                return (
+                  <div className="pt-4">
+                    <h3 className="font-semibold text-sm text-zinc-800 dark:text-zinc-200 mb-3">Attached Images</h3>
+                    <div className="flex flex-wrap gap-3">
+                      {imgs.map((url, idx) => (
+                        <a
+                          key={idx}
+                          href={getFileUrl(url)}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="block w-28 h-28 rounded-xl overflow-hidden border border-zinc-200 dark:border-zinc-700 hover:opacity-90 transition-opacity"
+                        >
+                          <img
+                            src={getFileUrl(url)}
+                            alt={`Job image ${idx + 1}`}
+                            className="w-full h-full object-cover"
+                          />
+                        </a>
+                      ))}
+                    </div>
                   </div>
-                </div>
-              )}
+                );
+              })()}
             </div>
           </div>
         </div>
