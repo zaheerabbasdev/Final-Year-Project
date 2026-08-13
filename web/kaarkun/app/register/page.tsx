@@ -100,8 +100,16 @@ export default function RegisterPage() {
     try {
       const res = await register(formData);
       if (res.requiresOTP) {
-        // Redirect to OTP verification
-        router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+        if (res.emailSent === false) {
+          // Account created but email failed — user will see Resend button on next page
+          setSuccessMsg(res.message || 'Account created! We could not send the email — use Resend Code on the next screen.');
+          setTimeout(() => {
+            router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+          }, 2500);
+        } else {
+          // Normal flow — email sent, go straight to OTP screen
+          router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
+        }
       } else {
         setSuccessMsg(res.message || 'Provider registration successful! Please wait for admin approval before logging in.');
         // Reset form

@@ -105,21 +105,22 @@ class _SignupScreenState extends State<SignupScreen> {
     if (response['success'] == true) {
       if (mounted) {
         if (response['requiresOTP'] == true) {
+          final emailSent = response['emailSent'] == true;
           Fluttertoast.showToast(
-            msg: 'Registration successful! Please check your email for the OTP.',
-            backgroundColor: Colors.green,
+            msg: emailSent
+                ? 'Account created! Check your email for the 6-digit code.'
+                : 'Account created! We couldn\'t send the email — tap "Resend Code" on the next screen.',
+            backgroundColor: emailSent ? AppTheme.successColor : AppTheme.warningColor,
             textColor: Colors.white,
-            timeInSecForIosWeb: 3,
-            webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
+            timeInSecForIosWeb: 4,
           );
           context.push('/verify-otp', extra: _emailController.text);
         } else {
           Fluttertoast.showToast(
-            msg: 'Wait for admin approval',
-            backgroundColor: Colors.green,
+            msg: 'Registration submitted! Please wait for admin approval.',
+            backgroundColor: AppTheme.successColor,
             textColor: Colors.white,
             timeInSecForIosWeb: 3,
-            webBgColor: "linear-gradient(to right, #00b09b, #96c93d)",
           );
           context.pop();
         }
@@ -127,8 +128,8 @@ class _SignupScreenState extends State<SignupScreen> {
     } else {
       if (mounted) {
         Fluttertoast.showToast(
-          msg: 'Registration failed. Email might already exist.',
-          backgroundColor: Colors.red,
+          msg: response['message'] ?? 'Registration failed. Email might already be registered.',
+          backgroundColor: AppTheme.errorColor,
           textColor: Colors.white,
           webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
         );

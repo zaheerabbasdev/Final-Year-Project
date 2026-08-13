@@ -67,8 +67,20 @@ const register = async (req, res) => {
         }
 
         if (userRole === 'customer' && otpCode) {
-            await mailer.sendOTP(email, otpCode);
-            res.status(201).json({ message: 'User registered. Please check your email for the OTP.', userId, requiresOTP: true });
+            const emailSent = await mailer.sendOTP(email, otpCode);
+            if (emailSent) {
+                console.log(`[register] OTP email sent to: ${email}`);
+            } else {
+                console.error(`[register] OTP email FAILED for: ${email} — user registered but email not delivered`);
+            }
+            res.status(201).json({
+                message: emailSent
+                    ? 'Registration successful! Please check your email for the 6-digit verification code.'
+                    : 'Account created, but we could not send the verification email. Please tap "Resend Code" on the next screen.',
+                userId,
+                requiresOTP: true,
+                emailSent,
+            });
         } else {
             res.status(201).json({ message: 'Provider registered successfully. Please wait for admin approval.', userId, requiresOTP: false });
         }
