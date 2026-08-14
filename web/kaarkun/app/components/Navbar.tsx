@@ -200,8 +200,8 @@ export default function Navbar() {
                       <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">{t('nav.language')}</p>
                     </div>
                     {[
-                      { code: 'en', label: 'English' },
-                      { code: 'ur', label: 'اردو' },
+                      { code: 'en' as const, label: 'English' },
+                      { code: 'ur' as const, label: 'اردو' },
                     ].map((option) => (
                       <button
                         key={option.code}
@@ -346,8 +346,8 @@ export default function Navbar() {
                       <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">{t('nav.language')}</p>
                     </div>
                     {[
-                      { code: 'en', label: 'English' },
-                      { code: 'ur', label: 'اردو' },
+                      { code: 'en' as const, label: 'English' },
+                      { code: 'ur' as const, label: 'اردو' },
                     ].map((option) => (
                       <button
                         key={option.code}
