@@ -1,16 +1,16 @@
 'use client';
 
-import React, { useState, useEffect, useRef, Suspense } from 'react';
+import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { api, getFileUrl } from '../utils/api';
-import { 
-  MessageSquare, 
-  Send, 
-  User as UserIcon, 
+import {
+  MessageSquare,
+  Send,
+  User as UserIcon,
   AlertCircle,
   Paperclip,
-  Image as ImageIcon
+  X
 } from 'lucide-react';
 
 interface ChatItem {
@@ -54,9 +54,23 @@ function ChatContent() {
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
+  // Ref mirrors selectedImage state so handleSendMessage always reads
+  // the latest file even if React hasn't flushed the state update yet.
+  const selectedImageRef = useRef<File | null>(null);
+
+  const closeLightbox = useCallback(() => setLightboxUrl(null), []);
+
+  // Close lightbox on Escape key
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => { if (e.key === 'Escape') closeLightbox(); };
+    if (lightboxUrl) window.addEventListener('keydown', onKey);
+    return () => window.removeEventListener('keydown', onKey);
+  }, [lightboxUrl, closeLightbox]);
 
   useEffect(() => {
     if (authLoading) return;
@@ -124,6 +138,7 @@ function ChatContent() {
   const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    selectedImageRef.current = file;
     setSelectedImage(file);
     setImagePreview(URL.createObjectURL(file));
     // Reset input so same file can be re-selected
@@ -131,6 +146,7 @@ function ChatContent() {
   };
 
   const clearImage = () => {
+    selectedImageRef.current = null;
     setSelectedImage(null);
     if (imagePreview) {
       URL.revokeObjectURL(imagePreview);
@@ -140,15 +156,17 @@ function ChatContent() {
 
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if ((!newMessage.trim() && !selectedImage) || !activeChat || !user) return;
+    const imageToSend = selectedImageRef.current;
+    if ((!newMessage.trim() && !imageToSend) || !activeChat || !user) return;
 
     setSending(true);
+    setSendError(null);
     try {
       const formData = new FormData();
       formData.append('job_id', String(activeChat.jobId));
       formData.append('receiver_id', String(activeChat.userId));
       formData.append('content', newMessage);
-      if (selectedImage) formData.append('image', selectedImage);
+      if (imageToSend) formData.append('image', imageToSend);
 
       await api.post('/messages/send', formData);
       setNewMessage('');
@@ -157,7 +175,7 @@ function ChatContent() {
       fetchChatList();
     } catch (err: any) {
       console.error(err);
-      setError('Failed to send message.');
+      setSendError(err.message || 'Failed to send. Please try again.');
     } finally {
       setSending(false);
     }
@@ -300,7 +318,18 @@ function ChatContent() {
                         }`}>
                           <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
                           {msg.image_url && (
-                            <img src={getFileUrl(msg.image_url)} alt="attachment" className="mt-2 rounded-lg max-h-48 object-cover" />
+                            <button
+                              type="button"
+                              onClick={() => setLightboxUrl(getFileUrl(msg.image_url!))}
+                              className="mt-2 block rounded-lg overflow-hidden cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                              title="Click to enlarge"
+                            >
+                              <img
+                                src={getFileUrl(msg.image_url)}
+                                alt="attachment"
+                                className="max-h-48 object-cover hover:opacity-90 transition-opacity"
+                              />
+                            </button>
                           )}
                           <div className={`text-[10px] mt-1 text-right ${isMine ? 'text-indigo-200' : 'text-zinc-400'}`}>
                             {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
@@ -326,11 +355,20 @@ function ChatContent() {
                     <button
                       type="button"
                       onClick={clearImage}
-                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center hover:bg-rose-600"
+                      disabled={sending}
+                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center hover:bg-rose-600 disabled:opacity-50"
                       title="Remove image"
                     >
                       ✕
                     </button>
+                  </div>
+                )}
+
+                {/* Send error — shown right above the input bar */}
+                {sendError && (
+                  <div className="mb-2 px-3 py-2 rounded-lg bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 text-xs flex items-center gap-2">
+                    <AlertCircle size={14} className="shrink-0" />
+                    <span>{sendError}</span>
                   </div>
                 )}
 
@@ -348,7 +386,8 @@ function ChatContent() {
                   <button
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
-                    className="p-3 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 transition-colors shrink-0"
+                    disabled={sending}
+                    className="p-3 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 transition-colors shrink-0 disabled:opacity-50"
                     title="Attach image"
                   >
                     <Paperclip size={18} />
@@ -359,17 +398,21 @@ function ChatContent() {
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder="Type a message..."
-                      className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                      placeholder={sending ? 'Sending...' : 'Type a message...'}
+                      disabled={sending}
+                      className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all disabled:opacity-60"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={(!newMessage.trim() && !selectedImage) || sending}
-                    className="p-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 text-white rounded-xl transition-colors shrink-0"
+                    className="p-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 text-white rounded-xl transition-colors shrink-0 disabled:opacity-60"
                   >
-                    <Send size={20} />
+                    {sending
+                      ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                      : <Send size={20} />
+                    }
                   </button>
                 </form>
               </div>
@@ -377,6 +420,32 @@ function ChatContent() {
           )}
         </div>
       </div>
+
+      {/* Lightbox modal */}
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+          onClick={closeLightbox}
+        >
+          {/* Close button */}
+          <button
+            type="button"
+            onClick={closeLightbox}
+            className="absolute top-4 right-4 w-9 h-9 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+            title="Close (Esc)"
+          >
+            <X size={20} />
+          </button>
+
+          {/* Image — click on the image itself does NOT close (stops propagation) */}
+          <img
+            src={lightboxUrl}
+            alt="Full size"
+            onClick={(e) => e.stopPropagation()}
+            className="max-w-full max-h-[90vh] rounded-xl object-contain shadow-2xl"
+          />
+        </div>
+      )}
     </div>
   );
 }
