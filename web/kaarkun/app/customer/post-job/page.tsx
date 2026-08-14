@@ -183,9 +183,9 @@ export default function PostJobPage() {
           <span className="inline-flex items-center justify-center p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 mb-4">
             <Briefcase size={24} />
           </span>
-          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">Post a Job</h1>
+          <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{t('customer.postJob.title')}</h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
-            Describe the service you need and start receiving bids from verified providers.
+            {t('customer.postJob.subtitle')}
           </p>
         </div>
 

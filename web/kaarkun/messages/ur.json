@@ -30,7 +30,10 @@
     "customer": "صارف",
     "provider": "فراہم کنندہ",
     "currency": "کرنسی",
-    "dismiss": "رد کریں"
+    "dismiss": "رد کریں",
+    "language": "زبان",
+    "english": "English",
+    "urdu": "اردو"
   },
   "sidebar": {
     "dashboard": "ڈیش بورڈ",
@@ -145,6 +148,7 @@
       "noJobs": "ابھی تک کوئی کام نہیں۔ پہلا کام پوسٹ کریں!",
       "noBookings": "کوئی فعال بکنگ نہیں۔",
       "bids": "بولیاں",
+      "details": "تفصیلات",
       "status": {
         "open": "کھلا",
         "active": "فعال",
@@ -177,7 +181,8 @@
       "analyzing": "تجزیہ ہو رہا ہے...",
       "submitting": "کام پوسٹ ہو رہا ہے...",
       "submit": "کام پوسٹ کریں",
-      "success": "کام کامیابی سے پوسٹ ہو گیا!"
+      "success": "کام کامیابی سے پوسٹ ہو گیا!",
+      "subtitle": "اپنی ضرورت کی خدمت کی تفصیل دیں اور تصدیق شدہ فراہم کنندگان سے بولیاں وصول کریں۔"
     },
     "jobs": {
       "title": "میرے کام",
@@ -243,6 +248,14 @@
       "generatingPin": "بنایا جا رہا ہے...",
       "yourPin": "آپ کا PIN",
       "chat": "چیٹ",
+      "quickActions": "فوری اقدامات",
+      "browseJobsTitle": "کام تلاش کریں",
+      "findNearby": "قریب کام تلاش کریں",
+      "availableVerified": "تصدیق کے بعد دستیاب",
+      "bidHistory": "بولیوں کی تاریخ",
+      "editProfile": "پروفائل ترمیم کریں",
+      "aiAssistant": "AI معاون",
+      "mySkills": "میری مہارتیں",
       "status": {
         "confirmed": "تصدیق شدہ",
         "in_progress": "جاری ہے",
@@ -287,6 +300,15 @@
         "accepted": "قبول شدہ",
         "rejected": "مسترد"
       }
+    },
+    "reviews": {
+      "title": "صارفین کے تبصرے",
+      "subtitle": "آپ کے ساتھ کام کرنے والے صارفین کے تاثرات",
+      "backToProfile": "پروفائل پر واپس",
+      "average": "اوسط",
+      "totalReviews": "کل تبصرے",
+      "noReviews": "ابھی تک کوئی تبصرہ نہیں",
+      "noReviewsSubtitle": "مکمل کام کے تبصرے یہاں نظر آئیں گے"
     }
   },
   "chat": {

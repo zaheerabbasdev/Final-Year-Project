@@ -275,7 +275,7 @@ export default function CustomerDashboard() {
                       href={`/customer/jobs/${job.id}`}
                       className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
                     >
-                      Details <ChevronRight size={13} />
+                      {t('customer.dashboard.details')} <ChevronRight size={13} />
                     </Link>
                     {job.status === 'open' && (
                       <button

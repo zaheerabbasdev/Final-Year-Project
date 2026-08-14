@@ -339,7 +339,7 @@ export default function ProviderDashboard() {
           <div className="glass-card p-5">
             <h2 className="font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
               <Sparkles size={17} className="text-violet-500" />
-              Quick Actions
+              {t('provider.dashboard.quickActions')}
             </h2>
             <div className="grid grid-cols-2 gap-3">
               {isVerified ? (
@@ -351,8 +351,8 @@ export default function ProviderDashboard() {
                     <Search size={18} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold">Browse Jobs</p>
-                    <p className="text-[11px] text-violet-200">Find new work nearby</p>
+                    <p className="text-sm font-bold">{t('provider.dashboard.browseJobsTitle')}</p>
+                    <p className="text-[11px] text-violet-200">{t('provider.dashboard.findNearby')}</p>
                   </div>
                   <ChevronRight size={16} className="shrink-0" />
                 </Link>
@@ -362,8 +362,8 @@ export default function ProviderDashboard() {
                     <Search size={18} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <p className="text-sm font-bold">Browse Jobs</p>
-                    <p className="text-[11px]">Available once verified</p>
+                    <p className="text-sm font-bold">{t('provider.dashboard.browseJobsTitle')}</p>
+                    <p className="text-[11px]">{t('provider.dashboard.availableVerified')}</p>
                   </div>
                 </div>
               )}
@@ -375,7 +375,7 @@ export default function ProviderDashboard() {
                 <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
                   <Scale size={16} className="text-indigo-500" />
                 </div>
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Bid History</span>
+                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t('provider.dashboard.bidHistory')}</span>
               </Link>
 
               <Link
@@ -385,7 +385,7 @@ export default function ProviderDashboard() {
                 <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center">
                   <UserCheck size={16} className="text-blue-500" />
                 </div>
-                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">Edit Profile</span>
+                <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t('provider.dashboard.editProfile')}</span>
               </Link>
 
               <Link
@@ -395,7 +395,7 @@ export default function ProviderDashboard() {
                 <div className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
                   <Sparkles size={16} className="text-violet-600 dark:text-violet-400" />
                 </div>
-                <span className="text-xs font-bold text-violet-700 dark:text-violet-400 flex-1">AI Assistant</span>
+                <span className="text-xs font-bold text-violet-700 dark:text-violet-400 flex-1">{t('provider.dashboard.aiAssistant')}</span>
                 <span className="text-[10px] font-bold px-1.5 py-0.5 bg-violet-200 dark:bg-violet-800/40 text-violet-700 dark:text-violet-300 rounded-full">AI</span>
               </Link>
             </div>
@@ -405,7 +405,7 @@ export default function ProviderDashboard() {
           {profile.skills && profile.skills.length > 0 && (
             <div className="glass-card p-5">
               <h3 className="font-bold text-zinc-900 dark:text-white mb-3 text-sm flex items-center gap-2">
-                <Award size={15} className="text-amber-500" /> My Skills
+                <Award size={15} className="text-amber-500" /> {t('provider.dashboard.mySkills')}
               </h3>
               <div className="flex flex-wrap gap-1.5">
                 {(Array.isArray(profile.skills) ? profile.skills : (profile.skills as string).split(',')).map((skill: string, i: number) => (

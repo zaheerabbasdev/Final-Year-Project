@@ -24,12 +24,14 @@ export default function Navbar() {
   const { selectedCurrency, setCurrency } = useCurrency();
   const { lang, setLang, t } = useLanguage();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
+  const [showLangDropdown, setShowLangDropdown] = useState(false);
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
   const [notifications, setNotifications] = useState<any[]>([]);
   const [unreadCount, setUnreadCount] = useState(0);
   const [avatarBroken, setAvatarBroken] = useState(false);
   const currencyRef = useRef<HTMLDivElement>(null);
+  const langRef = useRef<HTMLDivElement>(null);
   const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -44,6 +46,9 @@ export default function Navbar() {
     const handleClickOutside = (e: MouseEvent) => {
       if (currencyRef.current && !currencyRef.current.contains(e.target as Node)) {
         setShowCurrencyDropdown(false);
+      }
+      if (langRef.current && !langRef.current.contains(e.target as Node)) {
+        setShowLangDropdown(false);
       }
       if (notifRef.current && !notifRef.current.contains(e.target as Node)) {
         setShowNotificationsDropdown(false);
@@ -180,14 +185,40 @@ export default function Navbar() {
                 )}
               </button>
 
-              {/* Language toggle */}
-              <button
-                onClick={() => setLang(lang === 'en' ? 'ur' : 'en')}
-                title={lang === 'en' ? 'Switch to Urdu' : 'Switch to English'}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
-              >
-                {lang === 'en' ? 'اردو' : 'EN'}
-              </button>
+              {/* Language picker */}
+              <div className="relative" ref={langRef}>
+                <button
+                  onClick={() => setShowLangDropdown(!showLangDropdown)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
+                >
+                  <Globe size={14} />
+                  <span>{lang === 'en' ? 'EN' : 'اردو'}</span>
+                </button>
+                {showLangDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-36 bg-white dark:bg-[#13131e] border border-zinc-100 dark:border-white/[0.08] rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/40 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-3 py-2 border-b border-zinc-100 dark:border-white/[0.06]">
+                      <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">{t('nav.language')}</p>
+                    </div>
+                    {[
+                      { code: 'en', label: 'English' },
+                      { code: 'ur', label: 'اردو' },
+                    ].map((option) => (
+                      <button
+                        key={option.code}
+                        onClick={() => { setLang(option.code); setShowLangDropdown(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-xs flex items-center gap-2 transition-colors ${
+                          lang === option.code
+                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/[0.02]'
+                        }`}
+                      >
+                        {lang === option.code && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />}
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
 
               {/* Notifications dropdown */}
               <div className="relative" ref={notifRef}>
@@ -300,13 +331,40 @@ export default function Navbar() {
                   <Moon size={18} className="text-indigo-500" />
                 )}
               </button>
-              {/* Language toggle (guest) */}
-              <button
-                onClick={() => setLang(lang === 'en' ? 'ur' : 'en')}
-                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
-              >
-                {lang === 'en' ? 'اردو' : 'EN'}
-              </button>
+              {/* Language picker (guest) */}
+              <div className="relative" ref={langRef}>
+                <button
+                  onClick={() => setShowLangDropdown(!showLangDropdown)}
+                  className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
+                >
+                  <Globe size={14} />
+                  <span>{lang === 'en' ? 'EN' : 'اردو'}</span>
+                </button>
+                {showLangDropdown && (
+                  <div className="absolute top-full right-0 mt-2 w-36 bg-white dark:bg-[#13131e] border border-zinc-100 dark:border-white/[0.08] rounded-2xl shadow-xl shadow-black/10 dark:shadow-black/40 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
+                    <div className="px-3 py-2 border-b border-zinc-100 dark:border-white/[0.06]">
+                      <p className="text-[10px] font-semibold text-zinc-400 uppercase tracking-wider">{t('nav.language')}</p>
+                    </div>
+                    {[
+                      { code: 'en', label: 'English' },
+                      { code: 'ur', label: 'اردو' },
+                    ].map((option) => (
+                      <button
+                        key={option.code}
+                        onClick={() => { setLang(option.code); setShowLangDropdown(false); }}
+                        className={`w-full text-left px-4 py-2.5 text-xs flex items-center gap-2 transition-colors ${
+                          lang === option.code
+                            ? 'bg-indigo-50 dark:bg-indigo-500/10 text-indigo-600 dark:text-indigo-400 font-bold'
+                            : 'text-zinc-600 dark:text-zinc-400 hover:bg-zinc-50 dark:hover:bg-white/[0.02]'
+                        }`}
+                      >
+                        {lang === option.code && <span className="w-1.5 h-1.5 rounded-full bg-indigo-500 shrink-0" />}
+                        {option.label}
+                      </button>
+                    ))}
+                  </div>
+                )}
+              </div>
               <Link
                 href="/login"
                 className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 px-4 py-2 rounded-xl transition-colors hover:bg-zinc-100 dark:hover:bg-white/5"

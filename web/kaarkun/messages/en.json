@@ -30,7 +30,10 @@
     "customer": "Customer",
     "provider": "Provider",
     "currency": "Currency",
-    "dismiss": "Dismiss"
+    "dismiss": "Dismiss",
+    "language": "Language",
+    "english": "English",
+    "urdu": "Urdu"
   },
   "sidebar": {
     "dashboard": "Dashboard",
@@ -145,6 +148,7 @@
       "noJobs": "No jobs yet. Post your first job!",
       "noBookings": "No active bookings.",
       "bids": "bids",
+      "details": "Details",
       "status": {
         "open": "Open",
         "active": "Active",
@@ -177,7 +181,8 @@
       "analyzing": "Analyzing...",
       "submitting": "Posting Job...",
       "submit": "Submit Job Post",
-      "success": "Job posted successfully! Redirecting to dashboard..."
+      "success": "Job posted successfully! Redirecting to dashboard...",
+      "subtitle": "Describe the service you need and start receiving bids from verified providers."
     },
     "jobs": {
       "title": "My Jobs",
@@ -243,6 +248,14 @@
       "generatingPin": "Generating...",
       "yourPin": "Your PIN",
       "chat": "Chat",
+      "quickActions": "Quick Actions",
+      "browseJobsTitle": "Browse Jobs",
+      "findNearby": "Find new work nearby",
+      "availableVerified": "Available once verified",
+      "bidHistory": "Bid History",
+      "editProfile": "Edit Profile",
+      "aiAssistant": "AI Assistant",
+      "mySkills": "My Skills",
       "status": {
         "confirmed": "Confirmed",
         "in_progress": "In Progress",
@@ -287,6 +300,15 @@
         "accepted": "Accepted",
         "rejected": "Rejected"
       }
+    },
+    "reviews": {
+      "title": "Customer Reviews",
+      "subtitle": "All feedback left by clients you've worked with",
+      "backToProfile": "Back to Profile",
+      "average": "Average",
+      "totalReviews": "Total Reviews",
+      "noReviews": "No reviews yet",
+      "noReviewsSubtitle": "Reviews from completed jobs will appear here"
     }
   },
   "chat": {
