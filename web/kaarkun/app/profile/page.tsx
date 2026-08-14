@@ -286,7 +286,7 @@ export default function ProfilePage() {
         </div>
         <div>
           <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">{t('profile.title')}</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">Manage your account details and preferences</p>
+          <p className="text-xs text-zinc-400 mt-0.5">{t('profile.manageAccount')}</p>
         </div>
       </div>
 
@@ -353,7 +353,7 @@ export default function ProfilePage() {
                   <Briefcase className="w-4.5 h-4.5 text-indigo-500" />
                 </div>
                 <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{stats.totalJobs || 0}</span>
-                <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">Jobs Posted</p>
+                <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">{t('profile.jobsPosted')}</p>
               </div>
               <div className="stat-card p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
                 {user?.role === 'provider' ? (
@@ -364,15 +364,15 @@ export default function ProfilePage() {
                     <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">
                       {reviews.length > 0 ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1) : '5.0'}
                     </span>
-                    <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">Rating</p>
+                    <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">{t('profile.rating')}</p>
                   </>
                 ) : (
                   <>
                     <div className="w-9 h-9 mx-auto mb-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
                       <Activity className="w-4.5 h-4.5 text-emerald-500" />
                     </div>
-                    <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">Active</span>
-                    <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">Status</p>
+                    <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{t('profile.activeStatus')}</span>
+                    <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">{t('profile.statusLabel')}</p>
                   </>
                 )}
               </div>
@@ -384,8 +384,8 @@ export default function ProfilePage() {
                     <div className="w-9 h-9 mb-1.5 rounded-lg bg-emerald-100 dark:bg-emerald-950/40 flex items-center justify-center">
                       <BadgeCheck className="w-4.5 h-4.5 text-emerald-500" />
                     </div>
-                    <span className="text-xs font-bold text-zinc-755 dark:text-zinc-350">Available</span>
-                    <p className="text-[10px] text-zinc-400">{isOnline ? 'Online' : 'Offline'}</p>
+                    <span className="text-xs font-bold text-zinc-755 dark:text-zinc-350">{t('profile.available')}</span>
+                    <p className="text-[10px] text-zinc-400">{isOnline ? t('profile.online') : t('profile.offline')}</p>
                   </div>
                   <button
                     type="button"
@@ -408,7 +408,7 @@ export default function ProfilePage() {
         <div className="lg:col-span-3 space-y-6">
           <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow">
             <div className="flex justify-between items-center mb-6 pb-4 border-b border-zinc-100 dark:border-zinc-800">
-              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">Profile Information</h3>
+              <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">{t('profile.profileInfo')}</h3>
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
@@ -423,7 +423,7 @@ export default function ProfilePage() {
               <form onSubmit={handleSave} className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Full Name</label>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('profile.fullName')}</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                         <UserIcon size={14} />
@@ -439,7 +439,7 @@ export default function ProfilePage() {
                   </div>
 
                   <div>
-                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Phone Number</label>
+                    <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('profile.phone')}</label>
                     <div className="relative">
                       <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                         <Phone size={14} />
@@ -456,7 +456,7 @@ export default function ProfilePage() {
                 </div>
 
                 <div>
-                  <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Location Details</label>
+                  <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('profile.locationDetails')}</label>
                   <LocationInput
                     value={location}
                     onChange={setLocation}
@@ -472,7 +472,7 @@ export default function ProfilePage() {
                   <>
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
-                        <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Years of Experience</label>
+                        <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('profile.yearsOfExperience')}</label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                             <Award size={14} />
@@ -489,7 +489,7 @@ export default function ProfilePage() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Primary Skill Category</label>
+                        <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('profile.primaryCategory')}</label>
                         <div className="relative">
                           <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                             <Layers size={14} />
@@ -499,7 +499,7 @@ export default function ProfilePage() {
                             onChange={(e) => setCategoryId(e.target.value)}
                             className="block w-full pl-9 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 text-sm"
                           >
-                            <option value="">Select Category</option>
+                            <option value="">{t('profile.selectCategory')}</option>
                             {categories.map(c => (
                               <option key={c.id} value={c.id}>{c.name}</option>
                             ))}
@@ -509,7 +509,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Skills Tags (Comma separated)</label>
+                      <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('profile.skillsTags')}</label>
                       <input
                         type="text"
                         placeholder="e.g. Copper piping, Leak detection, Drain unclogging"
@@ -520,7 +520,7 @@ export default function ProfilePage() {
                     </div>
 
                     <div>
-                      <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">Bio Description</label>
+                      <label className="block text-xs font-semibold text-zinc-600 dark:text-zinc-400 mb-1">{t('profile.bioDescription')}</label>
                       <textarea
                         rows={4}
                         placeholder="Tell clients about yourself, your working style, and equipment..."
@@ -541,7 +541,7 @@ export default function ProfilePage() {
                     }}
                     className="px-4 py-2 text-xs font-semibold border border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-350 rounded-xl"
                   >
-                    Cancel
+                    {t('common.cancel')}
                   </button>
                   <button
                     type="submit"
@@ -561,7 +561,7 @@ export default function ProfilePage() {
                       <Mail size={15} className="text-blue-500" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Email Address</p>
+                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.emailAddress')}</p>
                       <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.email}</p>
                     </div>
                   </div>
@@ -570,8 +570,8 @@ export default function ProfilePage() {
                       <Phone size={15} className="text-emerald-500" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Phone Number</p>
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.phone || 'Not provided'}</p>
+                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.phoneNumber')}</p>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.phone || t('profile.notProvided')}</p>
                     </div>
                   </div>
                   <div className="stat-card sm:col-span-2 flex items-center gap-3 p-3.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
@@ -579,8 +579,8 @@ export default function ProfilePage() {
                       <MapPin size={15} className="text-rose-500" />
                     </div>
                     <div className="min-w-0">
-                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Service Location</p>
-                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.location || 'Not provided'}</p>
+                      <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.serviceLocation')}</p>
+                      <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100 truncate">{user?.location || t('profile.notProvided')}</p>
                     </div>
                   </div>
                 </div>
@@ -592,8 +592,8 @@ export default function ProfilePage() {
                         <Award size={15} className="text-amber-500" />
                       </div>
                       <div className="min-w-0">
-                        <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Experience</p>
-                        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{experienceYears} Years</p>
+                        <p className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.experience')}</p>
+                        <p className="text-sm font-semibold text-zinc-900 dark:text-zinc-100">{experienceYears} {t('profile.yearsUnit')}</p>
                       </div>
                     </div>
 
@@ -603,7 +603,7 @@ export default function ProfilePage() {
                           <div className="w-6 h-6 rounded-md bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center">
                             <Layers size={12} className="text-violet-500" />
                           </div>
-                          <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Skills Tags</span>
+                          <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.skillsTags')}</span>
                         </div>
                         <div className="flex flex-wrap gap-2">
                           {skills.split(',').map((s, idx) => (
@@ -621,7 +621,7 @@ export default function ProfilePage() {
                           <div className="w-6 h-6 rounded-md bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
                             <UserIcon size={12} className="text-indigo-500" />
                           </div>
-                          <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">Bio Description</span>
+                          <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.bioDescription')}</span>
                         </div>
                         <p className="text-sm text-zinc-600 dark:text-zinc-400 whitespace-pre-wrap leading-relaxed bg-zinc-50/50 dark:bg-white/[0.02] p-4 rounded-xl border border-zinc-100 dark:border-white/[0.04]">
                           {bio}
@@ -639,14 +639,14 @@ export default function ProfilePage() {
             <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow">
               <div className="flex items-center justify-between gap-3 mb-6">
                 <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50">
-                  Customer Reviews {reviews.length > 0 && <span className="text-zinc-400 font-medium">({reviews.length})</span>}
+                  {t('profile.customerReviews')} {reviews.length > 0 && <span className="text-zinc-400 font-medium">({reviews.length})</span>}
                 </h3>
                 {reviews.length > 0 && (
                   <Link
                     href="/provider/reviews"
                     className="flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
                   >
-                    All Reviews <ChevronRight size={13} />
+                    {t('profile.allReviews')} <ChevronRight size={13} />
                   </Link>
                 )}
               </div>
@@ -704,15 +704,15 @@ export default function ProfilePage() {
               <Trash2 size={16} className="text-red-500" />
             </div>
             <div>
-              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">Danger Zone</h3>
-              <p className="text-xs text-zinc-400">Permanently delete your account and all associated data</p>
+              <h3 className="text-sm font-bold text-zinc-900 dark:text-zinc-50">{t('profile.dangerZone')}</h3>
+              <p className="text-xs text-zinc-400">{t('profile.dangerZoneDesc')}</p>
             </div>
           </div>
           <button
             onClick={() => setShowDeleteModal(true)}
             className="w-full py-2.5 text-sm font-semibold text-red-600 dark:text-red-400 border border-red-200 dark:border-red-800 rounded-xl hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
           >
-            Delete My Account
+            {t('profile.deleteMyAccount')}
           </button>
         </div>
 

@@ -150,7 +150,7 @@ export default function SupportChatbotPage() {
                 AI
               </span>
             </h1>
-            <p className="text-[10px] text-zinc-400">Online Support Agent</p>
+            <p className="text-[10px] text-zinc-400">{t('chatbot.onlineAgent')}</p>
           </div>
         </div>
 

@@ -162,7 +162,7 @@ export default function CustomerJobsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">{t('customer.jobs.title')}</h1>
-            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">Track all your posted jobs and their statuses.</p>
+            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">{t('customer.jobs.subtitle')}</p>
           </div>
         </div>
         <Link
@@ -170,7 +170,7 @@ export default function CustomerJobsPage() {
           className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition-all"
         >
           <Plus size={14} />
-          Post New Job
+          {t('customer.jobs.postNew')}
         </Link>
       </div>
 
@@ -209,7 +209,7 @@ export default function CustomerJobsPage() {
           <Briefcase size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
           <p className="text-zinc-500 dark:text-zinc-400 text-sm">{t('customer.jobs.noJobs')}</p>
           <Link href="/customer/post-job" className="inline-block mt-4 text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold">
-            Post your first job →
+            {t('customer.jobs.postFirst')} →
           </Link>
         </div>
       ) : (
@@ -241,7 +241,7 @@ export default function CustomerJobsPage() {
                         <div className="flex flex-wrap items-center gap-1.5 mt-1">
                           {job.is_emergency && (
                             <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400 rounded-full uppercase">
-                              <AlertTriangle size={9} /> Emergency
+                              <AlertTriangle size={9} /> {t('customer.jobs.emergency')}
                             </span>
                           )}
                           {job.category_name && (
@@ -262,17 +262,17 @@ export default function CustomerJobsPage() {
                   {/* Stat pills */}
                   <div className="grid grid-cols-3 gap-2">
                     <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] p-2.5">
-                      <p className="text-[10px] text-zinc-400 uppercase font-semibold tracking-wide">Budget</p>
+                      <p className="text-[10px] text-zinc-400 uppercase font-semibold tracking-wide">{t('customer.jobs.budget')}</p>
                       <p className="text-sm font-black text-zinc-900 dark:text-white mt-0.5 truncate">
                         {format(job.budget)}{job.is_negotiable && <span className="text-[10px] font-normal text-zinc-400"> (Neg.)</span>}
                       </p>
                     </div>
                     <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] p-2.5">
-                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><MapPin size={10} /> Location</p>
+                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><MapPin size={10} /> {t('customer.jobs.location')}</p>
                       <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200 mt-0.5 truncate">{job.location}</p>
                     </div>
                     <div className="rounded-xl bg-zinc-50 dark:bg-white/[0.03] p-2.5">
-                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><Clock size={10} /> Posted</p>
+                      <p className="flex items-center gap-1 text-[10px] text-zinc-400 uppercase font-semibold tracking-wide"><Clock size={10} /> {t('customer.jobs.posted')}</p>
                       <p className="text-sm font-bold text-zinc-700 dark:text-zinc-200 mt-0.5 truncate">{job.created_at?.split('T')[0]}</p>
                     </div>
                   </div>
@@ -280,7 +280,7 @@ export default function CustomerJobsPage() {
                   {job.provider_name && (
                     <div className="flex items-center gap-2 text-xs text-zinc-500 dark:text-zinc-400">
                       <Users size={12} className="shrink-0" />
-                      Provider: <strong className="text-zinc-700 dark:text-zinc-200">{job.provider_name}</strong>
+                      {t('customer.jobs.providerLabel')}: <strong className="text-zinc-700 dark:text-zinc-200">{job.provider_name}</strong>
                     </div>
                   )}
                 </div>

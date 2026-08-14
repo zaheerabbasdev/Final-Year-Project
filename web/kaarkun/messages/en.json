@@ -182,7 +182,17 @@
       "submitting": "Posting Job...",
       "submit": "Submit Job Post",
       "success": "Job posted successfully! Redirecting to dashboard...",
-      "subtitle": "Describe the service you need and start receiving bids from verified providers."
+      "subtitle": "Describe the service you need and start receiving bids from verified providers.",
+      "describeLabel": "Describe what needs to be done",
+      "addressLabel": "Address / Location details",
+      "locationPlaceholder": "Search for a location, e.g. Sector F-7, Islamabad",
+      "dateOptional": "Preferred Date (Optional)",
+      "timeOptional": "Preferred Time (Optional)",
+      "negotiableDesc": "Providers can bid above or below your budget",
+      "emergencyLabel": "Emergency Job",
+      "emergencyDesc": "Providers can accept this job instantly without bidding",
+      "addImages": "Add Images (Max 6)",
+      "upload": "Upload"
     },
     "jobs": {
       "title": "My Jobs",
@@ -206,7 +216,11 @@
       "review": "Review",
       "budget": "Budget",
       "location": "Location",
-      "posted": "Posted"
+      "posted": "Posted",
+      "subtitle": "Track all your posted jobs and their statuses.",
+      "postNew": "Post New Job",
+      "providerLabel": "Provider",
+      "emergency": "Emergency"
     },
     "bookings": {
       "title": "My Bookings",
@@ -223,6 +237,9 @@
       "chat": "Chat",
       "review": "Leave Review",
       "provider": "Provider",
+      "subtitle": "Track and manage your service bookings",
+      "noBookingsDesc": "Your confirmed service hires will appear here",
+      "postJob": "Post a Job",
       "status": {
         "confirmed": "Confirmed",
         "in_progress": "In Progress",
@@ -359,7 +376,30 @@
     "uploadAvatar": "Upload Photo",
     "jobs": "Jobs",
     "rating": "Rating",
-    "successRate": "Success Rate"
+    "successRate": "Success Rate",
+    "manageAccount": "Manage your account details and preferences",
+    "profileInfo": "Profile Information",
+    "locationDetails": "Location Details",
+    "emailAddress": "Email Address",
+    "phoneNumber": "Phone Number",
+    "serviceLocation": "Service Location",
+    "notProvided": "Not provided",
+    "activeStatus": "Active",
+    "jobsPosted": "Jobs Posted",
+    "statusLabel": "Status",
+    "customerReviews": "Customer Reviews",
+    "allReviews": "All Reviews",
+    "yearsOfExperience": "Years of Experience",
+    "primaryCategory": "Primary Skill Category",
+    "skillsTags": "Skills Tags (Comma separated)",
+    "bioDescription": "Bio Description",
+    "dangerZone": "Danger Zone",
+    "dangerZoneDesc": "Permanently delete your account and all associated data",
+    "deleteMyAccount": "Delete My Account",
+    "available": "Available",
+    "online": "Online",
+    "offline": "Offline",
+    "yearsUnit": "Years"
   },
   "chatbot": {
     "title": "AI Support Assistant",
@@ -368,6 +408,7 @@
     "thinking": "Thinking...",
     "send": "Send",
     "clearChat": "Clear Chat",
-    "welcome": "Hello! I'm your Kaarkun AI assistant. How can I help you today?"
+    "welcome": "Hello! I'm your Kaarkun AI assistant. How can I help you today?",
+    "onlineAgent": "Online Support Agent"
   }
 }

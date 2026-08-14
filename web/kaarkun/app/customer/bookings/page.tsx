@@ -127,7 +127,7 @@ export default function CustomerBookingsPage() {
             {t('customer.bookings.title')}
           </h1>
           <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-0.5">
-            Track and manage your service bookings
+            {t('customer.bookings.subtitle')}
           </p>
         </div>
       </div>
@@ -144,11 +144,11 @@ export default function CustomerBookingsPage() {
           <div className="w-16 h-16 rounded-2xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center mx-auto mb-4">
             <Briefcase size={28} className="text-zinc-400 dark:text-zinc-600" />
           </div>
-          <p className="text-zinc-500 dark:text-zinc-400 font-medium">You have no bookings at the moment.</p>
-          <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">Your confirmed service hires will appear here</p>
+          <p className="text-zinc-500 dark:text-zinc-400 font-medium">{t('customer.bookings.noBookings')}</p>
+          <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">{t('customer.bookings.noBookingsDesc')}</p>
           <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-5 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all">
             <Briefcase size={14} />
-            Post a Job
+            {t('customer.bookings.postJob')}
           </Link>
         </div>
       ) : (

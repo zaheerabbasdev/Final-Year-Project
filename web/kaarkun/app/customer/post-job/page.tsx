@@ -222,7 +222,7 @@ export default function PostJobPage() {
           <div>
             <div className="flex justify-between items-center mb-1">
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Describe what needs to be done
+                {t('customer.postJob.describeLabel')}
               </label>
               <button
                 type="button"
@@ -270,7 +270,7 @@ export default function PostJobPage() {
 
             <div>
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Budget ({currencyInfo.code})
+                {t('customer.postJob.budgetLabel')}
               </label>
               <div className="mt-1">
                 <input
@@ -288,7 +288,7 @@ export default function PostJobPage() {
 
           <div>
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Address / Location details
+              {t('customer.postJob.addressLabel')}
             </label>
             <div className="mt-1">
               <LocationInput
@@ -298,7 +298,7 @@ export default function PostJobPage() {
                   setLatitude(lat);
                   setLongitude(lng);
                 }}
-                placeholder="Search for a location, e.g. Sector F-7, Islamabad"
+                placeholder={t('customer.postJob.locationPlaceholder')}
                 required
               />
             </div>
@@ -307,7 +307,7 @@ export default function PostJobPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Preferred Date (Optional)
+                {t('customer.postJob.dateOptional')}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -324,7 +324,7 @@ export default function PostJobPage() {
 
             <div>
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Preferred Time (Optional)
+                {t('customer.postJob.timeOptional')}
               </label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -350,8 +350,8 @@ export default function PostJobPage() {
                 className="w-4 h-4 rounded text-indigo-600 border-zinc-300 focus:ring-indigo-500"
               />
               <div>
-                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Budget is Negotiable</span>
-                <p className="text-xs text-zinc-500">Providers can bid above or below your budget</p>
+                <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{t('customer.postJob.negotiable')}</span>
+                <p className="text-xs text-zinc-500">{t('customer.postJob.negotiableDesc')}</p>
               </div>
             </label>
 
@@ -365,8 +365,8 @@ export default function PostJobPage() {
               <div className="flex gap-1.5 items-start">
               
                 <div>
-                  <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">Emergency Job</span>
-                  <p className="text-xs text-zinc-500">Providers can accept this job instantly without bidding</p>
+                  <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{t('customer.postJob.emergencyLabel')}</span>
+                  <p className="text-xs text-zinc-500">{t('customer.postJob.emergencyDesc')}</p>
                 </div>
               </div>
             </label>
@@ -375,12 +375,12 @@ export default function PostJobPage() {
           {/* Image uploads */}
           <div>
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-              Add Images (Max 6)
+              {t('customer.postJob.addImages')}
             </label>
             <div className="flex flex-wrap gap-4 items-center">
               <label className="flex flex-col items-center justify-center w-24 h-24 border border-dashed border-zinc-300 dark:border-zinc-700 rounded-lg cursor-pointer bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 transition-colors">
                 <Upload size={20} className="text-zinc-400" />
-                <span className="text-[10px] text-zinc-500 mt-1">Upload</span>
+                <span className="text-[10px] text-zinc-500 mt-1">{t('customer.postJob.upload')}</span>
                 <input
                   type="file"
                   multiple
