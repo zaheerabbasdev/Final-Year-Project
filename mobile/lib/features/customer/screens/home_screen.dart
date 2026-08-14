@@ -12,6 +12,7 @@ import '../../provider/provider_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
 import '../../../core/providers/currency_provider.dart';
+import '../../../core/providers/language_provider.dart';
 
 class CustomerHomeScreen extends StatefulWidget {
   const CustomerHomeScreen({super.key});
@@ -55,6 +56,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   Widget build(BuildContext context) {
     final avatarPath = context.watch<AuthService>().user?['avatar'];
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
+    final lang = context.watch<LanguageProvider>();
 
     return Scaffold(
       backgroundColor: Theme.of(context).scaffoldBackgroundColor,
@@ -80,21 +82,21 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                 _buildSearchBar(),
                 const SizedBox(height: 24),
                 if (_isSearching) ...[
-                  _buildSectionHeader('Search Results', '', () {}),
+                  _buildSectionHeader(lang.t('customer.home.searchResults'), '', () {}),
                   const SizedBox(height: 16),
                   _buildSearchResults(),
                 ] else ...[
                   _buildPromoCard(context),
                   const SizedBox(height: 32),
-                  _buildSectionHeader('Browse Categories', 'See All', () {}),
+                  _buildSectionHeader(lang.t('customer.home.browseCategories'), lang.t('customer.home.seeAll'), () {}),
                   const SizedBox(height: 16),
                   _buildCategoryGrid(),
                   const SizedBox(height: 32),
-                  _buildSectionHeader('Your Recent Jobs', 'View All', () {}),
+                  _buildSectionHeader(lang.t('customer.home.recentJobs'), lang.t('customer.home.viewAll'), () {}),
                   const SizedBox(height: 16),
                   _buildRecentJobsList(),
                   const SizedBox(height: 32),
-                  _buildSectionHeader('Top Rated Providers', 'See All', () {}),
+                  _buildSectionHeader(lang.t('customer.home.topProviders'), lang.t('customer.home.seeAll'), () {}),
                   const SizedBox(height: 16),
                   _buildTopProvidersList(),
                 ],
@@ -262,7 +264,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                   ],
                 ),
                 title: Text(provider['full_name'] ?? 'Unknown Provider', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
-                subtitle: Text(provider['bio'] ?? 'No bio provided', maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.outfit()),
+                subtitle: Text(provider['bio'] ?? context.read<LanguageProvider>().t('customer.home.noBio'), maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.outfit()),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,
                   children: [
@@ -324,7 +326,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
           ElevatedButton.icon(
             onPressed: () => context.push('/post-job'),
             icon: const Icon(Icons.add_circle_outline_rounded, size: 18),
-            label: const Text('Post a Job Request'),
+            label: Text(context.read<LanguageProvider>().t('customer.home.postJob')),
             style: ElevatedButton.styleFrom(
               backgroundColor: const Color(0xFF003B95),
               foregroundColor: Colors.white,
@@ -383,7 +385,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
         final categories = service.categories;
         if (categories.isEmpty) {
-          return const Center(child: Text('No categories available'));
+          return Center(child: Text(context.read<LanguageProvider>().t('customer.home.noCategories')));
         }
 
         return GridView.builder(
@@ -686,7 +688,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
 
         final providers = service.topProviders;
         if (providers.isEmpty) {
-          return const Center(child: Text('No top providers found'));
+          return Center(child: Text(context.read<LanguageProvider>().t('customer.home.noProviders')));
         }
 
         return SizedBox(

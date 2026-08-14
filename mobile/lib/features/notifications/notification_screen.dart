@@ -3,6 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:intl/intl.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'notification_provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme.dart';
 
 class NotificationScreen extends StatefulWidget {
@@ -23,6 +24,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -31,7 +33,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
         scrolledUnderElevation: 0,
         iconTheme: IconThemeData(color: colors.text),
         title: Text(
-          'Notifications',
+          lang.t('notifications.title'),
           style: GoogleFonts.outfit(
             color: colors.text,
             fontWeight: FontWeight.bold,
@@ -75,7 +77,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                     const SizedBox(height: 24),
                     Text(
-                      'No notifications yet',
+                      lang.t('notifications.noNotifications'),
                       style: GoogleFonts.outfit(
                         fontSize: 20,
                         color: colors.text,
@@ -84,7 +86,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                     ),
                     const SizedBox(height: 8),
                     Text(
-                      'Any alerts about your jobs or account will appear here.',
+                      lang.t('notifications.noNotificationsSubtitle'),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(
                         color: colors.subtext,
@@ -199,7 +201,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
   Widget _buildNotificationModal(Map<String, dynamic> notification) {
     final typeColor = _getTypeColor(notification['type']);
     final typeIcon = _getTypeIcon(notification['type']);
-
+    final lang = context.read<LanguageProvider>();
     final colors = Theme.of(context).appColors;
     return Dialog(
       backgroundColor: colors.surface,
@@ -276,7 +278,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
                   elevation: 0,
                 ),
                 child: Text(
-                  'Close',
+                  lang.t('notifications.close'),
                   style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
               ),

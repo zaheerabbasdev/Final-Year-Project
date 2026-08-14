@@ -7,6 +7,7 @@ import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../auth_service.dart';
 import '../../customer/category_service.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -77,9 +78,10 @@ class _SignupScreenState extends State<SignupScreen> {
 
   void _signup() async {
     if (!_formKey.currentState!.validate()) return;
+    final lang = context.read<LanguageProvider>();
     if (!_agreeToTerms) {
       Fluttertoast.showToast(
-        msg: 'Please agree to the Terms and Conditions',
+        msg: lang.t('auth.signup.agreeError'),
         backgroundColor: Colors.red,
         textColor: Colors.white,
         webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
@@ -117,7 +119,7 @@ class _SignupScreenState extends State<SignupScreen> {
           context.push('/verify-otp', extra: _emailController.text);
         } else {
           Fluttertoast.showToast(
-            msg: 'Registration submitted! Please wait for admin approval.',
+            msg: lang.t('auth.signup.providerSuccess'),
             backgroundColor: AppTheme.successColor,
             textColor: Colors.white,
             timeInSecForIosWeb: 3,
@@ -128,7 +130,7 @@ class _SignupScreenState extends State<SignupScreen> {
     } else {
       if (mounted) {
         Fluttertoast.showToast(
-          msg: response['message'] ?? 'Registration failed. Email might already be registered.',
+          msg: response['message'] ?? lang.t('auth.signup.registrationFailed'),
           backgroundColor: AppTheme.errorColor,
           textColor: Colors.white,
           webBgColor: "linear-gradient(to right, #ff5f6d, #ffc371)",
@@ -140,6 +142,7 @@ class _SignupScreenState extends State<SignupScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -184,7 +187,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Create Account',
+                lang.t('auth.signup.title'),
                 style: GoogleFonts.outfit(
                   fontSize: 32,
                   fontWeight: FontWeight.w800,
@@ -194,7 +197,7 @@ class _SignupScreenState extends State<SignupScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Join Kaarkun today',
+                lang.t('auth.signup.subtitle'),
                 style: GoogleFonts.outfit(
                   color: colors.subtext,
                   fontSize: 16,
@@ -240,7 +243,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         const SizedBox(width: 8),
                         Expanded(
                           child: Text(
-                            'Registration Details',
+                            lang.t('auth.signup.registrationDetails'),
                             style: GoogleFonts.outfit(
                               color: colors.text,
                               fontWeight: FontWeight.w700,
@@ -262,12 +265,12 @@ class _SignupScreenState extends State<SignupScreen> {
                     ),
                     const SizedBox(height: 28),
 
-                    _buildLabel('I want to', colors),
+                    _buildLabel(lang.t('auth.signup.iWantTo'), colors),
                     Row(
                       children: [
                         Expanded(
                           child: _RoleCard(
-                            title: 'Hire Services',
+                            title: lang.t('auth.signup.hireServices'),
                             icon: Icons.person_outline_rounded,
                             isSelected: _selectedRole == 'customer',
                             onTap: () => setState(() => _selectedRole = 'customer'),
@@ -276,7 +279,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         const SizedBox(width: 12),
                         Expanded(
                           child: _RoleCard(
-                            title: 'Offer Services',
+                            title: lang.t('auth.signup.offerServices'),
                             icon: Icons.build_outlined,
                             isSelected: _selectedRole == 'provider',
                             onTap: () => setState(() => _selectedRole = 'provider'),
@@ -322,33 +325,33 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildLabel('Full Name', colors),
+                    _buildLabel(lang.t('auth.signup.fullName'), colors),
                     TextFormField(
                       controller: _nameController,
                       style: GoogleFonts.outfit(color: colors.text),
-                      decoration: const InputDecoration(hintText: 'Enter your full name'),
-                      validator: (v) => v!.isEmpty ? 'Name is required' : null,
+                      decoration: InputDecoration(hintText: lang.t('auth.signup.fullNameHint')),
+                      validator: (v) => v!.isEmpty ? lang.t('auth.signup.nameRequired') : null,
                     ),
                     const SizedBox(height: 20),
-                    _buildLabel('Email Address', colors),
+                    _buildLabel(lang.t('auth.signup.emailLabel'), colors),
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
                       style: GoogleFonts.outfit(color: colors.text),
-                      decoration: const InputDecoration(hintText: 'Enter your email'),
-                      validator: (v) => v!.isEmpty ? 'Email is required' : null,
+                      decoration: InputDecoration(hintText: lang.t('auth.signup.emailHint')),
+                      validator: (v) => v!.isEmpty ? lang.t('auth.signup.emailRequired') : null,
                     ),
                     const SizedBox(height: 20),
-                    _buildLabel('Phone Number', colors),
+                    _buildLabel(lang.t('auth.signup.phoneLabel'), colors),
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
                       style: GoogleFonts.outfit(color: colors.text),
-                      decoration: const InputDecoration(hintText: 'Enter your phone number'),
+                      decoration: InputDecoration(hintText: lang.t('auth.signup.phoneHint')),
                     ),
                     if (_selectedRole == 'provider') ...[
                       const SizedBox(height: 20),
-                      _buildLabel('Service Category', colors),
+                      _buildLabel(lang.t('auth.signup.serviceCategory'), colors),
                       Consumer<CategoryService>(
                         builder: (context, catService, _) {
                           if (catService.isLoading) {
@@ -377,7 +380,7 @@ class _SignupScreenState extends State<SignupScreen> {
                                     const SizedBox(width: 12),
                                     Expanded(
                                       child: Text(
-                                        'No categories found. Tap to retry.',
+                                        lang.t('auth.signup.noCategories'),
                                         style: GoogleFonts.outfit(color: Colors.red.shade800, fontSize: 13, fontWeight: FontWeight.w500),
                                       ),
                                     ),
@@ -399,36 +402,36 @@ class _SignupScreenState extends State<SignupScreen> {
                               );
                             }).toList(),
                             onChanged: (value) => setState(() => _selectedCategoryId = value),
-                            decoration: const InputDecoration(
-                              hintText: 'Select your service type',
-                              prefixIcon: Icon(Icons.category_outlined, size: 20),
+                            decoration: InputDecoration(
+                              hintText: lang.t('auth.signup.selectCategory'),
+                              prefixIcon: const Icon(Icons.category_outlined, size: 20),
                             ),
-                            validator: (v) => _selectedRole == 'provider' && v == null ? 'Category is required' : null,
+                            validator: (v) => _selectedRole == 'provider' && v == null ? lang.t('auth.signup.categoryRequired') : null,
                           );
                         },
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel('Years of Experience', colors),
+                      _buildLabel(lang.t('auth.signup.experience'), colors),
                       TextFormField(
                         controller: _experienceController,
                         keyboardType: TextInputType.number,
                         style: GoogleFonts.outfit(color: colors.text),
-                        decoration: const InputDecoration(hintText: 'Enter your experience in years'),
-                        validator: (v) => _selectedRole == 'provider' && v!.isEmpty ? 'Experience is required' : null,
+                        decoration: InputDecoration(hintText: lang.t('auth.signup.experienceHint')),
+                        validator: (v) => _selectedRole == 'provider' && v!.isEmpty ? lang.t('auth.signup.experienceRequired') : null,
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel('Upload CNIC', colors),
+                      _buildLabel(lang.t('auth.signup.uploadCnic'), colors),
                       _buildFileUploadTile(
-                        title: _cnicFile == null ? 'Select CNIC Image' : _cnicFile!.name,
+                        title: _cnicFile == null ? lang.t('auth.signup.selectCnic') : _cnicFile!.name,
                         icon: Icons.badge_outlined,
                         onTap: _pickCnic,
                         isSelected: _cnicFile != null,
                         colors: colors,
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel('Upload Certificates', colors),
+                      _buildLabel(lang.t('auth.signup.uploadCertificates'), colors),
                       _buildFileUploadTile(
-                        title: _certificateFile == null ? 'Select Certificate Image' : _certificateFile!.name,
+                        title: _certificateFile == null ? lang.t('auth.signup.selectCertificate') : _certificateFile!.name,
                         icon: Icons.card_membership_outlined,
                         onTap: _pickCertificate,
                         isSelected: _certificateFile != null,
@@ -436,13 +439,13 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                     ],
                     const SizedBox(height: 20),
-                    _buildLabel('Password', colors),
+                    _buildLabel(lang.t('auth.signup.passwordLabel'), colors),
                     TextFormField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
                       style: GoogleFonts.outfit(color: colors.text),
                       decoration: InputDecoration(
-                        hintText: 'Create a password',
+                        hintText: lang.t('auth.signup.passwordHint'),
                         suffixIcon: IconButton(
                           icon: Icon(_isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                           onPressed: () => setState(() => _isPasswordVisible = !_isPasswordVisible),
@@ -452,20 +455,20 @@ class _SignupScreenState extends State<SignupScreen> {
                       validator: (v) => v!.length < 6 ? 'Password must be at least 6 chars' : null,
                     ),
                     const SizedBox(height: 20),
-                    _buildLabel('Confirm Password', colors),
+                    _buildLabel(lang.t('auth.signup.confirmPassword'), colors),
                     TextFormField(
                       controller: _confirmPasswordController,
                       obscureText: !_isConfirmPasswordVisible,
                       style: GoogleFonts.outfit(color: colors.text),
                       decoration: InputDecoration(
-                        hintText: 'Confirm your password',
+                        hintText: lang.t('auth.signup.confirmPasswordHint'),
                         suffixIcon: IconButton(
                           icon: Icon(_isConfirmPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined),
                           onPressed: () => setState(() => _isConfirmPasswordVisible = !_isConfirmPasswordVisible),
                           color: colors.subtext.withOpacity(0.7),
                         ),
                       ),
-                      validator: (v) => v != _passwordController.text ? 'Passwords do not match' : null,
+                      validator: (v) => v != _passwordController.text ? lang.t('auth.signup.passwordsNotMatch') : null,
                     ),
                     const SizedBox(height: 20),
                     Row(
@@ -486,14 +489,14 @@ class _SignupScreenState extends State<SignupScreen> {
                             text: TextSpan(
                               style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, height: 1.4),
                               children: [
-                                const TextSpan(text: 'I agree to the '),
+                                TextSpan(text: lang.t('auth.signup.agreeTerms')),
                                 TextSpan(
-                                  text: 'Terms of Service',
+                                  text: lang.t('auth.signup.termsOfService'),
                                   style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
                                 ),
-                                const TextSpan(text: ' and '),
+                                TextSpan(text: lang.t('auth.signup.and')),
                                 TextSpan(
-                                  text: 'Privacy Policy',
+                                  text: lang.t('auth.signup.privacyPolicy'),
                                   style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold),
                                 ),
                               ],
@@ -513,7 +516,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       ),
                       child: _isLoading 
                         ? const SizedBox(height: 24, width: 24, child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5))
-                        : Text('Create Account', style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
+                        : Text(lang.t('auth.signup.createAccount'), style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold)),
                     ),
                   ],
                 ),
@@ -529,14 +532,13 @@ class _SignupScreenState extends State<SignupScreen> {
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
                     Text(
-                      "Already have an account? ",
-                      // Use colors.text (near-white in dark) for high contrast
+                      lang.t('auth.signup.alreadyHaveAccount'),
                       style: GoogleFonts.outfit(color: colors.text, fontSize: 15, fontWeight: FontWeight.w500),
                     ),
                     GestureDetector(
                       onTap: () => context.pop(),
                       child: Text(
-                        'Sign In',
+                        lang.t('auth.signup.signIn'),
                         style: GoogleFonts.outfit(
                           color: Theme.of(context).brightness == Brightness.dark
                               ? AppTheme.secondaryColor   // bright blue visible on dark

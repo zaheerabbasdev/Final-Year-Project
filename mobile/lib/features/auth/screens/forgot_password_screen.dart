@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import '../../../core/theme.dart';
+import '../../../core/providers/language_provider.dart';
 import '../auth_service.dart';
 
 class ForgotPasswordScreen extends StatefulWidget {
@@ -39,7 +40,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   Future<void> _sendCode() async {
     final email = _emailController.text.trim();
     if (email.isEmpty) {
-      setState(() => _error = 'Please enter your email address.');
+      setState(() => _error = context.read<LanguageProvider>().t('auth.forgotPassword.enterEmail'));
       return;
     }
     setState(() { _isLoading = true; _error = null; });
@@ -60,8 +61,9 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
     final newPass  = _newPasswordController.text;
     final confirm  = _confirmPasswordController.text;
 
+    final lang = context.read<LanguageProvider>();
     if (otp.isEmpty || newPass.isEmpty || confirm.isEmpty) {
-      setState(() => _error = 'Please fill in all fields.');
+      setState(() => _error = lang.t('auth.forgotPassword.fillAllFields'));
       return;
     }
     if (newPass.length < 6) {
@@ -69,7 +71,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
       return;
     }
     if (newPass != confirm) {
-      setState(() => _error = 'Passwords do not match.');
+      setState(() => _error = lang.t('auth.forgotPassword.passwordsNotMatch'));
       return;
     }
 
@@ -89,6 +91,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -129,8 +132,8 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
               ),
               const SizedBox(height: 28),
               Text(
-                _step == 1 ? 'Forgot Password?' :
-                _step == 2 ? 'Enter Reset Code' : 'Password Reset!',
+                _step == 1 ? lang.t('auth.forgotPassword.step1Title') :
+                _step == 2 ? lang.t('auth.forgotPassword.step2Title') : lang.t('auth.forgotPassword.step3Title'),
                 style: GoogleFonts.outfit(
                   fontSize: 30,
                   fontWeight: FontWeight.w800,
@@ -175,7 +178,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
 
               // Step 1 — Email
               if (_step == 1) _buildCard(colors, [
-                _label(colors, 'Email Address'),
+                _label(colors, lang.t('auth.forgotPassword.emailLabel')),
                 const SizedBox(height: 8),
                 _textField(
                   controller: _emailController,
@@ -184,12 +187,12 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   colors: colors,
                 ),
                 const SizedBox(height: 24),
-                _primaryButton('Send Reset Code', _isLoading, _sendCode),
+                _primaryButton(lang.t('auth.forgotPassword.sendResetCode'), _isLoading, _sendCode),
               ]),
 
               // Step 2 — OTP + new password
               if (_step == 2) _buildCard(colors, [
-                _label(colors, 'Reset Code'),
+                _label(colors, lang.t('auth.forgotPassword.resetCode')),
                 const SizedBox(height: 8),
                 _textField(
                   controller: _otpController,
@@ -198,7 +201,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   colors: colors,
                 ),
                 const SizedBox(height: 20),
-                _label(colors, 'New Password'),
+                _label(colors, lang.t('auth.forgotPassword.newPassword')),
                 const SizedBox(height: 8),
                 _textField(
                   controller: _newPasswordController,
@@ -212,11 +215,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 20),
-                _label(colors, 'Confirm Password'),
+                _label(colors, lang.t('auth.forgotPassword.confirmPassword')),
                 const SizedBox(height: 8),
                 _textField(
                   controller: _confirmPasswordController,
-                  hint: 'Repeat new password',
+                  hint: lang.t('auth.forgotPassword.repeatPasswordHint'),
                   obscure: _obscureConfirm,
                   colors: colors,
                   suffixIcon: IconButton(
@@ -226,11 +229,11 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                _primaryButton('Reset Password', _isLoading, _resetPassword),
+                _primaryButton(lang.t('auth.forgotPassword.resetPassword'), _isLoading, _resetPassword),
                 const SizedBox(height: 12),
                 TextButton(
                   onPressed: _isLoading ? null : () => setState(() { _step = 1; _error = null; }),
-                  child: Text('← Back / Resend code',
+                  child: Text('← ${lang.t('auth.forgotPassword.backToLogin')}',
                       style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14)),
                 ),
               ]),
@@ -245,7 +248,7 @@ class _ForgotPasswordScreenState extends State<ForgotPasswordScreen> {
                     minimumSize: const Size(double.infinity, 56),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
-                  child: Text('Back to Login',
+                  child: Text(lang.t('auth.forgotPassword.backToLogin'),
                       style: GoogleFonts.outfit(fontSize: 17, fontWeight: FontWeight.bold)),
                 ),
               ],

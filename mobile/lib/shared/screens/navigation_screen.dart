@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/navigation_service.dart';
 import '../../features/auth/auth_service.dart';
+import '../../core/providers/language_provider.dart';
 import '../../features/customer/screens/home_screen.dart';
 import '../../features/customer/screens/my_jobs_screen.dart';
 import '../../features/provider/screens/dashboard_screen.dart';
@@ -20,8 +21,9 @@ class MainNavigationScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final role = context.watch<AuthService>().role;
     final navService = context.watch<NavigationService>();
+    final lang = context.watch<LanguageProvider>();
     final int selectedIndex = navService.selectedIndex;
-    
+
     final List<Widget> customerScreens = [
       const CustomerHomeScreen(),
       const MyJobsScreen(),
@@ -41,18 +43,18 @@ class MainNavigationScreen extends StatelessWidget {
 
     // Define items for each role
     final List<Map<String, dynamic>> customerItems = [
-      {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': 'Home'},
-      {'icon': Icons.assignment_outlined, 'activeIcon': Icons.assignment_rounded, 'label': 'My Jobs'},
-      {'icon': Icons.chat_bubble_outline_rounded, 'activeIcon': Icons.chat_bubble_rounded, 'label': 'Chat'},
-      {'icon': Icons.person_outline_rounded, 'activeIcon': Icons.person_rounded, 'label': 'Profile'},
+      {'icon': Icons.home_outlined, 'activeIcon': Icons.home_rounded, 'label': lang.t('nav.home')},
+      {'icon': Icons.assignment_outlined, 'activeIcon': Icons.assignment_rounded, 'label': lang.t('nav.myJobs')},
+      {'icon': Icons.chat_bubble_outline_rounded, 'activeIcon': Icons.chat_bubble_rounded, 'label': lang.t('nav.chat')},
+      {'icon': Icons.person_outline_rounded, 'activeIcon': Icons.person_rounded, 'label': lang.t('nav.profile')},
     ];
 
     final List<Map<String, dynamic>> providerItems = [
-      {'icon': Icons.dashboard_outlined, 'activeIcon': Icons.dashboard_rounded, 'label': 'Dashboard'},
-      {'icon': Icons.search_rounded, 'activeIcon': Icons.youtube_searched_for_rounded, 'label': 'Jobs'},
-      {'icon': Icons.gavel_outlined, 'activeIcon': Icons.gavel_rounded, 'label': 'Bids'},
-      {'icon': Icons.chat_bubble_outline_rounded, 'activeIcon': Icons.chat_bubble_rounded, 'label': 'Chat'},
-      {'icon': Icons.person_outline_rounded, 'activeIcon': Icons.person_rounded, 'label': 'Profile'},
+      {'icon': Icons.dashboard_outlined, 'activeIcon': Icons.dashboard_rounded, 'label': lang.t('nav.dashboard')},
+      {'icon': Icons.search_rounded, 'activeIcon': Icons.youtube_searched_for_rounded, 'label': lang.t('nav.jobs')},
+      {'icon': Icons.gavel_outlined, 'activeIcon': Icons.gavel_rounded, 'label': lang.t('nav.bids')},
+      {'icon': Icons.chat_bubble_outline_rounded, 'activeIcon': Icons.chat_bubble_rounded, 'label': lang.t('nav.chat')},
+      {'icon': Icons.person_outline_rounded, 'activeIcon': Icons.person_rounded, 'label': lang.t('nav.profile')},
     ];
 
     final items = role == 'customer' ? customerItems : providerItems;

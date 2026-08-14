@@ -5,6 +5,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../auth_service.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class OtpScreen extends StatefulWidget {
@@ -114,11 +115,12 @@ class _OtpScreenState extends State<OtpScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
         title: Text(
-          'Verify Email',
+          lang.t('auth.otp.title'),
           style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold),
         ),
         backgroundColor: Colors.transparent,
@@ -147,7 +149,7 @@ class _OtpScreenState extends State<OtpScreen> {
             ),
             const SizedBox(height: 36),
             Text(
-              'Enter Verification Code',
+              lang.t('auth.otp.enterCode'),
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(
                 fontSize: 26,
@@ -231,7 +233,7 @@ class _OtpScreenState extends State<OtpScreen> {
                           child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                         )
                       : Text(
-                          'Verify Account',
+                          lang.t('auth.otp.verifyAccount'),
                           style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold),
                         ),
                   ),
@@ -256,8 +258,8 @@ class _OtpScreenState extends State<OtpScreen> {
                             onTap: _resendCooldown == 0 ? _resend : null,
                             child: Text(
                               _resendCooldown > 0
-                                ? 'Resend in ${_resendCooldown}s'
-                                : 'Resend Code',
+                                ? '${lang.t('auth.otp.resendIn')} ${_resendCooldown}s'
+                                : lang.t('auth.otp.resendCode'),
                               style: GoogleFonts.outfit(
                                 color: _resendCooldown > 0
                                   ? Theme.of(context).appColors.subtext

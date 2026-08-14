@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../features/auth/auth_service.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/providers/currency_provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme.dart';
 
 class SettingsScreen extends StatelessWidget {
@@ -15,6 +16,7 @@ class SettingsScreen extends StatelessWidget {
     final authService = context.watch<AuthService>();
     final themeProvider = context.watch<ThemeProvider>();
     final currencyProvider = context.watch<CurrencyProvider>();
+    final langProvider = context.watch<LanguageProvider>();
     final role = authService.role;
     final colors = Theme.of(context).appColors;
     final isDark = themeProvider.isDarkMode;
@@ -30,7 +32,7 @@ class SettingsScreen extends StatelessWidget {
           onPressed: () => context.pop(),
         ),
         title: Text(
-          'Settings',
+          langProvider.t('settings.title'),
           style: GoogleFonts.outfit(
             color: colors.text,
             fontWeight: FontWeight.bold,
@@ -55,19 +57,20 @@ class SettingsScreen extends StatelessWidget {
                       _buildMenuItem(
                         context,
                         Icons.payment_outlined,
-                        'Payment Methods',
+                        langProvider.t('settings.paymentMethods'),
                         () {},
                         colors,
                       ),
                     _buildMenuItem(
                       context,
                       Icons.notifications_none_rounded,
-                      'Notifications',
+                      langProvider.t('settings.notifications'),
                       () => context.push('/notifications'),
                       colors,
                     ),
-                    _buildDarkModeMenuItem(context, themeProvider, colors),
-                    _buildCurrencyMenuItem(context, currencyProvider, colors),
+                    _buildDarkModeMenuItem(context, themeProvider, langProvider, colors),
+                    _buildLanguageMenuItem(context, langProvider, colors),
+                    _buildCurrencyMenuItem(context, currencyProvider, langProvider, colors),
                   ],
                 ),
               ),
@@ -103,6 +106,7 @@ class SettingsScreen extends StatelessWidget {
   Widget _buildDarkModeMenuItem(
     BuildContext context,
     ThemeProvider themeProvider,
+    LanguageProvider langProvider,
     AppColors colors,
   ) {
     final isDark = themeProvider.isDarkMode;
@@ -117,7 +121,7 @@ class SettingsScreen extends StatelessWidget {
         ),
       ),
       title: Text(
-        'Dark Mode',
+        langProvider.t('settings.darkMode'),
         style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.w600, fontSize: 16),
       ),
       trailing: Switch.adaptive(
@@ -128,9 +132,49 @@ class SettingsScreen extends StatelessWidget {
     );
   }
 
+  Widget _buildLanguageMenuItem(
+    BuildContext context,
+    LanguageProvider langProvider,
+    AppColors colors,
+  ) {
+    return ListTile(
+      leading: Container(
+        padding: const EdgeInsets.all(8),
+        decoration: BoxDecoration(color: colors.card, borderRadius: BorderRadius.circular(12)),
+        child: Icon(Icons.language_rounded, color: colors.text, size: 20),
+      ),
+      title: Text(
+        langProvider.t('settings.language'),
+        style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.w600, fontSize: 16),
+      ),
+      trailing: DropdownButtonHideUnderline(
+        child: DropdownButton<String>(
+          value: langProvider.lang,
+          dropdownColor: colors.surface,
+          icon: Icon(Icons.arrow_drop_down, color: colors.subtext),
+          style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold),
+          onChanged: (String? newValue) {
+            if (newValue != null) langProvider.setLanguage(newValue);
+          },
+          items: [
+            DropdownMenuItem(
+              value: 'en',
+              child: Text(langProvider.t('settings.english')),
+            ),
+            DropdownMenuItem(
+              value: 'ur',
+              child: Text(langProvider.t('settings.urdu')),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   Widget _buildCurrencyMenuItem(
     BuildContext context,
     CurrencyProvider currencyProvider,
+    LanguageProvider langProvider,
     AppColors colors,
   ) {
     return ListTile(
@@ -140,7 +184,7 @@ class SettingsScreen extends StatelessWidget {
         child: Icon(Icons.monetization_on_outlined, color: colors.text, size: 20),
       ),
       title: Text(
-        'Currency',
+        langProvider.t('settings.currency'),
         style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.w600, fontSize: 16),
       ),
       trailing: DropdownButtonHideUnderline(

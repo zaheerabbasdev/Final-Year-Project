@@ -12,6 +12,7 @@ import '../../../core/services/location_service.dart';
 import '../../notifications/notification_provider.dart';
 import '../../../shared/widgets/notification_bell.dart';
 import '../../../core/providers/currency_provider.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class ProviderDashboardScreen extends StatefulWidget {
@@ -65,6 +66,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   @override
   Widget build(BuildContext context) {
     final user = context.watch<AuthService>().user;
+    final lang = context.watch<LanguageProvider>();
     final String fullName = user?['full_name'] ?? 'Provider';
     final String firstName = fullName.split(' ').first;
     final avatarPath = user?['avatar'];
@@ -81,7 +83,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Provider Console',
+              lang.t('provider.dashboard.title'),
               style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 18),
             ),
             Text(
@@ -154,15 +156,15 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                 const SizedBox(height: 24),
               _buildStatsGrid(),
               const SizedBox(height: 32),
-              _buildSectionHeader('Quick Console'),
+              _buildSectionHeader(lang.t('provider.dashboard.quickConsole')),
               const SizedBox(height: 16),
               _buildQuickActions(),
               const SizedBox(height: 32),
               _buildEarningsCard(fullName),
               const SizedBox(height: 32),
               _buildSectionHeader(
-                _isNearMeEnabled ? 'Jobs Near You (20km)' : 'New Job Opportunities', 
-                action: _isLocating ? 'Locating...' : (_isNearMeEnabled ? 'Show All' : 'Near Me'), 
+                _isNearMeEnabled ? lang.t('provider.dashboard.jobsNearYou') : lang.t('provider.dashboard.newOpportunities'),
+                action: _isLocating ? lang.t('provider.dashboard.locating') : (_isNearMeEnabled ? lang.t('provider.dashboard.showAll') : lang.t('provider.dashboard.nearMe')),
                 onAction: _toggleNearMe
               ),
               const SizedBox(height: 16),
@@ -205,6 +207,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   Widget _buildStatsGrid() {
     return Consumer<ProviderService>(
       builder: (context, service, _) {
+        final lang = context.read<LanguageProvider>();
         final stats = service.dashboardStats;
         final allBids = context.watch<JobService>().providerBids;
         
@@ -228,10 +231,10 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           mainAxisSpacing: 16,
           childAspectRatio: 1.15,
           children: [
-            _buildStatCard('Active Jobs', activeJobsCount.toString(), Icons.assignment_rounded, const Color(0xFF0A84FF)),
-            _buildStatCard('Rating', (stats?['rating'] ?? '5.0').toString(), Icons.star_rounded, const Color(0xFFFFB020)),
-            _buildStatCard('Jobs Done', completedJobsCount.toString(), Icons.check_circle_rounded, const Color(0xFF2ECC71)),
-            _buildStatCard('Experience', '${stats?['experience_years'] ?? '0'} Yrs', Icons.military_tech_rounded, const Color(0xFF003B95)),
+            _buildStatCard(lang.t('provider.dashboard.activeJobs'), activeJobsCount.toString(), Icons.assignment_rounded, const Color(0xFF0A84FF)),
+            _buildStatCard(lang.t('provider.dashboard.rating'), (stats?['rating'] ?? '5.0').toString(), Icons.star_rounded, const Color(0xFFFFB020)),
+            _buildStatCard(lang.t('provider.dashboard.jobsDone'), completedJobsCount.toString(), Icons.check_circle_rounded, const Color(0xFF2ECC71)),
+            _buildStatCard(lang.t('provider.dashboard.experience'), '${stats?['experience_years'] ?? '0'} ${lang.t('provider.dashboard.yrs')}', Icons.military_tech_rounded, const Color(0xFF003B95)),
           ],
         );
       },
@@ -281,11 +284,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildQuickActions() {
+    final lang = context.read<LanguageProvider>();
     return Row(
       children: [
-        Expanded(child: _buildActionItem(Icons.search_rounded, 'Browse Opportunities', () => context.push('/browse-jobs'))),
+        Expanded(child: _buildActionItem(Icons.search_rounded, lang.t('provider.dashboard.browseOpportunities'), () => context.push('/browse-jobs'))),
         const SizedBox(width: 16),
-        Expanded(child: _buildActionItem(Icons.gavel_rounded, 'My Bids Console', () => context.read<NavigationService>().setIndex(2))),
+        Expanded(child: _buildActionItem(Icons.gavel_rounded, lang.t('provider.dashboard.myBidsConsole'), () => context.read<NavigationService>().setIndex(2))),
       ],
     );
   }
@@ -334,6 +338,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildEarningsCard(String fullName) {
+    final lang = context.read<LanguageProvider>();
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -365,7 +370,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
           ),
           const SizedBox(height: 24),
           Text(
-            'Weekly Performance Stats',
+            lang.t('provider.dashboard.weeklyPerformance'),
             style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
           ),
           const SizedBox(height: 16),
@@ -408,6 +413,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
     final colors = Theme.of(context).appColors;
     return Consumer<JobService>(
       builder: (context, service, _) {
+        final lang = context.read<LanguageProvider>();
         final openJobs = service.jobs.take(3).toList();
         if (openJobs.isEmpty) {
           return Container(
@@ -420,7 +426,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
             ),
             child: Center(
               child: Text(
-                'No new opportunities available right now.',
+                lang.t('provider.dashboard.noOpportunities'),
                 style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14),
               ),
             ),
@@ -434,6 +440,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildOpportunityCard(Map<String, dynamic> job) {
+    final lang = context.read<LanguageProvider>();
     final colors = Theme.of(context).appColors;
     return Container(
       margin: const EdgeInsets.only(bottom: 16),
@@ -548,7 +555,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(14)),
                       ),
                       child: Text(
-                        'Bid Console',
+                        lang.t('provider.dashboard.bidConsole'),
                         style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 13),
                       ),
                     ),
@@ -576,6 +583,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   }
 
   Widget _buildLocationWarning() {
+    final lang = context.read<LanguageProvider>();
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
@@ -592,12 +600,12 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Service Area Not Configured',
+                  lang.t('provider.dashboard.serviceAreaNotConfigured'),
                   style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: const Color(0xFF991B1B), fontSize: 14),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Configure your default coordinates to find matching customer jobs around you.',
+                  lang.t('provider.dashboard.configureLocation'),
                   style: GoogleFonts.outfit(fontSize: 12, color: const Color(0xFF991B1B).withOpacity(0.85), height: 1.3),
                 ),
               ],
@@ -613,7 +621,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
               elevation: 0,
             ),
-            child: Text('Set Now', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 11)),
+            child: Text(lang.t('provider.dashboard.setNow'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 11)),
           ),
         ],
       ),

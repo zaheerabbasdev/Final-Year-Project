@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import 'package:fluttertoast/fluttertoast.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../auth_service.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class LoginScreen extends StatefulWidget {
@@ -90,6 +91,7 @@ class _LoginScreenState extends State<LoginScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       body: SafeArea(
@@ -128,7 +130,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 28),
               Text(
-                'Welcome Back',
+                lang.t('auth.login.title'),
                 style: GoogleFonts.outfit(
                   fontSize: 32,
                   fontWeight: FontWeight.w800,
@@ -138,7 +140,7 @@ class _LoginScreenState extends State<LoginScreen> {
               ),
               const SizedBox(height: 8),
               Text(
-                'Sign in to continue to your dashboard',
+                lang.t('auth.login.subtitle'),
                 style: GoogleFonts.outfit(
                   color: colors.subtext,
                   fontSize: 16,
@@ -163,18 +165,18 @@ class _LoginScreenState extends State<LoginScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
-                    _buildLabel('Email Address', colors),
+                    _buildLabel(lang.t('auth.login.emailLabel'), colors),
                     TextField(
                       controller: _emailController,
                       textInputAction: TextInputAction.next,
                       keyboardType: TextInputType.emailAddress,
                       style: GoogleFonts.outfit(color: colors.text),
-                      decoration: const InputDecoration(
-                        hintText: 'Enter your email',
+                      decoration: InputDecoration(
+                        hintText: lang.t('auth.login.emailHint'),
                       ),
                     ),
                     const SizedBox(height: 24),
-                    _buildLabel('Password', colors),
+                    _buildLabel(lang.t('auth.login.passwordLabel'), colors),
                     TextField(
                       controller: _passwordController,
                       obscureText: !_isPasswordVisible,
@@ -182,7 +184,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       onSubmitted: (_) => _login(),
                       style: GoogleFonts.outfit(color: colors.text),
                       decoration: InputDecoration(
-                        hintText: 'Enter your password',
+                        hintText: lang.t('auth.login.passwordHint'),
                         suffixIcon: IconButton(
                           icon: Icon(
                             _isPasswordVisible ? Icons.visibility_off_outlined : Icons.visibility_outlined,
@@ -210,7 +212,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Remember me',
+                              lang.t('auth.login.rememberMe'),
                               style: GoogleFonts.outfit(
                                 color: colors.text,
                                 fontWeight: FontWeight.w500,
@@ -227,7 +229,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                           ),
                           child: Text(
-                            'Forgot Password?',
+                            lang.t('auth.login.forgotPassword'),
                             style: GoogleFonts.outfit(
                               color: AppTheme.secondaryColor,
                               fontWeight: FontWeight.w600,
@@ -253,7 +255,7 @@ class _LoginScreenState extends State<LoginScreen> {
                             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
                         : Text(
-                            'Sign In',
+                            lang.t('auth.login.signIn'),
                             style: GoogleFonts.outfit(
                               fontSize: 18,
                               fontWeight: FontWeight.w700,
@@ -267,7 +269,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         Padding(
                           padding: const EdgeInsets.symmetric(horizontal: 16),
                           child: Text(
-                            'Or continue with',
+                            lang.t('auth.login.orContinueWith'),
                             style: GoogleFonts.outfit(
                               color: colors.subtext,
                               fontSize: 14,
@@ -294,7 +296,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text(
-                    "Don't have an account? ",
+                    lang.t('auth.login.noAccount'),
                     style: GoogleFonts.outfit(
                       color: colors.subtext,
                       fontSize: 15,
@@ -309,7 +311,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       tapTargetSize: MaterialTapTargetSize.shrinkWrap,
                     ),
                     child: Text(
-                      'Sign Up',
+                      lang.t('auth.login.signUp'),
                       style: GoogleFonts.outfit(
                         color: AppTheme.primaryColor,
                         fontWeight: FontWeight.bold,

@@ -13,6 +13,7 @@ import '../../shared/widgets/review_card.dart';
 import '../../core/api_client.dart';
 import '../../core/services/location_service.dart';
 import 'map_picker_screen.dart';
+import '../../core/providers/language_provider.dart';
 import '../../shared/widgets/notification_bell.dart';
 import '../../core/providers/theme_provider.dart';
 import '../../core/theme.dart';
@@ -160,6 +161,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
     final avatarUrl = ApiClient.getImageUrl(avatarPath);
     final colors = Theme.of(context).appColors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final lang = context.watch<LanguageProvider>();
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -167,7 +169,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         backgroundColor: colors.background,
         elevation: 0,
         scrolledUnderElevation: 0,
-        title: Text('Profile', style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold)),
+        title: Text(lang.t('profile.title'), style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold)),
         actions: [
           NotificationBell(color: colors.text),
         ],
@@ -289,8 +291,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildCustomerStats(),
           const SizedBox(height: 32),
           _buildMenuCard([
-            _buildMenuItem(Icons.psychology_outlined, 'AI Support Assistant', () => context.push('/support-chatbot')),
-            _buildMenuItem(Icons.settings_outlined, 'Settings', () => context.push('/settings')),
+            _buildMenuItem(Icons.psychology_outlined, context.read<LanguageProvider>().t('profile.aiSupport'), () => context.push('/support-chatbot')),
+            _buildMenuItem(Icons.settings_outlined, context.read<LanguageProvider>().t('profile.settings'), () => context.push('/settings')),
           ]),
           const SizedBox(height: 32),
           _buildLogoutButton(authService),
@@ -323,8 +325,8 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildProviderStats(),
           const SizedBox(height: 32),
           _buildMenuCard([
-            _buildMenuItem(Icons.psychology_outlined, 'AI Support Assistant', () => context.push('/support-chatbot')),
-            _buildMenuItem(Icons.settings_outlined, 'Settings', () => context.push('/settings')),
+            _buildMenuItem(Icons.psychology_outlined, context.read<LanguageProvider>().t('profile.aiSupport'), () => context.push('/support-chatbot')),
+            _buildMenuItem(Icons.settings_outlined, context.read<LanguageProvider>().t('profile.settings'), () => context.push('/settings')),
           ]),
           const SizedBox(height: 32),
           _buildProviderReviews(user?['id']),
