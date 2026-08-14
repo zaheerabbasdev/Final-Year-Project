@@ -48,12 +48,15 @@ function ChatContent() {
   const [messages, setMessages] = useState<Message[]>([]);
   
   const [newMessage, setNewMessage] = useState('');
+  const [selectedImage, setSelectedImage] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
   const [loadingList, setLoadingList] = useState(true);
   const [loadingMessages, setLoadingMessages] = useState(false);
   const [sending, setSending] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     if (authLoading) return;
@@ -118,9 +121,26 @@ function ChatContent() {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setSelectedImage(file);
+    setImagePreview(URL.createObjectURL(file));
+    // Reset input so same file can be re-selected
+    e.target.value = '';
+  };
+
+  const clearImage = () => {
+    setSelectedImage(null);
+    if (imagePreview) {
+      URL.revokeObjectURL(imagePreview);
+      setImagePreview(null);
+    }
+  };
+
   const handleSendMessage = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!newMessage.trim() || !activeChat || !user) return;
+    if ((!newMessage.trim() && !selectedImage) || !activeChat || !user) return;
 
     setSending(true);
     try {
@@ -128,11 +148,13 @@ function ChatContent() {
       formData.append('job_id', String(activeChat.jobId));
       formData.append('receiver_id', String(activeChat.userId));
       formData.append('content', newMessage);
+      if (selectedImage) formData.append('image', selectedImage);
 
       await api.post('/messages/send', formData);
       setNewMessage('');
+      clearImage();
       fetchMessages(activeChat.jobId, activeChat.userId, false);
-      fetchChatList(); // Refresh last message in list
+      fetchChatList();
     } catch (err: any) {
       console.error(err);
       setError('Failed to send message.');
@@ -293,26 +315,58 @@ function ChatContent() {
 
               {/* Input Area */}
               <div className="p-4 border-t border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-900/40">
+                {/* Image preview */}
+                {imagePreview && (
+                  <div className="mb-3 relative inline-block">
+                    <img
+                      src={imagePreview}
+                      alt="attachment preview"
+                      className="h-24 rounded-lg object-cover border border-zinc-200 dark:border-zinc-700"
+                    />
+                    <button
+                      type="button"
+                      onClick={clearImage}
+                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center hover:bg-rose-600"
+                      title="Remove image"
+                    >
+                      ✕
+                    </button>
+                  </div>
+                )}
+
                 <form onSubmit={handleSendMessage} className="flex gap-2 items-center">
-                  <div className="flex-grow relative">
+                  {/* Hidden file input */}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleImageSelect}
+                    className="hidden"
+                  />
+
+                  {/* Attach button */}
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="p-3 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 transition-colors shrink-0"
+                    title="Attach image"
+                  >
+                    <Paperclip size={18} />
+                  </button>
+
+                  <div className="flex-grow">
                     <input
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder="Type a message..."
-                      className="w-full pl-4 pr-10 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                      className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
                     />
-                    <button 
-                      type="button" 
-                      className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
-                      title="Attach image"
-                    >
-                      <Paperclip size={18} />
-                    </button>
                   </div>
+
                   <button
                     type="submit"
-                    disabled={!newMessage.trim() || sending}
+                    disabled={(!newMessage.trim() && !selectedImage) || sending}
                     className="p-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 text-white rounded-xl transition-colors shrink-0"
                   >
                     <Send size={20} />
