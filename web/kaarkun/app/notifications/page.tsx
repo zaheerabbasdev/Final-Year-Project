@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../utils/api';
 import {
   Bell,
@@ -57,6 +58,7 @@ const timeAgo = (dateStr: string) => {
 
 export default function NotificationsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -123,10 +125,10 @@ export default function NotificationsPage() {
             <span className="p-2 bg-orange-100 dark:bg-orange-950/30 rounded-xl">
               <Bell size={22} className="text-orange-500" />
             </span>
-            Notifications
+            {t('notifications.title')}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1 ml-12">
-            {unreadCount > 0 ? `${unreadCount} unread notification${unreadCount > 1 ? 's' : ''}` : 'All caught up!'}
+            {unreadCount > 0 ? `${unreadCount} ${t('notifications.unread')}` : t('nav.allCaughtUp')}
           </p>
         </div>
         {unreadCount > 0 && (
@@ -136,7 +138,7 @@ export default function NotificationsPage() {
             className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-xl transition-all disabled:opacity-50"
           >
             <CheckCheck size={14} />
-            Mark All Read
+            {t('notifications.markAllRead')}
           </button>
         )}
       </div>
@@ -151,8 +153,8 @@ export default function NotificationsPage() {
       {notifications.length === 0 ? (
         <div className="text-center py-20 bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl">
           <BellOff size={48} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-4" />
-          <p className="text-zinc-500 dark:text-zinc-400 font-medium">No notifications yet</p>
-          <p className="text-xs text-zinc-400 mt-1">Activity alerts will appear here.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 font-medium">{t('notifications.noNotifications')}</p>
+          <p className="text-xs text-zinc-400 mt-1">{t('notifications.noNotificationsSubtitle')}</p>
         </div>
       ) : (
         <div className="space-y-3">
@@ -231,7 +233,7 @@ export default function NotificationsPage() {
                 onClick={() => setSelectedNotification(null)}
                 className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
               >
-                Dismiss
+                {t('nav.dismiss')}
               </button>
             </div>
           </div>

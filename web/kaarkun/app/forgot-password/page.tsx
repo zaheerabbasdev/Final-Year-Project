@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '../context/LanguageContext';
 import { KeyRound, Mail, Lock, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
 
 // ── tiny API helper (no auth needed) ────────────────────────────────────────
@@ -22,6 +23,7 @@ async function postJSON(path: string, body: object) {
 // ── component ────────────────────────────────────────────────────────────────
 export default function ForgotPasswordPage() {
   const router = useRouter();
+  const { t } = useLanguage();
 
   const [step, setStep]           = useState<1 | 2 | 3>(1);
   const [email, setEmail]         = useState('');
@@ -88,14 +90,14 @@ export default function ForgotPasswordPage() {
 
           {/* Title */}
           <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50 text-center">
-            {step === 1 ? 'Forgot your password?' : step === 2 ? 'Enter reset code' : 'Password updated!'}
+            {step === 1 ? t('auth.forgotPassword.title') : step === 2 ? t('auth.forgotPassword.resetTitle') : t('auth.forgotPassword.successTitle') || 'Password updated!'}
           </h2>
           <p className="mt-2 text-sm text-zinc-500 dark:text-zinc-400 text-center">
             {step === 1
-              ? "Enter your email and we'll send you a 6-digit reset code."
+              ? t('auth.forgotPassword.subtitle')
               : step === 2
-              ? `We sent a 6-digit code to ${email}.`
-              : 'Your password has been changed. You can now sign in.'}
+              ? `${t('auth.forgotPassword.codeSentTo') || 'We sent a 6-digit code to'} ${email}.`
+              : t('auth.forgotPassword.successSubtitle') || 'Your password has been changed. You can now sign in.'}
           </p>
 
           {/* Error */}
@@ -111,7 +113,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleRequestCode} className="mt-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  Email Address
+                  {t('auth.forgotPassword.emailLabel')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -132,7 +134,7 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
                 className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors"
               >
-                {loading ? 'Sending…' : 'Send Reset Code'}
+                {loading ? t('auth.forgotPassword.sending') : t('auth.forgotPassword.sendCode')}
               </button>
             </form>
           )}
@@ -142,7 +144,7 @@ export default function ForgotPasswordPage() {
             <form onSubmit={handleReset} className="mt-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  6-Digit Code
+                  {t('auth.forgotPassword.resetCode')}
                 </label>
                 <input
                   type="text"
@@ -156,7 +158,7 @@ export default function ForgotPasswordPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  New Password
+                  {t('auth.forgotPassword.newPassword')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -178,7 +180,7 @@ export default function ForgotPasswordPage() {
               </div>
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                  Confirm Password
+                  {t('auth.forgotPassword.confirmPassword')}
                 </label>
                 <div className="relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -203,14 +205,14 @@ export default function ForgotPasswordPage() {
                 disabled={loading}
                 className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors"
               >
-                {loading ? 'Resetting…' : 'Reset Password'}
+                {loading ? t('auth.forgotPassword.resetting') : t('auth.forgotPassword.resetPassword')}
               </button>
               <button
                 type="button"
                 onClick={() => { setStep(1); setError(null); setOtp(''); }}
                 className="w-full text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
               >
-                ← Resend code
+                {t('auth.forgotPassword.backToLogin')}
               </button>
             </form>
           )}
@@ -222,7 +224,7 @@ export default function ForgotPasswordPage() {
                 onClick={() => router.push('/login')}
                 className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
               >
-                Go to Login
+                {t('auth.forgotPassword.goToLogin') || 'Go to Login'}
               </button>
             </div>
           )}

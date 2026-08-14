@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../utils/api';
 import {
   Briefcase,
@@ -43,6 +44,7 @@ type TabKey = 'all' | 'pending' | 'active' | 'completed' | 'availed';
 export default function ProviderBidsPage() {
   const { user, loading: authLoading } = useAuth();
   const { format } = useCurrency();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [bids, setBids] = useState<Bid[]>([]);
@@ -140,7 +142,7 @@ export default function ProviderBidsPage() {
         </div>
         <div>
           <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
-            My Placed Bids
+            {t('provider.bids.title')}
           </h1>
           <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
             Monitor your quotes, active jobs, and completed work.
@@ -185,7 +187,7 @@ export default function ProviderBidsPage() {
       {displayedBids.length === 0 ? (
         <div className="text-center py-16 bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl">
           <Briefcase size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm">No bids found in this category.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm">{t('provider.bids.noBids')}</p>
           <Link href="/provider/browse-jobs" className="inline-block mt-4 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
             Find jobs →
           </Link>

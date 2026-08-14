@@ -3,11 +3,13 @@
 import React, { useState, useEffect, useRef, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../utils/api';
 import { KeyRound, AlertCircle, CheckCircle, RefreshCw } from 'lucide-react';
 
 function OTPContent() {
   const { verifyOtp } = useAuth();
+  const { t } = useLanguage();
   const searchParams = useSearchParams();
   const router = useRouter();
   const email = searchParams.get('email') || '';
@@ -81,10 +83,10 @@ function OTPContent() {
           <KeyRound size={28} />
         </span>
         <h2 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">
-          Enter Verification Code
+          {t('auth.verifyOtp.title')}
         </h2>
         <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-          We sent a 6-digit code to{' '}
+          {t('auth.verifyOtp.subtitle')}{' '}
           <span className="font-semibold text-zinc-800 dark:text-zinc-200">{email}</span>.
         </p>
       </div>
@@ -116,7 +118,7 @@ function OTPContent() {
       <form onSubmit={handleSubmit} className="space-y-5">
         <div>
           <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 text-center mb-2">
-            Verification Code
+            {t('auth.verifyOtp.otpLabel')}
           </label>
           <input
             type="text"
@@ -125,7 +127,7 @@ function OTPContent() {
             value={otp}
             onChange={(e) => setOtp(e.target.value.replace(/\D/g, ''))}
             className="block w-full text-center tracking-widest text-2xl font-mono px-3 py-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 transition-all"
-            placeholder="000000"
+            placeholder={t('auth.verifyOtp.otpPlaceholder')}
           />
         </div>
 
@@ -134,14 +136,14 @@ function OTPContent() {
           disabled={loading || otp.length !== 6}
           className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50"
         >
-          {loading ? 'Verifying...' : 'Verify Code'}
+          {loading ? t('auth.verifyOtp.verifying') : t('auth.verifyOtp.verify')}
         </button>
       </form>
 
       {/* Resend Code */}
       <div className="text-center pt-1">
         <p className="text-sm text-zinc-500 dark:text-zinc-400 mb-2">
-          Didn't receive the code?
+          {t('auth.verifyOtp.didntReceive') || "Didn't receive the code?"}
         </p>
         <button
           type="button"
@@ -152,14 +154,14 @@ function OTPContent() {
           {resending ? (
             <>
               <RefreshCw size={14} className="animate-spin" />
-              Sending...
+              {t('auth.verifyOtp.sending') || 'Sending...'}
             </>
           ) : cooldown > 0 ? (
-            `Resend in ${cooldown}s`
+            `${t('auth.verifyOtp.resendIn')} ${cooldown}s`
           ) : (
             <>
               <RefreshCw size={14} />
-              Resend Code
+              {t('auth.verifyOtp.resendCode')}
             </>
           )}
         </button>

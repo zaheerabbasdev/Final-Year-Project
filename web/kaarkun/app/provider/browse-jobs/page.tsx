@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../utils/api';
 import {
   Briefcase,
@@ -58,6 +59,7 @@ interface AISuggestion {
 
 export default function BrowseJobsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const { format, convertToPkr, convertFromPkr, currencyInfo } = useCurrency();
   const router = useRouter();
 
@@ -254,7 +256,7 @@ export default function BrowseJobsPage() {
           </div>
           <div>
             <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
-              Browse Jobs Feed
+              {t('provider.browseJobs.title')}
             </h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">
               Browse open listings in your community and send custom quotes.
@@ -436,7 +438,7 @@ export default function BrowseJobsPage() {
                   <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold">Budget</p>
                     <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{format(job.budget)}</p>
-                    {job.is_negotiable && <p className="text-[9px] text-zinc-400">Negotiable</p>}
+                    {job.is_negotiable && <p className="text-[9px] text-zinc-400">{t('provider.browseJobs.negotiable')}</p>}
                   </div>
                   <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><MapPin size={10} /> Location</p>
@@ -464,7 +466,7 @@ export default function BrowseJobsPage() {
                     onClick={() => handleOpenBidModal(job)}
                     className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition-all"
                   >
-                    Place a Bid
+                    {t('provider.browseJobs.placeBid')}
                   </button>
                 )}
               </div>
@@ -486,7 +488,7 @@ export default function BrowseJobsPage() {
             </button>
 
             <h3 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 mb-1">
-              Place Bid: {biddingJob.title}
+              {t('provider.browseJobs.bidModalTitle')}: {biddingJob.title}
             </h3>
             <p className="text-xs text-zinc-500 mb-4">
               Client budget: {format(biddingJob.budget)}
@@ -554,7 +556,7 @@ export default function BrowseJobsPage() {
             <form onSubmit={handlePlaceBid} className="space-y-4">
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Your Bid Amount ({currencyInfo.code})
+                  {t('provider.browseJobs.bidAmountLabel')}
                 </label>
                 <input
                   type="number"
@@ -568,7 +570,7 @@ export default function BrowseJobsPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Estimated Delivery Time
+                  {t('provider.browseJobs.estimatedTimeLabel')}
                 </label>
                 <input
                   type="text"
@@ -582,7 +584,7 @@ export default function BrowseJobsPage() {
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-700 dark:text-zinc-300 mb-1">
-                  Proposal Cover Letter
+                  {t('provider.browseJobs.coverLetterLabel')}
                 </label>
                 <textarea
                   required
@@ -608,7 +610,7 @@ export default function BrowseJobsPage() {
                   className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1"
                 >
                   <Send size={12} />
-                  {bidLoading ? 'Sending...' : 'Send Bid'}
+                  {bidLoading ? t('provider.browseJobs.submitting') : t('provider.browseJobs.submitBid')}
                 </button>
               </div>
             </form>

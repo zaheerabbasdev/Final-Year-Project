@@ -4,15 +4,16 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../utils/api';
-import { 
-  User as UserIcon, 
-  Mail, 
-  Lock, 
-  Phone, 
-  Briefcase, 
-  Upload, 
-  AlertCircle, 
+import {
+  User as UserIcon,
+  Mail,
+  Lock,
+  Phone,
+  Briefcase,
+  Upload,
+  AlertCircle,
   CheckCircle,
   FileCheck
 } from 'lucide-react';
@@ -24,6 +25,7 @@ interface Category {
 
 export default function RegisterPage() {
   const { register, loading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [categories, setCategories] = useState<Category[]>([
@@ -101,17 +103,15 @@ export default function RegisterPage() {
       const res = await register(formData);
       if (res.requiresOTP) {
         if (res.emailSent === false) {
-          // Account created but email failed — user will see Resend button on next page
           setSuccessMsg(res.message || 'Account created! We could not send the email — use Resend Code on the next screen.');
           setTimeout(() => {
             router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
           }, 2500);
         } else {
-          // Normal flow — email sent, go straight to OTP screen
           router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
         }
       } else {
-        setSuccessMsg(res.message || 'Provider registration successful! Redirecting to login...');
+        setSuccessMsg(res.message || t('auth.register.providerSuccess'));
         setTimeout(() => {
           router.push('/login');
         }, 2000);
@@ -128,12 +128,12 @@ export default function RegisterPage() {
       <div className="max-w-xl w-full space-y-8 bg-white dark:bg-zinc-900/40 p-8 sm:p-10 rounded-2xl border border-zinc-100 dark:border-zinc-800/80 shadow-sm backdrop-blur-sm">
         <div>
           <h2 className="text-center text-3xl font-extrabold text-zinc-900 dark:text-zinc-50">
-            Create an Account
+            {t('auth.register.title')}
           </h2>
           <p className="mt-2 text-center text-sm text-zinc-600 dark:text-zinc-400">
-            Already have an account?{' '}
+            {t('auth.register.alreadyHave')}{' '}
             <Link href="/login" className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-              Sign in
+              {t('auth.register.signIn')}
             </Link>
           </p>
         </div>
@@ -149,7 +149,7 @@ export default function RegisterPage() {
                 : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
             }`}
           >
-            I need services (Customer)
+            {t('auth.register.iNeedServices')}
           </button>
           <button
             type="button"
@@ -160,7 +160,7 @@ export default function RegisterPage() {
                 : 'text-zinc-600 hover:text-zinc-900 dark:text-zinc-400 dark:hover:text-zinc-200'
             }`}
           >
-            I want to work (Provider)
+            {t('auth.register.iWantToWork')}
           </button>
         </div>
 
@@ -181,7 +181,7 @@ export default function RegisterPage() {
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Full Name</label>
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('auth.register.fullName')}</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                   <UserIcon size={18} />
@@ -192,13 +192,13 @@ export default function RegisterPage() {
                   value={fullName}
                   onChange={(e) => setFullName(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                  placeholder="John Doe"
+                  placeholder={t('auth.register.fullNamePlaceholder')}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Email Address</label>
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('auth.register.emailLabel')}</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                   <Mail size={18} />
@@ -209,13 +209,13 @@ export default function RegisterPage() {
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                  placeholder="john@example.com"
+                  placeholder={t('auth.register.emailPlaceholder')}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Phone Number</label>
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('auth.register.phoneLabel')}</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                   <Phone size={18} />
@@ -226,13 +226,13 @@ export default function RegisterPage() {
                   value={phone}
                   onChange={(e) => setPhone(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                  placeholder="+923001234567"
+                  placeholder={t('auth.register.phonePlaceholder')}
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Password</label>
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('auth.register.passwordLabel')}</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                   <Lock size={18} />
@@ -244,22 +244,22 @@ export default function RegisterPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                  placeholder="••••••••"
+                  placeholder={t('auth.register.passwordPlaceholder')}
                 />
               </div>
-              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">At least 8 characters, with letters and numbers.</p>
+              <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{t('auth.register.passwordHint')}</p>
             </div>
           </div>
 
           {/* Avatar upload for both roles */}
           <div>
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-              Profile Photo
+              {t('auth.register.profilePhoto')}
             </label>
             <div className="flex items-center gap-4">
               <label className="flex items-center justify-center px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors gap-2">
                 <Upload size={16} />
-                Choose Photo
+                {t('auth.register.choosePhoto')}
                 <input
                   type="file"
                   accept="image/*"
@@ -275,12 +275,12 @@ export default function RegisterPage() {
           {role === 'provider' && (
             <div className="border-t border-zinc-100 dark:border-zinc-800 pt-6 space-y-6">
               <h3 className="text-md font-semibold text-zinc-800 dark:text-zinc-200">
-                Professional Details
+                {t('auth.register.professionalDetails')}
               </h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Category
+                    {t('auth.register.categoryLabel')}
                   </label>
                   <select
                     required
@@ -288,7 +288,7 @@ export default function RegisterPage() {
                     onChange={(e) => setCategoryId(e.target.value)}
                     className="mt-1 block w-full py-2 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
                   >
-                    <option value="">Select Category</option>
+                    <option value="">{t('auth.register.selectCategory')}</option>
                     {categories.map((cat) => (
                       <option key={cat.id} value={cat.id}>
                         {cat.name}
@@ -299,7 +299,7 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                    Experience (Years)
+                    {t('auth.register.experienceLabel')}
                   </label>
                   <input
                     type="number"
@@ -308,7 +308,7 @@ export default function RegisterPage() {
                     value={experience}
                     onChange={(e) => setExperience(e.target.value)}
                     className="mt-1 block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                    placeholder="e.g. 5"
+                    placeholder={t('auth.register.experiencePlaceholder')}
                   />
                 </div>
               </div>
@@ -316,12 +316,12 @@ export default function RegisterPage() {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                    CNIC Card Image / PDF
+                    {t('auth.register.cnicLabel')}
                   </label>
                   <div className="flex items-center gap-3">
                     <label className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
                       <Upload size={16} />
-                      Upload CNIC
+                      {t('auth.register.uploadCnic')}
                       <input
                         type="file"
                         accept="image/*,application/pdf"
@@ -336,12 +336,12 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                    Certifications (Optional)
+                    {t('auth.register.certificationsLabel')}
                   </label>
                   <div className="flex items-center gap-3">
                     <label className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
                       <Upload size={16} />
-                      Upload File
+                      {t('auth.register.uploadFile')}
                       <input
                         type="file"
                         accept="image/*,application/pdf"
@@ -362,7 +362,7 @@ export default function RegisterPage() {
               disabled={localLoading || loading}
               className="w-full flex justify-center py-3 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50"
             >
-              {localLoading || loading ? 'Creating Account...' : 'Register'}
+              {localLoading || loading ? t('auth.register.creating') : t('auth.register.register')}
             </button>
           </div>
         </form>

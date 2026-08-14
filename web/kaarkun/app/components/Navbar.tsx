@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { useCurrency, SUPPORTED_CURRENCIES } from '../context/CurrencyContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api, getFileUrl } from '../utils/api';
 import {
   Bell,
@@ -21,6 +22,7 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
   const { selectedCurrency, setCurrency } = useCurrency();
+  const { lang, setLang, t } = useLanguage();
   const [showCurrencyDropdown, setShowCurrencyDropdown] = useState(false);
   const [showNotificationsDropdown, setShowNotificationsDropdown] = useState(false);
   const [selectedNotification, setSelectedNotification] = useState<any | null>(null);
@@ -178,6 +180,15 @@ export default function Navbar() {
                 )}
               </button>
 
+              {/* Language toggle */}
+              <button
+                onClick={() => setLang(lang === 'en' ? 'ur' : 'en')}
+                title={lang === 'en' ? 'Switch to Urdu' : 'Switch to English'}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
+              >
+                {lang === 'en' ? 'اردو' : 'EN'}
+              </button>
+
               {/* Notifications dropdown */}
               <div className="relative" ref={notifRef}>
                 <button
@@ -194,9 +205,9 @@ export default function Navbar() {
                   <div className="absolute top-full right-0 mt-2 w-[340px] bg-white dark:bg-[#13131e] border border-zinc-100 dark:border-white/[0.08] rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/40 z-50 overflow-hidden animate-in fade-in slide-in-from-top-2 duration-200">
                     <div className="px-4 py-3 border-b border-zinc-100 dark:border-white/[0.06] flex justify-between items-center">
                       <div>
-                        <h3 className="font-bold text-zinc-900 dark:text-white text-sm">Notifications</h3>
+                        <h3 className="font-bold text-zinc-900 dark:text-white text-sm">{t('nav.notifications')}</h3>
                         {unreadCount > 0 && (
-                          <p className="text-xs text-zinc-400">{unreadCount} unread</p>
+                          <p className="text-xs text-zinc-400">{unreadCount} {t('common.unread')}</p>
                         )}
                       </div>
                       {unreadCount > 0 && (
@@ -205,7 +216,7 @@ export default function Navbar() {
                           className="flex items-center gap-1 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:text-indigo-700 transition-colors"
                         >
                           <CheckCheck size={12} />
-                          Mark all read
+                          {t('nav.markAllRead')}
                         </button>
                       )}
                     </div>
@@ -289,17 +300,24 @@ export default function Navbar() {
                   <Moon size={18} className="text-indigo-500" />
                 )}
               </button>
+              {/* Language toggle (guest) */}
+              <button
+                onClick={() => setLang(lang === 'en' ? 'ur' : 'en')}
+                className="flex items-center gap-1 px-2.5 py-1.5 rounded-xl text-xs font-bold border border-zinc-200 dark:border-white/[0.08] text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 transition-all"
+              >
+                {lang === 'en' ? 'اردو' : 'EN'}
+              </button>
               <Link
                 href="/login"
                 className="text-sm font-medium text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 px-4 py-2 rounded-xl transition-colors hover:bg-zinc-100 dark:hover:bg-white/5"
               >
-                Login
+                {t('nav.login')}
               </Link>
               <Link
                 href="/register"
                 className="text-sm font-semibold text-white bg-gradient-to-r from-indigo-600 to-violet-600 hover:from-indigo-500 hover:to-violet-500 px-4 py-2 rounded-xl shadow-lg shadow-indigo-500/25 transition-all"
               >
-                Sign Up
+                {t('nav.signup')}
               </Link>
             </div>
           )}

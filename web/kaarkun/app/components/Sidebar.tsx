@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useLanguage } from '../context/LanguageContext';
 import {
   LayoutDashboard,
   User,
@@ -34,6 +35,7 @@ type NavItem = {
 export default function Sidebar() {
   const { user, logout } = useAuth();
   const { theme, toggleTheme } = useTheme();
+  const { t } = useLanguage();
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
 
@@ -54,48 +56,48 @@ export default function Sidebar() {
   const primaryItems: NavItem[] = [
     {
       href: dashboardHref,
-      label: 'Dashboard',
+      label: t('sidebar.dashboard'),
       icon: <LayoutDashboard size={17} />,
     },
     // Customer only
     {
       href: '/customer/post-job',
-      label: 'Post a Job',
+      label: t('sidebar.postJob'),
       icon: <Briefcase size={17} />,
       roles: ['customer'],
     },
     {
       href: '/customer/jobs',
-      label: 'My Jobs',
+      label: t('sidebar.myJobs'),
       icon: <ClipboardList size={17} />,
       roles: ['customer'],
     },
     {
       href: '/customer/bookings',
-      label: 'My Bookings',
+      label: t('sidebar.myBookings'),
       icon: <BookOpen size={17} />,
       roles: ['customer'],
     },
     // Provider only
     {
       href: '/provider/browse-jobs',
-      label: 'Browse Jobs',
+      label: t('sidebar.browseJobs'),
       icon: <Search size={17} />,
       roles: ['provider'],
     },
     {
       href: '/provider/bids',
-      label: 'My Bids',
+      label: t('sidebar.myBids'),
       icon: <Scale size={17} />,
       roles: ['provider'],
     },
   ];
 
   const secondaryItems: NavItem[] = [
-    { href: '/chat', label: 'Messages', icon: <MessageSquare size={17} /> },
-    { href: '/notifications', label: 'Notifications', icon: <Bell size={17} /> },
-    { href: '/profile', label: 'My Profile', icon: <User size={17} /> },
-    { href: '/support-chatbot', label: 'AI Assistant', icon: <Bot size={17} />, badge: 'AI' },
+    { href: '/chat', label: t('sidebar.messages'), icon: <MessageSquare size={17} /> },
+    { href: '/notifications', label: t('sidebar.notifications'), icon: <Bell size={17} /> },
+    { href: '/profile', label: t('sidebar.myProfile'), icon: <User size={17} /> },
+    { href: '/support-chatbot', label: t('sidebar.aiAssistant'), icon: <Bot size={17} />, badge: 'AI' },
   ];
 
   const renderItem = (item: NavItem) => {
@@ -160,7 +162,7 @@ export default function Sidebar() {
                 Kaarkun
               </p>
               <p className="text-[10px] text-zinc-400 font-medium capitalize mt-0.5">
-                {role} portal
+                {t(isCustomer ? 'sidebar.customerPortal' : 'sidebar.providerPortal')}
               </p>
             </div>
           </div>
@@ -176,14 +178,14 @@ export default function Sidebar() {
         {/* Navigation */}
         <nav className="flex-1 overflow-y-auto px-3 pb-3 space-y-0.5">
           <p className="px-3 pt-4 pb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            {isCustomer ? 'Customer' : 'Provider'}
+            {t(isCustomer ? 'sidebar.customerSection' : 'sidebar.providerSection')}
           </p>
           {primaryItems.map(renderItem)}
 
           <div className="h-px bg-zinc-100 dark:bg-white/[0.06] my-3 mx-1" />
 
           <p className="px-3 pb-2 text-[10px] font-bold uppercase tracking-widest text-zinc-400 dark:text-zinc-500">
-            General
+            {t('sidebar.general')}
           </p>
           {secondaryItems.map(item => renderItem(item))}
         </nav>
@@ -199,14 +201,14 @@ export default function Sidebar() {
             ) : (
               <Moon size={17} className="text-indigo-500 shrink-0" />
             )}
-            {theme === 'dark' ? 'Light Mode' : 'Dark Mode'}
+            {theme === 'dark' ? t('common.lightMode') : t('common.darkMode')}
           </button>
           <button
             onClick={logout}
             className="w-full flex items-center gap-3 px-3 py-2.5 rounded-xl transition-all text-sm font-medium text-zinc-500 dark:text-zinc-400 hover:bg-rose-50 dark:hover:bg-rose-500/10 hover:text-rose-600 dark:hover:text-rose-400"
           >
             <LogOut size={17} className="shrink-0" />
-            Sign Out
+            {t('common.signOut')}
           </button>
         </div>
       </aside>

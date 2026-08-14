@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../utils/api';
 import LocationInput from '../../components/LocationInput';
 import { useCurrency } from '../../context/CurrencyContext';
@@ -26,6 +27,7 @@ interface Category {
 export default function PostJobPage() {
   const { user, loading: authLoading } = useAuth();
   const { currencyInfo, convertToPkr, convertFromPkr } = useCurrency();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [categories, setCategories] = useState<Category[]>([
@@ -205,7 +207,7 @@ export default function PostJobPage() {
 
           <div>
             <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-              Job Title
+              {t('customer.postJob.titleLabel')}
             </label>
             <input
               type="text"
@@ -233,7 +235,7 @@ export default function PostJobPage() {
                 ) : (
                   <Sparkles size={12} />
                 )}
-                {aiLoading ? 'Analyzing...' : 'Improve with AI'}
+                {aiLoading ? t('customer.postJob.analyzing') : t('customer.postJob.aiButton')}
               </button>
             </div>
             <textarea
@@ -249,7 +251,7 @@ export default function PostJobPage() {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
             <div>
               <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                Service Category
+                {t('customer.postJob.categoryLabel')}
               </label>
               <select
                 required
@@ -257,7 +259,7 @@ export default function PostJobPage() {
                 onChange={(e) => setCategoryId(e.target.value)}
                 className="mt-1 block w-full py-2 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
               >
-                <option value="">Select Category</option>
+                <option value="">{t('customer.postJob.selectCategory')}</option>
                 {categories.map((cat) => (
                   <option key={cat.id} value={cat.id}>
                     {cat.name}
@@ -414,7 +416,7 @@ export default function PostJobPage() {
             {submitLoading && (
               <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />
             )}
-            {submitLoading ? 'Posting Job...' : 'Submit Job Post'}
+            {submitLoading ? t('customer.postJob.submitting') : t('customer.postJob.submit')}
           </button>
 
         </form>

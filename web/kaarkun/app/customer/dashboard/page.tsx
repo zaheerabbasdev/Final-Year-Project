@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../utils/api';
 import {
   Briefcase,
@@ -73,6 +74,7 @@ const STATUS_ACCENT: Record<string, string> = {
 export default function CustomerDashboard() {
   const { user, loading: authLoading } = useAuth();
   const { format } = useCurrency();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -150,8 +152,8 @@ export default function CustomerDashboard() {
           <LayoutDashboard size={20} className="text-indigo-600 dark:text-indigo-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">Dashboard</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">Overview of your jobs and bookings</p>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">{t('sidebar.dashboard')}</h1>
+          <p className="text-xs text-zinc-400 mt-0.5">{t('customer.dashboard.subtitle')}</p>
         </div>
       </div>
 
@@ -162,7 +164,7 @@ export default function CustomerDashboard() {
         <div className="absolute -bottom-10 right-24 w-28 h-28 rounded-full bg-white/5 pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <p className="text-indigo-200 text-sm font-medium mb-1">Welcome back 👋</p>
+            <p className="text-indigo-200 text-sm font-medium mb-1">{t('customer.dashboard.greeting')} 👋</p>
             <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight">
               {user?.full_name}
             </h1>
@@ -175,7 +177,7 @@ export default function CustomerDashboard() {
             className="flex items-center gap-2 px-5 py-2.5 bg-white text-indigo-700 hover:bg-indigo-50 rounded-xl text-sm font-bold shadow-lg transition-all shrink-0"
           >
             <Plus size={16} />
-            Post a Job
+            {t('customer.dashboard.postJob')}
           </Link>
         </div>
       </div>
@@ -190,10 +192,10 @@ export default function CustomerDashboard() {
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Total Jobs', value: jobs.length, icon: <Briefcase size={18} />, color: 'indigo' },
-          { label: 'Active', value: activeJobs.length, icon: <TrendingUp size={18} />, color: 'amber' },
-          { label: 'Completed', value: completedJobs.length, icon: <CheckCircle2 size={18} />, color: 'emerald' },
-          { label: 'Bookings', value: bookings.length, icon: <CalendarCheck size={18} />, color: 'violet' },
+          { label: t('customer.dashboard.totalJobs'), value: jobs.length, icon: <Briefcase size={18} />, color: 'indigo' },
+          { label: t('customer.dashboard.status.active'), value: activeJobs.length, icon: <TrendingUp size={18} />, color: 'amber' },
+          { label: t('customer.dashboard.status.completed'), value: completedJobs.length, icon: <CheckCircle2 size={18} />, color: 'emerald' },
+          { label: t('customer.dashboard.activeBookingsStat'), value: bookings.length, icon: <CalendarCheck size={18} />, color: 'violet' },
         ].map(({ label, value, icon, color }) => (
           <div key={label} className="stat-card glass-card p-5">
             <div className="flex items-center justify-between mb-3">
@@ -213,20 +215,20 @@ export default function CustomerDashboard() {
           <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Layers size={18} className="text-indigo-500" />
-              <h2 className="font-bold text-zinc-900 dark:text-white">My Job Posts</h2>
+              <h2 className="font-bold text-zinc-900 dark:text-white">{t('customer.dashboard.recentJobs')}</h2>
             </div>
             <Link href="/customer/jobs" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
-              View all <ChevronRight size={13} />
+              {t('customer.dashboard.viewAllJobs')} <ChevronRight size={13} />
             </Link>
           </div>
 
           {jobs.length === 0 ? (
             <div className="px-6 py-14 text-center">
               <ClipboardList size={40} className="text-zinc-300 dark:text-zinc-600 mb-3 mx-auto" />
-              <p className="text-zinc-500 dark:text-zinc-400 font-medium">No jobs posted yet</p>
+              <p className="text-zinc-500 dark:text-zinc-400 font-medium">{t('customer.dashboard.noJobs')}</p>
               <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
                 <Sparkles size={14} />
-                Post your first job →
+                {t('customer.jobs.postFirst')} →
               </Link>
             </div>
           ) : (
@@ -298,17 +300,17 @@ export default function CustomerDashboard() {
           <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CalendarCheck size={18} className="text-emerald-500" />
-              <h2 className="font-bold text-zinc-900 dark:text-white">Active Bookings</h2>
+              <h2 className="font-bold text-zinc-900 dark:text-white">{t('customer.dashboard.activeBookings')}</h2>
             </div>
             <Link href="/customer/bookings" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
-              View all <ChevronRight size={13} />
+              {t('customer.dashboard.viewAllBookings')} <ChevronRight size={13} />
             </Link>
           </div>
 
           {bookings.length === 0 ? (
             <div className="px-6 py-14 text-center">
               <div className="text-4xl mb-3">📅</div>
-              <p className="text-sm text-zinc-400">No bookings yet. Hired jobs will appear here.</p>
+              <p className="text-sm text-zinc-400">{t('customer.dashboard.noBookings')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
@@ -352,7 +354,7 @@ export default function CustomerDashboard() {
                       href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
                       className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-all"
                     >
-                      <MessageSquare size={11} /> Message
+                      <MessageSquare size={11} /> {t('customer.bookings.chat')}
                     </Link>
                     {booking.status === 'awaiting_confirmation' && (
                       <button
@@ -369,7 +371,7 @@ export default function CustomerDashboard() {
                         href={`/customer/submit-review?bookingId=${booking.id}&jobId=${booking.job_id}&providerId=${booking.provider_id}&providerName=${encodeURIComponent(booking.provider_name || 'Provider')}`}
                         className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-amber-500 hover:bg-amber-600 text-white rounded-lg transition-all"
                       >
-                        <Star size={11} /> Review
+                        <Star size={11} /> {t('customer.bookings.review')}
                       </Link>
                     )}
                   </div>

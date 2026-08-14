@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api } from '../utils/api';
 import {
   Send,
@@ -22,6 +23,7 @@ interface ChatMessage {
 
 export default function SupportChatbotPage() {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [messages, setMessages] = useState<ChatMessage[]>([]);
@@ -41,7 +43,7 @@ export default function SupportChatbotPage() {
       {
         id: 'welcome',
         sender: 'bot',
-        text: `Hello ${user.full_name}! I am the Kaarkun AI Support Assistant. How can I help you today? You can ask me how to book services, place bids, or edit your profile settings.`,
+        text: `${t('chatbot.welcome')} ${user.full_name}!`,
         timestamp: new Date()
       }
     ]);
@@ -111,7 +113,7 @@ export default function SupportChatbotPage() {
         {
           id: 'welcome',
           sender: 'bot',
-          text: `Hello ${user?.full_name}! I am the Kaarkun AI Support Assistant. How can I help you today?`,
+          text: `${t('chatbot.welcome')} ${user?.full_name}!`,
           timestamp: new Date()
         }
       ]);
@@ -142,7 +144,7 @@ export default function SupportChatbotPage() {
           </div>
           <div>
             <h1 className="font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight text-base flex items-center gap-1.5">
-              Kaarkun AI Support
+              {t('chatbot.title')}
               <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-bold bg-violet-100 text-violet-850 dark:bg-violet-950/50 dark:text-violet-400 rounded-full uppercase">
                 <Sparkles size={8} className="fill-current" />
                 AI
@@ -215,7 +217,7 @@ export default function SupportChatbotPage() {
           value={inputText}
           onChange={(e) => setInputText(e.target.value)}
           disabled={loading}
-          placeholder="Ask AI Support a question..."
+          placeholder={t('chatbot.placeholder')}
           className="flex-grow px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
         />
         <button
@@ -224,7 +226,7 @@ export default function SupportChatbotPage() {
           className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 text-white disabled:text-zinc-400 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold transition-all shadow-sm shrink-0"
         >
           <Send size={16} />
-          Send
+          {t('chatbot.send')}
         </button>
       </form>
     </div>

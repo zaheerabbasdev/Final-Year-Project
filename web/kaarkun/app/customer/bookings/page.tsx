@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../utils/api';
 import {
   Briefcase,
@@ -34,6 +35,7 @@ interface Booking {
 
 export default function CustomerBookingsPage() {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -122,7 +124,7 @@ export default function CustomerBookingsPage() {
         </div>
         <div>
           <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">
-            My Bookings
+            {t('customer.bookings.title')}
           </h1>
           <p className="text-sm text-zinc-400 dark:text-zinc-500 mt-0.5">
             Track and manage your service bookings
@@ -261,7 +263,7 @@ export default function CustomerBookingsPage() {
                           className="px-3.5 py-1.5 bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-600 hover:to-teal-600 disabled:opacity-50 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm"
                         >
                           <CheckCheck size={12} />
-                          {actionLoading === booking.id ? 'Confirming...' : 'Confirm Completion'}
+                          {actionLoading === booking.id ? t('customer.bookings.confirming') : t('customer.bookings.confirmCompletion')}
                         </button>
                       )}
 
@@ -271,7 +273,7 @@ export default function CustomerBookingsPage() {
                             <input
                               type="text"
                               inputMode="numeric"
-                              placeholder="Arrival PIN"
+                              placeholder={t('customer.bookings.arrivalPin')}
                               value={pinInputs[booking.id] || ''}
                               onChange={(e) => setPinInputs(prev => ({ ...prev, [booking.id]: e.target.value }))}
                               className="w-28 px-3 py-1.5 text-[11px] font-bold tracking-widest rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
@@ -282,7 +284,7 @@ export default function CustomerBookingsPage() {
                               className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm"
                             >
                               <KeyRound size={12} />
-                              {verifyingPin === booking.id ? 'Verifying...' : 'Verify Arrival'}
+                              {verifyingPin === booking.id ? t('customer.bookings.verifying') : t('customer.bookings.verifyArrival')}
                             </button>
                           </div>
                           <button
@@ -291,7 +293,7 @@ export default function CustomerBookingsPage() {
                             className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-rose-200 dark:border-rose-800 text-rose-600 dark:text-rose-400 hover:bg-rose-50 dark:hover:bg-rose-950/20 text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all"
                           >
                             <XCircle size={12} />
-                            {actionLoading === booking.id ? 'Cancelling...' : 'Cancel Booking'}
+                            {actionLoading === booking.id ? t('customer.bookings.cancelling') : t('customer.bookings.cancelBooking')}
                           </button>
                         </>
                       )}

@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api, getFileUrl } from '../utils/api';
 import {
   MessageSquare,
@@ -37,6 +38,7 @@ interface Message {
 
 function ChatContent() {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   const searchParams = useSearchParams();
 
@@ -214,7 +216,7 @@ function ChatContent() {
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
               <MessageSquare size={20} className="text-indigo-600 dark:text-indigo-400" />
-              Messages
+              {t('chat.title')}
             </h2>
           </div>
 
@@ -222,7 +224,7 @@ function ChatContent() {
             {loadingList ? (
               <div className="p-4 text-center text-zinc-500 text-sm">Loading chats...</div>
             ) : chatList.length === 0 ? (
-              <div className="p-6 text-center text-zinc-500 text-sm">No active conversations.</div>
+              <div className="p-6 text-center text-zinc-500 text-sm">{t('chat.noConversations')}</div>
             ) : (
               chatList.map(chat => (
                 <button
@@ -271,7 +273,7 @@ function ChatContent() {
           {!activeChat ? (
             <div className="flex-grow flex flex-col items-center justify-center text-zinc-500 p-6">
               <MessageSquare size={48} className="text-zinc-300 dark:text-zinc-700 mb-4" />
-              <p>Select a conversation to start messaging</p>
+              <p>{t('chat.selectConversation')}</p>
             </div>
           ) : (
             <>
@@ -305,7 +307,7 @@ function ChatContent() {
                 {loadingMessages ? (
                   <div className="text-center text-zinc-500 text-sm mt-4">Loading messages...</div>
                 ) : messages.length === 0 ? (
-                  <div className="text-center text-zinc-500 text-sm mt-10">No messages yet. Send a message to start the conversation!</div>
+                  <div className="text-center text-zinc-500 text-sm mt-10">{t('chat.noMessages')}</div>
                 ) : (
                   messages.map((msg, idx) => {
                     const isMine = msg.sender_id === user?.id;
@@ -398,7 +400,7 @@ function ChatContent() {
                       type="text"
                       value={newMessage}
                       onChange={(e) => setNewMessage(e.target.value)}
-                      placeholder={sending ? 'Sending...' : 'Type a message...'}
+                      placeholder={sending ? t('chat.sending') : t('chat.placeholder')}
                       disabled={sending}
                       className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all disabled:opacity-60"
                     />

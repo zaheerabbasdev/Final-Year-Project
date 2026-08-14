@@ -4,6 +4,7 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { useAuth } from '../context/AuthContext';
+import { useLanguage } from '../context/LanguageContext';
 import { api, getFileUrl } from '../utils/api';
 import {
   User as UserIcon,
@@ -41,6 +42,7 @@ interface Category {
 
 export default function ProfilePage() {
   const { user, updateUser, logout, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
   // Use a ref so updateUser doesn't trigger the effect
   const updateUserRef = useRef(updateUser);
@@ -283,7 +285,7 @@ export default function ProfilePage() {
           <UserIcon size={20} className="text-violet-600 dark:text-violet-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">My Profile</h1>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">{t('profile.title')}</h1>
           <p className="text-xs text-zinc-400 mt-0.5">Manage your account details and preferences</p>
         </div>
       </div>
@@ -412,7 +414,7 @@ export default function ProfilePage() {
                   onClick={() => setIsEditing(true)}
                   className="px-4 py-2 text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-600 dark:text-indigo-400 rounded-xl transition-all"
                 >
-                  Edit Profile
+                  {t('profile.editProfile')}
                 </button>
               )}
             </div>
@@ -547,7 +549,7 @@ export default function ProfilePage() {
                     className="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center gap-1.5 shadow"
                   >
                     <Save size={14} />
-                    {saveLoading ? 'Saving...' : 'Save Changes'}
+                    {saveLoading ? t('profile.saving') : t('profile.saveChanges')}
                   </button>
                 </div>
               </form>
@@ -650,7 +652,7 @@ export default function ProfilePage() {
               </div>
               {reviews.length === 0 ? (
                 <div className="text-center py-8 text-zinc-500 dark:text-zinc-400 text-sm">
-                  No reviews left by clients yet.
+                  {t('profile.noReviews')}
                 </div>
               ) : (
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -725,7 +727,7 @@ export default function ProfilePage() {
                 <Trash2 size={20} className="text-red-600 dark:text-red-400" />
               </div>
               <div>
-                <h3 className="font-bold text-zinc-900 dark:text-white text-base leading-tight">Delete Account</h3>
+                <h3 className="font-bold text-zinc-900 dark:text-white text-base leading-tight">{t('profile.deleteAccount')}</h3>
                 <p className="text-xs text-zinc-400 mt-0.5">This action cannot be undone</p>
               </div>
             </div>
@@ -756,7 +758,7 @@ export default function ProfilePage() {
                 onClick={handleDeleteAccount}
                 className="flex-1 py-2.5 text-sm font-semibold bg-red-600 hover:bg-red-700 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-xl transition-colors"
               >
-                {deleteLoading ? 'Deleting…' : 'Delete Account'}
+                {deleteLoading ? t('profile.deleting') : t('profile.deleteAccount')}
               </button>
             </div>
           </div>

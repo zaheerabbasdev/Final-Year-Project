@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { api, getFileUrl } from '../../utils/api';
 import {
   Briefcase,
@@ -57,6 +58,7 @@ const STATUS_ACCENT: Record<string, string> = {
 
 export default function ProviderDashboard() {
   const { user, loading: authLoading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [bookings, setBookings] = useState<Booking[]>([]);
@@ -126,8 +128,8 @@ export default function ProviderDashboard() {
           <LayoutDashboard size={20} className="text-violet-600 dark:text-violet-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">Dashboard</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">Overview of your bookings and performance</p>
+          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">{t('sidebar.dashboard')}</h1>
+          <p className="text-xs text-zinc-400 mt-0.5">{t('provider.dashboard.subtitle')}</p>
         </div>
       </div>
 
@@ -136,9 +138,9 @@ export default function ProviderDashboard() {
         <div className="mb-6 flex items-start gap-4 p-5 rounded-2xl bg-amber-50 dark:bg-amber-900/10 border border-amber-200 dark:border-amber-800/40 text-amber-800 dark:text-amber-400">
           <AlertCircle size={22} className="shrink-0 mt-0.5" />
           <div>
-            <p className="font-bold text-sm">Account Pending Verification</p>
+            <p className="font-bold text-sm">{t('provider.dashboard.pendingApproval')}</p>
             <p className="text-sm font-light mt-0.5 opacity-80">
-              Your profile is being reviewed by our team. You'll be able to bid on jobs once approved.
+              {t('provider.dashboard.pendingSubtitle')}
             </p>
           </div>
         </div>
@@ -209,10 +211,10 @@ export default function ProviderDashboard() {
       {/* Stat tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: 'Active Tasks',  value: activeBookings.length,   icon: <Activity size={18} />,   color: 'indigo' },
-          { label: 'Completed',     value: completedBookings.length, icon: <CheckCircle2 size={18}/>, color: 'emerald' },
-          { label: 'Success Rate',  value: `${parseFloat(profile.success_rate || '0').toFixed(0)}%`, icon: <TrendingUp size={18} />, color: 'violet' },
-          { label: 'Avg Rating',    value: `${parseFloat(profile.rating || '0').toFixed(1)} ★`,     icon: <Award size={18} />,     color: 'amber' },
+          { label: t('provider.dashboard.activeBookings'), value: activeBookings.length,   icon: <Activity size={18} />,   color: 'indigo' },
+          { label: t('provider.dashboard.completedJobs'), value: completedBookings.length, icon: <CheckCircle2 size={18}/>, color: 'emerald' },
+          { label: t('provider.dashboard.successRate'),  value: `${parseFloat(profile.success_rate || '0').toFixed(0)}%`, icon: <TrendingUp size={18} />, color: 'violet' },
+          { label: t('provider.dashboard.rating'),    value: `${parseFloat(profile.rating || '0').toFixed(1)} ★`,     icon: <Award size={18} />,     color: 'amber' },
         ].map(({ label, value, icon, color }) => (
           <div key={label} className="stat-card glass-card p-5">
             <div className="flex items-center justify-between mb-3">
@@ -235,7 +237,7 @@ export default function ProviderDashboard() {
             <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
               <div className="flex items-center gap-2">
                 <Zap size={18} className="text-violet-500" />
-                <h2 className="font-bold text-zinc-900 dark:text-white">Active Bookings</h2>
+                <h2 className="font-bold text-zinc-900 dark:text-white">{t('provider.dashboard.activeBookings')}</h2>
               </div>
               <span className="text-xs font-semibold text-zinc-400">{activeBookings.length} active</span>
             </div>
@@ -247,10 +249,10 @@ export default function ProviderDashboard() {
                   : <Clock  size={40} className="text-zinc-300 dark:text-zinc-600 mb-3 mx-auto" />
                 }
                 <p className="text-zinc-500 dark:text-zinc-400 font-medium">
-                  {isVerified ? 'No active tasks yet' : 'Pending verification'}
+                  {isVerified ? t('provider.dashboard.noBookings') : t('provider.dashboard.pendingApproval')}
                 </p>
                 <p className="text-sm text-zinc-400 mt-1">
-                  {isVerified ? 'Browse jobs and start bidding to get hired!' : 'Active bookings will appear here once verified.'}
+                  {isVerified ? t('provider.dashboard.browseJobs') : t('provider.dashboard.pendingSubtitle')}
                 </p>
                 {isVerified && (
                   <Link
@@ -312,14 +314,14 @@ export default function ProviderDashboard() {
                           disabled={handshakeLoading === booking.id}
                           className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-[11px] font-bold bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white rounded-lg transition-all shadow-sm"
                         >
-                          <KeyRound size={11} /> {handshakeLoading === booking.id ? 'Generating...' : 'Generate PIN'}
+                          <KeyRound size={11} /> {handshakeLoading === booking.id ? t('provider.dashboard.generatingPin') : t('provider.dashboard.generatePin')}
                         </button>
                       )}
                       <Link
                         href={`/chat?jobId=${booking.job_id}&userId=${booking.customer_id}`}
                         className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-[11px] font-bold bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-all shadow-sm"
                       >
-                        <MessageSquare size={11} /> Chat
+                        <MessageSquare size={11} /> {t('provider.dashboard.chat')}
                       </Link>
                     </div>
                     {booking.status === 'confirmed' && handshakeTokens[booking.id] && (

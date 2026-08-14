@@ -4,10 +4,12 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../context/AuthContext';
-import { Shield, Mail, Lock, ArrowRight, AlertCircle } from 'lucide-react';
+import { useLanguage } from '../context/LanguageContext';
+import { Shield, Mail, Lock, AlertCircle } from 'lucide-react';
 
 export default function LoginPage() {
   const { login, user, loading } = useAuth();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [email, setEmail] = useState('');
@@ -50,12 +52,12 @@ export default function LoginPage() {
               <Shield size={24} />
             </span>
             <h2 className="text-2xl font-bold tracking-tight text-zinc-900 dark:text-zinc-50">
-              Welcome back
+              {t('auth.login.title')}
             </h2>
             <p className="mt-2 text-sm text-zinc-600 dark:text-zinc-400">
-              Don't have an account?{' '}
+              {t('auth.login.noAccount')}{' '}
               <Link href="/register" className="font-semibold text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300">
-                Create an account
+                {t('auth.login.createAccount')}
               </Link>
             </p>
           </div>
@@ -71,7 +73,7 @@ export default function LoginPage() {
             <form onSubmit={handleSubmit} className="space-y-6">
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Email Address
+                  {t('auth.login.emailLabel')}
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -83,14 +85,14 @@ export default function LoginPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                    placeholder="you@example.com"
+                    placeholder={t('auth.login.emailPlaceholder')}
                   />
                 </div>
               </div>
 
               <div>
                 <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">
-                  Password
+                  {t('auth.login.passwordLabel')}
                 </label>
                 <div className="mt-1 relative">
                   <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
@@ -102,14 +104,14 @@ export default function LoginPage() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
-                    placeholder="••••••••"
+                    placeholder={t('auth.login.passwordPlaceholder')}
                   />
                 </div>
               </div>
 
               <div className="flex items-center justify-end">
                 <Link href="/forgot-password" className="text-sm text-indigo-600 hover:text-indigo-500 dark:text-indigo-400 dark:hover:text-indigo-300 font-medium">
-                  Forgot password?
+                  {t('auth.login.forgotPassword')}
                 </Link>
               </div>
 
@@ -119,7 +121,7 @@ export default function LoginPage() {
                   disabled={localLoading || loading}
                   className="w-full flex justify-center py-2.5 px-4 border border-transparent rounded-lg shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-colors disabled:opacity-50"
                 >
-                  {localLoading || loading ? 'Signing in...' : 'Sign in'}
+                  {localLoading || loading ? t('auth.login.signingIn') : t('auth.login.signIn')}
                 </button>
               </div>
             </form>

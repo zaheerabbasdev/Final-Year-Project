@@ -3,6 +3,7 @@ import "./globals.css";
 import { AuthProvider } from "./context/AuthContext";
 import { ThemeProvider } from "./context/ThemeContext";
 import { CurrencyProvider } from "./context/CurrencyContext";
+import { LanguageProvider } from "./context/LanguageContext";
 import AppShell from "./components/AppShell";
 
 export const metadata: Metadata = {
@@ -42,13 +43,15 @@ export default function RootLayout({
         />
       </head>
       <body className="h-full bg-[#f8f9fc] dark:bg-[#0a0a0f] text-zinc-900 dark:text-zinc-50">
-        <ThemeProvider>
-          <CurrencyProvider>
-            <AuthProvider>
-              <AppShell>{children}</AppShell>
-            </AuthProvider>
-          </CurrencyProvider>
-        </ThemeProvider>
+        <LanguageProvider>
+          <ThemeProvider>
+            <CurrencyProvider>
+              <AuthProvider>
+                <AppShell>{children}</AppShell>
+              </AuthProvider>
+            </CurrencyProvider>
+          </ThemeProvider>
+        </LanguageProvider>
       </body>
     </html>
   );

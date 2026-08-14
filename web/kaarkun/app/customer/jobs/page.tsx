@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { useCurrency } from '../../context/CurrencyContext';
+import { useLanguage } from '../../context/LanguageContext';
 import { api } from '../../utils/api';
 import {
   Briefcase,
@@ -64,6 +65,7 @@ const STATUS_ACCENT: Record<string, string> = {
 export default function CustomerJobsPage() {
   const { user, loading: authLoading } = useAuth();
   const { format } = useCurrency();
+  const { t } = useLanguage();
   const router = useRouter();
 
   const [jobs, setJobs] = useState<Job[]>([]);
@@ -141,11 +143,11 @@ export default function CustomerJobsPage() {
   }
 
   const tabs: { key: TabKey; label: string }[] = [
-    { key: 'all', label: 'All' },
-    { key: 'open', label: 'Open' },
-    { key: 'active', label: 'Active' },
-    { key: 'completed', label: 'Completed' },
-    { key: 'cancelled', label: 'Cancelled' },
+    { key: 'all', label: t('customer.jobs.tabs.all') },
+    { key: 'open', label: t('customer.jobs.tabs.open') },
+    { key: 'active', label: t('customer.jobs.tabs.active') },
+    { key: 'completed', label: t('customer.jobs.tabs.completed') },
+    { key: 'cancelled', label: t('customer.jobs.tabs.cancelled') },
   ];
 
   const displayed = filterJobs(activeTab);
@@ -159,7 +161,7 @@ export default function CustomerJobsPage() {
             <ClipboardList size={20} className="text-indigo-600 dark:text-indigo-400" />
           </div>
           <div>
-            <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">My Jobs</h1>
+            <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">{t('customer.jobs.title')}</h1>
             <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-0.5">Track all your posted jobs and their statuses.</p>
           </div>
         </div>
@@ -205,7 +207,7 @@ export default function CustomerJobsPage() {
       {displayed.length === 0 ? (
         <div className="text-center py-16 bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl">
           <Briefcase size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
-          <p className="text-zinc-500 dark:text-zinc-400 text-sm">No jobs in this category.</p>
+          <p className="text-zinc-500 dark:text-zinc-400 text-sm">{t('customer.jobs.noJobs')}</p>
           <Link href="/customer/post-job" className="inline-block mt-4 text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold">
             Post your first job →
           </Link>
@@ -289,7 +291,7 @@ export default function CustomerJobsPage() {
                     href={`/customer/jobs/${job.id}`}
                     className="flex items-center gap-1 px-3 py-1.5 border border-zinc-200 dark:border-zinc-800 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:bg-white dark:hover:bg-zinc-900 rounded-xl transition-all"
                   >
-                    <ChevronRight size={12} /> View Bids
+                    <ChevronRight size={12} /> {t('customer.jobs.viewBids')}
                   </Link>
 
                   {isActive && job.provider_id && (
@@ -308,7 +310,7 @@ export default function CustomerJobsPage() {
                       className="flex items-center gap-1 px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 disabled:opacity-50 text-white text-xs font-bold rounded-xl transition-all shadow"
                     >
                       <CheckCheck size={12} />
-                      {actionLoading === job.id ? 'Confirming...' : 'Confirm Completion'}
+                      {actionLoading === job.id ? t('customer.jobs.confirming') : t('customer.jobs.confirmCompletion')}
                     </button>
                   )}
 
@@ -328,7 +330,7 @@ export default function CustomerJobsPage() {
                       className="flex items-center gap-1 px-3 py-1.5 bg-rose-50 dark:bg-rose-950/20 border border-rose-200 dark:border-rose-800/50 text-rose-600 dark:text-rose-400 text-xs font-semibold rounded-xl transition-all hover:bg-rose-100 dark:hover:bg-rose-950/40"
                     >
                       <XCircle size={12} />
-                      {actionLoading === job.id ? 'Cancelling...' : 'Cancel Job'}
+                      {actionLoading === job.id ? t('customer.jobs.cancelling') : t('customer.jobs.cancelJob')}
                     </button>
                   )}
                 </div>
