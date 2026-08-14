@@ -111,17 +111,10 @@ export default function RegisterPage() {
           router.push(`/verify-otp?email=${encodeURIComponent(email)}`);
         }
       } else {
-        setSuccessMsg(res.message || 'Provider registration successful! Please wait for admin approval before logging in.');
-        // Reset form
-        setFullName('');
-        setEmail('');
-        setPhone('');
-        setPassword('');
-        setExperience('');
-        setCategoryId('');
-        setAvatar(null);
-        setCnic(null);
-        setCertificates(null);
+        setSuccessMsg(res.message || 'Provider registration successful! Redirecting to login...');
+        setTimeout(() => {
+          router.push('/login');
+        }, 2000);
       }
     } catch (err: any) {
       setError(err.message || 'Registration failed. Please check inputs.');
