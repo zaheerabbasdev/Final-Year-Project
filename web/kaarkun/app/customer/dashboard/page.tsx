@@ -28,7 +28,7 @@ import {
   LayoutDashboard,
   Phone,
 } from 'lucide-react';
-import { CountUp, FullPageSpinner, EmptyState } from '../../../components/ui';
+import { CountUp, FullPageSpinner, EmptyState } from '../../components/ui';
 
 interface Job {
   id: number;

@@ -25,7 +25,7 @@ import {
   LayoutDashboard,
   Phone,
 } from 'lucide-react';
-import { CountUp, FullPageSpinner } from '../../../components/ui';
+import { CountUp, FullPageSpinner } from '../../components/ui';
 
 interface Booking {
   id: number;
