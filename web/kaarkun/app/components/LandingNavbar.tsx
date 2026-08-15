@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -23,7 +23,7 @@ export default function LandingNavbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-16 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 shrink-0" onClick={closeMobileMenu}>
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
+            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-sky-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
               <Sparkles size={17} className="text-white" />
             </span>
             <span className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">
@@ -53,7 +53,7 @@ export default function LandingNavbar() {
               {theme === 'dark' ? (
                 <Sun size={18} className="text-amber-400" />
               ) : (
-                <Moon size={18} className="text-indigo-500" />
+                <Moon size={18} className="text-blue-500" />
               )}
             </button>
             <Link
@@ -81,7 +81,7 @@ export default function LandingNavbar() {
               {theme === 'dark' ? (
                 <Sun size={18} className="text-amber-400" />
               ) : (
-                <Moon size={18} className="text-indigo-500" />
+                <Moon size={18} className="text-blue-500" />
               )}
             </button>
             <button

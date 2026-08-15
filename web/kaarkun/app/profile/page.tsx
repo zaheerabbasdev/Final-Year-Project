@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -252,7 +252,7 @@ export default function ProfilePage() {
   if (authLoading || loading) {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -281,8 +281,8 @@ export default function ProfilePage() {
 
       {/* Page title */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-violet-50 dark:bg-violet-900/30">
-          <UserIcon size={20} className="text-violet-600 dark:text-violet-400" />
+        <div className="p-2 rounded-xl bg-sky-50 dark:bg-sky-900/30">
+          <UserIcon size={20} className="text-sky-600 dark:text-sky-400" />
         </div>
         <div>
           <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">{t('profile.title')}</h1>
@@ -309,7 +309,7 @@ export default function ProfilePage() {
         <div className="lg:col-span-3 space-y-6">
           <div className="bg-white dark:bg-zinc-900/40 p-6 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm hover:shadow-md transition-shadow text-center relative overflow-hidden">
             {/* Role Header Banner */}
-            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-violet-600 to-indigo-600"></div>
+            <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-sky-600 to-sky-600"></div>
 
             <div className="relative w-32 h-32 mx-auto mt-4">
               {user?.avatar && !avatarBroken ? (
@@ -320,12 +320,12 @@ export default function ProfilePage() {
                   onError={() => setAvatarBroken(true)}
                 />
               ) : (
-                <div className="w-full h-full rounded-full bg-gradient-to-tr from-violet-100 to-indigo-100 dark:from-violet-950/40 dark:to-indigo-950/40 border-4 border-white dark:border-zinc-900 flex items-center justify-center text-4xl font-extrabold text-indigo-700 dark:text-indigo-400 shadow-md">
+                <div className="w-full h-full rounded-full bg-gradient-to-tr from-sky-100 to-sky-100 dark:from-sky-950/40 dark:to-sky-950/40 border-4 border-white dark:border-zinc-900 flex items-center justify-center text-4xl font-extrabold text-blue-700 dark:text-blue-400 shadow-md">
                   {user?.full_name?.charAt(0).toUpperCase()}
                 </div>
               )}
 
-              <label className="absolute bottom-0 right-0 p-2 bg-indigo-600 hover:bg-indigo-700 text-white rounded-full cursor-pointer shadow-lg hover:scale-105 transition-all">
+              <label className="absolute bottom-0 right-0 p-2 bg-blue-600 hover:bg-blue-700 text-white rounded-full cursor-pointer shadow-lg hover:scale-105 transition-all">
                 <Camera size={16} />
                 <input
                   type="file"
@@ -349,8 +349,8 @@ export default function ProfilePage() {
             {/* Stats Row */}
             <div className="grid grid-cols-3 max-w-md mx-auto gap-4 mt-6 pt-6 border-t border-zinc-100 dark:border-zinc-800">
               <div className="stat-card p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
-                <div className="w-9 h-9 mx-auto mb-1.5 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
-                  <Briefcase className="w-4.5 h-4.5 text-indigo-500" />
+                <div className="w-9 h-9 mx-auto mb-1.5 rounded-lg bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center">
+                  <Briefcase className="w-4.5 h-4.5 text-blue-500" />
                 </div>
                 <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{stats.totalJobs || 0}</span>
                 <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">{t('profile.jobsPosted')}</p>
@@ -412,7 +412,7 @@ export default function ProfilePage() {
               {!isEditing && (
                 <button
                   onClick={() => setIsEditing(true)}
-                  className="px-4 py-2 text-xs font-bold bg-indigo-50 dark:bg-indigo-950/50 hover:bg-indigo-100 dark:hover:bg-indigo-900 text-indigo-600 dark:text-indigo-400 rounded-xl transition-all"
+                  className="px-4 py-2 text-xs font-bold bg-blue-50 dark:bg-blue-950/50 hover:bg-blue-100 dark:hover:bg-blue-900 text-blue-600 dark:text-blue-400 rounded-xl transition-all"
                 >
                   {t('profile.editProfile')}
                 </button>
@@ -546,7 +546,7 @@ export default function ProfilePage() {
                   <button
                     type="submit"
                     disabled={saveLoading}
-                    className="px-4 py-2 text-xs font-semibold bg-indigo-600 hover:bg-indigo-700 text-white rounded-xl flex items-center gap-1.5 shadow"
+                    className="px-4 py-2 text-xs font-semibold bg-blue-600 hover:bg-blue-700 text-white rounded-xl flex items-center gap-1.5 shadow"
                   >
                     <Save size={14} />
                     {saveLoading ? t('profile.saving') : t('profile.saveChanges')}
@@ -600,8 +600,8 @@ export default function ProfilePage() {
                     {skills && (
                       <div className="border-t border-zinc-100 dark:border-zinc-800 pt-6">
                         <div className="flex items-center gap-2 mb-2.5">
-                          <div className="w-6 h-6 rounded-md bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center">
-                            <Layers size={12} className="text-violet-500" />
+                          <div className="w-6 h-6 rounded-md bg-sky-100 dark:bg-sky-950/40 flex items-center justify-center">
+                            <Layers size={12} className="text-sky-500" />
                           </div>
                           <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.skillsTags')}</span>
                         </div>
@@ -618,8 +618,8 @@ export default function ProfilePage() {
                     {bio && (
                       <div className="border-t border-zinc-100 dark:border-zinc-800 pt-6">
                         <div className="flex items-center gap-2 mb-2.5">
-                          <div className="w-6 h-6 rounded-md bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
-                            <UserIcon size={12} className="text-indigo-500" />
+                          <div className="w-6 h-6 rounded-md bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center">
+                            <UserIcon size={12} className="text-blue-500" />
                           </div>
                           <span className="text-[10px] uppercase font-bold text-zinc-400 tracking-wider">{t('profile.bioDescription')}</span>
                         </div>
@@ -644,7 +644,7 @@ export default function ProfilePage() {
                 {reviews.length > 0 && (
                   <Link
                     href="/provider/reviews"
-                    className="flex items-center gap-1 text-xs font-bold text-indigo-600 dark:text-indigo-400 hover:underline shrink-0"
+                    className="flex items-center gap-1 text-xs font-bold text-blue-600 dark:text-blue-400 hover:underline shrink-0"
                   >
                     {t('profile.allReviews')} <ChevronRight size={13} />
                   </Link>
@@ -666,7 +666,7 @@ export default function ProfilePage() {
                         <div className={`absolute top-0 left-0 h-1 w-full bg-${tier}-400`} />
 
                         <div className="flex items-start gap-3">
-                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-sky-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
                             {r.customer_name?.charAt(0).toUpperCase() || '?'}
                           </div>
                           <div className="min-w-0 flex-1">

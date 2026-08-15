@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -171,7 +171,7 @@ export default function PostJobPage() {
   if (authLoading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -180,7 +180,7 @@ export default function PostJobPage() {
     <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="bg-white dark:bg-zinc-900/40 p-8 rounded-2xl border border-zinc-200/60 dark:border-zinc-800/80 shadow-sm backdrop-blur-sm">
         <div className="mb-8">
-          <span className="inline-flex items-center justify-center p-2 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 mb-4">
+          <span className="inline-flex items-center justify-center p-2 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 mb-4">
             <Briefcase size={24} />
           </span>
           <h1 className="text-2xl font-bold text-zinc-900 dark:text-zinc-50">{t('customer.postJob.title')}</h1>
@@ -214,7 +214,7 @@ export default function PostJobPage() {
               required
               value={title}
               onChange={(e) => setTitle(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+              className="mt-1 block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
               placeholder="e.g. Repair kitchen sink pipeline leakage"
             />
           </div>
@@ -228,10 +228,10 @@ export default function PostJobPage() {
                 type="button"
                 onClick={handleAIAutocomplete}
                 disabled={aiLoading || (title.trim().length < 3 && description.trim().length < 3)}
-                className="text-xs font-bold text-violet-600 dark:text-violet-400 hover:text-violet-700 flex items-center gap-1 bg-violet-50 dark:bg-violet-950/30 px-2.5 py-1 rounded-lg border border-violet-100 dark:border-violet-900/50 disabled:opacity-50 transition-all cursor-pointer"
+                className="text-xs font-bold text-sky-600 dark:text-sky-400 hover:text-sky-700 flex items-center gap-1 bg-sky-50 dark:bg-sky-950/30 px-2.5 py-1 rounded-lg border border-sky-100 dark:border-sky-900/50 disabled:opacity-50 transition-all cursor-pointer"
               >
                 {aiLoading ? (
-                  <span className="inline-block w-3 h-3 border-2 border-violet-400 border-t-transparent rounded-full animate-spin" />
+                  <span className="inline-block w-3 h-3 border-2 border-sky-400 border-t-transparent rounded-full animate-spin" />
                 ) : (
                   <Sparkles size={12} />
                 )}
@@ -243,7 +243,7 @@ export default function PostJobPage() {
               rows={4}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
-              className="block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+              className="block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
               placeholder="Provide details about the job. Specify materials, size, or special requirements if any."
             />
           </div>
@@ -257,7 +257,7 @@ export default function PostJobPage() {
                 required
                 value={categoryId}
                 onChange={(e) => setCategoryId(e.target.value)}
-                className="mt-1 block w-full py-2 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                className="mt-1 block w-full py-2 px-3 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
               >
                 <option value="">{t('customer.postJob.selectCategory')}</option>
                 {categories.map((cat) => (
@@ -279,7 +279,7 @@ export default function PostJobPage() {
                   min="1"
                   value={budget}
                   onChange={(e) => setBudget(e.target.value)}
-                  className="block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                  className="block w-full px-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                   placeholder="e.g. 1500"
                 />
               </div>
@@ -317,7 +317,7 @@ export default function PostJobPage() {
                   type="date"
                   value={prefDate}
                   onChange={(e) => setPrefDate(e.target.value)}
-                  className="block w-full pl-8 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                  className="block w-full pl-8 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                 />
               </div>
             </div>
@@ -334,7 +334,7 @@ export default function PostJobPage() {
                   type="time"
                   value={prefTime}
                   onChange={(e) => setPrefTime(e.target.value)}
-                  className="block w-full pl-8 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                  className="block w-full pl-8 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                 />
               </div>
             </div>
@@ -347,7 +347,7 @@ export default function PostJobPage() {
                 type="checkbox"
                 checked={isNegotiable}
                 onChange={(e) => setIsNegotiable(e.target.checked)}
-                className="w-4 h-4 rounded text-indigo-600 border-zinc-300 focus:ring-indigo-500"
+                className="w-4 h-4 rounded text-blue-600 border-zinc-300 focus:ring-blue-500"
               />
               <div>
                 <span className="text-sm font-semibold text-zinc-800 dark:text-zinc-200">{t('customer.postJob.negotiable')}</span>
@@ -393,7 +393,7 @@ export default function PostJobPage() {
               {images.map((img, idx) => (
                 <div key={idx} className="relative w-24 h-24 border border-zinc-250 dark:border-zinc-800 rounded-lg p-1 bg-zinc-50 dark:bg-zinc-900 flex items-center justify-center text-center">
                   <div className="text-xs text-zinc-500 truncate max-w-[80px] flex flex-col items-center gap-1">
-                    <FileImage size={24} className="text-indigo-400" />
+                    <FileImage size={24} className="text-blue-400" />
                     <span className="text-[10px] select-none">{img.name.slice(0, 10)}</span>
                   </div>
                   <button
@@ -411,7 +411,7 @@ export default function PostJobPage() {
           <button
             type="submit"
             disabled={submitLoading}
-            className="w-full py-3 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl shadow-sm text-sm font-semibold transition-all flex items-center justify-center gap-2"
+            className="w-full py-3 bg-blue-600 hover:bg-blue-700 disabled:opacity-60 disabled:cursor-not-allowed text-white rounded-xl shadow-sm text-sm font-semibold transition-all flex items-center justify-center gap-2"
           >
             {submitLoading && (
               <span className="inline-block w-4 h-4 border-2 border-white/40 border-t-white rounded-full animate-spin" />

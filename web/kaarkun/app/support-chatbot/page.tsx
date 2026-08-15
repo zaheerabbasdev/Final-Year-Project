@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
@@ -123,7 +123,7 @@ export default function SupportChatbotPage() {
   if (authLoading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -135,17 +135,17 @@ export default function SupportChatbotPage() {
         <div className="flex items-center gap-3">
           <button
             onClick={() => router.back()}
-            className="p-2 -ml-2 text-zinc-500 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-colors"
+            className="p-2 -ml-2 text-zinc-500 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-colors"
           >
             <ChevronLeft size={20} />
           </button>
-          <div className="w-10 h-10 rounded-full bg-violet-100 dark:bg-violet-950/40 flex items-center justify-center text-violet-750 dark:text-violet-400">
+          <div className="w-10 h-10 rounded-full bg-sky-100 dark:bg-sky-950/40 flex items-center justify-center text-sky-750 dark:text-sky-400">
             <Bot size={22} className="animate-bounce-slow" />
           </div>
           <div>
             <h1 className="font-extrabold text-zinc-900 dark:text-zinc-50 tracking-tight text-base flex items-center gap-1.5">
               {t('chatbot.title')}
-              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-bold bg-violet-100 text-violet-850 dark:bg-violet-950/50 dark:text-violet-400 rounded-full uppercase">
+              <span className="inline-flex items-center gap-0.5 px-1.5 py-0.5 text-[9px] font-bold bg-sky-100 text-sky-850 dark:bg-sky-950/50 dark:text-sky-400 rounded-full uppercase">
                 <Sparkles size={8} className="fill-current" />
                 AI
               </span>
@@ -171,15 +171,15 @@ export default function SupportChatbotPage() {
             className={`flex gap-3 max-w-[80%] ${m.sender === 'user' ? 'ml-auto flex-row-reverse' : 'mr-auto'}`}
           >
             <div className={`w-8 h-8 rounded-full shrink-0 flex items-center justify-center text-xs font-bold ${m.sender === 'user'
-              ? 'bg-indigo-600 text-white'
-              : 'bg-violet-100 dark:bg-violet-900/40 text-violet-700 dark:text-violet-400 border border-violet-200/50 dark:border-violet-800/50'
+              ? 'bg-blue-600 text-white'
+              : 'bg-sky-100 dark:bg-sky-900/40 text-sky-700 dark:text-sky-400 border border-sky-200/50 dark:border-sky-800/50'
               }`}>
               {m.sender === 'user' ? <UserIcon size={14} /> : <Bot size={14} />}
             </div>
 
             <div className="space-y-1">
               <div className={`px-4 py-3 rounded-2xl text-sm leading-relaxed shadow-sm ${m.sender === 'user'
-                ? 'bg-indigo-600 text-white rounded-tr-none'
+                ? 'bg-blue-600 text-white rounded-tr-none'
                 : 'bg-white dark:bg-zinc-900 text-zinc-850 dark:text-zinc-55 border border-zinc-200/40 dark:border-zinc-800/80 rounded-tl-none'
                 }`}>
                 {m.text}
@@ -193,13 +193,13 @@ export default function SupportChatbotPage() {
 
         {loading && (
           <div className="flex gap-3 max-w-[80%] mr-auto animate-pulse">
-            <div className="w-8 h-8 rounded-full bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center">
-              <Bot size={14} className="text-violet-750 dark:text-violet-400" />
+            <div className="w-8 h-8 rounded-full bg-sky-100 dark:bg-sky-900/40 flex items-center justify-center">
+              <Bot size={14} className="text-sky-750 dark:text-sky-400" />
             </div>
             <div className="bg-white dark:bg-zinc-900 border border-zinc-200/40 dark:border-zinc-800/80 px-4 py-3 rounded-2xl rounded-tl-none flex items-center gap-1.5">
-              <span className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-              <span className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-              <span className="w-2 h-2 bg-indigo-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+              <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+              <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+              <span className="w-2 h-2 bg-blue-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
             </div>
           </div>
         )}
@@ -218,12 +218,12 @@ export default function SupportChatbotPage() {
           onChange={(e) => setInputText(e.target.value)}
           disabled={loading}
           placeholder={t('chatbot.placeholder')}
-          className="flex-grow px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+          className="flex-grow px-4 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
         />
         <button
           type="submit"
           disabled={loading || !inputText.trim()}
-          className="px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 text-white disabled:text-zinc-400 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold transition-all shadow-sm shrink-0"
+          className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 text-white disabled:text-zinc-400 rounded-xl flex items-center justify-center gap-1.5 text-sm font-semibold transition-all shadow-sm shrink-0"
         >
           <Send size={16} />
           {t('chatbot.send')}

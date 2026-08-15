@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
@@ -110,7 +110,7 @@ export default function CustomerBookingsPage() {
   if (authLoading || loading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -146,7 +146,7 @@ export default function CustomerBookingsPage() {
           </div>
           <p className="text-zinc-500 dark:text-zinc-400 font-medium">{t('customer.bookings.noBookings')}</p>
           <p className="text-xs text-zinc-400 dark:text-zinc-600 mt-1">{t('customer.bookings.noBookingsDesc')}</p>
-          <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-5 px-5 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-indigo-500/25 transition-all">
+          <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-5 px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-sm font-semibold rounded-xl shadow-lg shadow-blue-500/25 transition-all">
             <Briefcase size={14} />
             {t('customer.bookings.postJob')}
           </Link>
@@ -157,7 +157,7 @@ export default function CustomerBookingsPage() {
             const statusConfig: Record<string, { color: string; bg: string; border: string; accent: string; icon: React.ReactNode }> = {
               confirmed: { color: 'text-blue-700 dark:text-blue-400', bg: 'bg-blue-50 dark:bg-blue-950/30', border: 'border-blue-200 dark:border-blue-800', accent: 'bg-blue-500', icon: <CheckCircle2 size={13} /> },
               in_progress: { color: 'text-amber-700 dark:text-amber-400', bg: 'bg-amber-50 dark:bg-amber-950/30', border: 'border-amber-200 dark:border-amber-800', accent: 'bg-amber-500', icon: <Clock size={13} /> },
-              awaiting_confirmation: { color: 'text-violet-700 dark:text-violet-400', bg: 'bg-violet-50 dark:bg-violet-950/30', border: 'border-violet-200 dark:border-violet-800', accent: 'bg-violet-500', icon: <Clock size={13} /> },
+              awaiting_confirmation: { color: 'text-sky-700 dark:text-sky-400', bg: 'bg-sky-50 dark:bg-sky-950/30', border: 'border-sky-200 dark:border-sky-800', accent: 'bg-sky-500', icon: <Clock size={13} /> },
               completed: { color: 'text-emerald-700 dark:text-emerald-400', bg: 'bg-emerald-50 dark:bg-emerald-950/30', border: 'border-emerald-200 dark:border-emerald-800', accent: 'bg-emerald-500', icon: <CheckCircle2 size={13} /> },
               cancelled: { color: 'text-rose-700 dark:text-rose-400', bg: 'bg-rose-50 dark:bg-rose-950/30', border: 'border-rose-200 dark:border-rose-800', accent: 'bg-rose-500', icon: <XCircle size={13} /> },
             };
@@ -199,8 +199,8 @@ export default function CustomerBookingsPage() {
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                       {booking.provider_name && (
                         <div className="flex items-center gap-2.5 p-3 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
-                          <div className="w-8 h-8 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center shrink-0">
-                            <span className="text-sm font-bold text-indigo-600 dark:text-indigo-400">
+                          <div className="w-8 h-8 rounded-lg bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center shrink-0">
+                            <span className="text-sm font-bold text-blue-600 dark:text-blue-400">
                               {booking.provider_name.charAt(0).toUpperCase()}
                             </span>
                           </div>
@@ -240,7 +240,7 @@ export default function CustomerBookingsPage() {
                     <div className="flex flex-wrap gap-2 pt-4 mt-auto border-t border-zinc-100 dark:border-white/[0.06]">
                       <Link
                         href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
-                        className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-700 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg inline-flex items-center gap-1.5 transition-all hover:border-indigo-300 dark:hover:border-indigo-700"
+                        className="px-3.5 py-1.5 bg-white dark:bg-zinc-950 border border-zinc-200 dark:border-zinc-700 text-[11px] font-bold text-zinc-700 dark:text-zinc-300 hover:bg-zinc-50 dark:hover:bg-zinc-900 rounded-lg inline-flex items-center gap-1.5 transition-all hover:border-blue-300 dark:hover:border-blue-700"
                       >
                         <MessageSquare size={12} />
                         Message Provider
@@ -276,12 +276,12 @@ export default function CustomerBookingsPage() {
                               placeholder={t('customer.bookings.arrivalPin')}
                               value={pinInputs[booking.id] || ''}
                               onChange={(e) => setPinInputs(prev => ({ ...prev, [booking.id]: e.target.value }))}
-                              className="w-28 px-3 py-1.5 text-[11px] font-bold tracking-widest rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                              className="w-28 px-3 py-1.5 text-[11px] font-bold tracking-widest rounded-lg border border-zinc-200 dark:border-zinc-700 bg-white dark:bg-zinc-950 text-zinc-700 dark:text-zinc-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
                             />
                             <button
                               onClick={() => handleVerifyPin(booking.id)}
                               disabled={verifyingPin === booking.id || !(pinInputs[booking.id] || '').trim()}
-                              className="px-3.5 py-1.5 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm"
+                              className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-[11px] font-bold rounded-lg inline-flex items-center gap-1.5 transition-all shadow-sm"
                             >
                               <KeyRound size={12} />
                               {verifyingPin === booking.id ? t('customer.bookings.verifying') : t('customer.bookings.verifyArrival')}

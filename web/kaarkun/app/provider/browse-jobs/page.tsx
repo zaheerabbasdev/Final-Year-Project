@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -241,7 +241,7 @@ export default function BrowseJobsPage() {
   if (authLoading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -251,8 +251,8 @@ export default function BrowseJobsPage() {
       {/* Header */}
       <div className="mb-8 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
-            <Search size={20} className="text-indigo-600 dark:text-indigo-400" />
+          <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30">
+            <Search size={20} className="text-blue-600 dark:text-blue-400" />
           </div>
           <div>
             <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
@@ -289,8 +289,8 @@ export default function BrowseJobsPage() {
           onClick={() => handleTabChange('recommended')}
           className={`flex items-center gap-2 px-4 py-2 rounded-lg text-xs font-bold transition-all ${
             activeTab === 'recommended'
-              ? 'bg-gradient-to-r from-violet-600 to-indigo-600 text-white shadow-sm'
-              : 'text-zinc-500 dark:text-zinc-400 hover:text-violet-600 dark:hover:text-violet-400'
+              ? 'bg-gradient-to-r from-sky-600 to-sky-600 text-white shadow-sm'
+              : 'text-zinc-500 dark:text-zinc-400 hover:text-sky-600 dark:hover:text-sky-400'
           }`}
         >
           <Sparkles size={14} />
@@ -301,13 +301,13 @@ export default function BrowseJobsPage() {
 
       {/* AI Recommended Banner */}
       {activeTab === 'recommended' && (
-        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 border border-violet-200/50 dark:border-violet-800/50 flex items-start gap-3">
-          <div className="p-2 bg-violet-100 dark:bg-violet-900/40 rounded-lg">
-            <Brain size={18} className="text-violet-600 dark:text-violet-400" />
+        <div className="mb-6 p-4 rounded-xl bg-gradient-to-r from-sky-50 to-sky-50 dark:from-sky-950/20 dark:to-sky-950/20 border border-sky-200/50 dark:border-sky-800/50 flex items-start gap-3">
+          <div className="p-2 bg-sky-100 dark:bg-sky-900/40 rounded-lg">
+            <Brain size={18} className="text-sky-600 dark:text-sky-400" />
           </div>
           <div>
-            <p className="text-sm font-bold text-violet-800 dark:text-violet-300">AI Smart Job Matching</p>
-            <p className="text-xs text-violet-600/70 dark:text-violet-400/70 mt-0.5">
+            <p className="text-sm font-bold text-sky-800 dark:text-sky-300">AI Smart Job Matching</p>
+            <p className="text-xs text-sky-600/70 dark:text-sky-400/70 mt-0.5">
               Jobs are ranked by AI based on your skills, location proximity, and success rate. Higher match scores mean better fit for you.
             </p>
           </div>
@@ -325,7 +325,7 @@ export default function BrowseJobsPage() {
               type="text"
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+              className="block w-full pl-10 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
               placeholder="Search keywords, description..."
             />
           </div>
@@ -337,7 +337,7 @@ export default function BrowseJobsPage() {
             <select
               value={selectedCategory}
               onChange={(e) => setSelectedCategory(e.target.value)}
-              className="block w-full pl-10 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+              className="block w-full pl-10 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
             >
               <option value="">All Skill Categories</option>
               {categories.map((cat) => (
@@ -354,9 +354,9 @@ export default function BrowseJobsPage() {
       {isLoading ? (
         <div className="flex items-center justify-center py-20">
           <div className="flex flex-col items-center gap-3">
-            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-indigo-600"></div>
+            <div className="animate-spin rounded-full h-10 w-10 border-b-2 border-blue-600"></div>
             {aiLoading && (
-              <p className="text-sm text-violet-600 dark:text-violet-400 font-semibold animate-pulse">
+              <p className="text-sm text-sky-600 dark:text-sky-400 font-semibold animate-pulse">
                 AI is finding the best matches for you...
               </p>
             )}
@@ -375,16 +375,16 @@ export default function BrowseJobsPage() {
               key={job.id}
               className={`stat-card relative overflow-hidden bg-white dark:bg-zinc-900/40 rounded-2xl border shadow-sm flex flex-col hover:shadow-lg hover:-translate-y-0.5 transition-all ${
                 highMatch
-                  ? 'border-violet-200/60 dark:border-violet-800/50'
+                  ? 'border-sky-200/60 dark:border-sky-800/50'
                   : 'border-zinc-200/60 dark:border-zinc-800/80'
               }`}
             >
-              <div className={`absolute top-0 left-0 h-1 w-full ${job.is_emergency ? 'bg-rose-400' : highMatch ? 'bg-violet-400' : 'bg-indigo-300'}`} />
+              <div className={`absolute top-0 left-0 h-1 w-full ${job.is_emergency ? 'bg-rose-400' : highMatch ? 'bg-sky-400' : 'bg-blue-300'}`} />
 
               <div className="p-5 flex-1 space-y-3">
                 <div className="flex items-start gap-3">
-                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${job.is_emergency ? 'bg-rose-100 dark:bg-rose-950/40' : 'bg-indigo-100 dark:bg-indigo-950/40'}`}>
-                    {job.is_emergency ? <Zap size={18} className="text-rose-500" /> : <Wrench size={18} className="text-indigo-500" />}
+                  <div className={`w-10 h-10 rounded-xl flex items-center justify-center shrink-0 ${job.is_emergency ? 'bg-rose-100 dark:bg-rose-950/40' : 'bg-blue-100 dark:bg-blue-950/40'}`}>
+                    {job.is_emergency ? <Zap size={18} className="text-rose-500" /> : <Wrench size={18} className="text-blue-500" />}
                   </div>
                   <div className="min-w-0 flex-1">
                     <h3 className="text-base font-bold text-zinc-900 dark:text-zinc-50 truncate">
@@ -405,7 +405,7 @@ export default function BrowseJobsPage() {
                       {activeTab === 'recommended' && job.match_score !== undefined && (
                         <span className={`inline-flex items-center gap-1 px-2 py-0.5 text-[10px] font-bold rounded-full uppercase ${
                           job.match_score >= 70
-                            ? 'bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400'
+                            ? 'bg-sky-100 text-sky-800 dark:bg-sky-950/40 dark:text-sky-400'
                             : job.match_score >= 45
                               ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400'
                               : 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400'
@@ -426,7 +426,7 @@ export default function BrowseJobsPage() {
                 {activeTab === 'recommended' && job.match_reasons && job.match_reasons.length > 0 && (
                   <div className="flex flex-wrap gap-1.5">
                     {job.match_reasons.map((reason, idx) => (
-                      <span key={idx} className="text-[10px] font-medium text-violet-600 dark:text-violet-400 bg-violet-50 dark:bg-violet-950/20 px-2 py-0.5 rounded-md border border-violet-100 dark:border-violet-900/40">
+                      <span key={idx} className="text-[10px] font-medium text-sky-600 dark:text-sky-400 bg-sky-50 dark:bg-sky-950/20 px-2 py-0.5 rounded-md border border-sky-100 dark:border-sky-900/40">
                         {reason}
                       </span>
                     ))}
@@ -443,7 +443,7 @@ export default function BrowseJobsPage() {
                   <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><MapPin size={10} /> Location</p>
                     <p className="text-xs font-bold text-zinc-800 dark:text-zinc-200 mt-0.5 truncate">{job.location}</p>
-                    {job.distance_km !== undefined && <p className="text-[9px] text-violet-500 font-semibold">{job.distance_km} km away</p>}
+                    {job.distance_km !== undefined && <p className="text-[9px] text-sky-500 font-semibold">{job.distance_km} km away</p>}
                   </div>
                   <div className="p-2.5 rounded-xl bg-zinc-50 dark:bg-white/[0.03] border border-zinc-100 dark:border-white/[0.04]">
                     <p className="text-[9px] uppercase tracking-wider text-zinc-400 font-bold flex items-center gap-1"><Clock size={10} /> Posted</p>
@@ -464,7 +464,7 @@ export default function BrowseJobsPage() {
                 ) : (
                   <button
                     onClick={() => handleOpenBidModal(job)}
-                    className="w-full px-4 py-2.5 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition-all"
+                    className="w-full px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow transition-all"
                   >
                     {t('provider.browseJobs.placeBid')}
                   </button>
@@ -495,30 +495,30 @@ export default function BrowseJobsPage() {
             </p>
 
             {/* AI Bid Suggestion Panel */}
-            <div className="mb-5 p-3.5 rounded-xl bg-gradient-to-r from-violet-50 to-indigo-50 dark:from-violet-950/20 dark:to-indigo-950/20 border border-violet-200/50 dark:border-violet-800/40">
+            <div className="mb-5 p-3.5 rounded-xl bg-gradient-to-r from-sky-50 to-sky-50 dark:from-sky-950/20 dark:to-sky-950/20 border border-sky-200/50 dark:border-sky-800/40">
               <div className="flex items-center gap-2 mb-2">
-                <Sparkles size={14} className="text-violet-600 dark:text-violet-400" />
-                <span className="text-xs font-bold text-violet-800 dark:text-violet-300">AI Bid Price Suggestion</span>
+                <Sparkles size={14} className="text-sky-600 dark:text-sky-400" />
+                <span className="text-xs font-bold text-sky-800 dark:text-sky-300">AI Bid Price Suggestion</span>
               </div>
               {aiSuggestionLoading ? (
-                <div className="flex items-center gap-2 text-xs text-violet-600 dark:text-violet-400">
-                  <div className="animate-spin w-3 h-3 border-2 border-violet-500 border-t-transparent rounded-full"></div>
+                <div className="flex items-center gap-2 text-xs text-sky-600 dark:text-sky-400">
+                  <div className="animate-spin w-3 h-3 border-2 border-sky-500 border-t-transparent rounded-full"></div>
                   Analyzing historical bids...
                 </div>
               ) : aiSuggestion ? (
                 <div>
                   <div className="flex gap-3 text-center">
-                    <div className="flex-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-violet-100 dark:border-violet-900/50">
+                    <div className="flex-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-sky-100 dark:border-sky-900/50">
                       <p className="text-[9px] text-zinc-400 uppercase font-bold">Min</p>
-                      <p className="text-sm font-extrabold text-violet-700 dark:text-violet-400">{format(aiSuggestion.suggestedMin)}</p>
+                      <p className="text-sm font-extrabold text-sky-700 dark:text-sky-400">{format(aiSuggestion.suggestedMin)}</p>
                     </div>
-                    <div className="flex-1 p-2 bg-violet-600 rounded-lg">
-                      <p className="text-[9px] text-violet-200 uppercase font-bold">Avg</p>
+                    <div className="flex-1 p-2 bg-sky-600 rounded-lg">
+                      <p className="text-[9px] text-sky-200 uppercase font-bold">Avg</p>
                       <p className="text-sm font-extrabold text-white">{format(aiSuggestion.averagePrice)}</p>
                     </div>
-                    <div className="flex-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-violet-100 dark:border-violet-900/50">
+                    <div className="flex-1 p-2 bg-white dark:bg-zinc-900 rounded-lg border border-sky-100 dark:border-sky-900/50">
                       <p className="text-[9px] text-zinc-400 uppercase font-bold">Max</p>
-                      <p className="text-sm font-extrabold text-violet-700 dark:text-violet-400">{format(aiSuggestion.suggestedMax)}</p>
+                      <p className="text-sm font-extrabold text-sky-700 dark:text-sky-400">{format(aiSuggestion.suggestedMax)}</p>
                     </div>
                   </div>
                   <p className="text-[10px] text-zinc-400 mt-2 text-center">
@@ -529,7 +529,7 @@ export default function BrowseJobsPage() {
                   <button
                     type="button"
                     onClick={() => setBidAmount(String(Math.round(convertFromPkr(aiSuggestion.averagePrice))))}
-                    className="mt-2 w-full text-[10px] font-bold text-violet-600 dark:text-violet-400 border border-violet-200 dark:border-violet-800/50 rounded-lg py-1 hover:bg-violet-50 dark:hover:bg-violet-950/30 transition-colors"
+                    className="mt-2 w-full text-[10px] font-bold text-sky-600 dark:text-sky-400 border border-sky-200 dark:border-sky-800/50 rounded-lg py-1 hover:bg-sky-50 dark:hover:bg-sky-950/30 transition-colors"
                   >
                     Use AI Average ({format(aiSuggestion.averagePrice)})
                   </button>
@@ -607,7 +607,7 @@ export default function BrowseJobsPage() {
                 <button
                   type="submit"
                   disabled={bidLoading}
-                  className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1"
+                  className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1"
                 >
                   <Send size={12} />
                   {bidLoading ? t('provider.browseJobs.submitting') : t('provider.browseJobs.submitBid')}

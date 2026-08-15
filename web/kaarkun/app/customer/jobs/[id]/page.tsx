@@ -105,7 +105,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
   if (authLoading || loading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -136,7 +136,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
               <div>
                 <h1 className="text-2xl font-bold text-zinc-950 dark:text-zinc-50">{job.title}</h1>
                 <span className={`mt-2 inline-block px-2 py-0.5 text-xs font-semibold rounded-full uppercase ${
-                  job.status === 'open' ? 'bg-indigo-100 text-indigo-800 dark:bg-indigo-950/40 dark:text-indigo-400' :
+                  job.status === 'open' ? 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400' :
                   job.status === 'active' ? 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400' :
                   'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300'
                 }`}>
@@ -145,7 +145,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
               </div>
               <div className="text-right">
                 <p className="text-xs text-zinc-500">Budget</p>
-                <p className="text-xl font-bold text-indigo-600 dark:text-indigo-400">{format(job.budget)}</p>
+                <p className="text-xl font-bold text-blue-600 dark:text-blue-400">{format(job.budget)}</p>
               </div>
             </div>
 
@@ -226,7 +226,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
                   >
                     <div className="flex items-center justify-between">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-9 h-9 rounded-full bg-indigo-100 dark:bg-indigo-900/50 flex items-center justify-center text-indigo-600 dark:text-indigo-400 font-bold text-xs uppercase">
+                        <div className="w-9 h-9 rounded-full bg-blue-100 dark:bg-blue-900/50 flex items-center justify-center text-blue-600 dark:text-blue-400 font-bold text-xs uppercase">
                           {bid.provider_name?.charAt(0) || 'P'}
                         </div>
                         <div>
@@ -238,7 +238,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
                         </div>
                       </div>
                       <div className="text-right">
-                        <p className="text-sm font-bold text-indigo-600 dark:text-indigo-400">{format(bid.amount)}</p>
+                        <p className="text-sm font-bold text-blue-600 dark:text-blue-400">{format(bid.amount)}</p>
                         <p className="text-[10px] text-zinc-500">Est: {bid.estimated_time}</p>
                       </div>
                     </div>
@@ -252,7 +252,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
                         <button
                           onClick={() => handleAcceptBid(bid.id)}
                           disabled={actionLoading}
-                          className="flex-1 py-2 bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1 transition-all"
+                          className="flex-1 py-2 bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-1 transition-all"
                         >
                           <Check size={14} />
                           Accept & Hire

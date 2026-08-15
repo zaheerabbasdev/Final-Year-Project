@@ -152,7 +152,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               height: 140,
               decoration: const BoxDecoration(
                 gradient: LinearGradient(
-                  colors: [Color(0xFF6366F1), Color(0xFF10B981)],
+                  colors: [Color(0xFF2563EB), Color(0xFF10B981)],
                   begin: Alignment.topLeft,
                   end: Alignment.bottomRight,
                 ),
@@ -218,7 +218,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       children: [
         Expanded(child: _buildStatCard(Icons.stars_outlined, (profile?['rating'] ?? '5.0').toString(), lang.t('providerProfile.rating'), const Color(0xFF10B981))),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard(Icons.work_outline, (profile?['jobs_completed'] ?? '0').toString(), lang.t('providerProfile.jobsDone'), const Color(0xFF6366F1))),
+        Expanded(child: _buildStatCard(Icons.work_outline, (profile?['jobs_completed'] ?? '0').toString(), lang.t('providerProfile.jobsDone'), const Color(0xFF2563EB))),
         const SizedBox(width: 12),
         Expanded(child: _buildStatCard(Icons.access_time, profile?['experience_years']?.toString() ?? '0', lang.t('provider.dashboard.yrs'), const Color(0xFFF59E0B))),
       ],

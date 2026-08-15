@@ -69,7 +69,7 @@ export default function BidsPage() {
                   <td className="px-6 py-4">
                     <p className="text-sm text-gray-600 line-clamp-1">{bid.job_title}</p>
                   </td>
-                  <td className="px-6 py-4 text-sm font-bold text-indigo-600">
+                  <td className="px-6 py-4 text-sm font-bold text-blue-600">
                     ${bid.amount}
                   </td>
                   <td className="px-6 py-4">
@@ -86,7 +86,7 @@ export default function BidsPage() {
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => setSelectedBidId(bid.id)}
-                      className="text-gray-400 hover:text-indigo-600 p-2"
+                      className="text-gray-400 hover:text-blue-600 p-2"
                       title="View Bid Details"
                     >
                       👁️

@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -30,7 +30,7 @@ interface Notification {
 }
 
 const NOTIF_STYLE: Record<string, { icon: React.ReactNode; chip: string; accent: string }> = {
-  bid:       { icon: <Briefcase size={18} className="text-indigo-500" />, chip: 'bg-indigo-100 dark:bg-indigo-950/40', accent: 'bg-indigo-400' },
+  bid:       { icon: <Briefcase size={18} className="text-blue-500" />, chip: 'bg-blue-100 dark:bg-blue-950/40', accent: 'bg-blue-400' },
   message:   { icon: <MessageSquare size={18} className="text-blue-500" />, chip: 'bg-blue-100 dark:bg-blue-950/40', accent: 'bg-blue-400' },
   review:    { icon: <Star size={18} className="text-amber-500" />, chip: 'bg-amber-100 dark:bg-amber-950/40', accent: 'bg-amber-400' },
   emergency: { icon: <Zap size={18} className="text-rose-500" />, chip: 'bg-rose-100 dark:bg-rose-950/40', accent: 'bg-rose-400' },
@@ -111,7 +111,7 @@ export default function NotificationsPage() {
   if (authLoading || loading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -135,7 +135,7 @@ export default function NotificationsPage() {
           <button
             onClick={handleMarkAllRead}
             disabled={actionLoading}
-            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800/50 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-xl transition-all disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 text-xs font-bold text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-800/50 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-xl transition-all disabled:opacity-50"
           >
             <CheckCheck size={14} />
             {t('notifications.markAllRead')}
@@ -171,7 +171,7 @@ export default function NotificationsPage() {
                 }}
                 className={`group relative overflow-hidden flex items-start gap-4 p-4 pl-5 rounded-2xl border transition-all cursor-pointer hover:shadow-md hover:-translate-y-0.5 ${notif.is_read
                     ? 'bg-white dark:bg-zinc-900/30 border-zinc-100 dark:border-zinc-800/60 hover:bg-zinc-50 dark:hover:bg-zinc-900/50'
-                    : 'bg-indigo-50/40 dark:bg-indigo-950/10 border-indigo-100 dark:border-indigo-900/40 hover:bg-indigo-50/60 dark:hover:bg-indigo-950/20'
+                    : 'bg-blue-50/40 dark:bg-blue-950/10 border-blue-100 dark:border-blue-900/40 hover:bg-blue-50/60 dark:hover:bg-blue-950/20'
                   }`}
               >
                 <div className={`absolute top-0 left-0 h-full w-1.5 ${style.accent}`} />
@@ -194,7 +194,7 @@ export default function NotificationsPage() {
 
                 {/* Unread dot */}
                 {!notif.is_read && (
-                  <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-indigo-500 shrink-0" />
+                  <span className="absolute top-4 right-4 w-2 h-2 rounded-full bg-blue-500 shrink-0" />
                 )}
               </div>
             );
@@ -231,7 +231,7 @@ export default function NotificationsPage() {
             <div className="flex justify-end">
               <button
                 onClick={() => setSelectedNotification(null)}
-                className="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow-sm transition-all"
               >
                 {t('nav.dismiss')}
               </button>

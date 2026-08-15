@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState } from 'react';
 import Link from 'next/link';
@@ -74,7 +74,7 @@ export default function ForgotPasswordPage() {
         {/* Back to login */}
         <Link
           href="/login"
-          className="inline-flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 mb-8 transition-colors"
+          className="inline-flex items-center gap-1.5 text-sm text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 mb-8 transition-colors"
         >
           <ArrowLeft size={16} /> Back to Login
         </Link>
@@ -83,7 +83,7 @@ export default function ForgotPasswordPage() {
 
           {/* Icon */}
           <div className="flex justify-center mb-6">
-            <span className="inline-flex items-center justify-center p-3 rounded-xl bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400">
+            <span className="inline-flex items-center justify-center p-3 rounded-xl bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400">
               {step === 3 ? <CheckCircle2 size={28} /> : <KeyRound size={28} />}
             </span>
           </div>
@@ -125,14 +125,14 @@ export default function ForgotPasswordPage() {
                     value={email}
                     onChange={e => setEmail(e.target.value)}
                     placeholder="you@example.com"
-                    className="block w-full pl-9 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                    className="block w-full pl-9 pr-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                   />
                 </div>
               </div>
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
                 {loading ? t('auth.forgotPassword.sending') : t('auth.forgotPassword.sendCode')}
               </button>
@@ -153,7 +153,7 @@ export default function ForgotPasswordPage() {
                   value={otp}
                   onChange={e => setOtp(e.target.value.replace(/\D/g, ''))}
                   placeholder="123456"
-                  className="block w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm tracking-widest transition-all"
+                  className="block w-full px-3 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm tracking-widest transition-all"
                 />
               </div>
               <div>
@@ -170,7 +170,7 @@ export default function ForgotPasswordPage() {
                     value={newPassword}
                     onChange={e => setNew(e.target.value)}
                     placeholder="At least 6 characters"
-                    className="block w-full pl-9 pr-10 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                    className="block w-full pl-9 pr-10 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                   />
                   <button type="button" onClick={() => setShowNew(v => !v)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 text-xs">
@@ -192,7 +192,7 @@ export default function ForgotPasswordPage() {
                     value={confirm}
                     onChange={e => setConfirm(e.target.value)}
                     placeholder="Repeat new password"
-                    className="block w-full pl-9 pr-10 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all"
+                    className="block w-full pl-9 pr-10 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                   />
                   <button type="button" onClick={() => setShowConfirm(v => !v)}
                     className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 text-xs">
@@ -203,14 +203,14 @@ export default function ForgotPasswordPage() {
               <button
                 type="submit"
                 disabled={loading}
-                className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 transition-colors"
+                className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 disabled:opacity-50 transition-colors"
               >
                 {loading ? t('auth.forgotPassword.resetting') : t('auth.forgotPassword.resetPassword')}
               </button>
               <button
                 type="button"
                 onClick={() => { setStep(1); setError(null); setOtp(''); }}
-                className="w-full text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 transition-colors"
+                className="w-full text-center text-sm text-zinc-500 dark:text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 transition-colors"
               >
                 {t('auth.forgotPassword.backToLogin')}
               </button>
@@ -222,7 +222,7 @@ export default function ForgotPasswordPage() {
             <div className="mt-6">
               <button
                 onClick={() => router.push('/login')}
-                className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-indigo-600 hover:bg-indigo-700 transition-colors"
+                className="w-full flex justify-center py-2.5 px-4 rounded-lg text-sm font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors"
               >
                 {t('auth.forgotPassword.goToLogin') || 'Go to Login'}
               </button>

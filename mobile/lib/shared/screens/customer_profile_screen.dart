@@ -118,7 +118,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
         background: Container(
           decoration: const BoxDecoration(
             gradient: LinearGradient(
-              colors: [Color(0xFF6366F1), Color(0xFF10B981)],
+              colors: [Color(0xFF2563EB), Color(0xFF10B981)],
               begin: Alignment.topLeft,
               end: Alignment.bottomRight,
             ),
@@ -222,7 +222,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               color: Theme.of(context).appColors.card,
             borderRadius: BorderRadius.circular(12),
           ),
-          child: Icon(icon, color: const Color(0xFF6366F1), size: 20),
+          child: Icon(icon, color: const Color(0xFF2563EB), size: 20),
         ),
         const SizedBox(width: 16),
         Column(

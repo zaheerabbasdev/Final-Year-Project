@@ -254,7 +254,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     final bool isJobOpen = jobStatus == 'open';
 
     String buttonText = lang.t('jobDetail.placeYourBid');
-    Color buttonColor = const Color(0xFF6366F1);
+    Color buttonColor = const Color(0xFF2563EB);
     bool isButtonEnabled = true;
 
     if (hasAlreadyBidded) {

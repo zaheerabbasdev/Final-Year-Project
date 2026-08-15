@@ -316,7 +316,7 @@ class _NotificationScreenState extends State<NotificationScreen> {
       case 'booking':
         return AppTheme.secondaryColor;
       case 'payment':
-        return Colors.purple;
+        return Colors.blue;
       case 'new_job_posted':
         return Colors.teal;
       default:

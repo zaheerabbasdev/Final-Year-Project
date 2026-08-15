@@ -19,8 +19,8 @@
   --background: #0B0F19; /* Deeper premium background */
   --foreground: #FFFFFF; /* Crisp white foreground */
   --surface: #1E293B;
-  --primary: #6366F1; /* Dynamic premium purple-indigo for dark mode */
-  --secondary: #818CF8;
+  --primary: #3B82F6; /* Blue-500 — matches brand palette */
+  --secondary: #60A5FA; /* Blue-400 */
   --text: #FFFFFF; /* Pure white text for headings/important content */
   --subtext: #94A3B8; /* Muted contrast text */
   --danger: #EF4444;
@@ -63,10 +63,9 @@
 }
 
 .dark .bg-blue-50,
+.dark .bg-sky-50,
 .dark .bg-green-50,
 .dark .bg-orange-50,
-.dark .bg-indigo-50,
-.dark .bg-purple-50,
 .dark .bg-teal-50,
 .dark .bg-red-50,
 .dark .bg-yellow-50 {
@@ -76,8 +75,7 @@
 .dark .text-blue-600 { color: #60A5FA !important; }
 .dark .text-green-600 { color: #34D399 !important; }
 .dark .text-orange-600 { color: #FB923C !important; }
-.dark .text-indigo-600 { color: #818CF8 !important; }
-.dark .text-purple-600 { color: #A78BFA !important; }
+.dark .text-sky-600 { color: #38BDF8 !important; }
 .dark .text-teal-600 { color: #2DD4BF !important; }
 .dark .text-red-600 { color: #F87171 !important; }
 .dark .text-yellow-600 { color: #FBBF24 !important; }
@@ -117,7 +115,7 @@ body {
 }
 
 body.dark {
-  background: radial-gradient(circle at top left, rgba(99, 102, 241, 0.15), transparent 35%),
+  background: radial-gradient(circle at top left, rgba(37, 99, 235, 0.15), transparent 35%),
               var(--background);
 }
 
@@ -148,7 +146,7 @@ select {
 
 .dark .app-card:hover {
   border-color: var(--primary) !important; /* Lighter highlight instead of bold white */
-  box-shadow: 0 32px 70px rgba(99, 102, 241, 0.08);
+  box-shadow: 0 32px 70px rgba(37, 99, 235, 0.08);
 }
 
 

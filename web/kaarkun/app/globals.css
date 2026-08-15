@@ -1,24 +1,47 @@
 @import "tailwindcss";
 @variant dark (&:where(.dark, .dark *));
 
+/* ─── Design Tokens ─────────────────────────────────────────── */
 :root {
-  --background: #f8f9fc;
-  --foreground: #0f0f13;
+  --background: #f8fafc;
+  --foreground: #0f172a;
   --sidebar-bg: #ffffff;
   --card-bg: #ffffff;
-  --card-border: #e8eaf0;
-  --accent: #6366f1;
-  --accent-soft: #ede9fe;
+  --card-border: #e2e8f0;
+
+  /* Brand palette — professional blue */
+  --primary: #2563eb;
+  --primary-hover: #1d4ed8;
+  --primary-soft: #eff6ff;
+  --primary-muted: #bfdbfe;
+
+  /* Semantic */
+  --success: #10b981;
+  --warning: #f59e0b;
+  --error:   #ef4444;
+  --info:    #0ea5e9;
+
+  /* Text */
+  --text-primary:   #0f172a;
+  --text-secondary: #475569;
+  --text-muted:     #94a3b8;
 }
 
 .dark {
-  --background: #0a0a0f;
-  --foreground: #f4f4f8;
-  --sidebar-bg: #0f0f17;
-  --card-bg: #13131e;
-  --card-border: #1e1e2e;
-  --accent: #818cf8;
-  --accent-soft: #1e1b4b;
+  --background: #0b1120;
+  --foreground: #f1f5f9;
+  --sidebar-bg: #0f1a2e;
+  --card-bg: #131f35;
+  --card-border: #1e2d45;
+
+  --primary: #3b82f6;
+  --primary-hover: #2563eb;
+  --primary-soft: #172554;
+  --primary-muted: #1e40af;
+
+  --text-primary:   #f1f5f9;
+  --text-secondary: #cbd5e1;
+  --text-muted:     #64748b;
 }
 
 @theme inline {
@@ -53,7 +76,7 @@ body {
   border-radius: 99px;
 }
 .dark ::-webkit-scrollbar-thumb {
-  background: #27272a;
+  background: #1e2d45;
 }
 
 /* Heading colours */
@@ -68,14 +91,14 @@ p, span, label, input, textarea, select {
 }
 
 /* Text utility overrides */
-.text-xs  { font-size: 0.75rem !important; }
-.text-sm  { font-size: 0.875rem !important; }
+.text-xs   { font-size: 0.75rem !important; }
+.text-sm   { font-size: 0.875rem !important; }
 .text-base { font-size: 1rem !important; }
-.text-lg  { font-size: 1.125rem !important; }
-.text-xl  { font-size: 1.25rem !important; }
-.text-2xl { font-size: 1.5rem !important; }
-.text-3xl { font-size: 1.875rem !important; }
-.text-4xl { font-size: 2.25rem !important; }
+.text-lg   { font-size: 1.125rem !important; }
+.text-xl   { font-size: 1.25rem !important; }
+.text-2xl  { font-size: 1.5rem !important; }
+.text-3xl  { font-size: 1.875rem !important; }
+.text-4xl  { font-size: 2.25rem !important; }
 
 /* Glass card */
 .glass-card {
@@ -85,17 +108,17 @@ p, span, label, input, textarea, select {
   backdrop-filter: blur(12px);
 }
 
-/* Gradient text */
+/* Brand gradient text — blue palette */
 .gradient-text {
-  background: linear-gradient(135deg, #6366f1 0%, #8b5cf6 50%, #06b6d4 100%);
+  background: linear-gradient(135deg, #2563eb 0%, #0ea5e9 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
-/* Glow accent */
+/* Brand glow */
 .glow {
-  box-shadow: 0 0 24px rgba(99, 102, 241, 0.18);
+  box-shadow: 0 0 24px rgba(37, 99, 235, 0.18);
 }
 
 /* Stat card hover */
@@ -115,7 +138,6 @@ p, span, label, input, textarea, select {
   from { opacity: 0; transform: translateY(8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
-
 .page-enter {
   animation: page-fade-in 0.3s ease both;
 }
@@ -123,28 +145,20 @@ p, span, label, input, textarea, select {
 /* Hero background blobs */
 @keyframes blob {
   0%, 100% { transform: translate(0, 0) scale(1); }
-  33% { transform: translate(30px, -40px) scale(1.1); }
-  66% { transform: translate(-20px, 20px) scale(0.95); }
+  33%  { transform: translate(30px, -40px) scale(1.1); }
+  66%  { transform: translate(-20px, 20px) scale(0.95); }
 }
-
 .animate-blob {
   animation: blob 9s infinite ease-in-out;
 }
+.animation-delay-2000 { animation-delay: 2s; }
+.animation-delay-4000 { animation-delay: 4s; }
 
-.animation-delay-2000 {
-  animation-delay: 2s;
-}
-
-.animation-delay-4000 {
-  animation-delay: 4s;
-}
-
-/* Marquee scroll for category/logo strips */
+/* Marquee */
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
 }
-
 .animate-marquee {
   animation: marquee 28s linear infinite;
 }
@@ -152,19 +166,29 @@ p, span, label, input, textarea, select {
 /* Floating hero cards */
 @keyframes float {
   0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  50%  { transform: translateY(-12px); }
 }
-
 .animate-float {
   animation: float 4.5s ease-in-out infinite;
 }
 
-/* Dot grid texture for hero backgrounds */
+/* Dot grid — blue tint */
 .bg-grid-dots {
-  background-image: radial-gradient(circle, rgba(99, 102, 241, 0.18) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(37, 99, 235, 0.14) 1px, transparent 1px);
   background-size: 22px 22px;
 }
-
 .dark .bg-grid-dots {
-  background-image: radial-gradient(circle, rgba(129, 140, 248, 0.16) 1px, transparent 1px);
+  background-image: radial-gradient(circle, rgba(59, 130, 246, 0.12) 1px, transparent 1px);
+}
+
+/* Reduced motion */
+@media (prefers-reduced-motion: reduce) {
+  .animate-blob,
+  .animate-marquee,
+  .animate-float,
+  .animate-spin,
+  .page-enter {
+    animation: none !important;
+    transition: none !important;
+  }
 }

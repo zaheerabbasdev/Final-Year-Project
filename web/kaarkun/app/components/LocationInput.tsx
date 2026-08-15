@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { api } from '../utils/api';
@@ -178,7 +178,7 @@ export default function LocationInput({
           onFocus={() => predictions.length > 0 && setShowDropdown(true)}
           required={required}
           placeholder={placeholder}
-          className={`block w-full pl-9 pr-20 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all ${className}`}
+          className={`block w-full pl-9 pr-20 py-2.5 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all ${className}`}
         />
         <div className="absolute inset-y-0 right-0 flex items-center gap-1 pr-2">
           {loading && (
@@ -198,7 +198,7 @@ export default function LocationInput({
             onClick={handleUseMyLocation}
             disabled={geoLoading}
             title="Detect my current location"
-            className="p-1.5 text-indigo-500 hover:text-indigo-600 dark:text-indigo-400 dark:hover:text-indigo-300 hover:bg-indigo-50 dark:hover:bg-indigo-950/30 rounded-lg transition-all disabled:opacity-50"
+            className="p-1.5 text-blue-500 hover:text-blue-600 dark:text-blue-400 dark:hover:text-blue-300 hover:bg-blue-50 dark:hover:bg-blue-950/30 rounded-lg transition-all disabled:opacity-50"
           >
             {geoLoading ? (
               <Loader2 size={14} className="animate-spin" />
@@ -229,7 +229,7 @@ export default function LocationInput({
               onClick={() => handleSelectPrediction(pred)}
               className="w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/60 transition-colors border-b border-zinc-100 dark:border-zinc-800/50 last:border-b-0"
             >
-              <MapPin size={14} className="text-indigo-500 shrink-0 mt-0.5" />
+              <MapPin size={14} className="text-blue-500 shrink-0 mt-0.5" />
               <span className="text-sm text-zinc-700 dark:text-zinc-300 leading-snug line-clamp-2">
                 {pred.description}
               </span>

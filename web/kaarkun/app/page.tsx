@@ -47,13 +47,13 @@ const CATEGORIES = [
   { name: 'Deep Cleaning', desc: 'Home deep cleaning, sofa and rug washing.', icon: Trash2, color: 'text-rose-500 bg-rose-50 dark:bg-rose-950/30' },
   { name: 'Gardening & Lawn', desc: 'Lawn trimming, plant planting, weed control.', icon: Flower2, color: 'text-green-500 bg-green-50 dark:bg-green-950/30' },
   { name: 'AC Services', desc: 'AC installation, gas charging, filter wash.', icon: Wind, color: 'text-cyan-500 bg-cyan-50 dark:bg-cyan-950/30' },
-  { name: 'Appliance Repair', desc: 'Refrigerator, oven, washing machine troubleshooting.', icon: Tv, color: 'text-indigo-500 bg-indigo-50 dark:bg-indigo-950/30' },
+  { name: 'Appliance Repair', desc: 'Refrigerator, oven, washing machine troubleshooting.', icon: Tv, color: 'text-blue-500 bg-blue-50 dark:bg-blue-950/30' },
 ];
 
 const STATS = [
   { label: 'Verified Providers', value: '500+', icon: UserCheck, color: 'text-blue-500' },
   { label: 'Jobs Completed', value: '2,000+', icon: Briefcase, color: 'text-emerald-500' },
-  { label: 'Cities Covered', value: '15+', icon: MapPinned, color: 'text-violet-500' },
+  { label: 'Cities Covered', value: '15+', icon: MapPinned, color: 'text-sky-500' },
   { label: 'Average Rating', value: '4.8★', icon: Star, color: 'text-amber-500' },
 ];
 
@@ -65,7 +65,7 @@ const STEPS = [
 ];
 
 const AI_FEATURES = [
-  { title: 'Smart Job Matching', desc: 'AI ranks open jobs by your skills, location, and track record so providers see the best-fit work first.', icon: Brain, color: 'from-violet-500 to-indigo-500' },
+  { title: 'Smart Job Matching', desc: 'AI ranks open jobs by your skills, location, and track record so providers see the best-fit work first.', icon: Brain, color: 'from-blue-500 to-sky-500' },
   { title: 'Instant Bid Pricing', desc: 'Get a data-driven suggested price range based on historical bids before you quote a job.', icon: TrendingUp, color: 'from-blue-500 to-cyan-500' },
   { title: '24/7 AI Assistant', desc: 'A built-in support chatbot answers platform questions and resolves disputes instantly, any time of day.', icon: Sparkles, color: 'from-emerald-500 to-teal-500' },
   { title: 'Fraud Detection', desc: 'Suspicious bidding patterns and listings are automatically flagged for admin review to keep the marketplace safe.', icon: ShieldAlert, color: 'from-rose-500 to-orange-500' },
@@ -117,8 +117,8 @@ export default function LandingPage() {
           <div className="absolute inset-0 bg-grid-dots [mask-image:radial-gradient(ellipse_60%_60%_at_50%_0%,white_60%,transparent_100%)]" />
           <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full max-w-7xl h-full">
             <div className="absolute top-20 left-10 w-72 h-72 bg-blue-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 dark:opacity-10 animate-blob"></div>
-            <div className="absolute top-20 right-10 w-72 h-72 bg-indigo-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 dark:opacity-10 animate-blob animation-delay-2000"></div>
-            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-72 h-72 bg-violet-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 dark:opacity-10 animate-blob animation-delay-4000"></div>
+            <div className="absolute top-20 right-10 w-72 h-72 bg-sky-400 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 dark:opacity-10 animate-blob animation-delay-2000"></div>
+            <div className="absolute -bottom-8 left-1/2 -translate-x-1/2 w-72 h-72 bg-blue-300 rounded-full mix-blend-multiply filter blur-[100px] opacity-20 dark:opacity-10 animate-blob animation-delay-4000"></div>
           </div>
         </div>
 
@@ -153,7 +153,7 @@ export default function LandingPage() {
               {/* Avatar stack social proof */}
               <div className="mt-9 flex items-center justify-center lg:justify-start gap-3">
                 <div className="flex -space-x-3">
-                  {['bg-gradient-to-br from-blue-500 to-indigo-500', 'bg-gradient-to-br from-emerald-500 to-teal-500', 'bg-gradient-to-br from-amber-500 to-orange-500', 'bg-gradient-to-br from-violet-500 to-fuchsia-500'].map((g, i) => (
+                  {['bg-gradient-to-br from-blue-500 to-sky-500', 'bg-gradient-to-br from-emerald-500 to-teal-500', 'bg-gradient-to-br from-amber-500 to-orange-500', 'bg-gradient-to-br from-rose-500 to-pink-500'].map((g, i) => (
                     <div key={i} className={`w-9 h-9 rounded-full ${g} border-2 border-white dark:border-zinc-950 flex items-center justify-center text-white text-xs font-bold shadow-sm`}>
                       {['A', 'B', 'S', 'R'][i]}
                     </div>
@@ -177,7 +177,7 @@ export default function LandingPage() {
             <div className="relative hidden lg:block">
               <div className="relative max-w-md mx-auto">
                 {/* Main mock card */}
-                <div className="relative rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 shadow-2xl shadow-indigo-900/10 overflow-hidden">
+                <div className="relative rounded-3xl bg-white dark:bg-zinc-900 border border-zinc-200/70 dark:border-zinc-800 shadow-2xl shadow-blue-900/10 overflow-hidden">
                   <div className="flex items-center gap-1.5 px-5 py-3.5 border-b border-zinc-100 dark:border-zinc-800 bg-zinc-50/70 dark:bg-white/[0.02]">
                     <span className="w-2.5 h-2.5 rounded-full bg-rose-400" />
                     <span className="w-2.5 h-2.5 rounded-full bg-amber-400" />
@@ -210,7 +210,7 @@ export default function LandingPage() {
                     <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06]">
                       <div className="flex items-center gap-2">
                         <div className="flex -space-x-2">
-                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white text-[10px] font-bold">F</div>
+                          <div className="w-7 h-7 rounded-full bg-gradient-to-br from-blue-500 to-sky-500 border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white text-[10px] font-bold">F</div>
                           <div className="w-7 h-7 rounded-full bg-gradient-to-br from-emerald-500 to-teal-500 border-2 border-white dark:border-zinc-900 flex items-center justify-center text-white text-[10px] font-bold">H</div>
                           <div className="w-7 h-7 rounded-full bg-zinc-200 dark:bg-zinc-700 border-2 border-white dark:border-zinc-900 flex items-center justify-center text-zinc-600 dark:text-zinc-300 text-[10px] font-bold">+6</div>
                         </div>
@@ -221,7 +221,7 @@ export default function LandingPage() {
                       </span>
                     </div>
 
-                    <button className="w-full py-2.5 bg-indigo-600 text-white text-xs font-bold rounded-xl shadow-sm">
+                    <button className="w-full py-2.5 bg-blue-600 text-white text-xs font-bold rounded-xl shadow-sm">
                       View Bids
                     </button>
                   </div>
@@ -267,7 +267,7 @@ export default function LandingPage() {
       </section>
 
       {/* 2. Stats Band */}
-      <section className="relative -mt-px border-b border-zinc-100 dark:border-zinc-900 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600">
+      <section className="relative -mt-px border-b border-zinc-100 dark:border-zinc-900 bg-gradient-to-r from-blue-700 via-blue-600 to-sky-500">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10">
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-6">
             {STATS.map(({ label, value, icon: Icon }) => (
@@ -297,7 +297,7 @@ export default function LandingPage() {
           </div>
 
           <div className="relative grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
-            <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-blue-200 via-indigo-200 to-violet-200 dark:from-blue-900 dark:via-indigo-900 dark:to-violet-900" />
+            <div className="hidden lg:block absolute top-10 left-[12.5%] right-[12.5%] h-px bg-gradient-to-r from-blue-200 via-sky-200 to-blue-200 dark:from-blue-900 dark:via-sky-900 dark:to-blue-900" />
             {STEPS.map((step, idx) => {
               const Icon = step.icon;
               return (
@@ -362,10 +362,10 @@ export default function LandingPage() {
 
       {/* 5. AI-Powered Features */}
       <section id="ai-features" className="relative py-24 bg-white dark:bg-zinc-950 overflow-hidden">
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-violet-600/10 rounded-full blur-[120px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-blue-600/10 rounded-full blur-[120px] pointer-events-none" />
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
           <div className="text-center max-w-3xl mx-auto mb-16">
-            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-violet-600 dark:text-violet-400">
+            <span className="inline-flex items-center gap-1.5 text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400">
               <Sparkles size={13} /> Built-in Intelligence
             </span>
             <h2 className="mt-3 text-3xl font-extrabold tracking-tight text-zinc-900 dark:text-white sm:text-4xl">
@@ -441,7 +441,7 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-col items-center text-center group">
-              <div className="w-20 h-20 bg-indigo-50 dark:bg-indigo-950/50 text-indigo-600 dark:text-indigo-400 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-indigo-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+              <div className="w-20 h-20 bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-blue-600 group-hover:text-white transition-colors duration-300 shadow-sm">
                 <Clock size={32} />
               </div>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Quick Turnaround</h3>
@@ -461,7 +461,7 @@ export default function LandingPage() {
             </div>
 
             <div className="flex flex-col items-center text-center group">
-              <div className="w-20 h-20 bg-violet-50 dark:bg-violet-950/50 text-violet-600 dark:text-violet-400 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-violet-600 group-hover:text-white transition-colors duration-300 shadow-sm">
+              <div className="w-20 h-20 bg-sky-50 dark:bg-sky-950/50 text-sky-600 dark:text-sky-400 rounded-3xl flex items-center justify-center mb-6 group-hover:bg-sky-600 group-hover:text-white transition-colors duration-300 shadow-sm">
                 <Star size={32} />
               </div>
               <h3 className="text-lg font-bold text-zinc-900 dark:text-white">Verified Reviews</h3>
@@ -489,7 +489,7 @@ export default function LandingPage() {
                 <Quote size={28} className="text-blue-200 dark:text-blue-900/60 mb-4" />
                 <p className="text-sm text-zinc-700 dark:text-zinc-300 leading-relaxed mb-6">"{t.quote}"</p>
                 <div className="flex items-center gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-sky-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
                     {t.name.charAt(0)}
                   </div>
                   <div className="min-w-0">
@@ -528,7 +528,7 @@ export default function LandingPage() {
       {/* 10. Final CTA */}
       <section className="py-20 bg-white dark:bg-zinc-950">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-600 via-indigo-700 to-violet-700 p-10 sm:p-16 text-center shadow-2xl shadow-indigo-600/20">
+          <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 p-10 sm:p-16 text-center shadow-2xl shadow-blue-600/20">
             <div className="absolute -top-10 -left-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none" />
             <div className="absolute -bottom-10 -right-10 w-60 h-60 bg-white/10 rounded-full blur-3xl pointer-events-none" />
             <Handshake size={40} className="text-white/80 mx-auto mb-6 relative" />

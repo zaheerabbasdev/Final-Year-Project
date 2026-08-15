@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
@@ -45,7 +45,7 @@ export default function ProviderAllReviewsPage() {
   if (authLoading || loading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -58,7 +58,7 @@ export default function ProviderAllReviewsPage() {
     <div className="flex-grow max-w-5xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <button
         onClick={() => router.back()}
-        className="mb-6 flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-indigo-600 transition-colors"
+        className="mb-6 flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-blue-600 transition-colors"
       >
         <ChevronLeft size={18} />
         {t('provider.reviews.backToProfile')}
@@ -81,8 +81,8 @@ export default function ProviderAllReviewsPage() {
               </p>
               <p className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold">{t('provider.reviews.average')}</p>
             </div>
-            <div className="text-center px-4 py-2.5 rounded-xl bg-indigo-50 dark:bg-indigo-950/20 border border-indigo-100 dark:border-indigo-900/40">
-              <p className="text-xl font-black text-indigo-600 dark:text-indigo-400">{reviews.length}</p>
+            <div className="text-center px-4 py-2.5 rounded-xl bg-blue-50 dark:bg-blue-950/20 border border-blue-100 dark:border-blue-900/40">
+              <p className="text-xl font-black text-blue-600 dark:text-blue-400">{reviews.length}</p>
               <p className="text-[10px] uppercase tracking-wider text-zinc-400 font-bold">{t('provider.reviews.totalReviews')}</p>
             </div>
           </div>
@@ -116,7 +116,7 @@ export default function ProviderAllReviewsPage() {
                 <div className={`absolute top-0 left-0 h-1 w-full bg-${tier}-400`} />
 
                 <div className="flex items-start gap-3">
-                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
+                  <div className="w-10 h-10 rounded-full bg-gradient-to-br from-sky-500 to-sky-500 flex items-center justify-center text-white font-bold text-sm shrink-0">
                     {r.customer_name?.charAt(0).toUpperCase() || '?'}
                   </div>
                   <div className="min-w-0 flex-1">

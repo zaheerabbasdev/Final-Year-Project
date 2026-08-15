@@ -54,7 +54,7 @@ export default function BidModal({ bidId, onClose }: { bidId: number | null, onC
                     <p className="text-sm text-[var(--subtext)] mt-1">Date: {new Date(bid.created_at).toLocaleString()}</p>
                   </div>
                   <div className="text-right">
-                    <div className="text-2xl font-bold text-indigo-600">${bid.amount}</div>
+                    <div className="text-2xl font-bold text-blue-600">${bid.amount}</div>
                     <span className={`mt-2 inline-block px-2 py-1 rounded-2xl text-xs font-bold uppercase tracking-wider ${
                       bid.status === 'accepted' ? 'bg-[var(--success)]/15 text-[var(--success)]' :
                       bid.status === 'pending' ? 'bg-blue-100 text-blue-700' :

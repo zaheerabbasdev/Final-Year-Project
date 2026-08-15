@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -49,7 +49,7 @@ type TabKey = 'all' | 'open' | 'active' | 'completed' | 'cancelled';
 const STATUS_BADGE: Record<string, string> = {
   open: 'bg-blue-100 text-blue-800 dark:bg-blue-950/40 dark:text-blue-400',
   active: 'bg-amber-100 text-amber-800 dark:bg-amber-950/40 dark:text-amber-400',
-  awaiting_confirmation: 'bg-violet-100 text-violet-800 dark:bg-violet-950/40 dark:text-violet-400',
+  awaiting_confirmation: 'bg-sky-100 text-sky-800 dark:bg-sky-950/40 dark:text-sky-400',
   completed: 'bg-emerald-100 text-emerald-800 dark:bg-emerald-950/40 dark:text-emerald-400',
   cancelled: 'bg-rose-100 text-rose-800 dark:bg-rose-950/40 dark:text-rose-400',
 };
@@ -57,7 +57,7 @@ const STATUS_BADGE: Record<string, string> = {
 const STATUS_ACCENT: Record<string, string> = {
   open: 'bg-blue-400',
   active: 'bg-amber-400',
-  awaiting_confirmation: 'bg-violet-400',
+  awaiting_confirmation: 'bg-sky-400',
   completed: 'bg-emerald-400',
   cancelled: 'bg-rose-300',
 };
@@ -137,7 +137,7 @@ export default function CustomerJobsPage() {
   if (authLoading || loading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -157,8 +157,8 @@ export default function CustomerJobsPage() {
       {/* Header */}
       <div className="mb-6 flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
-            <ClipboardList size={20} className="text-indigo-600 dark:text-indigo-400" />
+          <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30">
+            <ClipboardList size={20} className="text-blue-600 dark:text-blue-400" />
           </div>
           <div>
             <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">{t('customer.jobs.title')}</h1>
@@ -167,7 +167,7 @@ export default function CustomerJobsPage() {
         </div>
         <Link
           href="/customer/post-job"
-          className="flex items-center gap-2 px-4 py-2 bg-indigo-600 hover:bg-indigo-700 text-white text-xs font-bold rounded-xl shadow transition-all"
+          className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold rounded-xl shadow transition-all"
         >
           <Plus size={14} />
           {t('customer.jobs.postNew')}
@@ -194,7 +194,7 @@ export default function CustomerJobsPage() {
           >
             {tab.label}
             <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold ${activeTab === tab.key
-              ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400'
+              ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400'
               : 'bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500'
               }`}>
               {countTab(tab.key)}
@@ -208,7 +208,7 @@ export default function CustomerJobsPage() {
         <div className="text-center py-16 bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl">
           <Briefcase size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
           <p className="text-zinc-500 dark:text-zinc-400 text-sm">{t('customer.jobs.noJobs')}</p>
-          <Link href="/customer/post-job" className="inline-block mt-4 text-indigo-600 dark:text-indigo-400 hover:underline text-xs font-semibold">
+          <Link href="/customer/post-job" className="inline-block mt-4 text-blue-600 dark:text-blue-400 hover:underline text-xs font-semibold">
             {t('customer.jobs.postFirst')} →
           </Link>
         </div>
@@ -233,7 +233,7 @@ export default function CustomerJobsPage() {
                   {/* Top Row: icon + title + status */}
                   <div className="flex items-start justify-between gap-3">
                     <div className="flex items-start gap-3 min-w-0">
-                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${job.is_emergency ? 'bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400' : 'bg-indigo-100 dark:bg-indigo-950/40 text-indigo-600 dark:text-indigo-400'}`}>
+                      <div className={`w-11 h-11 rounded-xl flex items-center justify-center shrink-0 ${job.is_emergency ? 'bg-rose-100 dark:bg-rose-950/40 text-rose-600 dark:text-rose-400' : 'bg-blue-100 dark:bg-blue-950/40 text-blue-600 dark:text-blue-400'}`}>
                         <Wrench size={18} />
                       </div>
                       <div className="min-w-0">
@@ -297,7 +297,7 @@ export default function CustomerJobsPage() {
                   {isActive && job.provider_id && (
                     <Link
                       href={`/chat?jobId=${job.id}&userId=${job.provider_id}`}
-                      className="flex items-center gap-1 px-3 py-1.5 bg-indigo-50 dark:bg-indigo-950/30 text-indigo-700 dark:text-indigo-400 border border-indigo-100 dark:border-indigo-900/50 text-xs font-semibold rounded-xl transition-all hover:bg-indigo-100 dark:hover:bg-indigo-950/50"
+                      className="flex items-center gap-1 px-3 py-1.5 bg-blue-50 dark:bg-blue-950/30 text-blue-700 dark:text-blue-400 border border-blue-100 dark:border-blue-900/50 text-xs font-semibold rounded-xl transition-all hover:bg-blue-100 dark:hover:bg-blue-950/50"
                     >
                       <Navigation size={12} /> Message Provider
                     </Link>

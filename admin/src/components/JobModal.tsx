@@ -102,7 +102,7 @@ export default function JobModal({ jobId, onClose, onRefresh }: { jobId: number 
                     <button 
                       onClick={handleSummarize}
                       disabled={summarizing}
-                      className="app-button-primary bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 text-xs px-4 py-2 whitespace-nowrap"
+                      className="app-button-primary bg-blue-600 hover:bg-blue-700 disabled:opacity-50 text-xs px-4 py-2 whitespace-nowrap"
                     >
                       {summarizing ? 'Analyzing Chat...' : 'Analyze Dispute with AI'}
                     </button>

@@ -69,7 +69,7 @@ export default function ProviderPublicProfilePage({ params }: { params: Promise<
   if (loading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -80,7 +80,7 @@ export default function ProviderPublicProfilePage({ params }: { params: Promise<
         <p className="text-lg font-semibold text-rose-500">{error || 'Provider not found.'}</p>
         <button
           onClick={() => router.back()}
-          className="inline-flex items-center gap-1.5 px-4 py-2 bg-indigo-600 text-white rounded-xl text-xs font-semibold shadow"
+          className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 text-white rounded-xl text-xs font-semibold shadow"
         >
           <ChevronLeft size={16} />
           Go Back
@@ -103,7 +103,7 @@ export default function ProviderPublicProfilePage({ params }: { params: Promise<
       {/* Back Button */}
       <button
         onClick={() => router.back()}
-        className="mb-6 flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-indigo-600 transition-colors"
+        className="mb-6 flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-blue-600 transition-colors"
       >
         <ChevronLeft size={18} />
         Back
@@ -149,7 +149,7 @@ export default function ProviderPublicProfilePage({ params }: { params: Promise<
                 <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">Rating</p>
               </div>
               <div className="p-3 bg-zinc-50 dark:bg-zinc-900/30 rounded-xl border border-zinc-100 dark:border-zinc-800/80">
-                <Award className="w-5 h-5 text-indigo-500 mx-auto mb-1.5" />
+                <Award className="w-5 h-5 text-blue-500 mx-auto mb-1.5" />
                 <span className="text-lg font-bold text-zinc-900 dark:text-zinc-100">{profile.experience_years || 0}</span>
                 <p className="text-[9px] text-zinc-400 uppercase tracking-wider font-semibold">Years Exp.</p>
               </div>

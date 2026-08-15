@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
@@ -119,7 +119,7 @@ export default function ProviderBidsPage() {
   if (authLoading || loading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -137,8 +137,8 @@ export default function ProviderBidsPage() {
   return (
     <div className="flex-grow max-w-57xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <div className="mb-6 flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
-          <Scale size={20} className="text-indigo-600 dark:text-indigo-400" />
+        <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30">
+          <Scale size={20} className="text-blue-600 dark:text-blue-400" />
         </div>
         <div>
           <h1 className="text-2xl font-black text-zinc-900 dark:text-zinc-50 leading-tight">
@@ -176,7 +176,7 @@ export default function ProviderBidsPage() {
               }`}
           >
             {tab.label}
-            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold ${activeTab === tab.key ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-400' : 'bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500'
+            <span className={`px-1.5 py-0.5 rounded-md text-[9px] font-bold ${activeTab === tab.key ? 'bg-blue-100 text-blue-700 dark:bg-blue-950/40 dark:text-blue-400' : 'bg-zinc-200/50 dark:bg-zinc-800/50 text-zinc-500'
               }`}>
               {countTab(tab.key)}
             </span>
@@ -188,7 +188,7 @@ export default function ProviderBidsPage() {
         <div className="text-center py-16 bg-white dark:bg-zinc-900/40 border border-zinc-200/60 dark:border-zinc-800/80 rounded-2xl">
           <Briefcase size={40} className="mx-auto text-zinc-300 dark:text-zinc-700 mb-3" />
           <p className="text-zinc-500 dark:text-zinc-400 text-sm">{t('provider.bids.noBids')}</p>
-          <Link href="/provider/browse-jobs" className="inline-block mt-4 text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
+          <Link href="/provider/browse-jobs" className="inline-block mt-4 text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline">
             Find jobs →
           </Link>
         </div>
@@ -211,8 +211,8 @@ export default function ProviderBidsPage() {
 
                 <div className="p-5 flex-1 space-y-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-10 h-10 rounded-xl bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center shrink-0">
-                      <Scale size={18} className="text-indigo-500" />
+                    <div className="w-10 h-10 rounded-xl bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center shrink-0">
+                      <Scale size={18} className="text-blue-500" />
                     </div>
                     <div className="min-w-0 flex-1">
                       <h3 className="font-bold text-base text-zinc-900 dark:text-zinc-50 truncate">

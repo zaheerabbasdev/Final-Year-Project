@@ -263,13 +263,13 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                         child: Container(
                           padding: const EdgeInsets.all(20),
                           decoration: BoxDecoration(
-                            color: const Color(0xFF6366F1).withOpacity(0.1),
+                            color: const Color(0xFF2563EB).withOpacity(0.1),
                             shape: BoxShape.circle,
                           ),
                           child: const Icon(
                             Icons.share_location,
                             size: 40,
-                            color: Color(0xFF6366F1),
+                            color: Color(0xFF2563EB),
                           ),
                         ),
                       )
@@ -336,12 +336,12 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                     Container(
                       padding: const EdgeInsets.all(12),
                       decoration: BoxDecoration(
-                        color: const Color(0xFF6366F1).withOpacity(0.1),
+                        color: const Color(0xFF2563EB).withOpacity(0.1),
                         borderRadius: BorderRadius.circular(16),
                       ),
                       child: const Icon(
                         Icons.directions_walk,
-                        color: Color(0xFF6366F1),
+                        color: Color(0xFF2563EB),
                         size: 24,
                       ),
                     ),
@@ -406,12 +406,12 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                       icon: Container(
                         padding: const EdgeInsets.all(10),
                         decoration: BoxDecoration(
-                          color: const Color(0xFF6366F1).withOpacity(0.1),
+                          color: const Color(0xFF2563EB).withOpacity(0.1),
                           borderRadius: BorderRadius.circular(12),
                         ),
                         child: const Icon(
                           Icons.my_location,
-                          color: Color(0xFF6366F1),
+                          color: Color(0xFF2563EB),
                           size: 20,
                         ),
                       ),

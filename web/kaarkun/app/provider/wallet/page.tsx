@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
@@ -125,8 +125,8 @@ export default function ProviderWalletPage() {
         </div>
       )}
 
-      {/* Balance card — violet/emerald gradient for providers */}
-      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-violet-600 via-purple-700 to-emerald-700 text-white p-8 shadow-xl shadow-violet-500/20">
+      {/* Balance card — blue/emerald gradient for providers */}
+      <div className="relative overflow-hidden rounded-3xl bg-gradient-to-br from-blue-700 via-blue-600 to-emerald-600 text-white p-8 shadow-xl shadow-blue-500/20">
         <div className="absolute -top-10 -right-10 w-44 h-44 rounded-full bg-white/5" />
         <div className="absolute -bottom-8 -left-8 w-36 h-36 rounded-full bg-white/5" />
 
@@ -208,7 +208,7 @@ export default function ProviderWalletPage() {
             <button
               onClick={() => fetchTransactions(false)}
               disabled={loadingMore}
-              className="w-full py-2.5 rounded-xl text-sm font-semibold text-violet-600 dark:text-violet-400 hover:bg-violet-50 dark:hover:bg-violet-900/20 transition-all disabled:opacity-60"
+              className="w-full py-2.5 rounded-xl text-sm font-semibold text-sky-600 dark:text-sky-400 hover:bg-sky-50 dark:hover:bg-sky-900/20 transition-all disabled:opacity-60"
             >
               {loadingMore ? t('common.loading') : `Load more (${total - transactions.length} remaining)`}
             </button>
@@ -281,7 +281,7 @@ function WithdrawModal({
             value={amount}
             onChange={e => setAmount(e.target.value)}
             placeholder={t('wallet.withdrawPlaceholder')}
-            className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-violet-500"
+            className="w-full px-4 py-3 rounded-xl border border-zinc-200 dark:border-white/10 bg-zinc-50 dark:bg-white/5 text-zinc-900 dark:text-white text-sm focus:outline-none focus:ring-2 focus:ring-sky-500"
           />
           <p className="flex items-center gap-1 text-xs text-zinc-400 mt-1">
             <Info size={11} /> {t('wallet.withdrawMin')} · Balance: PKR {balance.toLocaleString()}
@@ -301,8 +301,8 @@ function WithdrawModal({
                 onClick={() => setMethod(m.key)}
                 className={`py-2 px-2 rounded-xl text-xs font-semibold border transition-all ${
                   method === m.key
-                    ? 'bg-violet-600 text-white border-violet-600'
-                    : 'border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:border-violet-400'
+                    ? 'bg-sky-600 text-white border-sky-600'
+                    : 'border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-zinc-300 hover:border-sky-400'
                 }`}
               >
                 {m.label}
@@ -314,7 +314,7 @@ function WithdrawModal({
         <button
           onClick={handle}
           disabled={processing || !amount}
-          className="w-full py-3 rounded-xl bg-violet-600 hover:bg-violet-700 text-white font-bold text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
+          className="w-full py-3 rounded-xl bg-sky-600 hover:bg-sky-700 text-white font-bold text-sm transition-all disabled:opacity-60 disabled:cursor-not-allowed"
         >
           {processing ? t('wallet.processing') : t('wallet.withdrawBtn')}
         </button>

@@ -139,11 +139,11 @@ class _WalletScreenState extends State<WalletScreen> {
                         ? SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF6366F1)),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF2563EB)),
                           )
                         : Text(
                             lang.t('wallet.loadMore'),
-                            style: GoogleFonts.outfit(color: const Color(0xFF6366F1), fontWeight: FontWeight.w600),
+                            style: GoogleFonts.outfit(color: const Color(0xFF2563EB), fontWeight: FontWeight.w600),
                           ),
                   ),
                 ],
@@ -159,14 +159,14 @@ class _WalletScreenState extends State<WalletScreen> {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
-          colors: [Color(0xFF6366F1), Color(0xFF8B5CF6), Color(0xFF06B6D4)],
+          colors: [Color(0xFF2563EB), Color(0xFF0EA5E9), Color(0xFF06B6D4)],
           begin: Alignment.topLeft,
           end: Alignment.bottomRight,
         ),
         borderRadius: BorderRadius.circular(28),
         boxShadow: [
           BoxShadow(
-            color: const Color(0xFF6366F1).withOpacity(0.35),
+            color: const Color(0xFF2563EB).withOpacity(0.35),
             blurRadius: 24,
             offset: const Offset(0, 8),
           ),
@@ -517,9 +517,9 @@ class _TopUpSheetState extends State<_TopUpDialog> {
                     child: Container(
                       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
                       decoration: BoxDecoration(
-                        color: selected ? const Color(0xFF6366F1) : colors.surface,
+                        color: selected ? const Color(0xFF2563EB) : colors.surface,
                         borderRadius: BorderRadius.circular(12),
-                        border: Border.all(color: selected ? const Color(0xFF6366F1) : colors.border),
+                        border: Border.all(color: selected ? const Color(0xFF2563EB) : colors.border),
                       ),
                       child: Text(
                         'PKR ${a.toInt()}',
@@ -561,7 +561,7 @@ class _TopUpSheetState extends State<_TopUpDialog> {
                 child: FilledButton(
                   onPressed: _processing ? null : _submit,
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   ),
@@ -727,10 +727,10 @@ class _WithdrawSheetState extends State<_WithdrawDialog> {
                             : EdgeInsets.zero,
                         padding: const EdgeInsets.symmetric(vertical: 12),
                         decoration: BoxDecoration(
-                          color: isSelected ? const Color(0xFF6366F1) : colors.surface,
+                          color: isSelected ? const Color(0xFF2563EB) : colors.surface,
                           borderRadius: BorderRadius.circular(14),
                           border: Border.all(
-                            color: isSelected ? const Color(0xFF6366F1) : colors.border,
+                            color: isSelected ? const Color(0xFF2563EB) : colors.border,
                           ),
                         ),
                         child: Center(
@@ -755,7 +755,7 @@ class _WithdrawSheetState extends State<_WithdrawDialog> {
                 child: FilledButton(
                   onPressed: _processing ? null : _submit,
                   style: FilledButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
                   ),

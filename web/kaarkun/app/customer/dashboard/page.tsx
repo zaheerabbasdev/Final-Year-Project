@@ -10,7 +10,6 @@ import { api } from '../../utils/api';
 import {
   Briefcase,
   MapPin,
-  DollarSign,
   Clock,
   ChevronRight,
   Plus,
@@ -24,9 +23,10 @@ import {
   Layers,
   CalendarCheck,
   TrendingUp,
-  Sparkles,
+  Zap,
   ClipboardList,
   LayoutDashboard,
+  Phone,
 } from 'lucide-react';
 
 interface Job {
@@ -52,23 +52,23 @@ interface Booking {
 }
 
 const STATUS_STYLES: Record<string, string> = {
-  open:                 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-400',
+  open:                 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   active:               'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
   completed:            'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
-  cancelled:            'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
+  cancelled:            'bg-slate-100 text-slate-500 dark:bg-slate-800 dark:text-slate-400',
   confirmed:            'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   in_progress:          'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  awaiting_confirmation:'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+  awaiting_confirmation:'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
 };
 
 const STATUS_ACCENT: Record<string, string> = {
-  open:                 'bg-indigo-400',
+  open:                 'bg-blue-400',
   active:               'bg-amber-400',
   completed:            'bg-emerald-400',
-  cancelled:            'bg-zinc-300 dark:bg-zinc-700',
+  cancelled:            'bg-slate-300 dark:bg-slate-700',
   confirmed:            'bg-blue-400',
   in_progress:          'bg-amber-400',
-  awaiting_confirmation:'bg-violet-400',
+  awaiting_confirmation:'bg-sky-400',
 };
 
 export default function CustomerDashboard() {
@@ -132,8 +132,8 @@ export default function CustomerDashboard() {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-full border-4 border-indigo-600 border-t-transparent animate-spin" />
-          <p className="text-sm text-zinc-400">Loading your dashboard…</p>
+          <div className="w-10 h-10 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
+          <p className="text-sm text-slate-400">Loading your dashboard…</p>
         </div>
       </div>
     );
@@ -148,33 +148,32 @@ export default function CustomerDashboard() {
 
       {/* Page title */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-indigo-50 dark:bg-indigo-900/30">
-          <LayoutDashboard size={20} className="text-indigo-600 dark:text-indigo-400" />
+        <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30">
+          <LayoutDashboard size={20} className="text-blue-600 dark:text-blue-400" />
         </div>
         <div>
-          <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">{t('sidebar.dashboard')}</h1>
-          <p className="text-xs text-zinc-400 mt-0.5">{t('customer.dashboard.subtitle')}</p>
+          <h1 className="text-2xl font-black text-slate-900 dark:text-white leading-tight">{t('sidebar.dashboard')}</h1>
+          <p className="text-xs text-slate-400 mt-0.5">{t('customer.dashboard.subtitle')}</p>
         </div>
       </div>
 
       {/* Welcome hero */}
-      <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-indigo-600 via-indigo-700 to-violet-700 p-7 shadow-xl shadow-indigo-500/20">
-        {/* Decorative circles */}
+      <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 p-7 shadow-xl shadow-blue-500/20">
         <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
         <div className="absolute -bottom-10 right-24 w-28 h-28 rounded-full bg-white/5 pointer-events-none" />
         <div className="relative flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
           <div>
-            <p className="text-indigo-200 text-sm font-medium mb-1">{t('customer.dashboard.greeting')} 👋</p>
+            <p className="text-blue-100 text-sm font-medium mb-1">{t('customer.dashboard.greeting')}</p>
             <h1 className="text-2xl sm:text-3xl font-black text-white leading-tight">
               {user?.full_name}
             </h1>
-            <p className="text-indigo-200 text-sm mt-1">
+            <p className="text-blue-100 text-sm mt-1">
               {activeJobs.length} active job{activeJobs.length !== 1 ? 's' : ''} · {activeBookings.length} active booking{activeBookings.length !== 1 ? 's' : ''}
             </p>
           </div>
           <Link
             href="/customer/post-job"
-            className="flex items-center gap-2 px-5 py-2.5 bg-white text-indigo-700 hover:bg-indigo-50 rounded-xl text-sm font-bold shadow-lg transition-all shrink-0"
+            className="flex items-center gap-2 px-5 py-2.5 bg-white text-blue-700 hover:bg-blue-50 rounded-xl text-sm font-bold shadow-lg transition-all shrink-0"
           >
             <Plus size={16} />
             {t('customer.dashboard.postJob')}
@@ -192,42 +191,42 @@ export default function CustomerDashboard() {
       {/* Stat cards */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: t('customer.dashboard.totalJobs'), value: jobs.length, icon: <Briefcase size={18} />, color: 'indigo' },
-          { label: t('customer.dashboard.status.active'), value: activeJobs.length, icon: <TrendingUp size={18} />, color: 'amber' },
-          { label: t('customer.dashboard.status.completed'), value: completedJobs.length, icon: <CheckCircle2 size={18} />, color: 'emerald' },
-          { label: t('customer.dashboard.activeBookingsStat'), value: bookings.length, icon: <CalendarCheck size={18} />, color: 'violet' },
+          { label: t('customer.dashboard.totalJobs'),         value: jobs.length,        icon: <Briefcase size={18} />,     color: 'blue' },
+          { label: t('customer.dashboard.status.active'),     value: activeJobs.length,  icon: <TrendingUp size={18} />,    color: 'amber' },
+          { label: t('customer.dashboard.status.completed'),  value: completedJobs.length,icon: <CheckCircle2 size={18} />, color: 'emerald' },
+          { label: t('customer.dashboard.activeBookingsStat'),value: bookings.length,    icon: <CalendarCheck size={18} />, color: 'sky' },
         ].map(({ label, value, icon, color }) => (
           <div key={label} className="stat-card glass-card p-5">
             <div className="flex items-center justify-between mb-3">
-              <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{label}</p>
+              <p className="text-xs font-semibold text-slate-400 uppercase tracking-wider">{label}</p>
               <div className={`p-2 rounded-xl bg-${color}-50 dark:bg-${color}-900/20 text-${color}-500`}>
                 {icon}
               </div>
             </div>
-            <p className="text-2xl font-black text-zinc-900 dark:text-white">{value}</p>
+            <p className="text-2xl font-black text-slate-900 dark:text-white">{value}</p>
           </div>
         ))}
       </div>
 
-      {/* My Job Posts — Full width */}
+      {/* My Job Posts */}
       <div className="mb-6">
         <div className="glass-card overflow-hidden">
-          <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-white/[0.06] flex items-center justify-between">
             <div className="flex items-center gap-2">
-              <Layers size={18} className="text-indigo-500" />
-              <h2 className="font-bold text-zinc-900 dark:text-white">{t('customer.dashboard.recentJobs')}</h2>
+              <Layers size={18} className="text-blue-500" />
+              <h2 className="font-bold text-slate-900 dark:text-white">{t('customer.dashboard.recentJobs')}</h2>
             </div>
-            <Link href="/customer/jobs" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+            <Link href="/customer/jobs" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
               {t('customer.dashboard.viewAllJobs')} <ChevronRight size={13} />
             </Link>
           </div>
 
           {jobs.length === 0 ? (
             <div className="px-6 py-14 text-center">
-              <ClipboardList size={40} className="text-zinc-300 dark:text-zinc-600 mb-3 mx-auto" />
-              <p className="text-zinc-500 dark:text-zinc-400 font-medium">{t('customer.dashboard.noJobs')}</p>
-              <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-indigo-600 dark:text-indigo-400 hover:underline">
-                <Sparkles size={14} />
+              <ClipboardList size={40} className="text-slate-300 dark:text-slate-600 mb-3 mx-auto" />
+              <p className="text-slate-500 dark:text-slate-400 font-medium">{t('customer.dashboard.noJobs')}</p>
+              <Link href="/customer/post-job" className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline">
+                <Zap size={14} />
                 {t('customer.jobs.postFirst')} →
               </Link>
             </div>
@@ -236,16 +235,16 @@ export default function CustomerDashboard() {
               {jobs.slice(0, 6).map((job) => (
                 <div
                   key={job.id}
-                  className="stat-card relative overflow-hidden rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 group"
+                  className="stat-card relative overflow-hidden rounded-2xl border border-slate-100 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 group"
                 >
                   <div className={`absolute top-0 left-0 h-1 w-full ${STATUS_ACCENT[job.status] || STATUS_ACCENT.cancelled}`} />
 
                   <div className="flex items-start justify-between gap-2 mb-3">
                     <div className="min-w-0">
-                      <h3 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         {job.title}
                       </h3>
-                      <p className="flex items-center gap-1 text-xs text-zinc-400 mt-1">
+                      <p className="flex items-center gap-1 text-xs text-slate-400 mt-1">
                         <MapPin size={11} className="shrink-0" />
                         <span className="truncate">{job.location}</span>
                       </p>
@@ -255,16 +254,16 @@ export default function CustomerDashboard() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06]">
-                    <span className="text-base font-black text-zinc-900 dark:text-white">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/[0.06]">
+                    <span className="text-base font-black text-slate-900 dark:text-white">
                       {format(job.budget)}
                     </span>
                     {job.status === 'open' ? (
-                      <span className="text-[11px] font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/30 px-2 py-1 rounded-lg">
+                      <span className="text-[11px] font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 rounded-lg">
                         {job.bids_count || 0} bid{job.bids_count === 1 ? '' : 's'}
                       </span>
                     ) : (
-                      <span className="flex items-center gap-1 text-[11px] text-zinc-400">
+                      <span className="flex items-center gap-1 text-[11px] text-slate-400">
                         <Clock size={11} />{new Date(job.created_at).toLocaleDateString()}
                       </span>
                     )}
@@ -273,14 +272,14 @@ export default function CustomerDashboard() {
                   <div className="flex items-center gap-2 mt-3">
                     <Link
                       href={`/customer/jobs/${job.id}`}
-                      className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold text-zinc-600 dark:text-zinc-300 hover:text-indigo-600 dark:hover:text-indigo-400 py-1.5 rounded-lg hover:bg-indigo-50 dark:hover:bg-indigo-900/20 transition-colors"
+                      className="flex-1 flex items-center justify-center gap-1 text-xs font-semibold text-slate-600 dark:text-slate-300 hover:text-blue-600 dark:hover:text-blue-400 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors"
                     >
                       {t('customer.dashboard.details')} <ChevronRight size={13} />
                     </Link>
                     {job.status === 'open' && (
                       <button
                         onClick={() => handleCancelJob(job.id)}
-                        className="p-1.5 text-zinc-300 dark:text-zinc-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 shrink-0"
+                        className="p-1.5 text-slate-300 dark:text-slate-600 hover:text-rose-500 dark:hover:text-rose-400 transition-colors rounded-lg hover:bg-rose-50 dark:hover:bg-rose-900/20 shrink-0"
                         title="Cancel job"
                       >
                         <XCircle size={15} />
@@ -294,30 +293,30 @@ export default function CustomerDashboard() {
         </div>
       </div>
 
-      {/* Active Bookings — Full width */}
+      {/* Active Bookings */}
       <div>
         <div className="glass-card overflow-hidden">
-          <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
+          <div className="px-6 py-4 border-b border-slate-100 dark:border-white/[0.06] flex items-center justify-between">
             <div className="flex items-center gap-2">
               <CalendarCheck size={18} className="text-emerald-500" />
-              <h2 className="font-bold text-zinc-900 dark:text-white">{t('customer.dashboard.activeBookings')}</h2>
+              <h2 className="font-bold text-slate-900 dark:text-white">{t('customer.dashboard.activeBookings')}</h2>
             </div>
-            <Link href="/customer/bookings" className="text-xs font-semibold text-indigo-600 dark:text-indigo-400 hover:underline flex items-center gap-1">
+            <Link href="/customer/bookings" className="text-xs font-semibold text-blue-600 dark:text-blue-400 hover:underline flex items-center gap-1">
               {t('customer.dashboard.viewAllBookings')} <ChevronRight size={13} />
             </Link>
           </div>
 
           {bookings.length === 0 ? (
             <div className="px-6 py-14 text-center">
-              <div className="text-4xl mb-3">📅</div>
-              <p className="text-sm text-zinc-400">{t('customer.dashboard.noBookings')}</p>
+              <CalendarCheck size={40} className="text-slate-300 dark:text-slate-600 mb-3 mx-auto" />
+              <p className="text-sm text-slate-400">{t('customer.dashboard.noBookings')}</p>
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 p-6">
               {bookings.map((booking) => (
                 <div
                   key={booking.id}
-                  className="stat-card relative overflow-hidden rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 group"
+                  className="stat-card relative overflow-hidden rounded-2xl border border-slate-100 dark:border-white/[0.08] bg-white dark:bg-white/[0.02] p-4 group"
                 >
                   <div className={`absolute top-0 left-0 h-1 w-full ${STATUS_ACCENT[booking.status] || STATUS_ACCENT.cancelled}`} />
 
@@ -326,10 +325,10 @@ export default function CustomerDashboard() {
                       {(booking.provider_name || 'P').charAt(0).toUpperCase()}
                     </div>
                     <div className="min-w-0 flex-1">
-                      <h3 className="font-bold text-sm text-zinc-900 dark:text-white group-hover:text-indigo-600 dark:group-hover:text-indigo-400 transition-colors truncate">
+                      <h3 className="font-bold text-sm text-slate-900 dark:text-white group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors truncate">
                         {booking.job_title || `Booking #${booking.id}`}
                       </h3>
-                      <p className="flex items-center gap-1 text-xs text-zinc-400 mt-0.5 truncate">
+                      <p className="flex items-center gap-1 text-xs text-slate-400 mt-0.5 truncate">
                         <UserIcon size={11} className="shrink-0" />
                         {booking.provider_name || 'Provider'}
                       </p>
@@ -339,9 +338,11 @@ export default function CustomerDashboard() {
                     </span>
                   </div>
 
-                  <div className="flex items-center justify-between pt-3 border-t border-zinc-100 dark:border-white/[0.06] text-[11px] text-zinc-400">
+                  <div className="flex items-center justify-between pt-3 border-t border-slate-100 dark:border-white/[0.06] text-[11px] text-slate-400">
                     {booking.provider_phone ? (
-                      <span>📞 {booking.provider_phone}</span>
+                      <span className="flex items-center gap-1">
+                        <Phone size={11} className="shrink-0" />{booking.provider_phone}
+                      </span>
                     ) : <span />}
                     <span className="flex items-center gap-1">
                       <Clock size={11} />
@@ -352,7 +353,7 @@ export default function CustomerDashboard() {
                   <div className="flex items-center gap-2 mt-3">
                     <Link
                       href={`/chat?jobId=${booking.job_id}&userId=${booking.provider_id}`}
-                      className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-zinc-100 dark:bg-white/5 text-zinc-700 dark:text-zinc-300 hover:bg-indigo-50 dark:hover:bg-indigo-900/20 hover:text-indigo-600 dark:hover:text-indigo-400 rounded-lg transition-all"
+                      className="flex-1 flex items-center justify-center gap-1 px-3 py-1.5 text-[11px] font-bold bg-slate-100 dark:bg-white/5 text-slate-700 dark:text-slate-300 hover:bg-blue-50 dark:hover:bg-blue-900/20 hover:text-blue-600 dark:hover:text-blue-400 rounded-lg transition-all"
                     >
                       <MessageSquare size={11} /> {t('customer.bookings.chat')}
                     </Link>

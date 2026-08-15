@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, useRef, useCallback, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -186,7 +186,7 @@ function ChatContent() {
   if (authLoading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -215,7 +215,7 @@ function ChatContent() {
         <div className={`w-full md:w-80 border-r border-zinc-200 dark:border-zinc-800 flex flex-col ${activeChat ? 'hidden md:flex' : 'flex'}`}>
           <div className="p-4 border-b border-zinc-200 dark:border-zinc-800">
             <h2 className="text-lg font-bold text-zinc-900 dark:text-zinc-50 flex items-center gap-2">
-              <MessageSquare size={20} className="text-indigo-600 dark:text-indigo-400" />
+              <MessageSquare size={20} className="text-blue-600 dark:text-blue-400" />
               {t('chat.title')}
             </h2>
           </div>
@@ -232,7 +232,7 @@ function ChatContent() {
                   onClick={() => setActiveChat({ jobId: chat.job_id, userId: chat.other_user_id })}
                   className={`w-full p-4 border-b border-zinc-100 dark:border-zinc-800/50 flex items-start gap-3 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors text-left ${
                     activeChat?.jobId === chat.job_id && activeChat?.userId === chat.other_user_id 
-                      ? 'bg-indigo-50/50 dark:bg-indigo-950/20 border-l-2 border-l-indigo-500' 
+                      ? 'bg-blue-50/50 dark:bg-blue-950/20 border-l-2 border-l-blue-500' 
                       : ''
                   }`}
                 >
@@ -250,7 +250,7 @@ function ChatContent() {
                         {formatDate(chat.last_message_time)}
                       </span>
                     </div>
-                    <p className="text-[10px] text-indigo-600 dark:text-indigo-400 font-medium truncate mb-0.5">
+                    <p className="text-[10px] text-blue-600 dark:text-blue-400 font-medium truncate mb-0.5">
                       {chat.job_title}
                     </p>
                     <p className={`text-xs truncate ${chat.unread_count > 0 ? 'font-semibold text-zinc-900 dark:text-zinc-100' : 'text-zinc-500'}`}>
@@ -315,7 +315,7 @@ function ChatContent() {
                       <div key={msg.id || idx} className={`flex ${isMine ? 'justify-end' : 'justify-start'}`}>
                         <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${
                           isMine 
-                            ? 'bg-indigo-600 text-white rounded-br-sm' 
+                            ? 'bg-blue-600 text-white rounded-br-sm' 
                             : 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-zinc-100 border border-zinc-200 dark:border-zinc-700 rounded-bl-sm'
                         }`}>
                           <p className="text-sm whitespace-pre-wrap break-words">{msg.content}</p>
@@ -323,7 +323,7 @@ function ChatContent() {
                             <button
                               type="button"
                               onClick={() => setLightboxUrl(getFileUrl(msg.image_url!))}
-                              className="mt-2 block rounded-lg overflow-hidden cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-indigo-400"
+                              className="mt-2 block rounded-lg overflow-hidden cursor-zoom-in focus:outline-none focus:ring-2 focus:ring-blue-400"
                               title="Click to enlarge"
                             >
                               <img
@@ -333,7 +333,7 @@ function ChatContent() {
                               />
                             </button>
                           )}
-                          <div className={`text-[10px] mt-1 text-right ${isMine ? 'text-indigo-200' : 'text-zinc-400'}`}>
+                          <div className={`text-[10px] mt-1 text-right ${isMine ? 'text-blue-200' : 'text-zinc-400'}`}>
                             {new Date(msg.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
                           </div>
                         </div>
@@ -389,7 +389,7 @@ function ChatContent() {
                     type="button"
                     onClick={() => fileInputRef.current?.click()}
                     disabled={sending}
-                    className="p-3 text-zinc-400 hover:text-indigo-600 dark:hover:text-indigo-400 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 transition-colors shrink-0 disabled:opacity-50"
+                    className="p-3 text-zinc-400 hover:text-blue-600 dark:hover:text-blue-400 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 transition-colors shrink-0 disabled:opacity-50"
                     title="Attach image"
                   >
                     <Paperclip size={18} />
@@ -402,14 +402,14 @@ function ChatContent() {
                       onChange={(e) => setNewMessage(e.target.value)}
                       placeholder={sending ? t('chat.sending') : t('chat.placeholder')}
                       disabled={sending}
-                      className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all disabled:opacity-60"
+                      className="w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-zinc-50 dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all disabled:opacity-60"
                     />
                   </div>
 
                   <button
                     type="submit"
                     disabled={(!newMessage.trim() && !selectedImage) || sending}
-                    className="p-3 bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 text-white rounded-xl transition-colors shrink-0 disabled:opacity-60"
+                    className="p-3 bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-300 dark:disabled:bg-zinc-800 text-white rounded-xl transition-colors shrink-0 disabled:opacity-60"
                   >
                     {sending
                       ? <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />

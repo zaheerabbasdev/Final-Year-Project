@@ -457,13 +457,13 @@ class _ProfileScreenState extends State<ProfileScreen> {
               const SizedBox(width: 8),
               Container(
                 decoration: BoxDecoration(
-                  color: const Color(0xFF6366F1).withOpacity(0.1),
+                  color: const Color(0xFF2563EB).withOpacity(0.1),
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: IconButton(
                   icon: _isLoading
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
-                    : const Icon(Icons.my_location, color: Color(0xFF6366F1), size: 18),
+                    : const Icon(Icons.my_location, color: Color(0xFF2563EB), size: 18),
                   onPressed: _useCurrentLocation,
                 ),
               ),
@@ -541,7 +541,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     }
                   },
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFF6366F1),
+                    backgroundColor: const Color(0xFF2563EB),
                     padding: const EdgeInsets.symmetric(vertical: 16),
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
@@ -585,7 +585,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         final completed = jobs.where((j) => (j['status'] as String?)?.toLowerCase() == 'completed').length;
         return Row(
           children: [
-            Expanded(child: _buildStatCard(Icons.work_outline, total.toString(), 'Total Jobs', const Color(0xFF6366F1))),
+            Expanded(child: _buildStatCard(Icons.work_outline, total.toString(), 'Total Jobs', const Color(0xFF2563EB))),
             const SizedBox(width: 12),
             Expanded(child: _buildStatCard(Icons.check_circle_outline, completed.toString(), 'Completed', const Color(0xFF10B981))),
           ],
@@ -607,7 +607,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
         return Row(
           children: [
-            Expanded(child: _buildStatCard(Icons.work_outline, completedJobsCount.toString(), 'Jobs Done', const Color(0xFF6366F1))),
+            Expanded(child: _buildStatCard(Icons.work_outline, completedJobsCount.toString(), 'Jobs Done', const Color(0xFF2563EB))),
             const SizedBox(width: 12),
             Expanded(child: _buildStatCard(Icons.stars_outlined, (stats?['rating'] ?? '5.0').toString(), 'Rating', const Color(0xFF10B981))),
             const SizedBox(width: 12),

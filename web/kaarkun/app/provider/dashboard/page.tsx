@@ -7,9 +7,6 @@ import { useAuth } from '../../context/AuthContext';
 import { useLanguage } from '../../context/LanguageContext';
 import { api, getFileUrl } from '../../utils/api';
 import {
-  Briefcase,
-  MapPin,
-  DollarSign,
   Clock,
   Star,
   AlertCircle,
@@ -20,7 +17,7 @@ import {
   Search,
   Scale,
   ChevronRight,
-  Sparkles,
+  Bot,
   Activity,
   Award,
   Zap,
@@ -43,7 +40,7 @@ interface Booking {
 const STATUS_STYLES: Record<string, string> = {
   confirmed:             'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
   in_progress:           'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
-  awaiting_confirmation: 'bg-violet-100 text-violet-700 dark:bg-violet-900/30 dark:text-violet-400',
+  awaiting_confirmation: 'bg-sky-100 text-sky-700 dark:bg-sky-900/30 dark:text-sky-400',
   completed:             'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400',
   cancelled:             'bg-zinc-100 text-zinc-500 dark:bg-zinc-800 dark:text-zinc-400',
 };
@@ -51,7 +48,7 @@ const STATUS_STYLES: Record<string, string> = {
 const STATUS_ACCENT: Record<string, string> = {
   confirmed:             'bg-blue-400',
   in_progress:           'bg-amber-400',
-  awaiting_confirmation: 'bg-violet-400',
+  awaiting_confirmation: 'bg-sky-400',
   completed:             'bg-emerald-400',
   cancelled:             'bg-zinc-300 dark:bg-zinc-700',
 };
@@ -106,7 +103,7 @@ export default function ProviderDashboard() {
     return (
       <div className="flex-1 flex items-center justify-center min-h-[60vh]">
         <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-full border-4 border-violet-600 border-t-transparent animate-spin" />
+          <div className="w-10 h-10 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
           <p className="text-sm text-zinc-400">Loading your dashboard…</p>
         </div>
       </div>
@@ -124,8 +121,8 @@ export default function ProviderDashboard() {
 
       {/* Page title */}
       <div className="mb-6 flex items-center gap-3">
-        <div className="p-2 rounded-xl bg-violet-50 dark:bg-violet-900/30">
-          <LayoutDashboard size={20} className="text-violet-600 dark:text-violet-400" />
+        <div className="p-2 rounded-xl bg-blue-50 dark:bg-blue-900/30">
+          <LayoutDashboard size={20} className="text-blue-600 dark:text-blue-400" />
         </div>
         <div>
           <h1 className="text-2xl font-black text-zinc-900 dark:text-white leading-tight">{t('sidebar.dashboard')}</h1>
@@ -153,7 +150,7 @@ export default function ProviderDashboard() {
       )}
 
       {/* Hero profile card */}
-      <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-violet-600 via-indigo-700 to-blue-700 p-7 shadow-xl shadow-violet-500/20">
+      <div className="relative mb-8 overflow-hidden rounded-2xl bg-gradient-to-br from-blue-700 via-blue-600 to-sky-500 p-7 shadow-xl shadow-blue-500/20">
         <div className="absolute -top-8 -right-8 w-40 h-40 rounded-full bg-white/5 pointer-events-none" />
         <div className="absolute bottom-0 left-36 w-52 h-24 bg-white/5 rounded-full blur-xl pointer-events-none" />
 
@@ -180,8 +177,8 @@ export default function ProviderDashboard() {
                   </span>
                 )}
               </div>
-              <p className="text-violet-200 text-sm">{profile.experience_years || 0} years experience · {profile.category_name || 'Service Provider'}</p>
-              <p className="text-violet-200 text-xs mt-0.5">{user?.location || 'Location not set'}</p>
+              <p className="text-blue-100 text-sm">{profile.experience_years || 0} years experience · {profile.category_name || 'Service Provider'}</p>
+              <p className="text-blue-100 text-xs mt-0.5">{user?.location || 'Location not set'}</p>
             </div>
           </div>
 
@@ -192,17 +189,17 @@ export default function ProviderDashboard() {
                 {parseFloat(profile.rating || '0').toFixed(1)}
                 <Star size={16} className="text-amber-300 fill-amber-300" />
               </p>
-              <p className="text-violet-200 text-xs">Rating</p>
+              <p className="text-blue-100 text-xs">Rating</p>
             </div>
             <div className="w-px h-10 bg-white/20" />
             <div className="text-center">
               <p className="text-2xl font-black text-white">{profile.total_jobs || 0}</p>
-              <p className="text-violet-200 text-xs">Jobs Done</p>
+              <p className="text-blue-100 text-xs">Jobs Done</p>
             </div>
             <div className="w-px h-10 bg-white/20" />
             <div className="text-center">
               <p className="text-2xl font-black text-white">{parseFloat(profile.success_rate || '0').toFixed(0)}%</p>
-              <p className="text-violet-200 text-xs">Success</p>
+              <p className="text-blue-100 text-xs">Success</p>
             </div>
           </div>
         </div>
@@ -211,10 +208,10 @@ export default function ProviderDashboard() {
       {/* Stat tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: t('provider.dashboard.activeBookings'), value: activeBookings.length,   icon: <Activity size={18} />,   color: 'indigo' },
+          { label: t('provider.dashboard.activeBookings'), value: activeBookings.length,   icon: <Activity size={18} />,    color: 'blue' },
           { label: t('provider.dashboard.completedJobs'), value: completedBookings.length, icon: <CheckCircle2 size={18}/>, color: 'emerald' },
-          { label: t('provider.dashboard.successRate'),  value: `${parseFloat(profile.success_rate || '0').toFixed(0)}%`, icon: <TrendingUp size={18} />, color: 'violet' },
-          { label: t('provider.dashboard.rating'),    value: `${parseFloat(profile.rating || '0').toFixed(1)} ★`,     icon: <Award size={18} />,     color: 'amber' },
+          { label: t('provider.dashboard.successRate'),   value: `${parseFloat(profile.success_rate || '0').toFixed(0)}%`, icon: <TrendingUp size={18} />, color: 'sky' },
+          { label: t('provider.dashboard.rating'),        value: `${parseFloat(profile.rating || '0').toFixed(1)} ★`,     icon: <Award size={18} />,     color: 'amber' },
         ].map(({ label, value, icon, color }) => (
           <div key={label} className="stat-card glass-card p-5">
             <div className="flex items-center justify-between mb-3">
@@ -236,7 +233,7 @@ export default function ProviderDashboard() {
           <div className="glass-card overflow-hidden">
             <div className="px-6 py-4 border-b border-zinc-100 dark:border-white/[0.06] flex items-center justify-between">
               <div className="flex items-center gap-2">
-                <Zap size={18} className="text-violet-500" />
+                <Zap size={18} className="text-blue-500" />
                 <h2 className="font-bold text-zinc-900 dark:text-white">{t('provider.dashboard.activeBookings')}</h2>
               </div>
               <span className="text-xs font-semibold text-zinc-400">{activeBookings.length} active</span>
@@ -257,7 +254,7 @@ export default function ProviderDashboard() {
                 {isVerified && (
                   <Link
                     href="/provider/browse-jobs"
-                    className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-violet-600 dark:text-violet-400 hover:underline"
+                    className="inline-flex items-center gap-1.5 mt-4 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:underline"
                   >
                     <Search size={14} /> Browse available jobs →
                   </Link>
@@ -273,11 +270,11 @@ export default function ProviderDashboard() {
                     <div className={`absolute top-0 left-0 h-1 w-full ${STATUS_ACCENT[booking.status] || STATUS_ACCENT.cancelled}`} />
 
                     <div className="flex items-start gap-3 mb-3">
-                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-indigo-500 flex items-center justify-center text-white font-black text-sm shrink-0">
+                      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-600 to-sky-500 flex items-center justify-center text-white font-black text-sm shrink-0">
                         {(booking.customer_name || 'C').charAt(0).toUpperCase()}
                       </div>
                       <div className="min-w-0 flex-1">
-                        <h3 className="font-bold text-sm text-zinc-900 dark:text-white truncate group-hover:text-violet-600 dark:group-hover:text-violet-400 transition-colors">
+                        <h3 className="font-bold text-sm text-zinc-900 dark:text-white truncate group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                           {booking.job_title || `Booking #${booking.id}`}
                         </h3>
                         <p className="text-xs text-zinc-400 mt-0.5 truncate">
@@ -319,7 +316,7 @@ export default function ProviderDashboard() {
                       )}
                       <Link
                         href={`/chat?jobId=${booking.job_id}&userId=${booking.customer_id}`}
-                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-[11px] font-bold bg-violet-600 hover:bg-violet-700 text-white rounded-lg transition-all shadow-sm"
+                        className="flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 text-[11px] font-bold bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition-all shadow-sm"
                       >
                         <MessageSquare size={11} /> {t('provider.dashboard.chat')}
                       </Link>
@@ -338,21 +335,21 @@ export default function ProviderDashboard() {
         <div className="space-y-4">
           <div className="glass-card p-5">
             <h2 className="font-bold text-zinc-900 dark:text-white mb-4 flex items-center gap-2">
-              <Sparkles size={17} className="text-violet-500" />
+              <Zap size={17} className="text-blue-500" />
               {t('provider.dashboard.quickActions')}
             </h2>
             <div className="grid grid-cols-2 gap-3">
               {isVerified ? (
                 <Link
                   href="/provider/browse-jobs"
-                  className="stat-card col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white shadow-lg shadow-violet-500/20 transition-all"
+                  className="stat-card col-span-2 flex items-center gap-3 p-4 rounded-2xl bg-gradient-to-r from-blue-600 to-sky-500 hover:from-blue-500 hover:to-sky-400 text-white shadow-lg shadow-blue-500/20 transition-all"
                 >
                   <div className="w-10 h-10 rounded-xl bg-white/15 flex items-center justify-center shrink-0">
                     <Search size={18} />
                   </div>
                   <div className="min-w-0 flex-1">
                     <p className="text-sm font-bold">{t('provider.dashboard.browseJobsTitle')}</p>
-                    <p className="text-[11px] text-violet-200">{t('provider.dashboard.findNearby')}</p>
+                    <p className="text-[11px] text-blue-100">{t('provider.dashboard.findNearby')}</p>
                   </div>
                   <ChevronRight size={16} className="shrink-0" />
                 </Link>
@@ -372,8 +369,8 @@ export default function ProviderDashboard() {
                 href="/provider/bids"
                 className="stat-card flex flex-col gap-2.5 p-4 rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-zinc-50/50 dark:bg-white/[0.02] hover:bg-zinc-50 dark:hover:bg-white/[0.05] transition-all"
               >
-                <div className="w-9 h-9 rounded-lg bg-indigo-100 dark:bg-indigo-950/40 flex items-center justify-center">
-                  <Scale size={16} className="text-indigo-500" />
+                <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center">
+                  <Scale size={16} className="text-blue-500" />
                 </div>
                 <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t('provider.dashboard.bidHistory')}</span>
               </Link>
@@ -382,21 +379,21 @@ export default function ProviderDashboard() {
                 href="/profile"
                 className="stat-card flex flex-col gap-2.5 p-4 rounded-2xl border border-zinc-100 dark:border-white/[0.08] bg-zinc-50/50 dark:bg-white/[0.02] hover:bg-zinc-50 dark:hover:bg-white/[0.05] transition-all"
               >
-                <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-950/40 flex items-center justify-center">
-                  <UserCheck size={16} className="text-blue-500" />
+                <div className="w-9 h-9 rounded-lg bg-sky-100 dark:bg-sky-950/40 flex items-center justify-center">
+                  <UserCheck size={16} className="text-sky-500" />
                 </div>
                 <span className="text-xs font-bold text-zinc-700 dark:text-zinc-300">{t('provider.dashboard.editProfile')}</span>
               </Link>
 
               <Link
                 href="/support-chatbot"
-                className="stat-card col-span-2 flex items-center gap-3 p-4 rounded-2xl border border-violet-200 dark:border-violet-800/30 bg-violet-50 dark:bg-violet-900/10 hover:bg-violet-100 dark:hover:bg-violet-900/20 transition-all"
+                className="stat-card col-span-2 flex items-center gap-3 p-4 rounded-2xl border border-blue-200 dark:border-blue-800/30 bg-blue-50 dark:bg-blue-900/10 hover:bg-blue-100 dark:hover:bg-blue-900/20 transition-all"
               >
-                <div className="w-9 h-9 rounded-lg bg-violet-100 dark:bg-violet-900/40 flex items-center justify-center shrink-0">
-                  <Sparkles size={16} className="text-violet-600 dark:text-violet-400" />
+                <div className="w-9 h-9 rounded-lg bg-blue-100 dark:bg-blue-900/40 flex items-center justify-center shrink-0">
+                  <Bot size={16} className="text-blue-600 dark:text-blue-400" />
                 </div>
-                <span className="text-xs font-bold text-violet-700 dark:text-violet-400 flex-1">{t('provider.dashboard.aiAssistant')}</span>
-                <span className="text-[10px] font-bold px-1.5 py-0.5 bg-violet-200 dark:bg-violet-800/40 text-violet-700 dark:text-violet-300 rounded-full">AI</span>
+                <span className="text-xs font-bold text-blue-700 dark:text-blue-400 flex-1">{t('provider.dashboard.aiAssistant')}</span>
+                <span className="text-[10px] font-bold px-1.5 py-0.5 bg-blue-200 dark:bg-blue-800/40 text-blue-700 dark:text-blue-300 rounded-full">AI</span>
               </Link>
             </div>
           </div>

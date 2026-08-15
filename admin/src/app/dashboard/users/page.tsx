@@ -143,7 +143,7 @@ export default function UsersPage() {
                         />
                       ) : null}
                       <div
-                        className={`h-10 w-10 bg-indigo-100 rounded-full flex items-center justify-center font-bold text-indigo-700 ${user.avatar ? 'hidden' : 'flex'}`}
+                        className={`h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center font-bold text-blue-700 ${user.avatar ? 'hidden' : 'flex'}`}
                       >
                         {user.full_name.charAt(0)}
                       </div>

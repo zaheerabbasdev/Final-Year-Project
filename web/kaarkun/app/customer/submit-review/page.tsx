@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 
 import React, { useState, useEffect, Suspense } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
@@ -72,7 +72,7 @@ function SubmitReviewContent() {
   if (authLoading) {
     return (
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     );
   }
@@ -97,7 +97,7 @@ function SubmitReviewContent() {
     <div className="flex-grow max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <button
         onClick={() => router.back()}
-        className="mb-6 flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-indigo-600 transition-colors"
+        className="mb-6 flex items-center gap-1 text-sm font-semibold text-zinc-500 hover:text-blue-600 transition-colors"
       >
         <ChevronLeft size={18} />
         Back
@@ -113,7 +113,7 @@ function SubmitReviewContent() {
               className="w-20 h-20 rounded-full object-cover border-4 border-white dark:border-zinc-900 shadow-md mx-auto mb-4"
             />
           ) : (
-            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-indigo-100 to-violet-100 dark:from-indigo-950/40 dark:to-violet-950/40 flex items-center justify-center text-3xl font-extrabold text-indigo-600 dark:text-indigo-400 border-4 border-white dark:border-zinc-900 shadow-md mx-auto mb-4">
+            <div className="w-20 h-20 rounded-full bg-gradient-to-tr from-blue-100 to-sky-100 dark:from-blue-950/40 dark:to-sky-950/40 flex items-center justify-center text-3xl font-extrabold text-blue-600 dark:text-blue-400 border-4 border-white dark:border-zinc-900 shadow-md mx-auto mb-4">
               {providerName.charAt(0).toUpperCase()}
             </div>
           )}
@@ -152,7 +152,7 @@ function SubmitReviewContent() {
                 </button>
               ))}
             </div>
-            <p className={`text-base font-bold transition-colors ${rating > 0 ? 'text-indigo-600 dark:text-indigo-400' : 'text-zinc-400'}`}>
+            <p className={`text-base font-bold transition-colors ${rating > 0 ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-400'}`}>
               {activeRating > 0 ? RATING_LABELS[activeRating] : 'Tap stars to rate'}
             </p>
           </div>
@@ -167,14 +167,14 @@ function SubmitReviewContent() {
               value={comment}
               onChange={(e) => setComment(e.target.value)}
               placeholder="Describe the quality of service, punctuality, professionalism..."
-              className="block w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-indigo-500/20 focus:border-indigo-500 text-sm transition-all resize-none"
+              className="block w-full px-4 py-3 border border-zinc-200 dark:border-zinc-800 rounded-xl bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all resize-none"
             />
           </div>
 
           <button
             type="submit"
             disabled={loading || rating === 0}
-            className="w-full py-3.5 bg-indigo-600 hover:bg-indigo-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
+            className="w-full py-3.5 bg-blue-600 hover:bg-blue-700 disabled:bg-zinc-200 dark:disabled:bg-zinc-800 disabled:text-zinc-400 text-white rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition-all shadow-sm"
           >
             <Send size={15} />
             {loading ? 'Submitting...' : 'Submit Review'}
@@ -189,7 +189,7 @@ export default function SubmitReviewPage() {
   return (
     <Suspense fallback={
       <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-indigo-600"></div>
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
       </div>
     }>
       <SubmitReviewContent />

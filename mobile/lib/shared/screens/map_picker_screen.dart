@@ -194,7 +194,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                   decoration: BoxDecoration(
                     color: colors.surface,
                     borderRadius: BorderRadius.circular(12),
-                    border: Border.all(color: const Color(0xFF6366F1), width: 1.5),
+                    border: Border.all(color: const Color(0xFF2563EB), width: 1.5),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.04),
@@ -247,18 +247,18 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                               ? const SizedBox(
                                   width: 16,
                                   height: 16,
-                                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF6366F1)),
+                                  child: CircularProgressIndicator(strokeWidth: 2, color: Color(0xFF2563EB)),
                                 )
                               : const Icon(
                                   Icons.my_location,
                                   size: 16,
-                                  color: Color(0xFF6366F1),
+                                  color: Color(0xFF2563EB),
                                 ),
                           const SizedBox(width: 6),
                           Text(
                             lang.t('mapPicker.useCurrentLocation'),
                             style: const TextStyle(
-                              color: Color(0xFF6366F1),
+                              color: Color(0xFF2563EB),
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
                             ),

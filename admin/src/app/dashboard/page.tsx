@@ -31,7 +31,7 @@ export default function DashboardPage() {
   const maxGrowth = Math.max(1, ...userGrowth.map((m) => m.count));
   const categoryPopularity: { name: string; count: number }[] = stats?.categoryPopularity || [];
   const maxCategoryCount = Math.max(1, ...categoryPopularity.map((c) => c.count));
-  const categoryColors = ['bg-[var(--primary)]', 'bg-indigo-500', 'bg-purple-500', 'bg-teal-500', 'bg-orange-500'];
+  const categoryColors = ['bg-[var(--primary)]', 'bg-blue-500', 'bg-blue-500', 'bg-teal-500', 'bg-orange-500'];
 
   return (
     <div className="space-y-8">
@@ -39,7 +39,7 @@ export default function DashboardPage() {
         <StatCard title="Total Users" value={stats?.users || 0} icon="👥" color="blue" />
         <StatCard title="Active Jobs" value={stats?.activeJobs || 0} icon="💼" color="green" />
         <StatCard title="Total Bids" value={stats?.bids || 0} icon="⚖️" color="orange" />
-        <StatCard title="Total Categories" value={stats?.categories || 0} icon="📑" color="indigo" />
+        <StatCard title="Total Categories" value={stats?.categories || 0} icon="📑" color="blue" />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
@@ -93,7 +93,7 @@ function StatCard({ title, value, icon, color }: any) {
     blue: 'text-blue-600 bg-blue-50',
     green: 'text-green-600 bg-green-50',
     orange: 'text-orange-600 bg-orange-50',
-    indigo: 'text-indigo-600 bg-indigo-50',
+    sky: 'text-sky-600 bg-sky-50',
   };
 
   return (

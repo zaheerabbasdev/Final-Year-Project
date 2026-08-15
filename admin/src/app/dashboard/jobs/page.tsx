@@ -85,7 +85,7 @@ export default function JobsPage() {
                       {job.category_name}
                     </span>
                   </td>
-                  <td className="px-6 py-4 text-sm font-bold text-indigo-600">
+                  <td className="px-6 py-4 text-sm font-bold text-blue-600">
                     ${job.budget}
                   </td>
                   <td className="px-6 py-4">
@@ -99,7 +99,7 @@ export default function JobsPage() {
                   <td className="px-6 py-4 text-right">
                     <button 
                       onClick={() => setSelectedJobId(job.id)}
-                      className="text-gray-400 hover:text-indigo-600 p-2"
+                      className="text-gray-400 hover:text-blue-600 p-2"
                       title="View Details & Summarize"
                     >
                       👁️
