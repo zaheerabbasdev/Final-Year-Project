@@ -39,6 +39,7 @@ export default function CustomerWalletPage() {
   const router = useRouter();
 
   const [balance, setBalance] = useState<number>(0);
+  const [escrowBalance, setEscrowBalance] = useState<number>(0);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [total, setTotal] = useState(0);
   const [loading, setLoading] = useState(true);
@@ -62,6 +63,7 @@ export default function CustomerWalletPage() {
       setLoading(true);
       const data = await api.get('/wallet');
       setBalance(data.balance ?? 0);
+      setEscrowBalance(data.escrow_balance ?? 0);
     } catch {
       showToast('error', t('common.error'));
     } finally {
@@ -169,6 +171,16 @@ export default function CustomerWalletPage() {
             PKR {balance.toLocaleString('en-PK', { minimumFractionDigits: 2 })}
           </p>
           <p className="mt-1 text-xs opacity-60">{t('wallet.customerInfo')}</p>
+
+          {/* Escrow row — only shown when funds are locked */}
+          {escrowBalance > 0 && (
+            <div className="flex items-center gap-2 mt-3 bg-white/10 rounded-xl px-4 py-2.5">
+              <Info size={14} className="opacity-70 shrink-0" />
+              <span className="text-xs font-medium">
+                PKR {escrowBalance.toLocaleString('en-PK', { minimumFractionDigits: 2 })} {t('wallet.inEscrow')}
+              </span>
+            </div>
+          )}
 
           <div className="flex gap-3 mt-6">
             <button

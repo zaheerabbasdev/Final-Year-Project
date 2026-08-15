@@ -1,5 +1,6 @@
 const Booking = require('../models/bookingModel');
 const Job = require('../models/jobModel');
+const Wallet = require('../models/walletModel');
 const db = require('../config/db');
 const crypto = require('crypto');
 const { createNotification } = require('../services/notificationService');
@@ -34,12 +35,20 @@ const updateBookingStatus = async (req, res) => {
         if (booking) {
             if (status === 'completed') {
                 await Job.update(booking.job_id, { status: 'completed' });
+
+                // Release escrow → credit provider wallet
+                try {
+                    await Wallet.releaseEscrow(booking.id);
+                } catch (e) {
+                    console.error('Escrow release failed:', e.message);
+                }
+
                 const [jobRows] = await db.execute('SELECT title FROM jobs WHERE id = ?', [booking.job_id]);
                 const jobTitle = jobRows[0] ? jobRows[0].title : 'your job';
                 await createNotification(
                     booking.provider_id,
-                    'Job Completed',
-                    `The customer has confirmed completion for "${jobTitle}".`,
+                    'Job Completed & Payment Released',
+                    `The customer confirmed "${jobTitle}". Your earnings have been credited to your wallet.`,
                     'booking'
                 );
             } else if (status === 'awaiting_confirmation') {
@@ -102,12 +111,20 @@ const updateBookingStatusByJob = async (req, res) => {
 
         if (status === 'completed') {
             await Job.update(booking.job_id, { status: 'completed' });
+
+            // Release escrow → credit provider wallet
+            try {
+                await Wallet.releaseEscrow(booking.id);
+            } catch (e) {
+                console.error('Escrow release failed:', e.message);
+            }
+
             const [jobRows] = await db.execute('SELECT title FROM jobs WHERE id = ?', [booking.job_id]);
             const jobTitle = jobRows[0] ? jobRows[0].title : 'your job';
             await createNotification(
                 booking.provider_id,
-                'Job Completed',
-                `The customer has confirmed completion for "${jobTitle}".`,
+                'Job Completed & Payment Released',
+                `The customer confirmed "${jobTitle}". Your earnings have been credited to your wallet.`,
                 'booking'
             );
         } else if (status === 'awaiting_confirmation') {
@@ -198,6 +215,13 @@ const cancelBooking = async (req, res) => {
 
         // Cancel the booking
         await Booking.updateStatus(id, 'cancelled');
+
+        // Refund escrow back to customer wallet
+        try {
+            await Wallet.refundEscrow(parseInt(id));
+        } catch (e) {
+            console.error('Escrow refund failed:', e.message);
+        }
 
         // Reset all other bids for this job back to 'pending'
         await db.execute('UPDATE bids SET status = ? WHERE job_id = ? AND id != ?', ['pending', booking.job_id, booking.bid_id || 0]);

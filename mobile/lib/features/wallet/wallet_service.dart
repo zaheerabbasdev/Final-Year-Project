@@ -40,6 +40,7 @@ class WalletService extends ChangeNotifier {
   final ApiClient _api = ApiClient();
 
   double _balance = 0.0;
+  double _escrowBalance = 0.0;
   List<WalletTransaction> _transactions = [];
   int _total = 0;
   bool _loading = false;
@@ -50,6 +51,7 @@ class WalletService extends ChangeNotifier {
   int _offset = 0;
 
   double get balance => _balance;
+  double get escrowBalance => _escrowBalance;
   List<WalletTransaction> get transactions => _transactions;
   int get total => _total;
   bool get loading => _loading;
@@ -65,6 +67,7 @@ class WalletService extends ChangeNotifier {
       final res = await _api.dio.get('/wallet');
       final data = res.data as Map<String, dynamic>;
       _balance = double.tryParse(data['balance'].toString()) ?? 0.0;
+      _escrowBalance = double.tryParse((data['escrow_balance'] ?? 0).toString()) ?? 0.0;
     } catch (e) {
       _error = e.toString();
     } finally {
@@ -125,6 +128,7 @@ class WalletService extends ChangeNotifier {
 
   void reset() {
     _balance = 0.0;
+    _escrowBalance = 0.0;
     _transactions = [];
     _total = 0;
     _offset = 0;

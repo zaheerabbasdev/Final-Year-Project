@@ -1,6 +1,7 @@
 const Bid = require('../models/bidModel');
 const Job = require('../models/jobModel');
 const Booking = require('../models/bookingModel');
+const Wallet = require('../models/walletModel');
 const db = require('../config/db');
 const { createNotification } = require('../services/notificationService');
 
@@ -81,6 +82,18 @@ const acceptBid = async (req, res) => {
             return res.status(403).json({ message: 'Unauthorized' });
         }
 
+        // ── Escrow check: customer must have enough wallet balance ──
+        const customerWallet = await Wallet.getOrCreate(job.customer_id);
+        const bidAmount = parseFloat(bid.amount);
+        if (parseFloat(customerWallet.balance) < bidAmount) {
+            connection.release();
+            return res.status(400).json({
+                message: `Insufficient wallet balance. Please top up at least PKR ${bidAmount.toLocaleString()} to accept this bid.`,
+                required: bidAmount,
+                available: parseFloat(customerWallet.balance),
+            });
+        }
+
         await connection.beginTransaction();
 
         // Atomically claim the job — only succeeds if it's still 'open', so two
@@ -97,13 +110,22 @@ const acceptBid = async (req, res) => {
 
         await connection.execute("UPDATE bids SET status = 'accepted' WHERE id = ?", [bid.id]);
         await connection.execute("UPDATE bids SET status = 'rejected' WHERE job_id = ? AND id != ?", [job.id, bid.id]);
-        await connection.execute(
+        const [bookingResult] = await connection.execute(
             'INSERT INTO bookings (job_id, bid_id, customer_id, provider_id) VALUES (?, ?, ?, ?)',
             [job.id, bid.id, job.customer_id, bid.provider_id]
         );
+        const bookingId = bookingResult.insertId;
 
         await connection.commit();
         connection.release();
+
+        // ── Hold escrow (outside transaction — wallet has its own consistency) ──
+        try {
+            await Wallet.holdEscrow(job.customer_id, bidAmount, bookingId, job.title);
+        } catch (escrowErr) {
+            // Log but don't fail — booking is already created; admin can reconcile
+            console.error('Escrow hold failed after booking creation:', escrowErr.message);
+        }
 
         // Notify Provider (after commit — not part of the atomic transaction)
         await createNotification(
@@ -113,7 +135,7 @@ const acceptBid = async (req, res) => {
             'bid_accepted'
         );
 
-        res.json({ message: 'Bid accepted and booking created' });
+        res.json({ message: 'Bid accepted and booking created', bookingId });
     } catch (error) {
         await connection.rollback();
         connection.release();

@@ -51,6 +51,101 @@ const Wallet = {
     },
 
     /**
+     * Lock funds from customer wallet into escrow when a bid is accepted.
+     * Deducts from customer balance and stores the amount on the booking row.
+     */
+    holdEscrow: async (customerId, amount, bookingId, jobTitle) => {
+        const escrowAmount = parseFloat(amount);
+        // Deduct from customer wallet
+        const result = await Wallet.debit(
+            customerId,
+            escrowAmount,
+            `Payment held in escrow — "${jobTitle}"`,
+            'payment',
+            bookingId
+        );
+        // Record escrow amount on the booking
+        await db.execute('UPDATE bookings SET escrow_amount = ? WHERE id = ?', [escrowAmount, bookingId]);
+        return result;
+    },
+
+    /**
+     * Release escrow to provider when job is confirmed complete.
+     * Credits provider wallet and clears the booking's escrow_amount.
+     */
+    releaseEscrow: async (bookingId) => {
+        const [rows] = await db.execute(
+            `SELECT b.escrow_amount, b.provider_id, b.customer_id, j.title
+             FROM bookings b
+             JOIN jobs j ON j.id = b.job_id
+             WHERE b.id = ?`,
+            [bookingId]
+        );
+        if (rows.length === 0) throw new Error('Booking not found');
+        const { escrow_amount, provider_id, title } = rows[0];
+        const amount = parseFloat(escrow_amount);
+        if (amount <= 0) return null; // nothing held — no-op
+
+        // Credit provider
+        const result = await Wallet.credit(
+            provider_id,
+            amount,
+            `Earnings released — "${title}"`,
+            'earning',
+            bookingId
+        );
+        // Clear escrow on booking
+        await db.execute('UPDATE bookings SET escrow_amount = 0 WHERE id = ?', [bookingId]);
+        return result;
+    },
+
+    /**
+     * Refund escrow back to customer when booking is cancelled.
+     * Credits customer wallet and clears the booking's escrow_amount.
+     */
+    refundEscrow: async (bookingId) => {
+        const [rows] = await db.execute(
+            `SELECT b.escrow_amount, b.customer_id, j.title
+             FROM bookings b
+             JOIN jobs j ON j.id = b.job_id
+             WHERE b.id = ?`,
+            [bookingId]
+        );
+        if (rows.length === 0) throw new Error('Booking not found');
+        const { escrow_amount, customer_id, title } = rows[0];
+        const amount = parseFloat(escrow_amount);
+        if (amount <= 0) return null; // nothing to refund
+
+        // Refund customer
+        const result = await Wallet.credit(
+            customer_id,
+            amount,
+            `Refund — booking cancelled for "${title}"`,
+            'refund',
+            bookingId
+        );
+        // Clear escrow on booking
+        await db.execute('UPDATE bookings SET escrow_amount = 0 WHERE id = ?', [bookingId]);
+        return result;
+    },
+
+    /**
+     * Total amount currently locked in escrow for a customer
+     * (sum of all active bookings with escrow held).
+     */
+    getCustomerEscrow: async (customerId) => {
+        const [[row]] = await db.execute(
+            `SELECT COALESCE(SUM(escrow_amount), 0) AS total
+             FROM bookings
+             WHERE customer_id = ?
+               AND status IN ('confirmed', 'in_progress', 'awaiting_confirmation')
+               AND escrow_amount > 0`,
+            [customerId]
+        );
+        return parseFloat(row.total);
+    },
+
+    /**
      * Paginated transaction history for a user.
      */
     getTransactions: async (userId, limit = 20, offset = 0) => {

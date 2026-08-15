@@ -221,6 +221,25 @@ CREATE TABLE IF NOT EXISTS wallet_transactions (
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- --------------------------------------------------------
+-- Safe migration: add escrow_amount to bookings if absent
+-- --------------------------------------------------------
+DROP PROCEDURE IF EXISTS _kk_add_escrow_col;
+CREATE PROCEDURE _kk_add_escrow_col()
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM INFORMATION_SCHEMA.COLUMNS
+        WHERE TABLE_SCHEMA = DATABASE()
+          AND TABLE_NAME   = 'bookings'
+          AND COLUMN_NAME  = 'escrow_amount'
+    ) THEN
+        ALTER TABLE bookings
+            ADD COLUMN escrow_amount DECIMAL(10,2) NOT NULL DEFAULT 0.00;
+    END IF;
+END;
+CALL _kk_add_escrow_col();
+DROP PROCEDURE IF EXISTS _kk_add_escrow_col;
+
+-- --------------------------------------------------------
 -- Seed Categories
 -- --------------------------------------------------------
 INSERT IGNORE INTO categories (name, icon) VALUES

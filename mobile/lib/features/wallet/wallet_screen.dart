@@ -203,6 +203,29 @@ class _WalletScreenState extends State<WalletScreen> {
             lang.t('wallet.customerInfo'),
             style: GoogleFonts.outfit(color: Colors.white60, fontSize: 12),
           ),
+
+          // Escrow row — only shown when funds are locked
+          if (ws.escrowBalance > 0) ...[
+            const SizedBox(height: 12),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+              decoration: BoxDecoration(
+                color: Colors.white.withOpacity(0.12),
+                borderRadius: BorderRadius.circular(14),
+              ),
+              child: Row(
+                children: [
+                  const Icon(Icons.lock_outline_rounded, color: Colors.white70, size: 15),
+                  const SizedBox(width: 8),
+                  Text(
+                    'PKR ${_fmt(ws.escrowBalance)}  ${lang.t('wallet.inEscrow')}',
+                    style: GoogleFonts.outfit(color: Colors.white70, fontSize: 12, fontWeight: FontWeight.w600),
+                  ),
+                ],
+              ),
+            ),
+          ],
+
           const SizedBox(height: 20),
           Row(
             children: [

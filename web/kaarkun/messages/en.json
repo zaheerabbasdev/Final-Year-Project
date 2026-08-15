@@ -440,6 +440,8 @@
     "insufficientBalance": "Insufficient balance",
     "customerInfo": "Use your wallet to pay providers instantly when accepting bids.",
     "providerInfo": "Your earnings from completed jobs are credited here automatically.",
+    "inEscrow": "held in escrow for active job",
+    "escrowInfo": "Funds are locked until you confirm the job is complete.",
     "pkr": "PKR",
     "sidebarLink": "Wallet"
   },

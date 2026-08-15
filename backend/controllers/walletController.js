@@ -8,8 +8,16 @@ const getWallet = async (req, res) => {
     try {
         const wallet = await Wallet.getOrCreate(req.user.id);
         const recentTransactions = await Wallet.getTransactions(req.user.id, 5, 0);
+
+        // Escrow only applies to customers — providers always see 0
+        let escrowBalance = 0;
+        if (req.user.role === 'customer') {
+            escrowBalance = await Wallet.getCustomerEscrow(req.user.id);
+        }
+
         res.json({
             balance: parseFloat(wallet.balance),
+            escrow_balance: escrowBalance,
             recent_transactions: recentTransactions,
         });
     } catch (error) {
