@@ -25,20 +25,18 @@ class _WalletScreenState extends State<WalletScreen> {
   }
 
   void _showTopUpSheet() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const _TopUpSheet(),
+      barrierDismissible: true,
+      builder: (_) => const _TopUpDialog(),
     );
   }
 
   void _showWithdrawSheet() {
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      isScrollControlled: true,
-      backgroundColor: Colors.transparent,
-      builder: (_) => const _WithdrawSheet(),
+      barrierDismissible: true,
+      builder: (_) => const _WithdrawDialog(),
     );
   }
 
@@ -141,11 +139,11 @@ class _WalletScreenState extends State<WalletScreen> {
                         ? SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(strokeWidth: 2, color: colors.primary),
+                            child: CircularProgressIndicator(strokeWidth: 2, color: const Color(0xFF6366F1)),
                           )
                         : Text(
                             lang.t('wallet.loadMore'),
-                            style: GoogleFonts.outfit(color: colors.primary, fontWeight: FontWeight.w600),
+                            style: GoogleFonts.outfit(color: const Color(0xFF6366F1), fontWeight: FontWeight.w600),
                           ),
                   ),
                 ],
@@ -303,56 +301,77 @@ class _WalletScreenState extends State<WalletScreen> {
         borderRadius: BorderRadius.circular(18),
         border: Border.all(color: colors.border, width: 1),
       ),
-      child: ListTile(
-        contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-        leading: Container(
-          width: 44,
-          height: 44,
-          decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(14)),
-          child: Icon(
-            isCredit ? Icons.trending_up_rounded : Icons.trending_down_rounded,
-            color: iconColor,
-            size: 22,
-          ),
-        ),
-        title: Text(
-          tx.description,
-          style: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 14, color: colors.text),
-          maxLines: 1,
-          overflow: TextOverflow.ellipsis,
-        ),
-        subtitle: Row(
+      child: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 12),
+        child: Row(
           children: [
+            // Icon
             Container(
-              margin: const EdgeInsets.only(top: 4, right: 8),
-              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
-              decoration: BoxDecoration(
-                color: iconBg,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(typeLabel, style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: iconColor)),
-            ),
-            Text(
-              _formatDate(tx.createdAt),
-              style: GoogleFonts.outfit(fontSize: 11, color: colors.subtext),
-            ),
-          ],
-        ),
-        trailing: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.end,
-          children: [
-            Text(
-              amountText,
-              style: GoogleFonts.outfit(
-                fontWeight: FontWeight.bold,
-                fontSize: 14,
+              width: 44,
+              height: 44,
+              decoration: BoxDecoration(color: iconBg, borderRadius: BorderRadius.circular(14)),
+              child: Icon(
+                isCredit ? Icons.trending_up_rounded : Icons.trending_down_rounded,
                 color: iconColor,
+                size: 22,
               ),
             ),
-            Text(
-              '${lang.t('wallet.balanceAfter')}: PKR ${_fmt(tx.balanceAfter)}',
-              style: GoogleFonts.outfit(fontSize: 10, color: colors.subtext),
+            const SizedBox(width: 12),
+
+            // Title + subtitle
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Text(
+                    tx.description,
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600, fontSize: 13, color: colors.text),
+                    maxLines: 1,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                  const SizedBox(height: 4),
+                  Row(
+                    children: [
+                      Container(
+                        padding: const EdgeInsets.symmetric(horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: iconBg,
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: Text(typeLabel, style: GoogleFonts.outfit(fontSize: 10, fontWeight: FontWeight.bold, color: iconColor)),
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        _formatDate(tx.createdAt),
+                        style: GoogleFonts.outfit(fontSize: 11, color: colors.subtext),
+                      ),
+                    ],
+                  ),
+                ],
+              ),
+            ),
+            const SizedBox(width: 8),
+
+            // Amount + balance after (fixed width, no overflow)
+            Column(
+              mainAxisSize: MainAxisSize.min,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              children: [
+                Text(
+                  amountText,
+                  style: GoogleFonts.outfit(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                    color: iconColor,
+                  ),
+                ),
+                const SizedBox(height: 2),
+                Text(
+                  'Bal: PKR ${_fmt(tx.balanceAfter)}',
+                  style: GoogleFonts.outfit(fontSize: 10, color: colors.subtext),
+                ),
+              ],
             ),
           ],
         ),
@@ -383,16 +402,16 @@ class _WalletScreenState extends State<WalletScreen> {
 }
 
 // ─────────────────────────────────────────────
-// TOP UP BOTTOM SHEET
+// TOP UP CENTER DIALOG
 // ─────────────────────────────────────────────
-class _TopUpSheet extends StatefulWidget {
-  const _TopUpSheet();
+class _TopUpDialog extends StatefulWidget {
+  const _TopUpDialog();
 
   @override
-  State<_TopUpSheet> createState() => _TopUpSheetState();
+  State<_TopUpDialog> createState() => _TopUpSheetState();
 }
 
-class _TopUpSheetState extends State<_TopUpSheet> {
+class _TopUpSheetState extends State<_TopUpDialog> {
   final _controller = TextEditingController();
   bool _processing = false;
   final List<double> _quickAmounts = [500, 1000, 2000, 5000];
@@ -449,84 +468,110 @@ class _TopUpSheetState extends State<_TopUpSheet> {
     final colors = Theme.of(context).appColors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.circular(28),
         ),
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(width: 40, height: 4, decoration: BoxDecoration(color: colors.border, borderRadius: BorderRadius.circular(2))),
-            ),
-            const SizedBox(height: 20),
-            Text(lang.t('wallet.topUpTitle'), style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: colors.text)),
-            Text(lang.t('wallet.topUpSubtitle'), style: GoogleFonts.outfit(fontSize: 13, color: colors.subtext)),
-            const SizedBox(height: 20),
-
-            // Quick amounts
-            Wrap(
-              spacing: 10,
-              children: _quickAmounts.map((a) {
-                return ChoiceChip(
-                  label: Text('PKR ${a.toInt()}', style: GoogleFonts.outfit(fontWeight: FontWeight.w600)),
-                  selected: _controller.text == a.toInt().toString(),
-                  onSelected: (_) {
-                    setState(() => _controller.text = a.toInt().toString());
-                  },
-                  selectedColor: const Color(0xFF6366F1),
-                  labelStyle: TextStyle(
-                    color: _controller.text == a.toInt().toString() ? Colors.white : colors.text,
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header row
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(lang.t('wallet.topUpTitle'), style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: colors.text)),
+                        Text(lang.t('wallet.topUpSubtitle'), style: GoogleFonts.outfit(fontSize: 12, color: colors.subtext)),
+                      ],
+                    ),
                   ),
-                  backgroundColor: colors.surface,
-                  side: BorderSide(color: colors.border),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 16),
-
-            TextField(
-              controller: _controller,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-              style: GoogleFonts.outfit(color: colors.text),
-              decoration: InputDecoration(
-                labelText: lang.t('wallet.topUpAmount'),
-                hintText: lang.t('wallet.topUpPlaceholder'),
-                prefixText: 'PKR ',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: colors.border),
-                ),
-                filled: true,
-                fillColor: colors.surface,
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(10)),
+                      child: Icon(Icons.close, size: 18, color: colors.subtext),
+                    ),
+                  ),
+                ],
               ),
-              onChanged: (_) => setState(() {}),
-            ),
-            const SizedBox(height: 20),
+              const SizedBox(height: 20),
 
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _processing ? null : _submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                ),
-                child: _processing
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Text(lang.t('wallet.topUpBtn'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+              // Quick amounts
+              Wrap(
+                spacing: 8,
+                runSpacing: 8,
+                children: _quickAmounts.map((a) {
+                  final selected = _controller.text == a.toInt().toString();
+                  return GestureDetector(
+                    onTap: () => setState(() => _controller.text = a.toInt().toString()),
+                    child: Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 8),
+                      decoration: BoxDecoration(
+                        color: selected ? const Color(0xFF6366F1) : colors.surface,
+                        borderRadius: BorderRadius.circular(12),
+                        border: Border.all(color: selected ? const Color(0xFF6366F1) : colors.border),
+                      ),
+                      child: Text(
+                        'PKR ${a.toInt()}',
+                        style: GoogleFonts.outfit(
+                          fontWeight: FontWeight.w600,
+                          fontSize: 13,
+                          color: selected ? Colors.white : colors.text,
+                        ),
+                      ),
+                    ),
+                  );
+                }).toList(),
               ),
-            ),
-          ],
+              const SizedBox(height: 16),
+
+              TextField(
+                controller: _controller,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                style: GoogleFonts.outfit(color: colors.text),
+                decoration: InputDecoration(
+                  labelText: lang.t('wallet.topUpAmount'),
+                  hintText: lang.t('wallet.topUpPlaceholder'),
+                  prefixText: 'PKR ',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: colors.border),
+                  ),
+                  filled: true,
+                  fillColor: colors.surface,
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _processing ? null : _submit,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  ),
+                  child: _processing
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text(lang.t('wallet.topUpBtn'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
@@ -534,16 +579,16 @@ class _TopUpSheetState extends State<_TopUpSheet> {
 }
 
 // ─────────────────────────────────────────────
-// WITHDRAW BOTTOM SHEET
+// WITHDRAW CENTER DIALOG
 // ─────────────────────────────────────────────
-class _WithdrawSheet extends StatefulWidget {
-  const _WithdrawSheet();
+class _WithdrawDialog extends StatefulWidget {
+  const _WithdrawDialog();
 
   @override
-  State<_WithdrawSheet> createState() => _WithdrawSheetState();
+  State<_WithdrawDialog> createState() => _WithdrawSheetState();
 }
 
-class _WithdrawSheetState extends State<_WithdrawSheet> {
+class _WithdrawSheetState extends State<_WithdrawDialog> {
   final _controller = TextEditingController();
   String _method = 'bank_transfer';
   bool _processing = false;
@@ -608,100 +653,119 @@ class _WithdrawSheetState extends State<_WithdrawSheet> {
       {'key': 'easypaisa',     'label': lang.t('wallet.easyPaisa')},
     ];
 
-    return Padding(
-      padding: EdgeInsets.only(bottom: MediaQuery.of(context).viewInsets.bottom),
+    return Dialog(
+      backgroundColor: Colors.transparent,
+      insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 40),
       child: Container(
         decoration: BoxDecoration(
           color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
-          borderRadius: const BorderRadius.vertical(top: Radius.circular(28)),
+          borderRadius: BorderRadius.circular(28),
         ),
-        padding: const EdgeInsets.fromLTRB(24, 20, 24, 32),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Center(
-              child: Container(width: 40, height: 4, decoration: BoxDecoration(color: colors.border, borderRadius: BorderRadius.circular(2))),
-            ),
-            const SizedBox(height: 20),
-            Text(lang.t('wallet.withdrawTitle'), style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: colors.text)),
-            Text(lang.t('wallet.withdrawSubtitle'), style: GoogleFonts.outfit(fontSize: 13, color: colors.subtext)),
-            const SizedBox(height: 20),
-
-            TextField(
-              controller: _controller,
-              keyboardType: const TextInputType.numberWithOptions(decimal: true),
-              inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
-              style: GoogleFonts.outfit(color: colors.text),
-              decoration: InputDecoration(
-                labelText: lang.t('wallet.withdrawAmount'),
-                hintText: lang.t('wallet.withdrawPlaceholder'),
-                prefixText: 'PKR ',
-                helperText: '${lang.t('wallet.withdrawMin')} · Balance: PKR ${balance.toStringAsFixed(0)}',
-                border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(16),
-                  borderSide: BorderSide(color: colors.border),
-                ),
-                filled: true,
-                fillColor: colors.surface,
-              ),
-              onChanged: (_) => setState(() {}),
-            ),
-            const SizedBox(height: 16),
-
-            Text(lang.t('wallet.withdrawMethod'), style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: colors.subtext)),
-            const SizedBox(height: 10),
-            Row(
-              children: methods.map((m) {
-                final isSelected = _method == m['key'];
-                return Expanded(
-                  child: GestureDetector(
-                    onTap: () => setState(() => _method = m['key']!),
+        padding: const EdgeInsets.fromLTRB(24, 24, 24, 28),
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header row
+              Row(
+                children: [
+                  Expanded(
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(lang.t('wallet.withdrawTitle'), style: GoogleFonts.outfit(fontSize: 20, fontWeight: FontWeight.bold, color: colors.text)),
+                        Text(lang.t('wallet.withdrawSubtitle'), style: GoogleFonts.outfit(fontSize: 12, color: colors.subtext)),
+                      ],
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(context),
                     child: Container(
-                      margin: methods.indexOf(m) < methods.length - 1
-                          ? const EdgeInsets.only(right: 8)
-                          : EdgeInsets.zero,
-                      padding: const EdgeInsets.symmetric(vertical: 12),
-                      decoration: BoxDecoration(
-                        color: isSelected ? const Color(0xFF6366F1) : colors.surface,
-                        borderRadius: BorderRadius.circular(14),
-                        border: Border.all(
-                          color: isSelected ? const Color(0xFF6366F1) : colors.border,
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(10)),
+                      child: Icon(Icons.close, size: 18, color: colors.subtext),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 20),
+
+              TextField(
+                controller: _controller,
+                keyboardType: const TextInputType.numberWithOptions(decimal: true),
+                inputFormatters: [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))],
+                style: GoogleFonts.outfit(color: colors.text),
+                decoration: InputDecoration(
+                  labelText: lang.t('wallet.withdrawAmount'),
+                  hintText: lang.t('wallet.withdrawPlaceholder'),
+                  prefixText: 'PKR ',
+                  helperText: '${lang.t('wallet.withdrawMin')} · Balance: PKR ${balance.toStringAsFixed(0)}',
+                  border: OutlineInputBorder(borderRadius: BorderRadius.circular(16)),
+                  enabledBorder: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(16),
+                    borderSide: BorderSide(color: colors.border),
+                  ),
+                  filled: true,
+                  fillColor: colors.surface,
+                ),
+                onChanged: (_) => setState(() {}),
+              ),
+              const SizedBox(height: 16),
+
+              Text(lang.t('wallet.withdrawMethod'), style: GoogleFonts.outfit(fontSize: 13, fontWeight: FontWeight.w600, color: colors.subtext)),
+              const SizedBox(height: 10),
+              Row(
+                children: methods.map((m) {
+                  final isSelected = _method == m['key'];
+                  return Expanded(
+                    child: GestureDetector(
+                      onTap: () => setState(() => _method = m['key']!),
+                      child: Container(
+                        margin: methods.indexOf(m) < methods.length - 1
+                            ? const EdgeInsets.only(right: 8)
+                            : EdgeInsets.zero,
+                        padding: const EdgeInsets.symmetric(vertical: 12),
+                        decoration: BoxDecoration(
+                          color: isSelected ? const Color(0xFF6366F1) : colors.surface,
+                          borderRadius: BorderRadius.circular(14),
+                          border: Border.all(
+                            color: isSelected ? const Color(0xFF6366F1) : colors.border,
+                          ),
                         ),
-                      ),
-                      child: Center(
-                        child: Text(
-                          m['label']!,
-                          style: GoogleFonts.outfit(
-                            fontSize: 12,
-                            fontWeight: FontWeight.w600,
-                            color: isSelected ? Colors.white : colors.text,
+                        child: Center(
+                          child: Text(
+                            m['label']!,
+                            style: GoogleFonts.outfit(
+                              fontSize: 12,
+                              fontWeight: FontWeight.w600,
+                              color: isSelected ? Colors.white : colors.text,
+                            ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                );
-              }).toList(),
-            ),
-            const SizedBox(height: 20),
-
-            SizedBox(
-              width: double.infinity,
-              child: FilledButton(
-                onPressed: _processing ? null : _submit,
-                style: FilledButton.styleFrom(
-                  backgroundColor: const Color(0xFF6366F1),
-                  padding: const EdgeInsets.symmetric(vertical: 16),
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
-                ),
-                child: _processing
-                    ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
-                    : Text(lang.t('wallet.withdrawBtn'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+                  );
+                }).toList(),
               ),
-            ),
-          ],
+              const SizedBox(height: 20),
+
+              SizedBox(
+                width: double.infinity,
+                child: FilledButton(
+                  onPressed: _processing ? null : _submit,
+                  style: FilledButton.styleFrom(
+                    backgroundColor: const Color(0xFF6366F1),
+                    padding: const EdgeInsets.symmetric(vertical: 16),
+                    shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(18)),
+                  ),
+                  child: _processing
+                      ? const SizedBox(height: 20, width: 20, child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white))
+                      : Text(lang.t('wallet.withdrawBtn'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );
