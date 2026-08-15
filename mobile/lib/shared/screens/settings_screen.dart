@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -116,7 +116,7 @@ class SettingsScreen extends StatelessWidget {
         decoration: BoxDecoration(color: colors.card, borderRadius: BorderRadius.circular(12)),
         child: Icon(
           isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-          color: isDark ? const Color(0xFF818CF8) : const Color(0xFFF59E0B),
+          color: isDark ? const Color(0xFF60A5FA) : const Color(0xFFF59E0B),
           size: 20,
         ),
       ),

@@ -13,6 +13,7 @@ import {
   Sparkles,
   RefreshCw
 } from 'lucide-react';
+import { FullPageSpinner } from '../components/ui';
 
 interface ChatMessage {
   id: string;
@@ -122,9 +123,7 @@ export default function SupportChatbotPage() {
 
   if (authLoading) {
     return (
-      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     );
   }
 

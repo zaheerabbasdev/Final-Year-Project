@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '../../context/AuthContext';
 import { api, getFileUrl } from '../../utils/api';
 import { Star, CheckCircle2, AlertCircle, ChevronLeft, Send } from 'lucide-react';
+import { FullPageSpinner } from '../../components/ui';
 
 const RATING_LABELS: Record<number, string> = {
   1: 'Terrible',
@@ -71,9 +72,7 @@ function SubmitReviewContent() {
 
   if (authLoading) {
     return (
-      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     );
   }
 
@@ -188,9 +187,7 @@ function SubmitReviewContent() {
 export default function SubmitReviewPage() {
   return (
     <Suspense fallback={
-      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     }>
       <SubmitReviewContent />
     </Suspense>

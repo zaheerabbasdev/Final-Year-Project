@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../features/provider/provider_service.dart';
 import '../../shared/services/review_service.dart';
@@ -49,7 +49,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     final lang = context.watch<LanguageProvider>();
     if (_isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)),
       );
     }
 
@@ -296,7 +296,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           future: _reviewsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
             }
 
             if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {

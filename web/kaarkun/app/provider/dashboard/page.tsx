@@ -25,6 +25,7 @@ import {
   LayoutDashboard,
   Phone,
 } from 'lucide-react';
+import { CountUp, FullPageSpinner } from '../../../components/ui';
 
 interface Booking {
   id: number;
@@ -100,14 +101,7 @@ export default function ProviderDashboard() {
   };
 
   if (authLoading || loading) {
-    return (
-      <div className="flex-1 flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-3">
-          <div className="w-10 h-10 rounded-full border-4 border-blue-600 border-t-transparent animate-spin" />
-          <p className="text-sm text-zinc-400">Loading your dashboard…</p>
-        </div>
-      </div>
-    );
+    return <FullPageSpinner />;
   }
 
   const profile = user?.profile || {};
@@ -208,19 +202,20 @@ export default function ProviderDashboard() {
       {/* Stat tiles */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-8">
         {[
-          { label: t('provider.dashboard.activeBookings'), value: activeBookings.length,   icon: <Activity size={18} />,    color: 'blue' },
-          { label: t('provider.dashboard.completedJobs'), value: completedBookings.length, icon: <CheckCircle2 size={18}/>, color: 'emerald' },
-          { label: t('provider.dashboard.successRate'),   value: `${parseFloat(profile.success_rate || '0').toFixed(0)}%`, icon: <TrendingUp size={18} />, color: 'sky' },
-          { label: t('provider.dashboard.rating'),        value: `${parseFloat(profile.rating || '0').toFixed(1)} ★`,     icon: <Award size={18} />,     color: 'amber' },
-        ].map(({ label, value, icon, color }) => (
+          { label: t('provider.dashboard.activeBookings'), value: activeBookings.length,   numericValue: activeBookings.length,   icon: <Activity size={18} />,     iconCls: 'bg-blue-50 dark:bg-blue-900/20 text-blue-500' },
+          { label: t('provider.dashboard.completedJobs'), value: completedBookings.length, numericValue: completedBookings.length, icon: <CheckCircle2 size={18} />,  iconCls: 'bg-emerald-50 dark:bg-emerald-900/20 text-emerald-500' },
+          { label: t('provider.dashboard.successRate'),   value: null,                     numericValue: null,                    icon: <TrendingUp size={18} />,    iconCls: 'bg-sky-50 dark:bg-sky-900/20 text-sky-500',   text: `${parseFloat(profile.success_rate || '0').toFixed(0)}%` },
+          { label: t('provider.dashboard.rating'),        value: null,                     numericValue: null,                    icon: <Award size={18} />,         iconCls: 'bg-amber-50 dark:bg-amber-900/20 text-amber-500', text: `${parseFloat(profile.rating || '0').toFixed(1)} ★` },
+        ].map(({ label, value, numericValue, icon, iconCls, text }) => (
           <div key={label} className="stat-card glass-card p-5">
             <div className="flex items-center justify-between mb-3">
               <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider">{label}</p>
-              <div className={`p-2 rounded-xl bg-${color}-50 dark:bg-${color}-900/20 text-${color}-500`}>
-                {icon}
-              </div>
+              <div className={`p-2 rounded-xl ${iconCls}`}>{icon}</div>
             </div>
-            <p className="text-2xl font-black text-zinc-900 dark:text-white">{value}</p>
+            {numericValue !== null
+              ? <CountUp target={numericValue as number} className="text-2xl font-black text-zinc-900 dark:text-white tabular-nums" />
+              : <p className="text-2xl font-black text-zinc-900 dark:text-white">{text}</p>
+            }
           </div>
         ))}
       </div>

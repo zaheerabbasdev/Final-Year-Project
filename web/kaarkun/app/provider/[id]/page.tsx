@@ -3,6 +3,7 @@
 import React, { useState, useEffect, use } from 'react';
 import { useRouter } from 'next/navigation';
 import { api, getFileUrl } from '../../utils/api';
+import { FullPageSpinner } from '../../components/ui';
 import { 
   User as UserIcon, 
   Mail, 
@@ -68,9 +69,7 @@ export default function ProviderPublicProfilePage({ params }: { params: Promise<
 
   if (loading) {
     return (
-      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     );
   }
 

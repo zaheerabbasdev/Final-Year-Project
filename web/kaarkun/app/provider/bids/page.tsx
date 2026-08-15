@@ -22,6 +22,7 @@ import {
   Scale,
   Send
 } from 'lucide-react';
+import { FullPageSpinner } from '../../components/ui';
 
 interface Bid {
   id: number;
@@ -118,9 +119,7 @@ export default function ProviderBidsPage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     );
   }
 

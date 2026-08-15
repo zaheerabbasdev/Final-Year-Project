@@ -1,4 +1,4 @@
-import 'dart:typed_data';
+﻿import 'dart:typed_data';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:image_picker/image_picker.dart';
@@ -674,7 +674,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           future: _reviewsFuture,
           builder: (context, snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+              return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
             }
 
             if (snapshot.hasError || !snapshot.hasData || snapshot.data!.isEmpty) {
@@ -872,7 +872,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         decoration: BoxDecoration(color: colors.card, borderRadius: BorderRadius.circular(12)),
         child: Icon(
           isDark ? Icons.dark_mode_rounded : Icons.light_mode_rounded,
-          color: isDark ? const Color(0xFF818CF8) : const Color(0xFFF59E0B),
+          color: isDark ? const Color(0xFF60A5FA) : const Color(0xFFF59E0B),
           size: 20,
         ),
       ),

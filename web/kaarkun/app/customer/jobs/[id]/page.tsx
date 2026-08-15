@@ -4,6 +4,7 @@ import React, { useState, useEffect, use } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '../../../context/AuthContext';
+import { FullPageSpinner } from '../../../components/ui';
 import { useCurrency } from '../../../context/CurrencyContext';
 import { api } from '../../../utils/api';
 import {
@@ -104,9 +105,7 @@ export default function JobDetailsPage({ params }: { params: Promise<{ id: strin
 
   if (authLoading || loading) {
     return (
-      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     );
   }
 

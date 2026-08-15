@@ -1,4 +1,4 @@
-import 'dart:async';
+﻿import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -129,7 +129,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
               ),
               const SizedBox(height: 2),
               Text(
-                '$firstName 👋',
+                firstName,
                 style: GoogleFonts.outfit(
                   fontSize: 24,
                   fontWeight: FontWeight.bold,
@@ -221,7 +221,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   Widget _buildSearchResults() {
     return Consumer<ProviderService>(
       builder: (context, service, _) {
-        if (service.isLoading) return const Center(child: CircularProgressIndicator());
+        if (service.isLoading) return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
         if (service.searchResults.isEmpty) {
           return Center(child: Text(context.read<LanguageProvider>().t('customer.home.noSearchResults')));
         }
@@ -380,7 +380,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Consumer<CategoryService>(
       builder: (context, service, _) {
         if (service.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
         }
 
         final categories = service.categories;
@@ -473,7 +473,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   Widget _buildRecentJobsList() {
     return Consumer<JobService>(
       builder: (context, service, _) {
-        if (service.isLoading) return const Center(child: CircularProgressIndicator());
+        if (service.isLoading) return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
         if (service.jobs.isEmpty) {
           return Container(
             width: double.infinity,
@@ -683,7 +683,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
     return Consumer<ProviderService>(
       builder: (context, service, _) {
         if (service.isLoading) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
         }
 
         final providers = service.topProviders;

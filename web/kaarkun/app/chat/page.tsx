@@ -13,6 +13,7 @@ import {
   Paperclip,
   X
 } from 'lucide-react';
+import { FullPageSpinner } from '../components/ui';
 
 interface ChatItem {
   job_id: number;
@@ -185,9 +186,7 @@ function ChatContent() {
 
   if (authLoading) {
     return (
-      <div className="flex-grow flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     );
   }
 
@@ -358,10 +357,10 @@ function ChatContent() {
                       type="button"
                       onClick={clearImage}
                       disabled={sending}
-                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white text-xs flex items-center justify-center hover:bg-rose-600 disabled:opacity-50"
+                      className="absolute -top-2 -right-2 w-5 h-5 rounded-full bg-rose-500 text-white flex items-center justify-center hover:bg-rose-600 disabled:opacity-50"
                       title="Remove image"
                     >
-                      ✕
+                      <X size={10} />
                     </button>
                   </div>
                 )}

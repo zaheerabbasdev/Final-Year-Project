@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../features/provider/provider_service.dart';
 import '../../core/api_client.dart';
@@ -51,7 +51,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     final lang = context.watch<LanguageProvider>();
     if (_isLoading) {
       return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+        body: Center(child: CircularProgressIndicator(color: AppTheme.primaryColor)),
       );
     }
 

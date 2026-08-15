@@ -26,6 +26,7 @@ import {
   Trash2
 } from 'lucide-react';
 import LocationInput from '../components/LocationInput';
+import { FullPageSpinner } from '../components/ui';
 
 interface Review {
   id: number;
@@ -251,9 +252,7 @@ export default function ProfilePage() {
 
   if (authLoading || loading) {
     return (
-      <div className="flex-1 flex items-center justify-center min-h-[50vh]">
-        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
-      </div>
+      <FullPageSpinner />
     );
   }
 

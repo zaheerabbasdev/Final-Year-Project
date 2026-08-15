@@ -1,4 +1,4 @@
-import 'package:flutter/material.dart';
+﻿import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -78,7 +78,7 @@ class _WalletScreenState extends State<WalletScreen> {
               child: Column(
                 mainAxisSize: MainAxisSize.min,
                 children: [
-                  const CircularProgressIndicator(),
+                  const CircularProgressIndicator(color: AppTheme.primaryColor),
                   const SizedBox(height: 12),
                   Text(lang.t('wallet.loading'), style: GoogleFonts.outfit(color: colors.subtext)),
                 ],
