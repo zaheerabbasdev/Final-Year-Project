@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react';
 import { api } from '@/lib/api';
 import BidModal from '@/components/BidModal';
+import { Gavel, Eye } from 'lucide-react';
+import { PageHeader, StatusBadge, TableSkeleton, EmptyState } from '@/components/AdminUI';
 
 type Bid = {
   id: number;
@@ -12,98 +14,92 @@ type Bid = {
   created_at: string;
 };
 
+const TH = 'px-5 py-3.5 text-[10px] font-bold uppercase tracking-widest text-(--subtext)';
+const TD = 'px-5 py-4';
+
 export default function BidsPage() {
-  const [bids, setBids] = useState<Bid[]>([]);
-  const [loading, setLoading] = useState(true);
+  const [bids,          setBids]          = useState<Bid[]>([]);
+  const [loading,       setLoading]       = useState(true);
   const [selectedBidId, setSelectedBidId] = useState<number | null>(null);
 
   const fetchBids = async () => {
     try {
       const token = localStorage.getItem('adminToken');
-      const data = await api.get('/admin/bids', token || '');
+      const data  = await api.get('/admin/bids', token || '');
       setBids(data);
-    } catch (err) {
-      console.error(err);
-    } finally {
-      setLoading(false);
-    }
+    } catch { console.error('Failed to fetch bids'); }
+    finally { setLoading(false); }
   };
 
-  useEffect(() => {
-    fetchBids();
-  }, []);
+  useEffect(() => { fetchBids(); }, []);
 
   return (
     <div className="space-y-6">
-      <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-        <div>
-          <h2 className="text-2xl font-bold text-[var(--text)]">Marketplace Bids</h2>
-          <p className="text-sm text-slate-500 mt-1">Track your bid activity and vendor responses.</p>
-        </div>
-        <span className="text-xs font-semibold uppercase tracking-[0.16em] text-slate-500 bg-slate-100 border border-slate-200 px-3 py-1 rounded-full">
-            {bids.length} Total Bids
-        </span>
-      </div>
+      <PageHeader
+        title="Marketplace Bids"
+        subtitle="All bids submitted by service providers across the platform."
+        badge={`${bids.length} bids`}
+      />
 
-      <div className="app-card app-table overflow-hidden">
-        <table className="w-full text-left">
-          <thead className="bg-gray-50 border-b border-gray-100">
-            <tr>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Provider</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Job Title</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Amount</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Status</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Date</th>
-              <th className="px-6 py-4 text-xs font-bold text-gray-400 uppercase tracking-wider text-right">Actions</th>
-            </tr>
-          </thead>
-          <tbody className="divide-y divide-[var(--border-color)]">
-            {loading ? (
-              [1, 2, 3].map(i => <tr key={i} className="animate-pulse"><td colSpan={5} className="px-6 py-8 h-12 bg-gray-50" /></tr>)
-            ) : (
-              bids.map((bid) => (
-                <tr key={bid.id} className="hover:bg-slate-50 transition-colors">
-                  <td className="px-6 py-4">
-                    <p className="text-sm font-bold text-gray-900">{bid.provider_name}</p>
-                  </td>
-                  <td className="px-6 py-4">
-                    <p className="text-sm text-gray-600 line-clamp-1">{bid.job_title}</p>
-                  </td>
-                  <td className="px-6 py-4 text-sm font-bold text-blue-600">
-                    ${bid.amount}
-                  </td>
-                  <td className="px-6 py-4">
-                    <span className={`app-badge ${
-                      bid.status === 'accepted' ? 'app-badge-success' : 
-                      bid.status === 'pending' ? 'app-badge-info' : 'app-badge-danger'
-                    }`}>
-                      {bid.status}
-                    </span>
-                  </td>
-                  <td className="px-6 py-4 text-sm text-gray-500">
-                    {new Date(bid.created_at).toLocaleDateString()}
-                  </td>
-                  <td className="px-6 py-4 text-right">
-                    <button 
-                      onClick={() => setSelectedBidId(bid.id)}
-                      className="text-gray-400 hover:text-blue-600 p-2"
-                      title="View Bid Details"
-                    >
-                      👁️
-                    </button>
-                  </td>
-                </tr>
-              ))
-            )}
-          </tbody>
-        </table>
+      <div className="app-card overflow-hidden">
+        <div className="overflow-x-auto">
+          <table className="w-full text-left min-w-[640px]">
+            <thead>
+              <tr className="border-b border-[var(--border-color)] bg-(--card-bg)">
+                <th className={TH}>Provider</th>
+                <th className={TH}>Job</th>
+                <th className={TH}>Amount (PKR)</th>
+                <th className={TH}>Status</th>
+                <th className={TH}>Date</th>
+                <th className={`${TH} text-right`}>Detail</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--border-color)]">
+              {loading ? (
+                <TableSkeleton rows={5} cols={6} />
+              ) : bids.length === 0 ? (
+                <EmptyState
+                  icon={Gavel}
+                  title="No bids yet"
+                  description="Bids submitted by providers will appear here."
+                />
+              ) : (
+                bids.map(bid => (
+                  <tr key={bid.id} className="hover:bg-(--card-bg) transition-colors">
+                    <td className={TD}>
+                      <p className="text-sm font-semibold text-(--text)">{bid.provider_name}</p>
+                    </td>
+                    <td className={TD}>
+                      <p className="text-sm text-(--subtext) line-clamp-1 max-w-[180px]">{bid.job_title}</p>
+                    </td>
+                    <td className={`${TD} text-sm font-bold text-blue-600 dark:text-blue-400 tabular-nums`}>
+                      {Number(bid.amount).toLocaleString()}
+                    </td>
+                    <td className={TD}>
+                      <StatusBadge status={bid.status} />
+                    </td>
+                    <td className={`${TD} text-sm text-(--subtext)`}>
+                      {new Date(bid.created_at).toLocaleDateString()}
+                    </td>
+                    <td className={`${TD} text-right`}>
+                      <button
+                        onClick={() => setSelectedBidId(bid.id)}
+                        className="p-2 rounded-lg text-(--subtext) hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-950/20 transition-colors"
+                        title="View bid details"
+                      >
+                        <Eye size={15} />
+                      </button>
+                    </td>
+                  </tr>
+                ))
+              )}
+            </tbody>
+          </table>
+        </div>
       </div>
 
       {selectedBidId && (
-        <BidModal 
-          bidId={selectedBidId} 
-          onClose={() => setSelectedBidId(null)} 
-        />
+        <BidModal bidId={selectedBidId} onClose={() => setSelectedBidId(null)} />
       )}
     </div>
   );
