@@ -22,6 +22,7 @@ import {
   BookOpen,
   ClipboardList,
   ChevronRight,
+  Wallet,
 } from 'lucide-react';
 
 type NavItem = {
@@ -78,6 +79,12 @@ export default function Sidebar() {
       icon: <BookOpen size={17} />,
       roles: ['customer'],
     },
+    {
+      href: '/customer/wallet',
+      label: t('wallet.sidebarLink'),
+      icon: <Wallet size={17} />,
+      roles: ['customer'],
+    },
     // Provider only
     {
       href: '/provider/browse-jobs',
@@ -89,6 +96,12 @@ export default function Sidebar() {
       href: '/provider/bids',
       label: t('sidebar.myBids'),
       icon: <Scale size={17} />,
+      roles: ['provider'],
+    },
+    {
+      href: '/provider/wallet',
+      label: t('wallet.sidebarLink'),
+      icon: <Wallet size={17} />,
       roles: ['provider'],
     },
   ];

@@ -291,6 +291,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildCustomerStats(),
           const SizedBox(height: 32),
           _buildMenuCard([
+            _buildMenuItem(Icons.account_balance_wallet_outlined, context.read<LanguageProvider>().t('profile.wallet'), () => context.push('/wallet')),
             _buildMenuItem(Icons.psychology_outlined, context.read<LanguageProvider>().t('profile.aiSupport'), () => context.push('/support-chatbot')),
             _buildMenuItem(Icons.settings_outlined, context.read<LanguageProvider>().t('profile.settings'), () => context.push('/settings')),
           ]),
@@ -325,6 +326,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
           _buildProviderStats(),
           const SizedBox(height: 32),
           _buildMenuCard([
+            _buildMenuItem(Icons.account_balance_wallet_outlined, context.read<LanguageProvider>().t('profile.wallet'), () => context.push('/wallet')),
             _buildMenuItem(Icons.psychology_outlined, context.read<LanguageProvider>().t('profile.aiSupport'), () => context.push('/support-chatbot')),
             _buildMenuItem(Icons.settings_outlined, context.read<LanguageProvider>().t('profile.settings'), () => context.push('/settings')),
           ]),

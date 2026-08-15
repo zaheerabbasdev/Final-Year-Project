@@ -48,6 +48,8 @@ import 'core/services/notification_service.dart';
 import 'core/services/location_tracking_service.dart';
 import 'core/services/handshake_service.dart';
 import 'features/customer/screens/track_provider_screen.dart';
+import 'features/wallet/wallet_service.dart';
+import 'features/wallet/wallet_screen.dart';
 
 final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
@@ -72,6 +74,7 @@ void main() async {
         ChangeNotifierProvider(create: (_) => SyncProvider()),
         ChangeNotifierProvider(create: (_) => LocationTrackingService()),
         ChangeNotifierProvider(create: (_) => HandshakeService()),
+        ChangeNotifierProvider(create: (_) => WalletService()),
 
         Provider(create: (_) => NotificationService()),
         ProxyProvider3<NotificationService, NotificationProvider, ChatProvider, SocketService>(
@@ -236,6 +239,10 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
         GoRoute(
           path: '/support-chatbot',
           builder: (context, state) => const SupportChatbotScreen(),
+        ),
+        GoRoute(
+          path: '/wallet',
+          builder: (context, state) => const WalletScreen(),
         ),
       ],
     );

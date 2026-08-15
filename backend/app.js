@@ -19,6 +19,7 @@ const notificationRoutes = require('./routes/notificationRoutes');
 const messageRoutes = require('./routes/messageRoutes');
 const geocodeRoutes = require('./routes/geocodeRoutes');
 const aiRoutes = require('./routes/aiRoutes');
+const walletRoutes = require('./routes/walletRoutes');
 
 
 const http = require('http');
@@ -84,6 +85,7 @@ app.use('/api/notifications', notificationRoutes);
 app.use('/api/messages', messageRoutes);
 app.use('/api/geocode', geocodeRoutes);
 app.use('/api/ai', aiRoutes);
+app.use('/api/wallet', walletRoutes);
 
 
 app.get('/', (req, res) => {

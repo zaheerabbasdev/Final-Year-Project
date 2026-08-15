@@ -189,6 +189,35 @@ CREATE TABLE IF NOT EXISTS notifications (
     FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
 
+-- --------------------------------------------------------
+-- 12. wallets  → users
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS wallets (
+    id         INT           AUTO_INCREMENT PRIMARY KEY,
+    user_id    INT           NOT NULL UNIQUE,
+    balance    DECIMAL(10,2) NOT NULL DEFAULT 0.00,
+    created_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP     DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
+-- --------------------------------------------------------
+-- 13. wallet_transactions  → wallets, users
+-- --------------------------------------------------------
+CREATE TABLE IF NOT EXISTS wallet_transactions (
+    id             INT           AUTO_INCREMENT PRIMARY KEY,
+    user_id        INT           NOT NULL,
+    type           ENUM('credit','debit') NOT NULL,
+    amount         DECIMAL(10,2) NOT NULL,
+    description    VARCHAR(255)  NOT NULL,
+    reference_type ENUM('topup','withdrawal','payment','refund','earning') NOT NULL DEFAULT 'topup',
+    reference_id   INT           DEFAULT NULL,
+    balance_after  DECIMAL(10,2) NOT NULL,
+    status         ENUM('completed','pending','failed') NOT NULL DEFAULT 'completed',
+    created_at     TIMESTAMP     DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4;
+
 SET FOREIGN_KEY_CHECKS = 1;
 
 -- --------------------------------------------------------
