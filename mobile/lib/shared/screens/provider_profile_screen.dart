@@ -4,6 +4,7 @@ import '../../features/provider/provider_service.dart';
 import '../../shared/services/review_service.dart';
 import '../../shared/widgets/review_card.dart';
 import '../../core/api_client.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme.dart';
 import 'package:go_router/go_router.dart';
 
@@ -45,6 +46,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -53,7 +55,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
 
     if (_provider == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
+        appBar: AppBar(title: Text(lang.t('providerProfile.title'))),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -64,7 +66,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: () => _loadProvider(),
-                child: const Text('Retry'),
+                child: Text(lang.t('providerProfile.retry')),
               ),
             ],
           ),
@@ -86,7 +88,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
           icon: Icon(Icons.arrow_back, color: colors.text),
           onPressed: () => Navigator.pop(context),
         ),
-        title: Text('Provider Profile', style: TextStyle(color: colors.text, fontWeight: FontWeight.bold)),
+        title: Text(lang.t('providerProfile.title'), style: TextStyle(color: colors.text, fontWeight: FontWeight.bold)),
       ),
       body: SingleChildScrollView(
         child: Column(
@@ -97,7 +99,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  Text(_provider!['full_name'] ?? 'No Name', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.text)),
+                  Text(_provider!['full_name'] ?? lang.t('common.unknown'), style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: colors.text)),
                   const SizedBox(height: 8),
                   Row(
                     children: [
@@ -105,7 +107,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                       const SizedBox(width: 4),
                       Expanded(
                         child: Text(
-                          _provider!['location'] ?? 'Location not specified',
+                          _provider!['location'] ?? lang.t('customerProfile.locationNotSet'),
                           style: TextStyle(color: colors.subtext, fontSize: 14),
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
@@ -114,21 +116,21 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                     ],
                   ),
                   const SizedBox(height: 32),
-                  _buildStatsRow(profile),
+                  _buildStatsRow(profile, lang),
                   const SizedBox(height: 32),
                   if (profile?['bio'] != null && profile!['bio'].toString().isNotEmpty) ...[
-                    Text('About', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
+                    Text(lang.t('providerProfile.about'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
                     const SizedBox(height: 12),
                     Text(profile['bio'], style: TextStyle(color: colors.subtext, height: 1.6, fontSize: 14)),
                     const SizedBox(height: 32),
                   ],
                   if (profile?['skills'] != null) ...[
-                    Text('Specialized Skills', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
+                    Text(lang.t('providerProfile.skills'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text)),
                     const SizedBox(height: 16),
-                    _buildSkillsWrap(profile['skills']),
+                    _buildSkillsWrap(profile['skills'], lang),
                     const SizedBox(height: 32),
                   ],
-                  _buildReviewsSection(),
+                  _buildReviewsSection(lang),
                   const SizedBox(height: 48),
                 ],
               ),
@@ -211,14 +213,14 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     );
   }
 
-  Widget _buildStatsRow(Map<String, dynamic>? profile) {
+  Widget _buildStatsRow(Map<String, dynamic>? profile, LanguageProvider lang) {
     return Row(
       children: [
-        Expanded(child: _buildStatCard(Icons.stars_outlined, (profile?['rating'] ?? '5.0').toString(), 'Rating', const Color(0xFF10B981))),
+        Expanded(child: _buildStatCard(Icons.stars_outlined, (profile?['rating'] ?? '5.0').toString(), lang.t('providerProfile.rating'), const Color(0xFF10B981))),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard(Icons.work_outline, (profile?['jobs_completed'] ?? '0').toString(), 'Jobs Done', const Color(0xFF6366F1))),
+        Expanded(child: _buildStatCard(Icons.work_outline, (profile?['jobs_completed'] ?? '0').toString(), lang.t('providerProfile.jobsDone'), const Color(0xFF6366F1))),
         const SizedBox(width: 12),
-        Expanded(child: _buildStatCard(Icons.access_time, profile?['experience_years']?.toString() ?? '0', 'Years Exp.', const Color(0xFFF59E0B))),
+        Expanded(child: _buildStatCard(Icons.access_time, profile?['experience_years']?.toString() ?? '0', lang.t('provider.dashboard.yrs'), const Color(0xFFF59E0B))),
       ],
     );
   }
@@ -253,7 +255,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     );
   }
 
-  Widget _buildSkillsWrap(dynamic skills) {
+  Widget _buildSkillsWrap(dynamic skills, LanguageProvider lang) {
     List<String> skillsList = [];
     if (skills is List) {
       skillsList = List<String>.from(skills);
@@ -262,7 +264,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
       skillsList = [skills];
     }
 
-    if (skillsList.isEmpty) return Text('No skills listed', style: TextStyle(color: Theme.of(context).appColors.subtext, fontStyle: FontStyle.italic));
+    if (skillsList.isEmpty) return Text(lang.t('providerProfile.noSkills'), style: TextStyle(color: Theme.of(context).appColors.subtext, fontStyle: FontStyle.italic));
 
     return Wrap(
       spacing: 8,
@@ -275,17 +277,17 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
     );
   }
 
-  Widget _buildReviewsSection() {
+  Widget _buildReviewsSection(LanguageProvider lang) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Row(
           mainAxisAlignment: MainAxisAlignment.spaceBetween,
           children: [
-            Text('Reviews', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text)),
+            Text(lang.t('providerProfile.reviews'), style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text)),
             TextButton(
               onPressed: () => context.push('/provider-reviews/${widget.providerId}'),
-              child: Text('View All', style: TextStyle(color: Theme.of(context).appColors.text, fontWeight: FontWeight.w600)),
+              child: Text(lang.t('providerProfile.viewAll'), style: TextStyle(color: Theme.of(context).appColors.text, fontWeight: FontWeight.w600)),
             ),
           ],
         ),
@@ -306,7 +308,7 @@ class _ProviderProfileScreenState extends State<ProviderProfileScreen> {
                   border: Border.all(color: Theme.of(context).appColors.border),
                 ),
                 child: Center(
-                  child: Text('No reviews yet', style: TextStyle(color: Theme.of(context).appColors.subtext)),
+                  child: Text(lang.t('providerProfile.noReviews'), style: TextStyle(color: Theme.of(context).appColors.subtext)),
                 ),
               );
             }

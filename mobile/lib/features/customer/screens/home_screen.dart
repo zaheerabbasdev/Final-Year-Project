@@ -223,7 +223,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
       builder: (context, service, _) {
         if (service.isLoading) return const Center(child: CircularProgressIndicator());
         if (service.searchResults.isEmpty) {
-          return const Center(child: Text('No providers found matching your search.'));
+          return Center(child: Text(context.read<LanguageProvider>().t('customer.home.noSearchResults')));
         }
         return ListView.builder(
           shrinkWrap: true,
@@ -263,7 +263,7 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
                     ),
                   ],
                 ),
-                title: Text(provider['full_name'] ?? 'Unknown Provider', style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
+                title: Text(provider['full_name'] ?? context.read<LanguageProvider>().t('customer.home.unknownProvider'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold)),
                 subtitle: Text(provider['bio'] ?? context.read<LanguageProvider>().t('customer.home.noBio'), maxLines: 1, overflow: TextOverflow.ellipsis, style: GoogleFonts.outfit()),
                 trailing: Row(
                   mainAxisSize: MainAxisSize.min,

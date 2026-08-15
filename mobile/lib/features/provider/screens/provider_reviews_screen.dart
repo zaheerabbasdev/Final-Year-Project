@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../../../shared/services/review_service.dart';
 import '../../../shared/widgets/review_card.dart';
 import '../../../core/theme.dart';
+import '../../../core/providers/language_provider.dart';
 
 class ProviderReviewsScreen extends StatefulWidget {
   final int providerId;
@@ -67,6 +68,7 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -78,7 +80,7 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'All Reviews',
+          lang.t('provider.reviews.allReviews'),
           style: GoogleFonts.outfit(
             color: colors.text,
             fontWeight: FontWeight.bold,
@@ -89,7 +91,7 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
       body: _reviews.isEmpty && _isLoading
           ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
           : _reviews.isEmpty
-              ? _buildEmptyState()
+              ? _buildEmptyState(lang)
               : Container(
                   color: colors.background,
                   child: ListView.builder(
@@ -112,7 +114,7 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(LanguageProvider lang) {
     return Builder(
       builder: (context) {
         final colors = Theme.of(context).appColors;
@@ -136,7 +138,7 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'No reviews yet',
+                  lang.t('provider.reviews.noReviews'),
                   style: GoogleFonts.outfit(
                     fontSize: 20,
                     color: colors.text,
@@ -145,7 +147,7 @@ class _ProviderReviewsScreenState extends State<ProviderReviewsScreen> {
                 ),
                 const SizedBox(height: 8),
                 Text(
-                  'Reviews from customers will appear here.',
+                  lang.t('provider.reviews.noReviewsSubtitle'),
                   textAlign: TextAlign.center,
                   style: GoogleFonts.outfit(
                     color: colors.subtext,

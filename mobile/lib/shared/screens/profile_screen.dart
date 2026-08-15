@@ -411,7 +411,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     setState(() => _isLoading = false);
                     if (!success) {
                       ScaffoldMessenger.of(context).showSnackBar(
-                        const SnackBar(content: Text('Failed to update availability status')),
+                        SnackBar(content: Text(context.read<LanguageProvider>().t('profile.failedUpdateStatus'))),
                       );
                     }
                   }
@@ -426,27 +426,28 @@ class _ProfileScreenState extends State<ProfileScreen> {
 
   Widget _buildEditForm(String? role) {
     final colors = Theme.of(context).appColors;
+    final lang = context.read<LanguageProvider>();
     return Padding(
       padding: const EdgeInsets.all(24),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildFieldLabel('Full Name'),
-          _buildTextField(_nameController, 'Enter full name'),
+          _buildFieldLabel(lang.t('profile.fullName')),
+          _buildTextField(_nameController, lang.t('profile.enterFullName')),
           const SizedBox(height: 20),
-          _buildFieldLabel('Email'),
-          _buildTextField(_emailController, 'Enter email', keyboardType: TextInputType.emailAddress),
+          _buildFieldLabel(lang.t('profile.emailLabel')),
+          _buildTextField(_emailController, lang.t('profile.enterEmail'), keyboardType: TextInputType.emailAddress),
           const SizedBox(height: 20),
-          _buildFieldLabel('Phone'),
-          _buildTextField(_phoneController, 'Enter phone number', keyboardType: TextInputType.phone),
+          _buildFieldLabel(lang.t('profile.phoneLabel')),
+          _buildTextField(_phoneController, lang.t('profile.enterPhone'), keyboardType: TextInputType.phone),
           const SizedBox(height: 20),
-          _buildFieldLabel('Service Location'),
+          _buildFieldLabel(lang.t('profile.serviceLocation')),
           Row(
             children: [
               Expanded(
                 child: _buildTextField(
-                  _locationController, 
-                  'Pick service location', 
+                  _locationController,
+                  lang.t('profile.pickLocation'),
                   readOnly: true,
                   onTap: _pickLocation,
                 ),
@@ -458,7 +459,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
                 child: IconButton(
-                  icon: _isLoading 
+                  icon: _isLoading
                     ? const SizedBox(width: 16, height: 16, child: CircularProgressIndicator(strokeWidth: 2))
                     : const Icon(Icons.my_location, color: Color(0xFF6366F1), size: 18),
                   onPressed: _useCurrentLocation,
@@ -469,10 +470,10 @@ class _ProfileScreenState extends State<ProfileScreen> {
           const SizedBox(height: 20),
           if (role == 'provider') ...[
             const SizedBox(height: 20),
-            _buildFieldLabel('Years of Experience'),
+            _buildFieldLabel(lang.t('profile.yearsExperience')),
             _buildTextField(
-              _experienceController, 
-              'Enter years', 
+              _experienceController,
+              lang.t('profile.enterYears'),
               keyboardType: TextInputType.number,
             ),
           ],
@@ -490,7 +491,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     side: BorderSide(color: colors.border),
                   ),
-                  child: Text('Cancel', style: TextStyle(color: colors.subtext)),
+                  child: Text(context.read<LanguageProvider>().t('profile.cancel'), style: TextStyle(color: colors.subtext)),
                 ),
               ),
               const SizedBox(width: 16),
@@ -529,7 +530,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                         _tempAvatarFile = null;
                         _avatarBytes = null;
                       });
-                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(content: Text('Profile updated successfully!')));
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(context.read<LanguageProvider>().t('profile.profileUpdated'))));
                       
                       // Explicitly refresh both user and stats
                       if (role == 'provider') {
@@ -543,7 +544,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                     elevation: 0,
                   ),
-                  child: const Text('Save Changes'),
+                  child: Text(context.read<LanguageProvider>().t('profile.saveChanges')),
                 ),
               ),
             ],
@@ -564,7 +565,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         }
       },
       icon: const Icon(Icons.edit_outlined, size: 18),
-      label: const Text('Edit Profile'),
+      label: Text(context.read<LanguageProvider>().t('profile.editProfile')),
       style: OutlinedButton.styleFrom(
         foregroundColor: colors.text,
         side: BorderSide(color: colors.border),
@@ -707,7 +708,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         ElevatedButton.icon(
           onPressed: () => authService.logout(),
           icon: const Icon(Icons.logout, size: 18),
-          label: const Text('Logout'),
+          label: Text(context.read<LanguageProvider>().t('profile.logout')),
           style: ElevatedButton.styleFrom(
             backgroundColor: const Color(0xFFEF4444),
             foregroundColor: Colors.white,
@@ -720,7 +721,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
         OutlinedButton.icon(
           onPressed: () => _showDeleteAccountDialog(authService),
           icon: const Icon(Icons.delete_forever_rounded, size: 18),
-          label: const Text('Delete Account'),
+          label: Text(context.read<LanguageProvider>().t('profile.deleteAccount')),
           style: OutlinedButton.styleFrom(
             foregroundColor: const Color(0xFFEF4444),
             side: const BorderSide(color: Color(0xFFEF4444)),
@@ -821,7 +822,7 @@ class _ProfileScreenState extends State<ProfileScreen> {
                               if (!result['success'] && ctx.mounted) {
                                 Navigator.of(ctx).pop();
                                 ScaffoldMessenger.of(context).showSnackBar(
-                                  SnackBar(content: Text(result['message'] ?? 'Failed to delete account.')),
+                                  SnackBar(content: Text(result['message'] ?? context.read<LanguageProvider>().t('profile.failedDeleteAccount'))),
                                 );
                               }
                             }
@@ -973,14 +974,14 @@ class _ProfileScreenState extends State<ProfileScreen> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text('Years of Experience', style: TextStyle(color: colors.subtext, fontSize: 12)),
+        Text(context.read<LanguageProvider>().t('profile.yearsExperience'), style: TextStyle(color: colors.subtext, fontSize: 12)),
         const SizedBox(height: 8),
         Text('$_experienceYears years', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
         const SizedBox(height: 24),
-        Text('Specialized Skills', style: TextStyle(color: colors.subtext, fontSize: 12)),
+        Text(context.read<LanguageProvider>().t('profile.specializedSkills'), style: TextStyle(color: colors.subtext, fontSize: 12)),
         const SizedBox(height: 12),
         if (_skills.isEmpty)
-          Text('No skills listed', style: TextStyle(color: colors.subtext, fontSize: 13, fontStyle: FontStyle.italic))
+          Text(context.read<LanguageProvider>().t('profile.noSkillsListed'), style: TextStyle(color: colors.subtext, fontSize: 13, fontStyle: FontStyle.italic))
         else
           Wrap(
             spacing: 8,

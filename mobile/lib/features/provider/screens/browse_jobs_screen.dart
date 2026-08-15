@@ -8,6 +8,7 @@ import '../../customer/category_service.dart';
 import '../../../core/services/location_service.dart';
 import '../../../shared/widgets/notification_bell.dart';
 import '../../../core/providers/currency_provider.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class BrowseJobsScreen extends StatefulWidget {
@@ -19,12 +20,29 @@ class BrowseJobsScreen extends StatefulWidget {
 
 class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   final _searchController = TextEditingController();
+  // Internal keys — kept in English for comparison logic
   String selectedCategory = 'All Categories';
   String selectedSort = 'AI Recommended';
   Timer? _debounce;
   bool _isNearMeEnabled = false;
   bool _isLocating = false;
   final LocationService _locationService = LocationService();
+
+  /// Translate sort key to display label
+  String _sortLabel(String key, LanguageProvider lang) {
+    switch (key) {
+      case 'AI Recommended':
+        return lang.t('provider.browseJobs.aiRecommended');
+      case 'Most Recent':
+        return lang.t('provider.browseJobs.mostRecent');
+      case 'Highest Budget':
+        return lang.t('provider.browseJobs.highestBudget');
+      case 'Lowest Budget':
+        return lang.t('provider.browseJobs.lowestBudget');
+      default:
+        return key;
+    }
+  }
 
   bool _checkIsEmergency(dynamic val) {
     if (val == null) return false;
@@ -128,6 +146,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -139,7 +158,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Browse Jobs',
+          lang.t('provider.browseJobs.title'),
           style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 20),
         ),
         actions: [
@@ -148,9 +167,9 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
       ),
       body: Column(
         children: [
-          _buildSearchBar(colors),
-          _buildFilterRow(colors),
-          _buildResultsHeader(colors),
+          _buildSearchBar(colors, lang),
+          _buildFilterRow(colors, lang),
+          _buildResultsHeader(colors, lang),
           Expanded(
             child: Consumer<JobService>(
               builder: (context, service, _) {
@@ -167,7 +186,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                         Icon(Icons.search_off_rounded, size: 64, color: colors.subtext.withOpacity(0.3)),
                         const SizedBox(height: 16),
                         Text(
-                          'No open jobs found',
+                          lang.t('provider.browseJobs.noJobsFound'),
                           style: GoogleFonts.outfit(
                             color: colors.subtext,
                             fontSize: 16,
@@ -206,7 +225,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                   itemCount: jobsList.length,
                   itemBuilder: (context, index) {
                     final job = jobsList[index];
-                    return _buildJobCard(job, colors);
+                    return _buildJobCard(job, colors, lang);
                   },
                 );
               },
@@ -217,7 +236,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
     );
   }
 
-  Widget _buildSearchBar(AppColors colors) {
+  Widget _buildSearchBar(AppColors colors, LanguageProvider lang) {
     return Padding(
       padding: const EdgeInsets.fromLTRB(24, 16, 24, 8),
       child: Container(
@@ -231,12 +250,13 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
               offset: const Offset(0, 8),
             ),
           ],
-        ),        child: TextField(
+        ),
+        child: TextField(
           controller: _searchController,
           onChanged: _onSearchChanged,
           style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
           decoration: InputDecoration(
-            hintText: 'Search jobs...',
+            hintText: lang.t('provider.browseJobs.searchHint'),
             hintStyle: GoogleFonts.outfit(color: colors.subtext.withOpacity(0.7)),
             prefixIcon: Icon(Icons.search, color: colors.subtext),
             border: InputBorder.none,
@@ -252,23 +272,26 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
     );
   }
 
-  Widget _buildFilterRow(AppColors colors) {
+  Widget _buildFilterRow(AppColors colors, LanguageProvider lang) {
+    final catLabel = selectedCategory == 'All Categories'
+        ? lang.t('provider.browseJobs.allCategories')
+        : selectedCategory;
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Row(
         children: [
           Expanded(
             child: _buildFilterButton(
-              label: selectedCategory,
-              onTap: _showCategoryPicker,
+              label: catLabel,
+              onTap: () => _showCategoryPicker(lang),
               colors: colors,
             ),
           ),
           const SizedBox(width: 16),
           Expanded(
             child: _buildFilterButton(
-              label: selectedSort,
-              onTap: _showSortPicker,
+              label: _sortLabel(selectedSort, lang),
+              onTap: () => _showSortPicker(lang),
               colors: colors,
             ),
           ),
@@ -305,14 +328,20 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
     );
   }
 
-  void _showSortPicker() {
+  void _showSortPicker(LanguageProvider lang) {
     final colors = Theme.of(context).appColors;
+    // keys → display labels
+    final options = [
+      {'key': 'AI Recommended', 'label': lang.t('provider.browseJobs.aiRecommended')},
+      {'key': 'Most Recent', 'label': lang.t('provider.browseJobs.mostRecent')},
+      {'key': 'Highest Budget', 'label': lang.t('provider.browseJobs.highestBudget')},
+      {'key': 'Lowest Budget', 'label': lang.t('provider.browseJobs.lowestBudget')},
+    ];
     showModalBottomSheet(
       context: context,
       backgroundColor: colors.surface,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
       builder: (context) {
-        final options = ['AI Recommended', 'Most Recent', 'Highest Budget', 'Lowest Budget'];
         return SingleChildScrollView(
           padding: const EdgeInsets.all(28),
           child: Column(
@@ -325,21 +354,21 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
               ),
               const SizedBox(height: 24),
               Text(
-                'Sort By',
+                lang.t('provider.browseJobs.sortBy'),
                 style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
               ),
               const SizedBox(height: 16),
               ...options.map((opt) => ListTile(
                 title: Text(
-                  opt,
+                  opt['label']!,
                   style: GoogleFonts.outfit(
-                    color: selectedSort == opt ? AppTheme.primaryColor : colors.text,
-                    fontWeight: selectedSort == opt ? FontWeight.bold : FontWeight.normal,
+                    color: selectedSort == opt['key'] ? AppTheme.primaryColor : colors.text,
+                    fontWeight: selectedSort == opt['key'] ? FontWeight.bold : FontWeight.normal,
                   ),
                 ),
-                trailing: selectedSort == opt ? const Icon(Icons.check, color: AppTheme.primaryColor) : null,
+                trailing: selectedSort == opt['key'] ? const Icon(Icons.check, color: AppTheme.primaryColor) : null,
                 onTap: () {
-                  setState(() => selectedSort = opt);
+                  setState(() => selectedSort = opt['key']!);
                   Navigator.pop(context);
                   _onSearchChanged(_searchController.text);
                 },
@@ -352,7 +381,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
     );
   }
 
-  Widget _buildResultsHeader(AppColors colors) {
+  Widget _buildResultsHeader(AppColors colors, LanguageProvider lang) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 8),
       child: Row(
@@ -360,7 +389,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
         children: [
           Consumer<JobService>(
             builder: (context, service, _) => Text(
-              '${service.jobs.length} ${_isNearMeEnabled ? 'nearby ' : ''}jobs found',
+              '${service.jobs.length} ${_isNearMeEnabled ? '${lang.t('provider.browseJobs.nearbyJobs')} ' : ''}${lang.t('provider.browseJobs.jobsFound')}',
               style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500),
             ),
           ),
@@ -368,7 +397,9 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
             onPressed: _toggleNearMe,
             icon: Icon(_isNearMeEnabled ? Icons.location_off : Icons.near_me, size: 16, color: AppTheme.secondaryColor),
             label: Text(
-              _isLocating ? 'Locating...' : (_isNearMeEnabled ? 'Show All' : 'Near Me'), 
+              _isLocating
+                  ? lang.t('provider.browseJobs.locating')
+                  : (_isNearMeEnabled ? lang.t('provider.browseJobs.showAll') : lang.t('provider.browseJobs.nearMe')),
               style: GoogleFonts.outfit(color: AppTheme.secondaryColor, fontSize: 14, fontWeight: FontWeight.bold),
             ),
           ),
@@ -377,7 +408,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
     );
   }
 
-  void _showCategoryPicker() {
+  void _showCategoryPicker(LanguageProvider lang) {
     final colors = Theme.of(context).appColors;
     showModalBottomSheet(
       context: context,
@@ -399,13 +430,16 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 ),
                 const SizedBox(height: 24),
                 Text(
-                  'Select Category',
+                  lang.t('provider.browseJobs.selectCategory'),
                   style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
                 ),
                 const SizedBox(height: 16),
                 ListTile(
                   leading: const Icon(Icons.grid_view, color: AppTheme.primaryColor),
-                  title: Text('All Categories', style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: colors.text)),
+                  title: Text(
+                    lang.t('provider.browseJobs.allCategories'),
+                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: colors.text),
+                  ),
                   onTap: () {
                     setState(() => selectedCategory = 'All Categories');
                     context.read<JobService>().fetchJobs(filters: {'status': 'open'});
@@ -434,7 +468,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
     );
   }
 
-  Widget _buildJobCard(Map<String, dynamic> job, AppColors colors) {
+  Widget _buildJobCard(Map<String, dynamic> job, AppColors colors, LanguageProvider lang) {
     final isEmergency = _checkIsEmergency(job['is_emergency']);
     final int? matchScore = job['match_score'] != null ? int.tryParse(job['match_score'].toString()) : null;
     return Container(
@@ -499,7 +533,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                         const Icon(Icons.bolt, color: AppTheme.errorColor, size: 14),
                         const SizedBox(width: 4),
                         Text(
-                          'EMERGENCY',
+                          lang.t('provider.browseJobs.emergency'),
                           style: GoogleFonts.outfit(color: AppTheme.errorColor, fontSize: 10, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                         ),
                       ],
@@ -509,7 +543,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
             ),
             const SizedBox(height: 10),
             Text(
-              job['description'] ?? 'No description provided.',
+              job['description'] ?? lang.t('common.noDescription'),
               style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, height: 1.5),
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -532,7 +566,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                 Icon(Icons.calendar_today_outlined, size: 14, color: colors.subtext),
                 const SizedBox(width: 6),
                 Text(
-                  job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
+                  job['created_at'] != null ? job['created_at'].toString().split('T').first : lang.t('common.unknown'),
                   style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
                 const SizedBox(width: 16),
@@ -557,7 +591,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Budget',
+                        lang.t('provider.browseJobs.budget'),
                         style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11, fontWeight: FontWeight.w500),
                       ),
                       const SizedBox(height: 2),
@@ -578,7 +612,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                                 borderRadius: BorderRadius.circular(6),
                               ),
                               child: Text(
-                                'NEGOTIABLE',
+                                lang.t('provider.browseJobs.negotiable'),
                                 style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                               ),
                             ),
@@ -597,7 +631,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
                     shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                   ),
                   child: Text(
-                    isEmergency ? 'Accept Instantly' : 'Place Bid',
+                    isEmergency ? lang.t('provider.browseJobs.acceptInstantly') : lang.t('provider.browseJobs.placeBid'),
                     style: GoogleFonts.outfit(fontWeight: FontWeight.bold),
                   ),
                 ),

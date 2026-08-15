@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../../core/theme.dart';
 import '../../../core/api_client.dart';
+import '../../../core/providers/language_provider.dart';
 
 class SupportChatbotScreen extends StatefulWidget {
   const SupportChatbotScreen({super.key});
@@ -12,23 +14,34 @@ class SupportChatbotScreen extends StatefulWidget {
 
 class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
   final _messageController = TextEditingController();
-  final List<Map<String, dynamic>> _messages = [
-    {
-      'role': 'assistant',
-      'content': 'Hello! I am Kaarkun AI Support. How can I help you navigate the platform today?',
-      'time': DateTime.now()
-    }
-  ];
+  List<Map<String, dynamic>> _messages = [];
   bool _isWriting = false;
   final ApiClient _apiClient = ApiClient();
   final ScrollController _scrollController = ScrollController();
+  List<String> _quickSuggestions = [];
+  bool _initialized = false;
 
-  final List<String> _quickSuggestions = [
-    'How do I post a job?',
-    'Why is my account pending?',
-    'How do bids work?',
-    'What are the fees?'
-  ];
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (!_initialized) {
+      _initialized = true;
+      final lang = context.read<LanguageProvider>();
+      _messages = [
+        {
+          'role': 'assistant',
+          'content': 'Hello! I am Kaarkun AI Support. How can I help you navigate the platform today?',
+          'time': DateTime.now()
+        }
+      ];
+      _quickSuggestions = [
+        'How do I post a job?',
+        'Why is my account pending?',
+        'How do bids work?',
+        'What are the fees?'
+      ];
+    }
+  }
 
   void _scrollToBottom() {
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -44,7 +57,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
 
   Future<void> _sendMessage(String text) async {
     if (text.trim().isEmpty) return;
-    
+
     setState(() {
       _messages.add({
         'role': 'user',
@@ -57,7 +70,6 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
     _scrollToBottom();
 
     try {
-      // Build conversation history format for backend
       final history = _messages.sublist(0, _messages.length - 1).map((m) => {
         'role': m['role'],
         'content': m['content']
@@ -95,6 +107,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -120,11 +133,11 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Kaarkun AI Support',
+                  lang.t('chat.chatbot.title'),
                   style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 Text(
-                  'Always Online',
+                  lang.t('chat.chatbot.alwaysOnline'),
                   style: GoogleFonts.outfit(color: AppTheme.successColor, fontWeight: FontWeight.w600, fontSize: 11),
                 ),
               ],
@@ -152,14 +165,14 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
               child: Row(
                 children: [
                   Text(
-                    'AI Support is typing...',
+                    lang.t('chat.chatbot.aiTyping'),
                     style: GoogleFonts.outfit(fontSize: 12, color: colors.subtext, fontStyle: FontStyle.italic),
                   ),
                 ],
               ),
             ),
           if (_messages.length == 1 && !_isWriting) _buildSuggestionsRow(colors),
-          _buildInputBar(colors),
+          _buildInputBar(colors, lang),
         ],
       ),
     );
@@ -229,7 +242,7 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
     );
   }
 
-  Widget _buildInputBar(AppColors colors) {
+  Widget _buildInputBar(AppColors colors, LanguageProvider lang) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final btnColor = isDark ? AppTheme.secondaryColor : AppTheme.primaryColor;
 
@@ -248,10 +261,9 @@ class _SupportChatbotScreenState extends State<SupportChatbotScreen> {
                 controller: _messageController,
                 style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
                 decoration: InputDecoration(
-                  hintText: 'Ask anything...',
+                  hintText: lang.t('chat.chatbot.askHint'),
                   hintStyle: GoogleFonts.outfit(color: colors.subtext),
                   filled: true,
-                  // Use a clearly different fill than the bar background
                   fillColor: colors.background,
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(24),

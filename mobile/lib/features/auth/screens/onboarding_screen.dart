@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../auth_service.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -16,20 +17,20 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   final PageController _pageController = PageController();
   int _currentPage = 0;
 
-  final List<Map<String, dynamic>> _pages = [
+  List<Map<String, dynamic>> _buildPages(LanguageProvider lang) => [
     {
-      'title': 'Find Expert Help\nFor Your Home',
-      'description': 'From plumbing to electrical work, find verified professionals for all your service needs.',
+      'title': lang.t('onboarding.page1Title'),
+      'description': lang.t('onboarding.page1Desc'),
       'icon': Icons.search_rounded,
     },
     {
-      'title': 'Real-time Tracking\n& Live Updates',
-      'description': 'Track your service provider in real-time and get instant updates on your booking status.',
+      'title': lang.t('onboarding.page2Title'),
+      'description': lang.t('onboarding.page2Desc'),
       'icon': Icons.location_on_rounded,
     },
     {
-      'title': 'Secure Payments\n& Quality Work',
-      'description': 'Pay securely through the app and only when the job is done to your satisfaction.',
+      'title': lang.t('onboarding.page3Title'),
+      'description': lang.t('onboarding.page3Desc'),
       'icon': Icons.verified_user_rounded,
     },
   ];
@@ -50,6 +51,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     final colors = Theme.of(context).appColors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
     final themeColor = _getThemeColor(_currentPage);
+    final lang = context.watch<LanguageProvider>();
+    final pages = _buildPages(lang);
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -121,7 +124,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       TextButton(
                         onPressed: () => _finishOnboarding(),
                         child: Text(
-                          'Skip',
+                          lang.t('onboarding.skip'),
                           style: GoogleFonts.outfit(
                             color: colors.subtext,
                             fontWeight: FontWeight.w600,
@@ -136,7 +139,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                 Expanded(
                   child: PageView.builder(
                     controller: _pageController,
-                    itemCount: _pages.length,
+                    itemCount: pages.length,
                     onPageChanged: (index) => setState(() => _currentPage = index),
                     itemBuilder: (context, index) {
                       final pageThemeColor = _getThemeColor(index);
@@ -155,7 +158,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   AnimatedSwitcher(
                                     duration: const Duration(milliseconds: 600),
                                     child: Icon(
-                                      _pages[index]['icon'],
+                                      pages[index]['icon'],
                                       key: ValueKey('icon_$index'),
                                       size: 200,
                                       color: pageThemeColor.withOpacity(isDark ? 0.08 : 0.05),
@@ -192,7 +195,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   key: ValueKey('content_$index'),
                                   children: [
                                     Text(
-                                      _pages[index]['title']!,
+                                      pages[index]['title']!,
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.outfit(
                                         fontSize: 32,
@@ -203,7 +206,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     ),
                                     const SizedBox(height: 16),
                                     Text(
-                                      _pages[index]['description']!,
+                                      pages[index]['description']!,
                                       textAlign: TextAlign.center,
                                       style: GoogleFonts.outfit(
                                         fontSize: 16,
@@ -231,7 +234,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       // Dots Indicator
                       Row(
                         children: List.generate(
-                          _pages.length,
+                          pages.length,
                           (index) {
                             final dotColor = _getThemeColor(index);
                             return AnimatedContainer(
@@ -253,7 +256,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       // Next Button
                       GestureDetector(
                         onTap: () {
-                          if (_currentPage == _pages.length - 1) {
+                          if (_currentPage == pages.length - 1) {
                             _finishOnboarding();
                           } else {
                             _pageController.nextPage(
@@ -269,7 +272,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               width: 70,
                               height: 70,
                               child: CircularProgressIndicator(
-                                value: (_currentPage + 1) / _pages.length,
+                                value: (_currentPage + 1) / pages.length,
                                 strokeWidth: 3,
                                 backgroundColor: themeColor.withOpacity(isDark ? 0.15 : 0.1),
                                 valueColor: AlwaysStoppedAnimation<Color>(themeColor),
@@ -290,7 +293,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 ],
                               ),
                               child: Icon(
-                                _currentPage == _pages.length - 1 
+                                _currentPage == pages.length - 1 
                                     ? Icons.check_rounded 
                                     : Icons.arrow_forward_ios_rounded,
                                 color: Colors.white,

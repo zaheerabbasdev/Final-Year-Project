@@ -8,6 +8,7 @@ import '../../../features/auth/auth_service.dart';
 import '../../../shared/widgets/notification_bell.dart';
 import '../../../core/theme.dart';
 import '../../../core/providers/currency_provider.dart';
+import '../../../core/providers/language_provider.dart';
 import '../screens/track_provider_screen.dart';
 
 class MyJobsScreen extends StatelessWidget {
@@ -16,6 +17,7 @@ class MyJobsScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return DefaultTabController(
       length: 4,
       child: Scaffold(
@@ -25,7 +27,7 @@ class MyJobsScreen extends StatelessWidget {
           scrolledUnderElevation: 0,
           elevation: 0,
           title: Text(
-            'My Jobs',
+            lang.t('customer.myJobs.title'),
             style: GoogleFonts.outfit(
               color: colors.text,
               fontWeight: FontWeight.bold,
@@ -43,11 +45,11 @@ class MyJobsScreen extends StatelessWidget {
             unselectedLabelColor: colors.subtext,
             labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
             unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500, fontSize: 14),
-            tabs: const [
-              Tab(text: 'All'),
-              Tab(text: 'Open'),
-              Tab(text: 'Active'),
-              Tab(text: 'Completed'),
+            tabs: [
+              Tab(text: lang.t('customer.myJobs.tabAll')),
+              Tab(text: lang.t('customer.myJobs.tabOpen')),
+              Tab(text: lang.t('customer.myJobs.tabActive')),
+              Tab(text: lang.t('customer.myJobs.tabCompleted')),
             ],
           ),
         ),
@@ -84,6 +86,7 @@ class _JobsListViewState extends State<_JobsListView> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Consumer<JobService>(
       builder: (context, service, _) {
         if (service.isLoading) {
@@ -93,10 +96,10 @@ class _JobsListViewState extends State<_JobsListView> {
             ),
           );
         }
-        
+
         final jobs = service.jobs;
-        final filteredJobs = widget.statusFilter == null 
-            ? jobs 
+        final filteredJobs = widget.statusFilter == null
+            ? jobs
             : jobs.where((j) => (j['status'] as String).toLowerCase() == widget.statusFilter!.toLowerCase()).toList();
 
         if (filteredJobs.isEmpty) {
@@ -107,7 +110,7 @@ class _JobsListViewState extends State<_JobsListView> {
                 Icon(Icons.assignment_outlined, size: 64, color: colors.subtext.withOpacity(0.3)),
                 const SizedBox(height: 16),
                 Text(
-                  'No jobs found',
+                  lang.t('customer.myJobs.noJobsFound'),
                   style: GoogleFonts.outfit(
                     color: colors.subtext,
                     fontSize: 16,
@@ -125,7 +128,7 @@ class _JobsListViewState extends State<_JobsListView> {
           itemBuilder: (context, index) {
             final job = filteredJobs[index];
             final status = (job['status'] as String).toLowerCase();
-            
+
             Color statusColor;
             switch (status) {
               case 'open':
@@ -211,7 +214,7 @@ class _JobsListViewState extends State<_JobsListView> {
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                job['created_at'] != null ? job['created_at'].toString().split('T').first : 'Unknown',
+                                job['created_at'] != null ? job['created_at'].toString().split('T').first : lang.t('common.unknown'),
                                 style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -222,7 +225,7 @@ class _JobsListViewState extends State<_JobsListView> {
                             const SizedBox(width: 6),
                             Flexible(
                               child: Text(
-                                job['location'] ?? 'Not specified',
+                                job['location'] ?? lang.t('customer.myJobs.notSpecified'),
                                 style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -252,7 +255,7 @@ class _JobsListViewState extends State<_JobsListView> {
                                   ),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'Budget',
+                                    lang.t('customer.myJobs.budget'),
                                     style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500),
                                   ),
                                 ],
@@ -266,7 +269,7 @@ class _JobsListViewState extends State<_JobsListView> {
                                 const SizedBox(width: 4),
                                 Flexible(
                                   child: Text(
-                                    'View Details',
+                                    lang.t('customer.myJobs.viewDetails'),
                                     style: GoogleFonts.outfit(
                                       color: AppTheme.secondaryColor,
                                       fontWeight: FontWeight.w700,
@@ -297,7 +300,7 @@ class _JobsListViewState extends State<_JobsListView> {
                               },
                               icon: const Icon(Icons.share_location, size: 18),
                               label: Text(
-                                'Track Live Location',
+                                lang.t('customer.myJobs.trackLive'),
                                 style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
                               ),
                               style: ElevatedButton.styleFrom(
@@ -332,7 +335,10 @@ class _JobsListViewState extends State<_JobsListView> {
 
                                   ScaffoldMessenger.of(context).showSnackBar(
                                     SnackBar(
-                                      content: Text('Job completed! Please leave a review.', style: GoogleFonts.outfit()),
+                                      content: Text(
+                                        context.read<LanguageProvider>().t('customer.myJobs.jobCompleted'),
+                                        style: GoogleFonts.outfit(),
+                                      ),
                                       backgroundColor: AppTheme.primaryColor,
                                       behavior: SnackBarBehavior.floating,
                                       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -347,7 +353,7 @@ class _JobsListViewState extends State<_JobsListView> {
                                 elevation: 0,
                               ),
                               child: Text(
-                                'Confirm Completion & Review',
+                                lang.t('customer.myJobs.confirmCompletion'),
                                 style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white),
                               ),
                             ),
@@ -372,7 +378,7 @@ class _JobsListViewState extends State<_JobsListView> {
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                               ),
                               child: Text(
-                                'Leave a Review',
+                                lang.t('customer.myJobs.leaveReview'),
                                 style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: AppTheme.primaryColor),
                               ),
                             ),

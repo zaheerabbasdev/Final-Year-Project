@@ -8,6 +8,7 @@ import '../../../shared/widgets/notification_bell.dart';
 import '../../../core/services/socket_service.dart';
 import '../../../core/services/location_tracking_service.dart';
 import '../../../core/providers/currency_provider.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class MyBidsScreen extends StatefulWidget {
@@ -40,7 +41,8 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
   Widget build(BuildContext context) {
     final _allBids = context.watch<JobService>().providerBids;
     final colors = Theme.of(context).appColors;
-    
+    final lang = context.watch<LanguageProvider>();
+
     final pendingCount = _allBids.where((b) {
       if (b['status'] == 'accepted') return false;
       final js = (b['job_status'] ?? 'open').toString().toLowerCase();
@@ -76,7 +78,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
           scrolledUnderElevation: 0,
           elevation: 0,
           title: Text(
-            'My Bids',
+            lang.t('provider.myBids.title'),
             style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 22),
           ),
           actions: [
@@ -91,11 +93,11 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
             labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
             unselectedLabelStyle: GoogleFonts.outfit(fontWeight: FontWeight.w500, fontSize: 14),
             tabs: [
-              Tab(text: 'All (${_allBids.length})'),
-              Tab(text: 'Pending ($pendingCount)'),
-              Tab(text: 'Active ($activeCount)'),
-              Tab(text: 'Completed ($completedCount)'),
-              Tab(text: 'Availed ($availedCount)'),
+              Tab(text: '${lang.t('nav.bids')} (${_allBids.length})'),
+              Tab(text: '${lang.t('provider.myBids.tabPending')} ($pendingCount)'),
+              Tab(text: '${lang.t('provider.myBids.tabActive')} ($activeCount)'),
+              Tab(text: '${lang.t('provider.myBids.tabCompleted')} ($completedCount)'),
+              Tab(text: '${lang.t('provider.myBids.tabAvailed')} ($availedCount)'),
             ],
           ),
         ),
@@ -133,6 +135,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
   }
 
   Widget _buildBidsList(List<dynamic> bids, AppColors colors) {
+    final lang = context.read<LanguageProvider>();
     if (_isLoading) {
       return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
     }
@@ -144,7 +147,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
             Icon(Icons.assignment_outlined, size: 64, color: colors.subtext.withOpacity(0.3)),
             const SizedBox(height: 16),
             Text(
-              'No bids found',
+              lang.t('provider.myBids.noBidsFound'),
               style: GoogleFonts.outfit(
                 color: colors.subtext,
                 fontSize: 16,
@@ -214,7 +217,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                     ),
                     const SizedBox(width: 16),
                     Text(
-                      'Submitted ',
+                      '${context.read<LanguageProvider>().t('provider.myBids.submitted')} ',
                       style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                     Text(
@@ -233,7 +236,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
-                          'Your Bid',
+                          context.read<LanguageProvider>().t('provider.myBids.yourBid'),
                           style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 2),
@@ -247,7 +250,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
                         Text(
-                          'Category',
+                          context.read<LanguageProvider>().t('provider.myBids.category'),
                           style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11, fontWeight: FontWeight.w500),
                         ),
                         const SizedBox(height: 2),
@@ -308,7 +311,9 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                             size: 18,
                           ),
                           label: Text(
-                            isTrackingThisJob ? 'Stop Sharing Location' : 'Share Live Location',
+                            isTrackingThisJob
+                                ? context.read<LanguageProvider>().t('provider.myBids.stopSharing')
+                                : context.read<LanguageProvider>().t('provider.myBids.shareLocation'),
                             style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 15),
                           ),
                           style: ElevatedButton.styleFrom(
@@ -353,7 +358,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                         if (success && mounted) {
                           messenger.showSnackBar(
                             SnackBar(
-                              content: Text('Job marked as done! Waiting for customer confirmation.', style: GoogleFonts.outfit()),
+                              content: Text(context.read<LanguageProvider>().t('provider.myBids.jobMarkedDone'), style: GoogleFonts.outfit()),
                               backgroundColor: AppTheme.successColor,
                               behavior: SnackBarBehavior.floating,
                               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -369,7 +374,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
                         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                         elevation: 0,
                       ),
-                      child: Text('Mark Job as Done', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
+                      child: Text(context.read<LanguageProvider>().t('provider.myBids.markDone'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16)),
                     ),
                   ),
                 ],

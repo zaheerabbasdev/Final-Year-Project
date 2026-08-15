@@ -9,6 +9,7 @@ import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../shared/widgets/notification_bell.dart';
 import '../../core/providers/currency_provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme.dart';
 
 class JobDetailScreen extends StatefulWidget {
@@ -65,6 +66,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Future<void> _showCancelDialog() async {
+    final lang = context.read<LanguageProvider>();
     final colors = Theme.of(context).appColors;
     final confirm = await showDialog<bool>(
       context: context,
@@ -73,17 +75,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Text(
-          'Cancel Booking?',
+          lang.t('jobDetail.cancelBookingTitle'),
           style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: colors.text),
         ),
         content: Text(
-          'Are you sure you want to cancel this booking? The job will be reopened so other providers can bid on it.',
+          lang.t('jobDetail.cancelBookingContent'),
           style: GoogleFonts.outfit(color: colors.subtext),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Keep Booking', style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold)),
+            child: Text(lang.t('jobDetail.keepBooking'), style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -91,7 +93,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               backgroundColor: AppTheme.errorColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text('Yes, Cancel', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text(lang.t('jobDetail.yesCancel'), style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -104,7 +106,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Booking cancelled successfully.', style: GoogleFonts.outfit(color: Colors.white)),
+              content: Text(lang.t('jobDetail.cancelledSuccess'), style: GoogleFonts.outfit(color: Colors.white)),
               backgroundColor: AppTheme.successColor,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -115,7 +117,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to cancel booking. Please try again.', style: GoogleFonts.outfit(color: Colors.white)),
+              content: Text(lang.t('jobDetail.cancelledFailed'), style: GoogleFonts.outfit(color: Colors.white)),
               backgroundColor: AppTheme.errorColor,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -128,6 +130,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Future<void> _showCancelJobDialog() async {
+    final lang = context.read<LanguageProvider>();
     final colors = Theme.of(context).appColors;
     final confirm = await showDialog<bool>(
       context: context,
@@ -136,17 +139,17 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         surfaceTintColor: Colors.transparent,
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
         title: Text(
-          'Cancel Job Post?',
+          lang.t('jobDetail.cancelJobTitle'),
           style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: colors.text),
         ),
         content: Text(
-          'Are you sure you want to cancel this job post? It will no longer be visible to providers for bidding.',
+          lang.t('jobDetail.cancelJobContent'),
           style: GoogleFonts.outfit(color: colors.subtext),
         ),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
-            child: Text('Keep Job', style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold)),
+            child: Text(lang.t('jobDetail.keepJob'), style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold)),
           ),
           ElevatedButton(
             onPressed: () => Navigator.pop(context, true),
@@ -154,7 +157,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               backgroundColor: AppTheme.errorColor,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             ),
-            child: Text('Yes, Cancel', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+            child: Text(lang.t('jobDetail.yesCancel'), style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
           ),
         ],
       ),
@@ -167,7 +170,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         if (success) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Job cancelled successfully.', style: GoogleFonts.outfit(color: Colors.white)),
+              content: Text(lang.t('jobDetail.jobCancelledSuccess'), style: GoogleFonts.outfit(color: Colors.white)),
               backgroundColor: AppTheme.successColor,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -178,7 +181,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         } else {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Failed to cancel job. Please try again.', style: GoogleFonts.outfit(color: Colors.white)),
+              content: Text(lang.t('jobDetail.jobCancelledFailed'), style: GoogleFonts.outfit(color: Colors.white)),
               backgroundColor: AppTheme.errorColor,
               behavior: SnackBarBehavior.floating,
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -201,6 +204,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     }
 
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return DefaultTabController(
       length: 2,
       child: Scaffold(
@@ -214,7 +218,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             onPressed: () => Navigator.pop(context),
           ),
           title: Text(
-            'Job Details',
+            lang.t('jobDetail.title'),
             style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 18),
           ),
           actions: [
@@ -227,8 +231,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             unselectedLabelColor: colors.subtext,
             labelStyle: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 14),
             tabs: [
-              const Tab(text: 'Details'),
-              Tab(text: 'Bids (${_bids.length})'),
+              Tab(text: lang.t('jobDetail.tabDetails')),
+              Tab(text: '${lang.t('jobDetail.bids')} (${_bids.length})'),
             ],
           ),
         ),
@@ -243,25 +247,26 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildProviderView(dynamic currentUserId) {
+    final lang = context.read<LanguageProvider>();
     // Check if current provider has already placed a bid
     final bool hasAlreadyBidded = _bids.any((bid) => bid['provider_id'] == currentUserId);
     final String jobStatus = (_job?['status'] ?? 'open').toLowerCase();
     final bool isJobOpen = jobStatus == 'open';
 
-    String buttonText = 'Place Your Bid';
+    String buttonText = lang.t('jobDetail.placeYourBid');
     Color buttonColor = const Color(0xFF6366F1);
     bool isButtonEnabled = true;
 
     if (hasAlreadyBidded) {
-      buttonText = 'Already Bidded';
+      buttonText = lang.t('jobDetail.alreadyBidded');
       buttonColor = const Color(0xFF94A3B8);
       isButtonEnabled = false;
     } else if (!isJobOpen) {
-      buttonText = 'Job No Longer Open';
+      buttonText = lang.t('jobDetail.jobNotOpen');
       buttonColor = const Color(0xFF94A3B8);
       isButtonEnabled = false;
     } else if (_checkIsEmergency(_job?['is_emergency'])) {
-      buttonText = 'Accept Instantly';
+      buttonText = lang.t('jobDetail.acceptInstantly');
       buttonColor = const Color(0xFFB91C1C);
       isButtonEnabled = true;
     }
@@ -277,7 +282,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Job Details',
+          lang.t('jobDetail.title'),
           style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 18),
         ),
         actions: [
@@ -368,7 +373,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       Icon(Icons.access_time_rounded, size: 16, color: colors.subtext),
                       const SizedBox(width: 8),
                       Text(
-                        'Posted ${_job?['created_at']?.toString().split('T').first ?? 'Unknown'}',
+                        '${lang.t('jobDetail.posted')} ${_job?['created_at']?.toString().split('T').first ?? 'Unknown'}',
                         style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500),
                       ),
                     ],
@@ -386,7 +391,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Client Budget', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500)),
+                        Text(lang.t('jobDetail.clientBudget'), style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500)),
                         const SizedBox(height: 6),
                         Text(
                           context.watch<CurrencyProvider>().format(_job?['budget']),
@@ -398,8 +403,8 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   const SizedBox(height: 24),
                   Row(
                     children: [
-                      Expanded(child: _buildSimpleStat(Icons.location_on_outlined, 'Location', _job?['location'] ?? 'Not specified', colors)),
-                      Expanded(child: _buildSimpleStat(Icons.people_outline_rounded, 'Total Bids', '${_bids.length} bids', colors)),
+                      Expanded(child: _buildSimpleStat(Icons.location_on_outlined, lang.t('jobDetail.location'), _job?['location'] ?? 'Not specified', colors)),
+                      Expanded(child: _buildSimpleStat(Icons.people_outline_rounded, lang.t('jobDetail.totalBids'), '${_bids.length} ${lang.t('jobDetail.bids')}', colors)),
                     ],
                   ),
                 ],
@@ -425,11 +430,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           Text(
-                            'EMERGENCY REQUEST',
+                            lang.t('jobDetail.emergencyRequest'),
                             style: GoogleFonts.outfit(color: AppTheme.errorColor, fontWeight: FontWeight.bold, fontSize: 16),
                           ),
                           Text(
-                            'This client needs help immediately. Accept this job to start right away without bidding.',
+                            lang.t('jobDetail.emergencyRequestDesc'),
                             style: GoogleFonts.outfit(color: AppTheme.errorColor.withOpacity(0.9), fontSize: 13),
                           ),
                         ],
@@ -439,13 +444,13 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
               ),
             if (_job?['latitude'] != null && _job?['longitude'] != null)
-              _buildProviderDetailSection('Job Location', _buildMapCard(
+              _buildProviderDetailSection(lang.t('jobDetail.jobLocation'), _buildMapCard(
                 double.parse(_job!['latitude'].toString()),
                 double.parse(_job!['longitude'].toString()),
                 colors,
               ), colors),
             const SizedBox(height: 24),
-            _buildProviderDetailSection('Job Description', Container(
+            _buildProviderDetailSection(lang.t('jobDetail.jobDescription'), Container(
               padding: const EdgeInsets.all(24),
               width: double.infinity,
               decoration: BoxDecoration(
@@ -466,11 +471,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               ),
             ), colors),
             const SizedBox(height: 24),
-            _buildProviderDetailSection('Attached Images', _buildImageGallery(_job?['images'], colors), colors),
+            _buildProviderDetailSection(lang.t('jobDetail.attachedImages'), _buildImageGallery(_job?['images'], colors), colors),
             const SizedBox(height: 24),
-            _buildProviderDetailSection('Client Information', _buildClientInfoCard(colors), colors),
+            _buildProviderDetailSection(lang.t('jobDetail.clientInfo'), _buildClientInfoCard(colors), colors),
             const SizedBox(height: 24),
-            _buildProviderDetailSection('Bidding Competition', _buildCompetitionCard(colors), colors),
+            _buildProviderDetailSection(lang.t('jobDetail.biddingCompetition'), _buildCompetitionCard(colors), colors),
             const SizedBox(height: 32),
             if (_booking != null && _booking!['status'] == 'confirmed' && _booking!['provider_id'] == currentUserId) ...[
               Container(
@@ -484,7 +489,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 child: Column(
                   children: [
                     Text(
-                      'You are hired! Show this QR to the customer to start.',
+                      lang.t('jobDetail.youAreHired'),
                       textAlign: TextAlign.center,
                       style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.w600),
                     ),
@@ -502,7 +507,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                           }
                         },
                         icon: const Icon(Icons.qr_code_rounded, color: Colors.white),
-                        label: Text('Show Handshake QR', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+                        label: Text(lang.t('jobDetail.showQR'), style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
                         style: ElevatedButton.styleFrom(
                           backgroundColor: AppTheme.primaryColor,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -521,7 +526,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 child: OutlinedButton.icon(
                   onPressed: () => _showCancelDialog(),
                   icon: const Icon(Icons.cancel_outlined, size: 18),
-                  label: Text('Cancel Booking', style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
+                  label: Text(lang.t('jobDetail.cancelBooking'), style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppTheme.errorColor,
                     side: BorderSide(color: AppTheme.errorColor.withOpacity(0.5)),
@@ -540,30 +545,34 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       if (_checkIsEmergency(_job?['is_emergency'])) {
                         final confirm = await showDialog<bool>(
                           context: context,
-                          builder: (context) => AlertDialog(
-                            backgroundColor: Colors.white,
-                            surfaceTintColor: Colors.transparent,
-                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
-                            title: Text('Accept Emergency Job?', style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text)),
-                            content: Text('By accepting this emergency request, you agree to arrive at the customer\'s location as soon as possible.', style: GoogleFonts.outfit(color: Theme.of(context).appColors.subtext)),
-                            actions: [
-                              TextButton(onPressed: () => Navigator.pop(context, false), child: Text('Cancel', style: GoogleFonts.outfit(color: Theme.of(context).appColors.subtext, fontWeight: FontWeight.bold))),
-                              ElevatedButton(
-                                onPressed: () => Navigator.pop(context, true),
-                                style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
-                                child: Text('Accept Now', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
-                              ),
-                            ],
-                          ),
+                          builder: (ctx) {
+                            final dLang = ctx.read<LanguageProvider>();
+                            final dColors = Theme.of(ctx).appColors;
+                            return AlertDialog(
+                              backgroundColor: dColors.surface,
+                              surfaceTintColor: Colors.transparent,
+                              shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(24)),
+                              title: Text(dLang.t('jobDetail.acceptEmergency'), style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: dColors.text)),
+                              content: Text(dLang.t('jobDetail.acceptEmergencyContent'), style: GoogleFonts.outfit(color: dColors.subtext)),
+                              actions: [
+                                TextButton(onPressed: () => Navigator.pop(ctx, false), child: Text(dLang.t('jobDetail.keepJob'), style: GoogleFonts.outfit(color: dColors.subtext, fontWeight: FontWeight.bold))),
+                                ElevatedButton(
+                                  onPressed: () => Navigator.pop(ctx, true),
+                                  style: ElevatedButton.styleFrom(backgroundColor: AppTheme.errorColor, shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12))),
+                                  child: Text(dLang.t('jobDetail.acceptNow'), style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+                                ),
+                              ],
+                            );
+                          },
                         );
-                        
+
                         if (confirm == true) {
                           final success = await context.read<JobService>().expressAccept(widget.jobId);
                           if (success) {
                             _loadData();
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
-                                content: Text('You have accepted the job!', style: GoogleFonts.outfit(color: Colors.white)),
+                                content: Text(lang.t('jobDetail.jobAccepted'), style: GoogleFonts.outfit(color: Colors.white)),
                                 backgroundColor: AppTheme.successColor,
                                 behavior: SnackBarBehavior.floating,
                                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -596,7 +605,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   side: BorderSide(color: colors.border),
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
                 ),
-                child: Text('Save for Later', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
+                child: Text(lang.t('jobDetail.saveForLater'), style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
               ),
             ),
             const SizedBox(height: 24),
@@ -620,6 +629,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildClientInfoCard(AppColors colors) {
+    final lang = context.read<LanguageProvider>();
     final avatarUrl = ApiClient.getImageUrl(_job?['customer_avatar']);
     final customerName = _job?['customer_name'] ?? 'Unknown User';
     final initials = customerName.isNotEmpty ? customerName[0].toUpperCase() : '?';
@@ -669,7 +679,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                   style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 18, color: colors.text),
                 ),
                 const SizedBox(height: 4),
-                Text('Verified Client', style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500)),
+                Text(lang.t('jobDetail.verifiedClient'), style: GoogleFonts.outfit(color: colors.subtext, fontSize: 13, fontWeight: FontWeight.w500)),
                 const SizedBox(height: 8),
                 Row(
                   children: [
@@ -690,7 +700,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             const Icon(Icons.person_outline_rounded, size: 14, color: AppTheme.primaryColor),
                             const SizedBox(width: 4),
                             Text(
-                              'View Profile',
+                              lang.t('jobDetail.viewProfile'),
                               style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
                             ),
                           ],
@@ -714,7 +724,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                             const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: AppTheme.primaryColor),
                             const SizedBox(width: 4),
                             Text(
-                              'Chat',
+                              lang.t('jobDetail.chatBtn'),
                               style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
                             ),
                           ],
@@ -732,6 +742,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildCompetitionCard(AppColors colors) {
+    final lang = context.read<LanguageProvider>();
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -748,11 +759,11 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       ),
       child: Column(
         children: [
-          _buildCompetitionRow('Total Bids', '${_bids.length}', colors),
+          _buildCompetitionRow(lang.t('jobDetail.totalBids'), '${_bids.length}', colors),
           const SizedBox(height: 16),
-          _buildCompetitionRow('Your Status', (_job?['status'] ?? 'Open').toUpperCase(), colors, valueColor: AppTheme.successColor),
+          _buildCompetitionRow(lang.t('jobDetail.yourStatus'), (_job?['status'] ?? 'Open').toUpperCase(), colors, valueColor: AppTheme.successColor),
           const SizedBox(height: 16),
-          _buildCompetitionRow('Category', _job?['category_name'] ?? 'N/A', colors),
+          _buildCompetitionRow(lang.t('jobDetail.category'), _job?['category_name'] ?? 'N/A', colors),
         ],
       ),
     );
@@ -769,6 +780,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildBiddingTips(AppColors colors) {
+    final lang = context.read<LanguageProvider>();
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -782,14 +794,14 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             children: [
               const Icon(Icons.lightbulb_outline_rounded, color: AppTheme.primaryColor, size: 24),
               const SizedBox(width: 12),
-              Text('Bidding Tips', style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
+              Text(lang.t('jobDetail.biddingTips'), style: GoogleFonts.outfit(fontSize: 16, fontWeight: FontWeight.bold, color: colors.text)),
             ],
           ),
           const SizedBox(height: 16),
-          _buildTipItem('Research the job requirements carefully', colors),
-          _buildTipItem('Bid competitively but fairly', colors),
-          _buildTipItem('Highlight your relevant experience', colors),
-          _buildTipItem('Respond promptly to client questions', colors),
+          _buildTipItem(lang.t('jobDetail.tip1'), colors),
+          _buildTipItem(lang.t('jobDetail.tip2'), colors),
+          _buildTipItem(lang.t('jobDetail.tip3'), colors),
+          _buildTipItem(lang.t('jobDetail.tip4'), colors),
         ],
       ),
     );
@@ -841,8 +853,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Widget _buildDetailsTab(String? role) {
     final colors = Theme.of(context).appColors;
+    final lang = context.read<LanguageProvider>();
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
-    if (_job == null) return Center(child: Text('Job not found', style: GoogleFonts.outfit(color: colors.subtext)));
+    if (_job == null) return Center(child: Text(lang.t('jobDetail.jobNotFound'), style: GoogleFonts.outfit(color: colors.subtext)));
 
     final title = _job!['title'] ?? 'No Title';
     final category = _job!['category_name'] ?? 'General';
@@ -861,15 +874,15 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
         children: [
           _buildJobMainCard(title, category, status, colors),
           const SizedBox(height: 24),
-          _buildInfoSection('Description', description, colors),
+          _buildInfoSection(lang.t('jobDetail.description'), description, colors),
           const SizedBox(height: 24),
-          _buildStatsGrid(budget, location, createdAt, _bids.length, colors),
+          _buildStatsGrid(budget, location, createdAt, _bids.length, colors, lang),
           const SizedBox(height: 24),
           if (_job!['latitude'] != null && _job!['longitude'] != null)
             Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                _buildInfoSectionTitle('Job Location', colors),
+                _buildInfoSectionTitle(lang.t('jobDetail.jobLocation'), colors),
                 const SizedBox(height: 16),
                 _buildMapCard(
                   double.parse(_job!['latitude'].toString()),
@@ -879,12 +892,12 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 const SizedBox(height: 24),
               ],
             ),
-          _buildInfoSectionTitle('Images', colors),
+          _buildInfoSectionTitle(lang.t('jobDetail.images'), colors),
           const SizedBox(height: 16),
           _buildImageGallery(_job!['images'], colors),
           const SizedBox(height: 24),
           if (_booking != null && _booking!['status'] == 'confirmed') ...[
-            _buildInfoSectionTitle('Service Verification', colors),
+            _buildInfoSectionTitle(lang.t('jobDetail.serviceVerification'), colors),
             const SizedBox(height: 16),
             Container(
               padding: const EdgeInsets.all(20),
@@ -896,7 +909,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               child: Column(
                 children: [
                   Text(
-                    'To start the job, please complete the secure handshake.',
+                    lang.t('jobDetail.handshakePrompt'),
                     textAlign: TextAlign.center,
                     style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.w600),
                   ),
@@ -914,7 +927,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                         }
                       },
                       icon: Icon(role == 'provider' ? Icons.qr_code_rounded : Icons.qr_code_scanner_rounded, color: Colors.white),
-                      label: Text(role == 'provider' ? 'Show Handshake QR' : 'Scan Handshake QR', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+                      label: Text(role == 'provider' ? lang.t('jobDetail.showQR') : lang.t('jobDetail.scanQR'), style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.primaryColor,
                         foregroundColor: Colors.white,
@@ -936,7 +949,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _showCancelDialog(),
                 icon: const Icon(Icons.cancel_outlined, size: 18),
-                label: Text('Cancel Booking', style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
+                label: Text(lang.t('jobDetail.cancelBooking'), style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.errorColor,
                   side: BorderSide(color: AppTheme.errorColor.withOpacity(0.5)),
@@ -955,7 +968,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               child: OutlinedButton.icon(
                 onPressed: () => _showCancelJobDialog(),
                 icon: const Icon(Icons.delete_outline_rounded, size: 18),
-                label: Text('Cancel Job', style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
+                label: Text(lang.t('jobDetail.cancelJob'), style: GoogleFonts.outfit(fontSize: 15, fontWeight: FontWeight.bold)),
                 style: OutlinedButton.styleFrom(
                   foregroundColor: AppTheme.errorColor,
                   side: BorderSide(color: AppTheme.errorColor.withOpacity(0.5)),
@@ -966,7 +979,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
             const SizedBox(height: 24),
           ],
           if (role == 'provider') ...[
-            _buildInfoSectionTitle('Customer Information', colors),
+            _buildInfoSectionTitle(lang.t('jobDetail.customerInfo'), colors),
             const SizedBox(height: 16),
             _buildCustomerCard(_job!['customer_name'], createdAt, colors),
             const SizedBox(height: 32),
@@ -1056,7 +1069,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     );
   }
 
-  Widget _buildStatsGrid(String budget, String location, String date, int bidsCount, AppColors colors) {
+  Widget _buildStatsGrid(String budget, String location, String date, int bidsCount, AppColors colors, LanguageProvider lang) {
     return GridView.count(
       shrinkWrap: true,
       physics: const NeverScrollableScrollPhysics(),
@@ -1065,10 +1078,10 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
       crossAxisSpacing: 16,
       childAspectRatio: 2.2,
       children: [
-        _buildStatItem(Icons.attach_money_rounded, 'Budget', context.watch<CurrencyProvider>().format(budget), colors),
-        _buildStatItem(Icons.location_on_outlined, 'Location', location, colors),
-        _buildStatItem(Icons.calendar_today_outlined, 'Posted', date, colors),
-        _buildStatItem(Icons.people_outline_rounded, 'Bids', '$bidsCount received', colors),
+        _buildStatItem(Icons.attach_money_rounded, lang.t('jobDetail.budget'), context.watch<CurrencyProvider>().format(budget), colors),
+        _buildStatItem(Icons.location_on_outlined, lang.t('jobDetail.location'), location, colors),
+        _buildStatItem(Icons.calendar_today_outlined, lang.t('jobDetail.posted'), date, colors),
+        _buildStatItem(Icons.people_outline_rounded, lang.t('jobDetail.bids'), '$bidsCount ${lang.t('jobDetail.bids')}', colors),
       ],
     );
   }
@@ -1105,6 +1118,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildImageGallery(List<dynamic>? images, AppColors colors) {
+    final lang = context.read<LanguageProvider>();
     if (images == null || images.isEmpty) {
       return Container(
         height: 120,
@@ -1114,7 +1128,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
           borderRadius: BorderRadius.circular(24),
           border: Border.all(color: colors.border),
         ),
-        child: Text('No images provided.', style: GoogleFonts.outfit(color: colors.subtext)),
+        child: Text(lang.t('jobDetail.noImages'), style: GoogleFonts.outfit(color: colors.subtext)),
       );
     }
 
@@ -1175,6 +1189,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
   }
 
   Widget _buildCustomerCard(String? name, String date, AppColors colors) {
+    final lang = context.read<LanguageProvider>();
     final avatarUrl = ApiClient.getImageUrl(_job?['customer_avatar']);
     final initials = name != null && name.isNotEmpty ? name[0].toUpperCase() : '?';
 
@@ -1216,7 +1231,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  'Job posted on $date',
+                  '${lang.t('jobDetail.jobPostedOn')} $date',
                   style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                 ),
               ],
@@ -1237,7 +1252,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                 side: BorderSide(color: colors.border),
                 shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
               ),
-              child: Text('View Profile', style: GoogleFonts.outfit(color: colors.text, fontSize: 12, fontWeight: FontWeight.bold)),
+              child: Text(lang.t('jobDetail.viewProfile'), style: GoogleFonts.outfit(color: colors.text, fontSize: 12, fontWeight: FontWeight.bold)),
             ),
         ],
       ),
@@ -1246,8 +1261,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
 
   Widget _buildBidsTab() {
     final colors = Theme.of(context).appColors;
+    final lang = context.read<LanguageProvider>();
     if (_bids.isEmpty) {
-      return Center(child: Text('No bids yet.', style: GoogleFonts.outfit(color: colors.subtext)));
+      return Center(child: Text(lang.t('jobDetail.noBids'), style: GoogleFonts.outfit(color: colors.subtext)));
     }
 
     final bool hasAcceptedAny = _bids.any((b) => b['status'] == 'accepted');
@@ -1294,15 +1310,16 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
     required bool hasAcceptedAny,
     required AppColors colors,
   }) {
+    final lang = context.read<LanguageProvider>();
     final avatarUrl = ApiClient.getImageUrl(avatar);
-    
+
     Widget? statusTag;
     if (status != 'pending' || hasAcceptedAny) {
       String label = status.toUpperCase();
       Color color = status == 'accepted' ? AppTheme.successColor : AppTheme.errorColor;
-      
+
       if (hasAcceptedAny && status != 'accepted') {
-        label = 'SERVICE AVAILED';
+        label = lang.t('provider.myBids.tabAvailed').toUpperCase();
         color = AppTheme.warningColor;
       }
       
@@ -1380,7 +1397,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                   const Icon(Icons.info_outline, size: 14, color: AppTheme.primaryColor),
                                   const SizedBox(width: 4),
                                   Text(
-                                    'View Details',
+                                    lang.t('jobDetail.viewDetails'),
                                     style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
                                   ),
                                 ],
@@ -1404,7 +1421,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                                 const Icon(Icons.chat_bubble_outline_rounded, size: 14, color: AppTheme.primaryColor),
                                 const SizedBox(width: 4),
                                 Text(
-                                  'Chat',
+                                  lang.t('jobDetail.chatBtn'),
                                   style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontWeight: FontWeight.bold, fontSize: 12),
                                 ),
                               ],
@@ -1448,7 +1465,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                       _loadData();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text('Bid accepted successfully!', style: GoogleFonts.outfit(color: Colors.white)),
+                          content: Text(lang.t('jobDetail.bidAccepted'), style: GoogleFonts.outfit(color: Colors.white)),
                           backgroundColor: AppTheme.successColor,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -1458,7 +1475,7 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
                     }
                   },
                   icon: const Icon(Icons.check_circle_outline_rounded, size: 16, color: Colors.white),
-                  label: Text('Accept Bid', style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
+                  label: Text(lang.t('jobDetail.acceptBid'), style: GoogleFonts.outfit(color: Colors.white, fontWeight: FontWeight.bold)),
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppTheme.primaryColor,
                     minimumSize: const Size(120, 48),

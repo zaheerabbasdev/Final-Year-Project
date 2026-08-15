@@ -6,6 +6,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../providers/chat_provider.dart';
 import '../../../core/api_client.dart';
 import '../../../core/theme.dart';
+import '../../../core/providers/language_provider.dart';
 
 class ChatListScreen extends StatefulWidget {
   const ChatListScreen({super.key});
@@ -26,13 +27,14 @@ class _ChatListScreenState extends State<ChatListScreen> {
   @override
   Widget build(BuildContext context) {
     final chatProvider = context.watch<ChatProvider>();
+    final lang = context.watch<LanguageProvider>();
 
     final colors = Theme.of(context).appColors;
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
         title: Text(
-          'Chats',
+          lang.t('chat.title'),
           style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 22),
         ),
         elevation: 0,
@@ -42,7 +44,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
       body: chatProvider.isLoading && chatProvider.chats.isEmpty
           ? const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor))
           : chatProvider.chats.isEmpty
-              ? _buildEmptyState()
+              ? _buildEmptyState(lang)
               : RefreshIndicator(
                   color: AppTheme.primaryColor,
                   onRefresh: () => chatProvider.fetchChatList(),
@@ -129,7 +131,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
                                     const SizedBox(width: 4),
                                   Expanded(
                                     child: Text(
-                                      chat.lastMessage.isEmpty ? 'Photo' : chat.lastMessage,
+                                      chat.lastMessage.isEmpty ? lang.t('chat.photo') : chat.lastMessage,
                                       style: GoogleFonts.outfit(
                                         color: chat.isRead ? colors.subtext : colors.text,
                                         fontSize: 14,
@@ -161,7 +163,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
     );
   }
 
-  Widget _buildEmptyState() {
+  Widget _buildEmptyState(LanguageProvider lang) {
     final colors = Theme.of(context).appColors;
     return Center(
       child: Padding(
@@ -179,7 +181,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ),
             const SizedBox(height: 24),
             Text(
-              'No conversations yet',
+              lang.t('chat.noConversations'),
               style: GoogleFonts.outfit(
                 fontSize: 20,
                 color: colors.text,
@@ -188,7 +190,7 @@ class _ChatListScreenState extends State<ChatListScreen> {
             ),
             const SizedBox(height: 8),
             Text(
-              'Chats regarding active bookings will appear here.',
+              lang.t('chat.noConversationsSubtitle'),
               textAlign: TextAlign.center,
               style: GoogleFonts.outfit(color: colors.subtext, fontSize: 14, fontWeight: FontWeight.w500),
             ),

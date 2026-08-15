@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:provider/provider.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/services/socket_service.dart';
 import '../../../core/theme.dart';
 
@@ -122,6 +123,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       extendBodyBehindAppBar: true,
@@ -150,7 +152,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text(
-              'Live Tracking',
+              lang.t('tracking.title'),
               style: TextStyle(
                 color: colors.text,
                 fontWeight: FontWeight.bold,
@@ -187,7 +189,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                 ),
                 const SizedBox(width: 6),
                 Text(
-                  _isWaiting ? 'Waiting...' : 'LIVE',
+                  _isWaiting ? lang.t('tracking.waiting') : lang.t('tracking.live'),
                   style: TextStyle(
                     color: _isWaiting ? const Color(0xFFF59E0B) : const Color(0xFF10B981),
                     fontWeight: FontWeight.bold,
@@ -222,7 +224,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                       ),
                       infoWindow: InfoWindow(
                         title: widget.providerName,
-                        snippet: 'Service Provider',
+                        snippet: lang.t('tracking.serviceProvider'),
                       ),
                     ),
                   }
@@ -286,7 +288,7 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                       ),
                     const SizedBox(height: 24),
                     Text(
-                      _locationStopped ? 'Location Sharing Stopped' : 'Waiting for Provider',
+                      _locationStopped ? lang.t('tracking.locationStopped') : lang.t('tracking.waitingForProvider'),
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -296,8 +298,8 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                     const SizedBox(height: 8),
                     Text(
                       _locationStopped
-                          ? 'The provider has stopped\nsharing their location'
-                          : 'The provider needs to enable\nlocation sharing from their app',
+                          ? lang.t('tracking.locationStoppedDesc')
+                          : lang.t('tracking.waitingDesc'),
                       textAlign: TextAlign.center,
                       style: TextStyle(
                         color: colors.subtext,
@@ -369,9 +371,9 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              const Text(
-                                'Sharing location • On the way',
-                                style: TextStyle(
+                              Text(
+                                lang.t('tracking.sharingLocation'),
+                                style: const TextStyle(
                                   color: Color(0xFF10B981),
                                   fontSize: 13,
                                   fontWeight: FontWeight.w500,

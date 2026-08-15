@@ -10,6 +10,7 @@ import '../job_service.dart';
 import '../../../shared/screens/map_picker_screen.dart';
 import '../../../core/services/location_service.dart';
 import '../../../core/providers/currency_provider.dart';
+import '../../../core/providers/language_provider.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import '../../../core/theme.dart';
 
@@ -39,6 +40,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
 
   Future<void> _autocompleteDescription() async {
     final colors = Theme.of(context).appColors;
+    final lang = context.read<LanguageProvider>();
     final title = _titleController.text.trim();
     final desc = _descController.text.trim();
 
@@ -55,7 +57,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     if (inputText.length < 3) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please enter a Job Title or description first so AI can generate details.', style: GoogleFonts.outfit()),
+          content: Text(lang.t('customer.postJob.aiInputRequired'), style: GoogleFonts.outfit()),
           backgroundColor: colors.text,
         ),
       );
@@ -130,14 +132,14 @@ class _PostJobScreenState extends State<PostJobScreen> {
       
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('AI auto-filled details based on your input!', style: GoogleFonts.outfit()),
+          content: Text(lang.t('customer.postJob.aiGenerated'), style: GoogleFonts.outfit()),
           backgroundColor: AppTheme.successColor,
         ),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Failed to generate suggestions. Please fill manually.', style: GoogleFonts.outfit()),
+          content: Text(lang.t('customer.postJob.aiFailed'), style: GoogleFonts.outfit()),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -160,10 +162,11 @@ class _PostJobScreenState extends State<PostJobScreen> {
   }
 
   void _submit() async {
+    final lang = context.read<LanguageProvider>();
     if (!_formKey.currentState!.validate() || _selectedCategoryId == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please fill all required fields', style: GoogleFonts.outfit()),
+          content: Text(lang.t('customer.postJob.fillRequired'), style: GoogleFonts.outfit()),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -201,7 +204,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Job posted successfully!', style: GoogleFonts.outfit()),
+            content: Text(context.read<LanguageProvider>().t('customer.postJob.postedSuccess'), style: GoogleFonts.outfit()),
             backgroundColor: AppTheme.successColor,
           ),
         );
@@ -325,6 +328,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
   Widget build(BuildContext context) {
     final categories = context.watch<CategoryService>().categories;
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -337,7 +341,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Post a Job',
+          lang.t('customer.postJob.title'),
           style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
@@ -351,11 +355,11 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
-                    _buildSectionHeader('Job Title *'),
-                    _buildTextField(_titleController, 'e.g., Fix Kitchen Sink Leak'),
+                    _buildSectionHeader('${lang.t('customer.postJob.titleLabel')} *'),
+                    _buildTextField(_titleController, lang.t('customer.postJob.titleHint')),
                     const SizedBox(height: 20),
-                    _buildSectionHeader('Description *'),
-                    _buildTextField(_descController, 'Describe your job in detail...', maxLines: 5),
+                    _buildSectionHeader('${lang.t('customer.postJob.descriptionLabel')} *'),
+                    _buildTextField(_descController, lang.t('customer.postJob.descHint'), maxLines: 5),
                     const SizedBox(height: 4),
                     Align(
                       alignment: Alignment.centerRight,
@@ -363,19 +367,19 @@ class _PostJobScreenState extends State<PostJobScreen> {
                         onPressed: _autocompleteDescription,
                         icon: const Icon(Icons.psychology, size: 18, color: AppTheme.secondaryColor),
                         label: Text(
-                          'AI Auto-Fill Description & Category',
+                          lang.t('customer.postJob.aiAutoFill'),
                           style: GoogleFonts.outfit(color: AppTheme.secondaryColor, fontWeight: FontWeight.bold, fontSize: 13),
                         ),
                       ),
                     ),
                     const SizedBox(height: 12),
-                    _buildSectionHeader('Category *'),
-                    _buildDropdownField(categories),
+                    _buildSectionHeader('${lang.t('customer.postJob.categoryLabel')} *'),
+                    _buildDropdownField(categories, lang),
                     const SizedBox(height: 20),
-                    _buildSectionHeader('Budget (${context.watch<CurrencyProvider>().selectedCurrency}) *'),
+                    _buildSectionHeader('${lang.t('customer.postJob.budgetLabel')} (${context.watch<CurrencyProvider>().selectedCurrency}) *'),
                     _buildTextField(
                       _budgetController,
-                      'Enter your budget',
+                      lang.t('customer.postJob.budgetHint'),
                       isNumber: true,
                       prefix: Icon(Icons.attach_money, size: 20, color: colors.subtext),
                     ),
@@ -383,7 +387,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     SwitchListTile(
                       contentPadding: EdgeInsets.zero,
                       title: Text(
-                        'Budget is Negotiable',
+                        lang.t('customer.postJob.budgetNegotiable'),
                         style: GoogleFonts.outfit(fontSize: 14, fontWeight: FontWeight.w600, color: colors.text),
                       ),
                       value: _isNegotiable,
@@ -406,7 +410,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                           SwitchListTile(
                             contentPadding: EdgeInsets.zero,
                             title: Text(
-                              'EMERGENCY / EXPRESS HIRE',
+                              lang.t('customer.postJob.emergencyLabel'),
                               style: GoogleFonts.outfit(
                                 fontSize: 14,
                                 fontWeight: FontWeight.bold,
@@ -415,7 +419,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                               ),
                             ),
                             subtitle: Text(
-                              'Skip bidding. The first provider to accept will be hired immediately.',
+                              lang.t('customer.postJob.emergencyDesc'),
                               style: GoogleFonts.outfit(fontSize: 12, color: AppTheme.errorColor.withOpacity(0.8), height: 1.3),
                             ),
                             secondary: Icon(Icons.bolt, color: _isEmergency ? AppTheme.errorColor : colors.subtext),
@@ -438,7 +442,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                                   const SizedBox(width: 8),
                                   Expanded(
                                     child: Text(
-                                      'Bidding is skipped. First responder is hired!',
+                                      lang.t('customer.postJob.emergencyInfo'),
                                       style: GoogleFonts.outfit(fontSize: 12, color: AppTheme.errorColor, fontWeight: FontWeight.bold),
                                     ),
                                   ),
@@ -449,10 +453,10 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    _buildSectionHeader('Location *'),
+                    _buildSectionHeader('${lang.t('customer.postJob.locationLabel')} *'),
                     _buildTextField(
                       _locationController,
-                      'Enter or pick location',
+                      lang.t('customer.postJob.locationHint'),
                       prefix: const Icon(Icons.location_on_outlined, size: 20, color: AppTheme.primaryColor),
                       readOnly: true,
                       onTap: _pickLocationOnMap,
@@ -469,7 +473,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildSectionHeader('Preferred Date'),
+                              _buildSectionHeader(lang.t('customer.postJob.preferredDate')),
                               _buildPickerField(
                                 _selectedDate == null ? 'mm/dd/yyyy' : DateFormat('MM/dd/yyyy').format(_selectedDate!),
                                 Icons.calendar_today_outlined,
@@ -483,7 +487,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              _buildSectionHeader('Preferred Time'),
+                              _buildSectionHeader(lang.t('customer.postJob.preferredTime')),
                               _buildPickerField(
                                 _selectedTime == null ? '--:-- --' : _selectedTime!.format(context),
                                 Icons.access_time,
@@ -495,15 +499,15 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       ],
                     ),
                     const SizedBox(height: 20),
-                    _buildSectionHeader('Images (Optional)'),
-                    _buildImageUpload(),
+                    _buildSectionHeader(lang.t('customer.postJob.imagesLabel')),
+                    _buildImageUpload(lang),
                     const SizedBox(height: 20),
                   ],
                 ),
               ),
             ),
           ),
-          _buildFooter(colors),
+          _buildFooter(colors, lang),
         ],
       ),
     );
@@ -538,12 +542,12 @@ class _PostJobScreenState extends State<PostJobScreen> {
     );
   }
 
-  Widget _buildDropdownField(List<dynamic> categories) {
+  Widget _buildDropdownField(List<dynamic> categories, LanguageProvider lang) {
     final colors = Theme.of(context).appColors;
     return DropdownButtonFormField<int>(
       value: _selectedCategoryId,
       style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
-      decoration: const InputDecoration(hintText: 'Select a category'),
+      decoration: InputDecoration(hintText: lang.t('customer.postJob.selectCategory')),
       isExpanded: true,
       items: categories.map<DropdownMenuItem<int>>((cat) {
         return DropdownMenuItem<int>(
@@ -552,7 +556,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
         );
       }).toList(),
       onChanged: (v) => setState(() => _selectedCategoryId = v),
-      validator: (v) => v == null ? 'Please select a category' : null,
+      validator: (v) => v == null ? lang.t('customer.postJob.fieldRequired') : null,
     );
   }
 
@@ -593,7 +597,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     );
   }
 
-  Widget _buildImageUpload() {
+  Widget _buildImageUpload(LanguageProvider lang) {
     final colors = Theme.of(context).appColors;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -614,8 +618,8 @@ class _PostJobScreenState extends State<PostJobScreen> {
                       decoration: BoxDecoration(
                         borderRadius: BorderRadius.circular(16),
                         image: DecorationImage(
-                          image: kIsWeb 
-                            ? NetworkImage(_images[index].path) 
+                          image: kIsWeb
+                            ? NetworkImage(_images[index].path)
                             : FileImage(File(_images[index].path)) as ImageProvider,
                           fit: BoxFit.cover,
                         ),
@@ -659,17 +663,17 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 ),
                 const SizedBox(height: 6),
                 Text(
-                  _images.length >= 6 ? 'Maximum 6 images reached' : 'Add Project Images',
+                  _images.length >= 6 ? lang.t('customer.postJob.maxImages') : lang.t('customer.postJob.addImages'),
                   style: GoogleFonts.outfit(
-                    color: _images.length >= 6 ? Theme.of(context).appColors.subtext.withOpacity(0.5) : Theme.of(context).appColors.text,
+                    color: _images.length >= 6 ? colors.subtext.withOpacity(0.5) : colors.text,
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
                 const SizedBox(height: 2),
                 Text(
-                  '(${_images.length}/6 items)',
-                  style: GoogleFonts.outfit(color: Theme.of(context).appColors.subtext, fontSize: 11),
+                  '(${_images.length}/6)',
+                  style: GoogleFonts.outfit(color: colors.subtext, fontSize: 11),
                 ),
               ],
             ),
@@ -679,7 +683,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
     );
   }
 
-  Widget _buildFooter(AppColors colors) {
+  Widget _buildFooter(AppColors colors, LanguageProvider lang) {
     final isDark = Theme.of(context).brightness == Brightness.dark;
     // primaryColor (#003B95) is too dark to see on dark surfaces —
     // use the brighter secondaryColor (#0A84FF) in dark mode.
@@ -706,7 +710,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                 padding: const EdgeInsets.symmetric(vertical: 18),
               ),
               child: Text(
-                'Cancel',
+                lang.t('customer.postJob.cancel'),
                 style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 16),
               ),
             ),
@@ -729,7 +733,7 @@ class _PostJobScreenState extends State<PostJobScreen> {
                     child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                   )
                 : Text(
-                    'Post Job',
+                    lang.t('customer.postJob.postJob'),
                     style: GoogleFonts.outfit(fontWeight: FontWeight.bold, fontSize: 16),
                   ),
             ),

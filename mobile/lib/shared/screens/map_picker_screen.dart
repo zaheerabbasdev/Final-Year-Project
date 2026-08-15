@@ -1,6 +1,8 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
+import 'package:provider/provider.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/services/location_service.dart';
 import '../../core/theme.dart';
 
@@ -105,7 +107,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
             backgroundColor: Colors.red.shade600,
             behavior: SnackBarBehavior.floating,
             action: SnackBarAction(
-              label: 'Retry',
+              label: context.read<LanguageProvider>().t('mapPicker.retry'),
               textColor: Colors.white,
               onPressed: _getUserLocation,
             ),
@@ -161,6 +163,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -171,7 +174,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Select Location',
+          lang.t('mapPicker.title'),
           style: TextStyle(
             color: colors.text,
             fontWeight: FontWeight.bold,
@@ -203,7 +206,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                   child: TextField(
                     controller: _searchController,
                     decoration: InputDecoration(
-                      hintText: 'Search for a place...',
+                      hintText: lang.t('mapPicker.searchHint'),
                       hintStyle: TextStyle(
                         color: colors.subtext,
                         fontSize: 15,
@@ -252,9 +255,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                                   color: Color(0xFF6366F1),
                                 ),
                           const SizedBox(width: 6),
-                          const Text(
-                            'Use Current Location',
-                            style: TextStyle(
+                          Text(
+                            lang.t('mapPicker.useCurrentLocation'),
+                            style: const TextStyle(
                               color: Color(0xFF6366F1),
                               fontWeight: FontWeight.w600,
                               fontSize: 14,
@@ -275,7 +278,7 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       Text(
-                        'Address: ',
+                        lang.t('mapPicker.addressLabel'),
                         style: TextStyle(
                           fontWeight: FontWeight.bold,
                           fontSize: 14,
@@ -284,9 +287,9 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                       ),
                       Expanded(
                         child: Text(
-                          _isLoadingAddress 
-                              ? 'Fetching address...' 
-                              : (_currentAddress ?? 'Determining location...'),
+                          _isLoadingAddress
+                              ? lang.t('mapPicker.fetchingAddress')
+                              : (_currentAddress ?? lang.t('mapPicker.determiningLocation')),
                           style: TextStyle(
                             fontSize: 14,
                             color: colors.text,
@@ -345,8 +348,8 @@ class _MapPickerScreenState extends State<MapPickerScreen> {
                         ),
                         child: Row(
                           children: [
-                            _buildMapTypeButton('Map', MapType.normal),
-                            _buildMapTypeButton('Satellite', MapType.satellite),
+                            _buildMapTypeButton(lang.t('mapPicker.mapView'), MapType.normal),
+                            _buildMapTypeButton(lang.t('mapPicker.satellite'), MapType.satellite),
                           ],
                         ),
                       ),

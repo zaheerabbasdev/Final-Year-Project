@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../features/provider/provider_service.dart';
 import '../../core/api_client.dart';
+import '../../core/providers/language_provider.dart';
 import '../../core/theme.dart';
 
 class CustomerProfileScreen extends StatefulWidget {
@@ -47,6 +48,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     if (_isLoading) {
       return const Scaffold(
         body: Center(child: CircularProgressIndicator()),
@@ -55,7 +57,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
 
     if (_customer == null) {
       return Scaffold(
-        appBar: AppBar(title: const Text('Profile')),
+        appBar: AppBar(title: Text(lang.t('customerProfile.title'))),
         body: Center(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
@@ -66,7 +68,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               const SizedBox(height: 16),
               ElevatedButton(
                 onPressed: _loadCustomer,
-                child: const Text('Retry'),
+                child: Text(lang.t('customerProfile.retry')),
               ),
             ],
           ),
@@ -75,9 +77,9 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     }
     final avatarUrl = ApiClient.getImageUrl(_customer!['avatar']);
     final initials = _customer!['full_name']?.isNotEmpty == true ? _customer!['full_name'][0].toUpperCase() : '?';
-    final joinedDate = _customer!['created_at'] != null 
-        ? _customer!['created_at'].toString().split('T').first 
-        : 'Unknown';
+    final joinedDate = _customer!['created_at'] != null
+        ? _customer!['created_at'].toString().split('T').first
+        : lang.t('common.unknown');
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -90,11 +92,11 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildProfileHeader(),
+                  _buildProfileHeader(lang),
                   const SizedBox(height: 32),
-                  _buildSectionTitle('Client Information'),
+                  _buildSectionTitle(lang.t('customerProfile.clientInfo')),
                   const SizedBox(height: 16),
-                  _buildInfoCard(),
+                  _buildInfoCard(lang, joinedDate),
                 ],
               ),
             ),
@@ -150,12 +152,12 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     );
   }
 
-  Widget _buildProfileHeader() {
+  Widget _buildProfileHeader(LanguageProvider lang) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Text(
-          _customer!['full_name'] ?? 'Unknown Client',
+          _customer!['full_name'] ?? lang.t('common.unknown'),
           style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Theme.of(context).appColors.text),
         ),
         const SizedBox(height: 8),
@@ -163,16 +165,16 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
           children: [
             const Icon(Icons.verified, color: Color(0xFF10B981), size: 20),
             const SizedBox(width: 8),
-            const Text(
-              'Verified',
-              style: TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w600),
+            Text(
+              lang.t('customerProfile.verified'),
+              style: const TextStyle(color: Color(0xFF10B981), fontWeight: FontWeight.w600),
             ),
             const SizedBox(width: 16),
             Icon(Icons.location_on, color: Theme.of(context).appColors.subtext, size: 18),
             const SizedBox(width: 4),
             Expanded(
               child: Text(
-                _customer!['location'] ?? 'Location not set',
+                _customer!['location'] ?? lang.t('customerProfile.locationNotSet'),
                 style: TextStyle(color: Theme.of(context).appColors.subtext),
                 overflow: TextOverflow.ellipsis,
                 maxLines: 1,
@@ -191,7 +193,7 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
     );
   }
 
-  Widget _buildInfoCard() {
+  Widget _buildInfoCard(LanguageProvider lang, String joinedDate) {
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -201,12 +203,11 @@ class _CustomerProfileScreenState extends State<CustomerProfileScreen> {
       ),
       child: Column(
         children: [
-          _buildInfoRow(Icons.email_outlined, 'Email', _customer!['email'] ?? 'Not provided'),
+          _buildInfoRow(Icons.email_outlined, lang.t('customerProfile.email'), _customer!['email'] ?? lang.t('customerProfile.notProvided')),
           Divider(height: 32, color: Theme.of(context).appColors.border),
-          _buildInfoRow(Icons.phone_outlined, 'Phone', _customer!['phone'] ?? 'Not provided'),
+          _buildInfoRow(Icons.phone_outlined, lang.t('customerProfile.phone'), _customer!['phone'] ?? lang.t('customerProfile.notProvided')),
           Divider(height: 32, color: Theme.of(context).appColors.border),
-          _buildInfoRow(Icons.calendar_today_outlined, 'Joined Since', 
-              _customer!['created_at']?.toString().split('T').first ?? 'Unknown'),
+          _buildInfoRow(Icons.calendar_today_outlined, lang.t('customerProfile.joinedSince'), joinedDate),
         ],
       ),
     );

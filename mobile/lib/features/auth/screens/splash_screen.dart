@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -43,6 +45,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
 
   @override
   Widget build(BuildContext context) {
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       body: Container(
         width: double.infinity,
@@ -102,7 +105,7 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
                   ),
                   const SizedBox(height: 10),
                   Text(
-                    'Your Service Marketplace',
+                    lang.t('splash.tagline'),
                     style: GoogleFonts.outfit(
                       color: Colors.white.withOpacity(0.9),
                       fontSize: 18,

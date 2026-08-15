@@ -5,6 +5,7 @@ import '../../customer/job_service.dart';
 import 'package:go_router/go_router.dart';
 import '../../../shared/services/navigation_service.dart';
 import '../../../core/providers/currency_provider.dart';
+import '../../../core/providers/language_provider.dart';
 import '../../../core/theme.dart';
 
 class PlaceBidScreen extends StatefulWidget {
@@ -42,10 +43,11 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   }
 
   void _submitBid() async {
+    final lang = context.read<LanguageProvider>();
     if (_amountController.text.isEmpty || _timeController.text.isEmpty || _proposalController.text.isEmpty) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
-          content: Text('Please fill all fields', style: GoogleFonts.outfit()),
+          content: Text(lang.t('provider.placeBid.fillAll'), style: GoogleFonts.outfit()),
           backgroundColor: AppTheme.errorColor,
         ),
       );
@@ -53,7 +55,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
     }
 
     setState(() => _isLoading = true);
-    
+
     final currencyProvider = context.read<CurrencyProvider>();
     double bidAmount = double.tryParse(_amountController.text) ?? 0.0;
     if (currencyProvider.selectedCurrency == 'USD') {
@@ -74,7 +76,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Bid submitted successfully!', style: GoogleFonts.outfit()),
+            content: Text(lang.t('provider.placeBid.submitted'), style: GoogleFonts.outfit()),
             backgroundColor: AppTheme.successColor,
           ),
         );
@@ -85,7 +87,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to submit bid', style: GoogleFonts.outfit()),
+            content: Text(lang.t('provider.placeBid.failed'), style: GoogleFonts.outfit()),
             backgroundColor: AppTheme.errorColor,
           ),
         );
@@ -96,6 +98,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -107,7 +110,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Place Your Bid',
+          lang.t('provider.placeBid.title'),
           style: GoogleFonts.outfit(color: colors.text, fontWeight: FontWeight.bold, fontSize: 20),
         ),
       ),
@@ -134,7 +137,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                       backgroundColor: colors.surface,
                     ),
                     child: Text(
-                      'Cancel',
+                      lang.t('provider.placeBid.cancel'),
                       style: GoogleFonts.outfit(color: colors.subtext, fontWeight: FontWeight.bold, fontSize: 16),
                     ),
                   ),
@@ -157,7 +160,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                             child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2.5),
                           )
                         : Text(
-                            'Submit Bid',
+                            lang.t('provider.placeBid.submitBid'),
                             style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: Colors.white, fontSize: 16),
                           ),
                   ),
@@ -172,8 +175,9 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   }
 
   Widget _buildJobSummary() {
+    final lang = context.read<LanguageProvider>();
     if (_isLoading) return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
-    if (_job == null) return Center(child: Text('Job not found', style: GoogleFonts.outfit()));
+    if (_job == null) return Center(child: Text(lang.t('provider.placeBid.jobNotFound'), style: GoogleFonts.outfit()));
 
     final colors = Theme.of(context).appColors;
     return Container(
@@ -206,7 +210,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
                     Text(
-                      'Client Budget',
+                      lang.t('provider.placeBid.clientBudget'),
                       style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 4),
@@ -228,7 +232,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                               borderRadius: BorderRadius.circular(6),
                             ),
                             child: Text(
-                              'NEGOTIABLE',
+                              lang.t('provider.placeBid.negotiable'),
                               style: GoogleFonts.outfit(color: AppTheme.primaryColor, fontSize: 9, fontWeight: FontWeight.bold, letterSpacing: 0.5),
                             ),
                           ),
@@ -245,7 +249,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
                     Text(
-                      'Category',
+                      lang.t('provider.placeBid.category'),
                       style: GoogleFonts.outfit(color: colors.subtext, fontSize: 12, fontWeight: FontWeight.w500),
                     ),
                     const SizedBox(height: 4),
@@ -267,6 +271,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
 
   Widget _buildBidForm() {
     final colors = Theme.of(context).appColors;
+    final lang = context.read<LanguageProvider>();
     return Container(
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
@@ -283,11 +288,11 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          _buildInputLabel('Your Bid Amount (${context.watch<CurrencyProvider>().selectedCurrency}) *', colors),
+          _buildInputLabel('${lang.t('provider.placeBid.bidAmount')} (${context.watch<CurrencyProvider>().selectedCurrency}) *', colors),
           const SizedBox(height: 12),
           _buildTextField(
             controller: _amountController,
-            hint: 'Enter your bid',
+            hint: lang.t('provider.placeBid.enterBid'),
             prefixIcon: Icons.payments_outlined,
             keyboardType: TextInputType.number,
           ),
@@ -306,7 +311,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
                   const SizedBox(width: 8),
                   Expanded(
                     child: Text(
-                      'Suggested competitive bid: ${context.watch<CurrencyProvider>().format(_suggestion!["suggestedMin"])} - ${context.watch<CurrencyProvider>().format(_suggestion!["suggestedMax"])} (Average: ${context.watch<CurrencyProvider>().format(_suggestion!["averagePrice"])})',
+                      '${lang.t('provider.placeBid.aiSuggestion')} ${context.watch<CurrencyProvider>().format(_suggestion!["suggestedMin"])} - ${context.watch<CurrencyProvider>().format(_suggestion!["suggestedMax"])}',
                       style: GoogleFonts.outfit(
                         color: AppTheme.secondaryColor,
                         fontSize: 12,
@@ -321,24 +326,24 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
           const SizedBox(height: 16),
           Divider(color: colors.border, height: 1),
           const SizedBox(height: 16),
-          _buildInputLabel('Estimated Completion Time *', colors),
+          _buildInputLabel('${lang.t('provider.placeBid.estTime')} *', colors),
           const SizedBox(height: 12),
           _buildTextField(
             controller: _timeController,
-            hint: 'e.g., 2 hours, 1 day, 3 days',
+            hint: lang.t('provider.placeBid.timePlaceholder'),
             prefixIcon: Icons.access_time,
           ),
           const SizedBox(height: 16),
           Divider(color: colors.border, height: 1),
           const SizedBox(height: 16),
-          _buildInputLabel('Cover Letter / Proposal *', colors),
+          _buildInputLabel('${lang.t('provider.placeBid.coverLetter')} *', colors),
           const SizedBox(height: 12),
           TextField(
             controller: _proposalController,
             maxLines: 5,
             style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
             decoration: InputDecoration(
-              hintText: "Introduce yourself and explain why you're the best fit for this job...",
+              hintText: lang.t('provider.placeBid.coverHint'),
               hintStyle: GoogleFonts.outfit(color: colors.subtext.withOpacity(0.7), fontSize: 13),
               filled: true,
               fillColor: colors.background,
@@ -410,6 +415,7 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
   }
 
   Widget _buildImportantNotes() {
+    final lang = context.read<LanguageProvider>();
     return Container(
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
@@ -425,16 +431,16 @@ class _PlaceBidScreenState extends State<PlaceBidScreen> {
               const Icon(Icons.warning_amber_rounded, color: AppTheme.warningColor, size: 20),
               const SizedBox(width: 8),
               Text(
-                'Important Notes',
+                lang.t('provider.placeBid.importantNotes'),
                 style: GoogleFonts.outfit(fontWeight: FontWeight.bold, color: const Color(0xFF78350F), fontSize: 15),
               ),
             ],
           ),
           const SizedBox(height: 12),
-          _buildNoteItem('Once submitted, you cannot edit your bid'),
-          _buildNoteItem('5% platform fee applies to all earnings'),
-          _buildNoteItem('Be professional and accurate in your proposal'),
-          _buildNoteItem('Payment is released after job completion'),
+          _buildNoteItem(lang.t('provider.placeBid.note1')),
+          _buildNoteItem(lang.t('provider.placeBid.note2')),
+          _buildNoteItem(lang.t('provider.placeBid.note3')),
+          _buildNoteItem(lang.t('provider.placeBid.note4')),
         ],
       ),
     );

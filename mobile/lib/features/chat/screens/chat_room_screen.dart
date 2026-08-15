@@ -10,6 +10,7 @@ import '../../../features/auth/auth_service.dart';
 import '../../../core/api_client.dart';
 import '../models/chat_message.dart';
 import '../../../core/theme.dart';
+import '../../../core/providers/language_provider.dart';
 
 class ChatRoomScreen extends StatefulWidget {
   final int jobId;
@@ -106,6 +107,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
     WidgetsBinding.instance.addPostFrameCallback((_) => _scrollToBottom());
 
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       appBar: AppBar(
@@ -135,7 +137,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                     ),
                     if (chatProvider.isOtherTyping && chatProvider.typingJobId == widget.jobId)
                       Text(
-                        'typing...',
+                        lang.t('chat.typing'),
                         style: GoogleFonts.outfit(
                           fontSize: 12,
                           color: AppTheme.secondaryColor,
@@ -144,7 +146,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                       )
                     else
                       Text(
-                        'Online',
+                        lang.t('chat.online'),
                         style: GoogleFonts.outfit(
                           fontSize: 12,
                           color: colors.subtext,
@@ -260,12 +262,13 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
   }
 
   Widget _buildDateHeader(DateTime date) {
+    final lang = context.read<LanguageProvider>();
     String dateStr;
     final now = DateTime.now();
     if (date.day == now.day && date.month == now.month && date.year == now.year) {
-      dateStr = 'Today';
+      dateStr = lang.t('chat.today');
     } else if (date.day == now.day - 1 && date.month == now.month && date.year == now.year) {
-      dateStr = 'Yesterday';
+      dateStr = lang.t('chat.yesterday');
     } else {
       dateStr = DateFormat('MMMM dd, yyyy').format(date);
     }
@@ -489,7 +492,7 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
                             fontSize: 15,
                           ),
                           decoration: InputDecoration(
-                            hintText: 'Type a message...',
+                            hintText: context.read<LanguageProvider>().t('chat.messageHint'),
                             hintStyle: GoogleFonts.outfit(color: colors.subtext),
                             border: InputBorder.none,
                             enabledBorder: InputBorder.none,

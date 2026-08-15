@@ -5,6 +5,7 @@ import 'package:google_fonts/google_fonts.dart';
 import '../services/review_service.dart';
 import '../../core/api_client.dart';
 import '../../core/theme.dart';
+import '../../core/providers/language_provider.dart';
 
 class SubmitReviewScreen extends StatefulWidget {
   final int bookingId;
@@ -31,11 +32,12 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
   final TextEditingController _commentController = TextEditingController();
 
   Future<void> _submitReview() async {
+    final lang = context.read<LanguageProvider>();
     if (_rating == 0) {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            'Please select a rating',
+            lang.t('submitReview.selectRating'),
             style: GoogleFonts.outfit(),
           ),
           backgroundColor: AppTheme.errorColor,
@@ -59,18 +61,18 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
       if (success) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Review submitted successfully!', style: GoogleFonts.outfit(color: Colors.white)),
+            content: Text(lang.t('submitReview.reviewSuccess'), style: GoogleFonts.outfit(color: Colors.white)),
             backgroundColor: AppTheme.successColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             margin: const EdgeInsets.all(12),
           ),
         );
-        context.pop(); // Close the screen
+        context.pop();
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Failed to submit review', style: GoogleFonts.outfit(color: Colors.white)),
+            content: Text(lang.t('submitReview.reviewFailed'), style: GoogleFonts.outfit(color: Colors.white)),
             backgroundColor: AppTheme.errorColor,
             behavior: SnackBarBehavior.floating,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
@@ -81,20 +83,20 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
     }
   }
 
-  String _getRatingLabel(int rating) {
+  String _getRatingLabel(int rating, LanguageProvider lang) {
     switch (rating) {
       case 1:
-        return 'Terrible';
+        return lang.t('submitReview.terrible');
       case 2:
-        return 'Bad';
+        return lang.t('submitReview.bad');
       case 3:
-        return 'Good';
+        return lang.t('submitReview.good');
       case 4:
-        return 'Very Good';
+        return lang.t('submitReview.veryGood');
       case 5:
-        return 'Excellent!';
+        return lang.t('submitReview.excellent');
       default:
-        return 'Tap stars to rate';
+        return lang.t('submitReview.tapStars');
     }
   }
 
@@ -109,6 +111,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
     final avatarUrl = ApiClient.getImageUrl(widget.providerAvatar);
     final isSubmitting = context.watch<ReviewService>().isLoading;
     final colors = Theme.of(context).appColors;
+    final lang = context.watch<LanguageProvider>();
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -121,7 +124,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
           onPressed: () => Navigator.pop(context),
         ),
         title: Text(
-          'Leave a Review',
+          lang.t('submitReview.title'),
           style: GoogleFonts.outfit(
             color: colors.text,
             fontWeight: FontWeight.bold,
@@ -150,7 +153,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
             ),
             const SizedBox(height: 16),
             Text(
-              'How was your experience with',
+              lang.t('submitReview.howWas'),
               style: GoogleFonts.outfit(
                 color: colors.subtext,
                 fontSize: 15,
@@ -185,7 +188,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
             ),
             const SizedBox(height: 12),
             Text(
-              _getRatingLabel(_rating),
+              _getRatingLabel(_rating, lang),
               style: GoogleFonts.outfit(
                 fontSize: 16,
                 color: _rating > 0 ? AppTheme.secondaryColor : colors.subtext,
@@ -198,7 +201,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
               maxLines: 5,
               style: GoogleFonts.outfit(color: colors.text, fontSize: 15),
               decoration: InputDecoration(
-                hintText: 'Share details of your experience...',
+                hintText: lang.t('submitReview.commentHint'),
                 hintStyle: GoogleFonts.outfit(color: colors.subtext),
                 filled: true,
                 fillColor: colors.card,
@@ -231,7 +234,7 @@ class _SubmitReviewScreenState extends State<SubmitReviewScreen> {
                 child: isSubmitting
                     ? const CircularProgressIndicator(color: Colors.white)
                     : Text(
-                        'Submit Review',
+                        lang.t('submitReview.submitBtn'),
                         style: GoogleFonts.outfit(
                           fontSize: 16,
                           fontWeight: FontWeight.bold,
