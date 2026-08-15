@@ -54,12 +54,14 @@ const Wallet = {
      * Paginated transaction history for a user.
      */
     getTransactions: async (userId, limit = 20, offset = 0) => {
+        const safeLimit  = parseInt(limit)  || 20;
+        const safeOffset = parseInt(offset) || 0;
         const [rows] = await db.execute(
             `SELECT * FROM wallet_transactions
              WHERE user_id = ?
              ORDER BY created_at DESC
-             LIMIT ? OFFSET ?`,
-            [userId, parseInt(limit), parseInt(offset)]
+             LIMIT ${safeLimit} OFFSET ${safeOffset}`,
+            [userId]
         );
         return rows;
     },
