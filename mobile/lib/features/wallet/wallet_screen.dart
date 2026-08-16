@@ -390,7 +390,7 @@ class _WalletScreenState extends State<WalletScreen> {
     }
   }
 
-  String _fmt(double v) => v.toStringAsFixed(2).replaceAllMapped(
+  String _fmt(double v) => v.round().toString().replaceAllMapped(
         RegExp(r'(\d{1,3})(?=(\d{3})+(?!\d))'),
         (m) => '${m[1]},',
       );

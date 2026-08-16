@@ -136,7 +136,7 @@ export default function ProviderWalletPage() {
             <span className="text-sm font-medium opacity-80">{t('wallet.balance')}</span>
           </div>
           <p className="text-4xl font-black tracking-tight mt-2">
-            PKR {balance.toLocaleString('en-PK', { minimumFractionDigits: 2 })}
+            PKR {Math.round(balance).toLocaleString('en-PK')}
           </p>
           <p className="mt-1 text-xs opacity-60">{t('wallet.providerInfo')}</p>
 

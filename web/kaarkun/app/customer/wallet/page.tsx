@@ -168,7 +168,7 @@ export default function CustomerWalletPage() {
             <span className="text-sm font-medium opacity-80">{t('wallet.balance')}</span>
           </div>
           <p className="text-4xl font-black tracking-tight mt-2">
-            PKR {balance.toLocaleString('en-PK', { minimumFractionDigits: 2 })}
+            PKR {Math.round(balance).toLocaleString('en-PK')}
           </p>
           <p className="mt-1 text-xs opacity-60">{t('wallet.customerInfo')}</p>
 
@@ -177,7 +177,7 @@ export default function CustomerWalletPage() {
             <div className="flex items-center gap-2 mt-3 bg-white/10 rounded-xl px-4 py-2.5">
               <Info size={14} className="opacity-70 shrink-0" />
               <span className="text-xs font-medium">
-                PKR {escrowBalance.toLocaleString('en-PK', { minimumFractionDigits: 2 })} {t('wallet.inEscrow')}
+                PKR {Math.round(escrowBalance).toLocaleString('en-PK')} {t('wallet.inEscrow')}
               </span>
             </div>
           )}
