@@ -330,54 +330,92 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
 
   void _showSortPicker(LanguageProvider lang) {
     final colors = Theme.of(context).appColors;
-    // keys → display labels
+    final isDark = Theme.of(context).brightness == Brightness.dark;
     final options = [
       {'key': 'AI Recommended', 'label': lang.t('provider.browseJobs.aiRecommended')},
-      {'key': 'Most Recent', 'label': lang.t('provider.browseJobs.mostRecent')},
+      {'key': 'Most Recent',    'label': lang.t('provider.browseJobs.mostRecent')},
       {'key': 'Highest Budget', 'label': lang.t('provider.browseJobs.highestBudget')},
-      {'key': 'Lowest Budget', 'label': lang.t('provider.browseJobs.lowestBudget')},
+      {'key': 'Lowest Budget',  'label': lang.t('provider.browseJobs.lowestBudget')},
     ];
-    showModalBottomSheet(
+    showDialog(
       context: context,
-      backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-      builder: (context) {
-        return SingleChildScrollView(
-          padding: const EdgeInsets.all(28),
+      barrierColor: Colors.black54,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
+        child: Container(
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
+            borderRadius: BorderRadius.circular(28),
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
           child: Column(
             mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Container(
-                width: 44,
-                height: 4,
-                decoration: BoxDecoration(color: colors.border, borderRadius: BorderRadius.circular(2)),
-              ),
-              const SizedBox(height: 24),
-              Text(
-                lang.t('provider.browseJobs.sortBy'),
-                style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
-              ),
-              const SizedBox(height: 16),
-              ...options.map((opt) => ListTile(
-                title: Text(
-                  opt['label']!,
-                  style: GoogleFonts.outfit(
-                    color: selectedSort == opt['key'] ? AppTheme.primaryColor : colors.text,
-                    fontWeight: selectedSort == opt['key'] ? FontWeight.bold : FontWeight.normal,
+              // Header
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      lang.t('provider.browseJobs.sortBy'),
+                      style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
+                    ),
                   ),
-                ),
-                trailing: selectedSort == opt['key'] ? const Icon(Icons.check, color: AppTheme.primaryColor) : null,
-                onTap: () {
-                  setState(() => selectedSort = opt['key']!);
-                  Navigator.pop(context);
-                  _onSearchChanged(_searchController.text);
-                },
-              )),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(ctx),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(10)),
+                      child: Icon(Icons.close, size: 18, color: colors.subtext),
+                    ),
+                  ),
+                ],
+              ),
               const SizedBox(height: 16),
+              Divider(color: colors.border, height: 1),
+              ...options.map((opt) {
+                final isSelected = selectedSort == opt['key'];
+                return InkWell(
+                  borderRadius: BorderRadius.circular(14),
+                  onTap: () {
+                    setState(() => selectedSort = opt['key']!);
+                    Navigator.pop(ctx);
+                    _onSearchChanged(_searchController.text);
+                  },
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+                    child: Row(
+                      children: [
+                        Expanded(
+                          child: Text(
+                            opt['label']!,
+                            style: GoogleFonts.outfit(
+                              fontSize: 15,
+                              color: isSelected ? AppTheme.primaryColor : colors.text,
+                              fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                            ),
+                          ),
+                        ),
+                        if (isSelected)
+                          Container(
+                            padding: const EdgeInsets.all(4),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withOpacity(0.1),
+                              shape: BoxShape.circle,
+                            ),
+                            child: const Icon(Icons.check, color: AppTheme.primaryColor, size: 14),
+                          ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+              const SizedBox(height: 8),
             ],
           ),
-        );
-      },
+        ),
+      ),
     );
   }
 
@@ -410,61 +448,158 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
 
   void _showCategoryPicker(LanguageProvider lang) {
     final colors = Theme.of(context).appColors;
-    showModalBottomSheet(
+    final isDark = Theme.of(context).brightness == Brightness.dark;
+    final categories = context.read<CategoryService>().categories;
+    showDialog(
       context: context,
-      backgroundColor: colors.surface,
-      shape: const RoundedRectangleBorder(borderRadius: BorderRadius.vertical(top: Radius.circular(28))),
-      builder: (context) {
-        final categories = context.read<CategoryService>().categories;
-        return Container(
-          constraints: BoxConstraints(maxHeight: MediaQuery.of(context).size.height * 0.6),
-          child: SingleChildScrollView(
-            padding: const EdgeInsets.all(28),
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Container(
-                  width: 44,
-                  height: 4,
-                  decoration: BoxDecoration(color: colors.border, borderRadius: BorderRadius.circular(2)),
-                ),
-                const SizedBox(height: 24),
-                Text(
-                  lang.t('provider.browseJobs.selectCategory'),
-                  style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
-                ),
-                const SizedBox(height: 16),
-                ListTile(
-                  leading: const Icon(Icons.grid_view, color: AppTheme.primaryColor),
-                  title: Text(
-                    lang.t('provider.browseJobs.allCategories'),
-                    style: GoogleFonts.outfit(fontWeight: FontWeight.w600, color: colors.text),
-                  ),
-                  onTap: () {
-                    setState(() => selectedCategory = 'All Categories');
-                    context.read<JobService>().fetchJobs(filters: {'status': 'open'});
-                    Navigator.pop(context);
-                  },
-                ),
-                Divider(color: colors.border),
-                ...categories.map((cat) => ListTile(
-                  leading: const Icon(Icons.category_outlined, color: AppTheme.primaryColor),
-                  title: Text(cat['name'] as String, style: GoogleFonts.outfit(fontWeight: FontWeight.w500, color: colors.text)),
-                  onTap: () {
-                    setState(() => selectedCategory = cat['name'] as String);
-                    context.read<JobService>().fetchJobs(filters: {
-                      'category_id': cat['id'],
-                      'status': 'open',
-                    });
-                    Navigator.pop(context);
-                  },
-                )),
-                const SizedBox(height: 16),
-              ],
-            ),
+      barrierColor: Colors.black54,
+      builder: (ctx) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: const EdgeInsets.symmetric(horizontal: 28, vertical: 40),
+        child: Container(
+          constraints: BoxConstraints(
+            maxHeight: MediaQuery.of(context).size.height * 0.65,
           ),
-        );
-      },
+          decoration: BoxDecoration(
+            color: isDark ? const Color(0xFF1A1A2E) : Colors.white,
+            borderRadius: BorderRadius.circular(28),
+          ),
+          padding: const EdgeInsets.fromLTRB(24, 24, 24, 16),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Header
+              Row(
+                children: [
+                  Expanded(
+                    child: Text(
+                      lang.t('provider.browseJobs.selectCategory'),
+                      style: GoogleFonts.outfit(fontSize: 18, fontWeight: FontWeight.bold, color: colors.text),
+                    ),
+                  ),
+                  GestureDetector(
+                    onTap: () => Navigator.pop(ctx),
+                    child: Container(
+                      padding: const EdgeInsets.all(6),
+                      decoration: BoxDecoration(color: colors.surface, borderRadius: BorderRadius.circular(10)),
+                      child: Icon(Icons.close, size: 18, color: colors.subtext),
+                    ),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+              Divider(color: colors.border, height: 1),
+              // Scrollable list
+              Flexible(
+                child: SingleChildScrollView(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      // "All Categories" row
+                      InkWell(
+                        borderRadius: BorderRadius.circular(14),
+                        onTap: () {
+                          setState(() => selectedCategory = 'All Categories');
+                          context.read<JobService>().fetchJobs(filters: {'status': 'open'});
+                          Navigator.pop(ctx);
+                        },
+                        child: Padding(
+                          padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+                          child: Row(
+                            children: [
+                              Container(
+                                padding: const EdgeInsets.all(8),
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryColor.withOpacity(0.1),
+                                  borderRadius: BorderRadius.circular(10),
+                                ),
+                                child: const Icon(Icons.grid_view_rounded, color: AppTheme.primaryColor, size: 18),
+                              ),
+                              const SizedBox(width: 14),
+                              Expanded(
+                                child: Text(
+                                  lang.t('provider.browseJobs.allCategories'),
+                                  style: GoogleFonts.outfit(
+                                    fontSize: 15,
+                                    fontWeight: selectedCategory == 'All Categories' ? FontWeight.bold : FontWeight.w500,
+                                    color: selectedCategory == 'All Categories' ? AppTheme.primaryColor : colors.text,
+                                  ),
+                                ),
+                              ),
+                              if (selectedCategory == 'All Categories')
+                                Container(
+                                  padding: const EdgeInsets.all(4),
+                                  decoration: BoxDecoration(
+                                    color: AppTheme.primaryColor.withOpacity(0.1),
+                                    shape: BoxShape.circle,
+                                  ),
+                                  child: const Icon(Icons.check, color: AppTheme.primaryColor, size: 14),
+                                ),
+                            ],
+                          ),
+                        ),
+                      ),
+                      Divider(color: colors.border, height: 1),
+                      ...categories.map((cat) {
+                        final isSelected = selectedCategory == cat['name'];
+                        return InkWell(
+                          borderRadius: BorderRadius.circular(14),
+                          onTap: () {
+                            setState(() => selectedCategory = cat['name'] as String);
+                            context.read<JobService>().fetchJobs(filters: {
+                              'category_id': cat['id'],
+                              'status': 'open',
+                            });
+                            Navigator.pop(ctx);
+                          },
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 14, horizontal: 4),
+                            child: Row(
+                              children: [
+                                Container(
+                                  padding: const EdgeInsets.all(8),
+                                  decoration: BoxDecoration(
+                                    color: colors.surface,
+                                    borderRadius: BorderRadius.circular(10),
+                                    border: Border.all(color: colors.border),
+                                  ),
+                                  child: Icon(Icons.category_outlined, color: isSelected ? AppTheme.primaryColor : colors.subtext, size: 18),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Text(
+                                    cat['name'] as String,
+                                    style: GoogleFonts.outfit(
+                                      fontSize: 15,
+                                      fontWeight: isSelected ? FontWeight.bold : FontWeight.w500,
+                                      color: isSelected ? AppTheme.primaryColor : colors.text,
+                                    ),
+                                  ),
+                                ),
+                                if (isSelected)
+                                  Container(
+                                    padding: const EdgeInsets.all(4),
+                                    decoration: BoxDecoration(
+                                      color: AppTheme.primaryColor.withOpacity(0.1),
+                                      shape: BoxShape.circle,
+                                    ),
+                                    child: const Icon(Icons.check, color: AppTheme.primaryColor, size: 14),
+                                  ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                      const SizedBox(height: 8),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 

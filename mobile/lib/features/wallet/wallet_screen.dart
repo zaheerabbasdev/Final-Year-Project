@@ -4,6 +4,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../../core/providers/language_provider.dart';
 import '../../core/theme.dart';
+import '../auth/auth_service.dart';
 import 'wallet_service.dart';
 
 class WalletScreen extends StatefulWidget {
@@ -55,6 +56,7 @@ class _WalletScreenState extends State<WalletScreen> {
     final lang = context.watch<LanguageProvider>();
     final colors = Theme.of(context).appColors;
     final isDark = Theme.of(context).brightness == Brightness.dark;
+    final isProvider = context.watch<AuthService>().role == 'provider';
 
     return Scaffold(
       backgroundColor: colors.background,
@@ -97,7 +99,7 @@ class _WalletScreenState extends State<WalletScreen> {
                 const SizedBox(height: 8),
 
                 // ── Balance card ──
-                _buildBalanceCard(ws, lang, colors, isDark),
+                _buildBalanceCard(ws, lang, colors, isDark, isProvider: isProvider),
 
                 const SizedBox(height: 24),
 
@@ -155,7 +157,7 @@ class _WalletScreenState extends State<WalletScreen> {
     );
   }
 
-  Widget _buildBalanceCard(WalletService ws, LanguageProvider lang, AppColors colors, bool isDark) {
+  Widget _buildBalanceCard(WalletService ws, LanguageProvider lang, AppColors colors, bool isDark, {required bool isProvider}) {
     return Container(
       decoration: BoxDecoration(
         gradient: const LinearGradient(
@@ -227,8 +229,10 @@ class _WalletScreenState extends State<WalletScreen> {
           const SizedBox(height: 20),
           Row(
             children: [
-              _cardButton(Icons.add_rounded, lang.t('wallet.topUp'), _showTopUpSheet),
-              const SizedBox(width: 12),
+              if (!isProvider) ...[
+                _cardButton(Icons.add_rounded, lang.t('wallet.topUp'), _showTopUpSheet),
+                const SizedBox(width: 12),
+              ],
               _cardButton(Icons.remove_rounded, lang.t('wallet.withdraw'),
                   ws.balance >= 500 ? _showWithdrawSheet : null),
             ],
