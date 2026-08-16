@@ -53,14 +53,6 @@ class SettingsScreen extends StatelessWidget {
                 ),
                 child: Column(
                   children: [
-                    if (role == 'customer')
-                      _buildMenuItem(
-                        context,
-                        Icons.payment_outlined,
-                        langProvider.t('settings.paymentMethods'),
-                        () {},
-                        colors,
-                      ),
                     _buildMenuItem(
                       context,
                       Icons.notifications_none_rounded,
