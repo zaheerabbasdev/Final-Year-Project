@@ -26,13 +26,14 @@ function useCountUp(target: number, duration = 900) {
   return count;
 }
 
-/* ── Build last-12-months scaffold ───────────────────────────────── */
+/* ── Build current-year month scaffold (Jan → current month) ─────── */
 function buildMonthGrid(apiData: { month: string; count: number }[]) {
-  const now = new Date();
-  return Array.from({ length: 12 }, (_, i) => {
-    const d   = new Date(now.getFullYear(), now.getMonth() - 11 + i, 1);
-    const key = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
-    const lbl = d.toLocaleString('en-US', { month: 'short' });
+  const now          = new Date();
+  const year         = now.getFullYear();
+  const monthsToShow = now.getMonth() + 1; // 1-indexed count up to current month
+  return Array.from({ length: monthsToShow }, (_, i) => {
+    const key = `${year}-${String(i + 1).padStart(2, '0')}`;
+    const lbl = new Date(year, i, 1).toLocaleString('en-US', { month: 'short' });
     const hit = apiData.find(g => g.month === key);
     return { key, label: lbl, count: hit?.count ?? 0 };
   });

@@ -12,7 +12,6 @@ import {
   LogOut,
   ChevronRight,
 } from 'lucide-react';
-import Image from 'next/image';
 
 const NAV_ITEMS = [
   { href: '/dashboard',            icon: LayoutDashboard, label: 'Dashboard' },
@@ -39,7 +38,8 @@ export default function Sidebar() {
       <div className="px-6 py-5 border-b border-[var(--border-color)]">
         <Link href="/dashboard" className="flex items-center gap-3 group">
           <div className="h-9 w-9 rounded-xl overflow-hidden shadow-md shadow-blue-500/20 group-hover:shadow-blue-500/30 transition-shadow shrink-0">
-            <Image src="/icon.png" alt="Kaarkun" width={36} height={36} className="w-full h-full object-cover" />
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src="/icon.png" alt="Kaarkun" className="w-full h-full object-cover" />
           </div>
           <div>
             <span className="text-[15px] font-bold text-(--text) tracking-tight">Kaarkun</span>
