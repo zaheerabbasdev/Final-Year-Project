@@ -139,14 +139,14 @@ select {
 }
 
 .app-card:hover {
-  transform: translateY(-4px);
-  border-color: var(--primary); /* highlight using theme primary color */
-  box-shadow: 0 32px 70px rgba(0, 0, 0, 0.12);
+  transform: translateY(-2px);
+  border-color: #BFDBFE; /* blue-200 — subtle light-mode highlight */
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.10);
 }
 
 .dark .app-card:hover {
-  border-color: var(--primary) !important; /* Lighter highlight instead of bold white */
-  box-shadow: 0 32px 70px rgba(37, 99, 235, 0.08);
+  border-color: rgba(59, 130, 246, 0.45) !important; /* blue-500/45 — soft dark-mode highlight */
+  box-shadow: 0 12px 32px rgba(37, 99, 235, 0.12);
 }
 
 

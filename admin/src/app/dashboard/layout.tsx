@@ -34,7 +34,7 @@ export default function DashboardLayout({
   return (
     <div className="min-h-screen bg-[var(--background)] transition-colors duration-200">
       <Sidebar />
-      <main className="pl-72 min-h-screen bg-[var(--background)]">
+      <main className="pl-64 min-h-screen bg-[var(--background)]">
         <header className="sticky top-0 z-20 border-b border-[var(--border-color)] bg-[var(--surface)]/95 backdrop-blur-xl shadow-sm transition-colors duration-200">
           <div className="h-20 px-10 flex items-center justify-between gap-6">
             <div>

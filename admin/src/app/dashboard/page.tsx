@@ -166,21 +166,27 @@ export default function DashboardPage() {
             </div>
           ) : (
             <>
-              <div className="h-48 flex items-end gap-1.5 px-2">
-                {userGrowth.map((m, i) => (
-                  <div key={m.month} className="flex-1 flex flex-col items-center gap-1 group" title={`${m.month}: ${m.count}`}>
+              <div className="relative h-48 flex gap-1.5 px-2">
+                {userGrowth.map((m, i) => {
+                  const pct = Math.max((m.count / maxGrowth) * 100, m.count > 0 ? 3 : 0);
+                  return (
                     <div
-                      className="w-full rounded-t-lg transition-all duration-500 ease-out group-hover:opacity-80"
-                      style={{
-                        height: `${(m.count / maxGrowth) * 100}%`,
-                        minHeight: '4px',
-                        background: i % 2 === 0
-                          ? 'rgba(37,99,235,0.25)'
-                          : 'rgba(37,99,235,0.45)',
-                      }}
-                    />
-                  </div>
-                ))}
+                      key={m.month}
+                      className="relative flex-1 h-full group cursor-default"
+                      title={`${m.month}: ${m.count} signup${m.count !== 1 ? 's' : ''}`}
+                    >
+                      <div
+                        className="absolute bottom-0 left-0 right-0 rounded-t-md transition-all duration-700 ease-out group-hover:brightness-110"
+                        style={{
+                          height: `${pct}%`,
+                          background: i % 2 === 0
+                            ? 'linear-gradient(to top, #2563EB, #60A5FA)'
+                            : 'linear-gradient(to top, #0EA5E9, #7DD3FC)',
+                        }}
+                      />
+                    </div>
+                  );
+                })}
               </div>
               <div className="flex justify-between mt-3 px-2 text-[10px] font-semibold text-(--subtext) uppercase tracking-wider">
                 {userGrowth.map(m => <span key={m.month}>{m.month.slice(5)}</span>)}
