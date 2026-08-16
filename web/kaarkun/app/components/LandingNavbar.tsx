@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowRight, Menu, Moon, Sparkles, Sun, X } from 'lucide-react';
+import { ArrowRight, Menu, Moon, Sun, X } from 'lucide-react';
 import { useTheme } from '../context/ThemeContext';
 
 const navLinks = [
@@ -23,8 +23,9 @@ export default function LandingNavbar() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="h-16 flex items-center justify-between gap-4">
           <Link href="/" className="flex items-center gap-2.5 shrink-0" onClick={closeMobileMenu}>
-            <span className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-600 to-sky-600 flex items-center justify-center shadow-lg shadow-blue-600/20">
-              <Sparkles size={17} className="text-white" />
+            <span className="w-9 h-9 rounded-xl overflow-hidden shadow-lg shadow-blue-600/20 shrink-0">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src="/icon.png" alt="Kaarkun" className="w-full h-full object-cover" />
             </span>
             <span className="text-xl font-black tracking-tight text-zinc-950 dark:text-white">
               Kaarkun

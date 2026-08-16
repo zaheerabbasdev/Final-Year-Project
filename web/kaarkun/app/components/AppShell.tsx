@@ -5,7 +5,7 @@ import { usePathname } from 'next/navigation';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
 
-const PUBLIC_ROUTES = ['/', '/login', '/register', '/verify-otp'];
+const PUBLIC_ROUTES = ['/', '/login', '/register', '/verify-otp', '/forgot-password'];
 
 function isPublicRoute(pathname: string) {
   return PUBLIC_ROUTES.some((route) => (
