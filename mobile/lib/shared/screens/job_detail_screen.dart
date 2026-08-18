@@ -1460,18 +1460,81 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               if (status == 'pending' && context.read<AuthService>().role == 'customer')
                 ElevatedButton.icon(
                   onPressed: () async {
-                    final success = await context.read<JobService>().acceptBid(id);
-                    if (success) {
+                    final result = await context.read<JobService>().acceptBid(id);
+                    if (!mounted) return;
+
+                    if (result['success'] == true) {
+                      // ── Success ─────────────────────────────────────────
                       _loadData();
                       ScaffoldMessenger.of(context).showSnackBar(
                         SnackBar(
-                          content: Text(lang.t('jobDetail.bidAccepted'), style: GoogleFonts.outfit(color: Colors.white)),
+                          content: Text(lang.t('jobDetail.bidAccepted'),
+                              style: GoogleFonts.outfit(color: Colors.white)),
                           backgroundColor: AppTheme.successColor,
                           behavior: SnackBarBehavior.floating,
                           shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                           margin: const EdgeInsets.all(12),
                         ),
                       );
+                    } else {
+                      // ── Failure — detect balance vs other errors ─────────
+                      final rawMsg = (result['message'] as String? ?? '').toLowerCase();
+                      final isBalanceError = rawMsg.contains('balance') ||
+                          rawMsg.contains('insufficient') ||
+                          rawMsg.contains('wallet') ||
+                          rawMsg.contains('funds');
+
+                      if (isBalanceError) {
+                        // Wallet / balance error — guide the customer to top up
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Row(
+                              children: [
+                                const Icon(
+                                  Icons.account_balance_wallet_outlined,
+                                  color: Colors.white,
+                                  size: 20,
+                                ),
+                                const SizedBox(width: 12),
+                                Expanded(
+                                  child: Text(
+                                    lang.t('jobDetail.insufficientBalance'),
+                                    style: GoogleFonts.outfit(
+                                      color: Colors.white,
+                                      fontWeight: FontWeight.w600,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            backgroundColor: AppTheme.errorColor,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            margin: const EdgeInsets.all(12),
+                            duration: const Duration(seconds: 6),
+                            action: SnackBarAction(
+                              label: lang.t('wallet.topUp'),
+                              textColor: Colors.white,
+                              onPressed: () => context.push('/wallet'),
+                            ),
+                          ),
+                        );
+                      } else {
+                        // Generic error — surface the server message
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text(
+                              result['message'] as String? ??
+                                  lang.t('jobDetail.bidAcceptFailed'),
+                              style: GoogleFonts.outfit(color: Colors.white),
+                            ),
+                            backgroundColor: AppTheme.errorColor,
+                            behavior: SnackBarBehavior.floating,
+                            shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                            margin: const EdgeInsets.all(12),
+                          ),
+                        );
+                      }
                     }
                   },
                   icon: const Icon(Icons.check_circle_outline_rounded, size: 16, color: Colors.white),

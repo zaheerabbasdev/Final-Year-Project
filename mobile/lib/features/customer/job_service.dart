@@ -94,17 +94,30 @@ class JobService extends ChangeNotifier {
     }
   }
 
-  Future<bool> acceptBid(int bidId) async {
+  /// Accepts a bid.  Returns a map with:
+  ///   {'success': true}  — on success
+  ///   {'success': false, 'message': String}  — on failure (passes back the
+  ///     server's error message so the UI can distinguish balance errors from
+  ///     other failures).
+  Future<Map<String, dynamic>> acceptBid(int bidId) async {
     try {
       final response = await _apiClient.dio.put('/bids/$bidId/accept');
       if (response.statusCode == 200) {
         await fetchJobs();
-        return true;
+        return {'success': true};
       }
+      final msg = response.data is Map ? response.data['message'] as String? : null;
+      return {'success': false, 'message': msg ?? 'Failed to accept bid'};
+    } on DioException catch (e) {
+      final msg = e.response?.data is Map
+          ? e.response!.data['message'] as String?
+          : null;
+      print('Error accepting bid: $e');
+      return {'success': false, 'message': msg ?? 'Failed to accept bid'};
     } catch (e) {
       print('Error accepting bid: $e');
+      return {'success': false, 'message': 'An error occurred. Please try again.'};
     }
-    return false;
   }
   Future<void> fetchProviderBids() async {
     try {
