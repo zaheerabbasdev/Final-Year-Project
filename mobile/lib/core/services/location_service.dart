@@ -40,8 +40,8 @@ class LocationService {
 
     return await Geolocator.getCurrentPosition(
       locationSettings: const LocationSettings(
-        accuracy: LocationAccuracy.high,
-        timeLimit: Duration(seconds: 30),
+        accuracy: LocationAccuracy.medium, // faster first fix; high accuracy needs satellite lock
+        timeLimit: Duration(seconds: 10),  // was 30 s — fail fast and retry rather than stalling
       ),
     );
   }

@@ -74,7 +74,26 @@ class ChatProvider extends ChangeNotifier {
   }
 
 
-  Future<void> sendMessage(int jobId, int receiverId, String content) async {
+  Future<void> sendMessage(int jobId, int receiverId, String content,
+      {int senderId = 0}) async {
+    // Optimistic update — show the message immediately so the chat feels instant.
+    // We use a negative timestamp-based ID as a temporary local key.
+    final tempId = -(DateTime.now().millisecondsSinceEpoch);
+    if (senderId != 0 && _activeJobId == jobId) {
+      final opt = ChatMessage(
+        id: tempId,
+        jobId: jobId,
+        senderId: senderId,
+        receiverId: receiverId,
+        content: content,
+        imageUrl: null,
+        isRead: false,
+        createdAt: DateTime.now(),
+      );
+      _messages.add(opt);
+      notifyListeners();
+    }
+
     try {
       await _apiClient.dio.post('/messages/send', data: {
         'job_id': jobId,
@@ -82,6 +101,9 @@ class ChatProvider extends ChangeNotifier {
         'content': content,
       });
     } catch (e) {
+      // Roll back the optimistic message on failure
+      _messages.removeWhere((m) => m.id == tempId);
+      notifyListeners();
       print('Error sending message: $e');
     }
   }
@@ -161,7 +183,14 @@ class ChatProvider extends ChangeNotifier {
   }
 
   void receiveMessage(ChatMessage message) {
-    // Check if message already exists (prevents duplicates from socket + optimistic/refresh)
+    // Replace any matching optimistic message (negative temp ID, same sender/content/job)
+    _messages.removeWhere((m) =>
+        m.id < 0 &&
+        m.senderId == message.senderId &&
+        m.content == message.content &&
+        m.jobId == message.jobId);
+
+    // Check if real message already exists (prevents duplicates from socket + refresh)
     if (_messages.any((m) => m.id == message.id)) return;
 
     // Check if this message belongs to the active conversation

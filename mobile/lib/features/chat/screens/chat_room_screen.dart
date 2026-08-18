@@ -552,11 +552,18 @@ class _ChatRoomScreenState extends State<ChatRoomScreen> {
 
   void _sendMessage() {
     if (_messageController.text.trim().isEmpty) return;
-    
+
+    final auth = context.read<AuthService>();
+    final rawId = auth.user?['id'];
+    final senderId = rawId is int
+        ? rawId
+        : (rawId is double ? rawId.toInt() : int.tryParse(rawId?.toString() ?? '') ?? 0);
+
     context.read<ChatProvider>().sendMessage(
       widget.jobId,
       widget.otherUserId,
       _messageController.text.trim(),
+      senderId: senderId,
     );
     _messageController.clear();
     setState(() {}); // Update to show mic icon if needed

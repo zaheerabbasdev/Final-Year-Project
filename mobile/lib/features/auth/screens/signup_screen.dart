@@ -35,6 +35,7 @@ class _SignupScreenState extends State<SignupScreen> {
   XFile? _cnicFile;
   XFile? _certificateFile;
   int? _selectedCategoryId;
+  bool _hasAttemptedSubmit = false; // triggers inline error states on upload fields
 
   @override
   void initState() {
@@ -77,7 +78,17 @@ class _SignupScreenState extends State<SignupScreen> {
   }
 
   void _signup() async {
-    if (!_formKey.currentState!.validate()) return;
+    // Mark as attempted so upload fields reveal their error states
+    setState(() => _hasAttemptedSubmit = true);
+
+    // Validate text fields, avatar, and required uploads all at once so the
+    // user sees every error in one go rather than fixing them one by one.
+    final isFormValid = _formKey.currentState!.validate();
+    final isAvatarValid = _avatarBytes != null;
+    final isCnicValid = _selectedRole != 'provider' || _cnicFile != null;
+
+    if (!isFormValid || !isAvatarValid || !isCnicValid) return;
+
     final lang = context.read<LanguageProvider>();
     if (!_agreeToTerms) {
       Fluttertoast.showToast(
@@ -288,41 +299,77 @@ class _SignupScreenState extends State<SignupScreen> {
                       ],
                     ),
                     const SizedBox(height: 28),
-                    Center(
-                      child: GestureDetector(
-                        onTap: _pickImage,
-                        child: Stack(
-                          children: [
-                            Container(
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(color: AppTheme.primaryColor.withOpacity(0.15), width: 3),
-                              ),
-                              child: CircleAvatar(
-                                radius: 45,
-                                backgroundColor: colors.border,
-                                backgroundImage: _avatarBytes != null ? MemoryImage(_avatarBytes!) : null,
-                                child: _avatarBytes == null 
-                                  ? Icon(Icons.person, size: 45, color: colors.subtext)
-                                  : null,
-                              ),
-                            ),
-                            Positioned(
-                              bottom: 0,
-                              right: 0,
-                              child: Container(
-                                padding: const EdgeInsets.all(6),
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryColor,
-                                  shape: BoxShape.circle,
-                                  border: Border.all(color: Colors.white, width: 2),
+                    Column(
+                      children: [
+                        Center(
+                          child: GestureDetector(
+                            onTap: _pickImage,
+                            child: Stack(
+                              children: [
+                                Container(
+                                  decoration: BoxDecoration(
+                                    shape: BoxShape.circle,
+                                    border: Border.all(
+                                      color: (_hasAttemptedSubmit && _avatarBytes == null)
+                                          ? Colors.red.shade400
+                                          : AppTheme.primaryColor.withOpacity(0.15),
+                                      width: 3,
+                                    ),
+                                  ),
+                                  child: CircleAvatar(
+                                    radius: 45,
+                                    backgroundColor: (_hasAttemptedSubmit && _avatarBytes == null)
+                                        ? Colors.red.shade50
+                                        : colors.border,
+                                    backgroundImage: _avatarBytes != null ? MemoryImage(_avatarBytes!) : null,
+                                    child: _avatarBytes == null
+                                        ? Icon(
+                                            Icons.person,
+                                            size: 45,
+                                            color: (_hasAttemptedSubmit && _avatarBytes == null)
+                                                ? Colors.red.shade300
+                                                : colors.subtext,
+                                          )
+                                        : null,
+                                  ),
                                 ),
-                                child: const Icon(Icons.camera_alt, size: 14, color: Colors.white),
-                              ),
+                                Positioned(
+                                  bottom: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: const EdgeInsets.all(6),
+                                    decoration: BoxDecoration(
+                                      color: (_hasAttemptedSubmit && _avatarBytes == null)
+                                          ? Colors.red.shade400
+                                          : AppTheme.primaryColor,
+                                      shape: BoxShape.circle,
+                                      border: Border.all(color: Colors.white, width: 2),
+                                    ),
+                                    child: Icon(
+                                      (_hasAttemptedSubmit && _avatarBytes == null)
+                                          ? Icons.error_outline
+                                          : Icons.camera_alt,
+                                      size: 14,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                              ],
                             ),
-                          ],
+                          ),
                         ),
-                      ),
+                        if (_hasAttemptedSubmit && _avatarBytes == null) ...[
+                          const SizedBox(height: 8),
+                          Text(
+                            lang.t('auth.signup.avatarRequired'),
+                            style: GoogleFonts.outfit(
+                              color: Colors.red.shade600,
+                              fontSize: 12,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ],
                     ),
                     const SizedBox(height: 24),
                     _buildLabel(lang.t('auth.signup.fullName'), colors),
@@ -348,6 +395,10 @@ class _SignupScreenState extends State<SignupScreen> {
                       keyboardType: TextInputType.phone,
                       style: GoogleFonts.outfit(color: colors.text),
                       decoration: InputDecoration(hintText: lang.t('auth.signup.phoneHint')),
+                      validator: (v) =>
+                          (v == null || v.trim().isEmpty)
+                              ? lang.t('auth.signup.phoneRequired')
+                              : null,
                     ),
                     if (_selectedRole == 'provider') ...[
                       const SizedBox(height: 20),
@@ -427,15 +478,18 @@ class _SignupScreenState extends State<SignupScreen> {
                         onTap: _pickCnic,
                         isSelected: _cnicFile != null,
                         colors: colors,
+                        hasError: _hasAttemptedSubmit && _cnicFile == null,
+                        errorText: lang.t('auth.signup.cnicRequired'),
                       ),
                       const SizedBox(height: 20),
-                      _buildLabel(lang.t('auth.signup.uploadCertificates'), colors),
+                      _buildUploadLabel(lang.t('auth.signup.uploadCertificates'), lang.t('auth.signup.optional'), colors),
                       _buildFileUploadTile(
                         title: _certificateFile == null ? lang.t('auth.signup.selectCertificate') : _certificateFile!.name,
                         icon: Icons.card_membership_outlined,
                         onTap: _pickCertificate,
                         isSelected: _certificateFile != null,
                         colors: colors,
+                        hintText: lang.t('auth.signup.certificatesHint'),
                       ),
                     ],
                     const SizedBox(height: 20),
@@ -573,48 +627,140 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
+  /// Label row with an "(Optional)" badge — used for non-required upload fields.
+  Widget _buildUploadLabel(String text, String optionalLabel, AppColors colors) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 8.0),
+      child: Row(
+        children: [
+          Text(
+            text,
+            style: GoogleFonts.outfit(
+              fontSize: 14,
+              fontWeight: FontWeight.w600,
+              color: colors.text,
+            ),
+          ),
+          const SizedBox(width: 8),
+          Container(
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+            decoration: BoxDecoration(
+              color: colors.border,
+              borderRadius: BorderRadius.circular(8),
+            ),
+            child: Text(
+              optionalLabel,
+              style: GoogleFonts.outfit(
+                fontSize: 11,
+                fontWeight: FontWeight.w500,
+                color: colors.subtext,
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
   Widget _buildFileUploadTile({
     required String title,
     required IconData icon,
     required VoidCallback onTap,
     required bool isSelected,
     required AppColors colors,
+    bool hasError = false,
+    String? errorText,
+    String? hintText,
   }) {
-    return InkWell(
-      onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
-      child: Container(
-        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-        decoration: BoxDecoration(
-          color: isSelected ? AppTheme.primaryColor.withOpacity(0.05) : colors.surface,
+    final borderColor = hasError
+        ? Colors.red.shade400
+        : isSelected
+            ? AppTheme.primaryColor
+            : colors.border;
+    final bgColor = hasError
+        ? Colors.red.shade50
+        : isSelected
+            ? AppTheme.primaryColor.withOpacity(0.05)
+            : colors.surface;
+    final iconColor = hasError
+        ? Colors.red.shade400
+        : isSelected
+            ? AppTheme.primaryColor
+            : colors.subtext;
+    final textColor = hasError
+        ? Colors.red.shade700
+        : isSelected
+            ? colors.text
+            : colors.subtext;
+
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        InkWell(
+          onTap: onTap,
           borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: isSelected ? AppTheme.primaryColor : colors.border,
-            width: isSelected ? 1.5 : 1,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(icon, size: 22, color: isSelected ? AppTheme.primaryColor : colors.subtext),
-            const SizedBox(width: 12),
-            Expanded(
-              child: Text(
-                title,
-                style: GoogleFonts.outfit(
-                  color: isSelected ? colors.text : colors.subtext,
-                  fontSize: 14,
-                  fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
-                ),
-                overflow: TextOverflow.ellipsis,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+            decoration: BoxDecoration(
+              color: bgColor,
+              borderRadius: BorderRadius.circular(16),
+              border: Border.all(
+                color: borderColor,
+                width: (hasError || isSelected) ? 1.5 : 1,
               ),
             ),
-            if (isSelected)
-              const Icon(Icons.check_circle, size: 20, color: AppTheme.primaryColor)
-            else
-              Icon(Icons.add_a_photo_outlined, size: 20, color: colors.subtext),
-          ],
+            child: Row(
+              children: [
+                Icon(icon, size: 22, color: iconColor),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    title,
+                    style: GoogleFonts.outfit(
+                      color: textColor,
+                      fontSize: 14,
+                      fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+                if (isSelected)
+                  const Icon(Icons.check_circle, size: 20, color: AppTheme.primaryColor)
+                else if (hasError)
+                  Icon(Icons.error_outline, size: 20, color: Colors.red.shade400)
+                else
+                  Icon(Icons.add_a_photo_outlined, size: 20, color: colors.subtext),
+              ],
+            ),
+          ),
         ),
-      ),
+        if (hasError && errorText != null) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              errorText,
+              style: GoogleFonts.outfit(
+                color: Colors.red.shade600,
+                fontSize: 12,
+                fontWeight: FontWeight.w500,
+              ),
+            ),
+          ),
+        ] else if (!isSelected && hintText != null) ...[
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              hintText,
+              style: GoogleFonts.outfit(
+                color: colors.subtext,
+                fontSize: 12,
+              ),
+            ),
+          ),
+        ],
+      ],
     );
   }
 }
