@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'core/theme.dart';
@@ -99,6 +100,7 @@ class KaarkunApp extends StatefulWidget {
 
 class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
   bool? _wasAuthenticated;
+  bool? _lastIsDark; // tracks last applied SystemChrome style to avoid per-frame calls
   late final GoRouter _router;
 
   @override
@@ -289,12 +291,43 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
       socketService.disconnect();
     }
 
+    // ── System chrome sync ────────────────────────────────────────────────────
+    // Determine effective brightness (handles system, light, and dark modes).
+    final isDark = themeProvider.themeMode == ThemeMode.dark ||
+        (themeProvider.themeMode == ThemeMode.system &&
+            MediaQuery.platformBrightnessOf(context) == Brightness.dark);
+
+    // Only update when theme actually changes — avoids a platform-channel call
+    // on every frame during the AnimatedTheme transition.
+    if (_lastIsDark != isDark) {
+      _lastIsDark = isDark;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (!mounted) return;
+        SystemChrome.setSystemUIOverlayStyle(
+          isDark
+              ? SystemUiOverlayStyle.light.copyWith(
+                  statusBarColor: Colors.transparent,
+                  systemNavigationBarColor: AppTheme.darkBackground,
+                  systemNavigationBarIconBrightness: Brightness.light,
+                )
+              : SystemUiOverlayStyle.dark.copyWith(
+                  statusBarColor: Colors.transparent,
+                  systemNavigationBarColor: AppTheme.lightBackground,
+                  systemNavigationBarIconBrightness: Brightness.dark,
+                ),
+        );
+      });
+    }
+
     return MaterialApp.router(
       debugShowCheckedModeBanner: false,
       title: 'Kaarkun',
       theme: AppTheme.lightTheme,
       darkTheme: AppTheme.darkTheme,
       themeMode: themeProvider.themeMode,
+      // Smooth 300 ms cross-fade instead of the default 200 ms snap
+      themeAnimationDuration: const Duration(milliseconds: 300),
+      themeAnimationCurve: Curves.easeInOut,
       routerConfig: _router,
     );
   }

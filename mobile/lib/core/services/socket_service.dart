@@ -69,9 +69,8 @@ class SocketService {
       return;
     }
 
-    // Clean up any stale disconnected socket so listeners don't double-fire
+    // Clean up any stale disconnected socket before creating a fresh one
     if (_socket != null) {
-      _socket!.off();
       _socket!.disconnect();
       _socket = null;
     }
@@ -203,7 +202,6 @@ class SocketService {
   void disconnect() {
     _isConnecting = false;
     _lastUserId = null;
-    _socket?.off();
     _socket?.disconnect();
     _socket = null;
   }
