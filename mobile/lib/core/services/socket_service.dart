@@ -12,6 +12,12 @@ class SocketService {
   final NotificationService _notificationService;
   final ChatProvider _chatProvider;
 
+  // Stored so we can re-emit join_room after a fresh connect / reconnect
+  dynamic _lastUserId;
+
+  // Guard: prevents duplicate _establishConnection calls while connecting
+  bool _isConnecting = false;
+
   // Location tracking callbacks
   Function(Map<String, dynamic>)? _onProviderLocation;
   Function(Map<String, dynamic>)? _onProviderLocationStopped;
@@ -25,15 +31,17 @@ class SocketService {
     };
   }
 
-
+  bool get isConnected => _socket?.connected == true;
 
   void connect(dynamic userId) {
-    // Force to int if it's a double/number to avoid "user_1.0" room names
+    // Normalise to int to avoid "user_1.0" room names
     if (userId is double) {
       userId = userId.toInt();
     } else if (userId is String) {
       userId = int.tryParse(userId) ?? userId;
     }
+
+    _lastUserId = userId;
 
     logDebug('SocketService.connect called with userId: $userId (type: ${userId.runtimeType})');
 
@@ -43,13 +51,30 @@ class SocketService {
       return;
     }
 
+    // Prevent multiple concurrent connection attempts (build() fires often)
+    if (_isConnecting) {
+      logDebug('Socket already connecting — skipping duplicate attempt');
+      return;
+    }
+
+    _isConnecting = true;
     // Fetch the auth token before opening the connection — the backend
     // rejects the handshake without it.
     TokenStorage.getToken().then((token) => _establishConnection(token));
   }
 
   void _establishConnection(String? token) {
-    if (_socket != null && _socket!.connected) return;
+    if (_socket != null && _socket!.connected) {
+      _isConnecting = false;
+      return;
+    }
+
+    // Clean up any stale disconnected socket so listeners don't double-fire
+    if (_socket != null) {
+      _socket!.off();
+      _socket!.disconnect();
+      _socket = null;
+    }
 
     final serverUrl = ApiClient.baseUrl.replaceAll('/api', '');
 
@@ -62,7 +87,12 @@ class SocketService {
     _socket!.connect();
 
     _socket!.onConnect((_) {
+      _isConnecting = false;
       logDebug('Socket connected: ${_socket!.id}');
+      // Always join the user's room on connect *and* reconnect
+      if (_lastUserId != null) {
+        _socket!.emit('join_room', _lastUserId);
+      }
     });
 
     _socket!.on('new_notification', (data) {
@@ -102,10 +132,16 @@ class SocketService {
     });
 
     _socket!.onDisconnect((_) {
+      // Allow connect() to create a fresh socket on the next call
+      _isConnecting = false;
       logDebug('Socket disconnected');
     });
 
-    _socket!.onConnectError((err) => logDebug('Socket Connect Error: $err'));
+    _socket!.onConnectError((err) {
+      _isConnecting = false;
+      logDebug('Socket Connect Error: $err');
+    });
+
     _socket!.onError((err) => logDebug('Socket Error: $err'));
   }
 
@@ -120,7 +156,16 @@ class SocketService {
   }) {
     logDebug('emitLocationUpdate - socket connected: ${_socket?.connected}');
 
-    _socket?.emit('location_update', {
+    if (_socket?.connected != true) {
+      // Socket not ready — trigger reconnect so the *next* GPS emission lands
+      logDebug('emitLocationUpdate - socket not connected, triggering reconnect');
+      if (_lastUserId != null) {
+        connect(_lastUserId);
+      }
+      return;
+    }
+
+    _socket!.emit('location_update', {
       'jobId': jobId,
       'customerId': customerId,
       'latitude': latitude,
@@ -156,6 +201,9 @@ class SocketService {
   }
 
   void disconnect() {
+    _isConnecting = false;
+    _lastUserId = null;
+    _socket?.off();
     _socket?.disconnect();
     _socket = null;
   }
