@@ -33,7 +33,7 @@ class ChatMessage {
       content: json['content'] ?? '',
       imageUrl: json['image_url'],
       isRead: json['is_read'] == 1 || json['is_read'] == true,
-      createdAt: DateTime.parse(json['created_at']),
+      createdAt: DateTime.parse(json['created_at']).toLocal(),
       senderName: json['sender_name'],
       senderAvatar: json['sender_avatar'],
     );
@@ -86,7 +86,7 @@ class ChatSummary {
       otherUserAvatar: json['other_user_avatar'],
       otherUserRole: json['other_user_role'],
       lastMessage: json['content'] ?? '',
-      lastMessageTime: DateTime.parse(json['created_at']),
+      lastMessageTime: DateTime.parse(json['created_at']).toLocal(),
       isRead: json['is_read'] == 1 || json['is_read'] == true,
     );
   }
