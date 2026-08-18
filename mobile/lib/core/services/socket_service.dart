@@ -12,23 +12,19 @@ class SocketService {
   final NotificationService _notificationService;
   final ChatProvider _chatProvider;
 
-  // Stored so we can re-emit join_room after a fresh connect / reconnect
+  // Stored so we can re-emit join_room after reconnect
   dynamic _lastUserId;
 
-  // Guard: prevents duplicate _establishConnection calls while connecting
-  bool _isConnecting = false;
+  // Prevents duplicate socket creation (build() is called on every rebuild)
+  bool _isCreating = false;
 
   // Location tracking callbacks
   Function(Map<String, dynamic>)? _onProviderLocation;
   Function(Map<String, dynamic>)? _onProviderLocationStopped;
 
   SocketService(this._notificationService, this._chatProvider) {
-    _chatProvider.onEmitTyping = (data) {
-      _socket?.emit('typing', data);
-    };
-    _chatProvider.onEmitStopTyping = (data) {
-      _socket?.emit('stop_typing', data);
-    };
+    _chatProvider.onEmitTyping = (data) => _socket?.emit('typing', data);
+    _chatProvider.onEmitStopTyping = (data) => _socket?.emit('stop_typing', data);
   }
 
   bool get isConnected => _socket?.connected == true;
@@ -42,56 +38,63 @@ class SocketService {
     }
 
     _lastUserId = userId;
-
     logDebug('SocketService.connect called with userId: $userId (type: ${userId.runtimeType})');
 
     if (_socket != null && _socket!.connected) {
+      // Already up — just re-join the room (safe to call repeatedly)
       logDebug('Socket already connected, re-emitting join_room');
       _socket!.emit('join_room', userId);
       return;
     }
 
-    // Prevent multiple concurrent connection attempts (build() fires often)
-    if (_isConnecting) {
-      logDebug('Socket already connecting — skipping duplicate attempt');
+    if (_socket != null && !_socket!.connected) {
+      // Socket exists but is in the middle of socket.io's own reconnection
+      // back-off loop.  Do NOT touch it — onConnect will fire when ready.
+      logDebug('Socket reconnecting via built-in retry — will join_room on connect');
       return;
     }
 
-    _isConnecting = true;
-    // Fetch the auth token before opening the connection — the backend
-    // rejects the handshake without it.
-    TokenStorage.getToken().then((token) => _establishConnection(token));
+    // _socket == null: first connection or after an explicit disconnect()
+    if (_isCreating) {
+      logDebug('Socket creation already in progress — skipping duplicate');
+      return;
+    }
+
+    _isCreating = true;
+    TokenStorage.getToken().then((token) => _createSocket(token));
   }
 
-  void _establishConnection(String? token) {
-    if (_socket != null && _socket!.connected) {
-      _isConnecting = false;
-      return;
-    }
-
-    // Clean up any stale disconnected socket before creating a fresh one
-    if (_socket != null) {
-      _socket!.disconnect();
-      _socket = null;
-    }
+  void _createSocket(String? token) {
+    _isCreating = false;
+    if (_socket != null) return; // lost the race to another call
 
     final serverUrl = ApiClient.baseUrl.replaceAll('/api', '');
+    logDebug('Creating socket → $serverUrl');
 
     _socket = IO.io(serverUrl, <String, dynamic>{
       'transports': ['websocket'],
       'autoConnect': false,
       'auth': {'token': token},
+      // Let socket.io's built-in back-off loop handle reconnection.
+      // Reconnect every 1–10 s so location gaps are short.
+      'reconnection': true,
+      'reconnectionDelay': 1000,
+      'reconnectionDelayMax': 10000,
     });
 
     _socket!.connect();
 
     _socket!.onConnect((_) {
-      _isConnecting = false;
       logDebug('Socket connected: ${_socket!.id}');
-      // Always join the user's room on connect *and* reconnect
-      if (_lastUserId != null) {
-        _socket!.emit('join_room', _lastUserId);
-      }
+      // Re-join user room on every connect and reconnect
+      if (_lastUserId != null) _socket!.emit('join_room', _lastUserId);
+    });
+
+    _socket!.on('reconnect', (_) {
+      // Belt-and-suspenders: some socket.io versions fire this instead
+      // of (or in addition to) onConnect after a reconnect
+      logDebug('Socket reconnect event — re-joining room');
+      if (_lastUserId != null) _socket!.emit('join_room', _lastUserId);
     });
 
     _socket!.on('new_notification', (data) {
@@ -118,27 +121,24 @@ class SocketService {
     // ─── Live Location Tracking Listeners ───────────────────────────────
     _socket!.on('provider_location', (data) {
       logDebug('Provider location received: $data');
-      if (_onProviderLocation != null) {
-        _onProviderLocation!(data);
-      }
+      _onProviderLocation?.call(data);
     });
 
     _socket!.on('provider_location_stopped', (data) {
       logDebug('Provider location stopped: $data');
-      if (_onProviderLocationStopped != null) {
-        _onProviderLocationStopped!(data);
-      }
+      _onProviderLocationStopped?.call(data);
     });
 
     _socket!.onDisconnect((_) {
-      // Allow connect() to create a fresh socket on the next call
-      _isConnecting = false;
-      logDebug('Socket disconnected');
+      // Do NOT null _socket here — socket.io's built-in reconnection needs
+      // the existing socket object to retry.  onConnect will fire again
+      // when the connection is restored.
+      logDebug('Socket disconnected — built-in reconnection will retry');
     });
 
     _socket!.onConnectError((err) {
-      _isConnecting = false;
-      logDebug('Socket Connect Error: $err');
+      // Same: don't destroy the socket.  socket.io will back off and retry.
+      logDebug('Socket Connect Error: $err — socket.io will retry');
     });
 
     _socket!.onError((err) => logDebug('Socket Error: $err'));
@@ -156,11 +156,10 @@ class SocketService {
     logDebug('emitLocationUpdate - socket connected: ${_socket?.connected}');
 
     if (_socket?.connected != true) {
-      // Socket not ready — trigger reconnect so the *next* GPS emission lands
-      logDebug('emitLocationUpdate - socket not connected, triggering reconnect');
-      if (_lastUserId != null) {
-        connect(_lastUserId);
-      }
+      // Socket is in socket.io's reconnection back-off loop.
+      // Skip this GPS update — the next one will arrive in a few seconds
+      // and will find the socket ready once it reconnects.
+      logDebug('emitLocationUpdate - socket reconnecting, update skipped');
       return;
     }
 
@@ -200,7 +199,7 @@ class SocketService {
   }
 
   void disconnect() {
-    _isConnecting = false;
+    _isCreating = false;
     _lastUserId = null;
     _socket?.disconnect();
     _socket = null;
