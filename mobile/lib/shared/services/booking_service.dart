@@ -65,6 +65,29 @@ class BookingService extends ChangeNotifier {
     }
   }
 
+  /// Returns the booking with [bookingId] from the current user's booking list.
+  /// Used by the provider's QR screen to poll for status changes (confirmed →
+  /// in_progress) after the customer scans the QR code.
+  Future<Map<String, dynamic>?> getBookingById(int bookingId) async {
+    try {
+      final response = await _apiClient.dio.get('/bookings/my');
+      if (response.data is List) {
+        for (final item in response.data as List) {
+          final b = item as Map<String, dynamic>;
+          final rawId = b['id'];
+          if (rawId == bookingId ||
+              rawId?.toString() == bookingId.toString()) {
+            return b;
+          }
+        }
+      }
+      return null;
+    } catch (e) {
+      print('Error fetching booking by id: $e');
+      return null;
+    }
+  }
+
   Future<bool> cancelBooking(int bookingId) async {
     try {
       final response = await _apiClient.dio.put('/bookings/$bookingId/cancel');

@@ -473,6 +473,7 @@ const Map<String, dynamic> enTranslations = {
     'verifyPin': 'Verify PIN',
     'success': 'Handshake Successful! Job started.',
     'invalidQR': 'Invalid QR Code. Please try again.',
+    'qrScanned': 'QR scanned! Job is now in progress.',
   },
   'splash': {
     'tagline': 'Your Service Marketplace',
@@ -1018,6 +1019,7 @@ const Map<String, dynamic> urTranslations = {
     'verifyPin': 'پن تصدیق کریں',
     'success': 'ہینڈشیک کامیاب! کام شروع ہو گیا۔',
     'invalidQR': 'غلط QR کوڈ۔ دوبارہ کوشش کریں۔',
+    'qrScanned': 'QR اسکین ہو گیا! کام شروع ہو گیا۔',
   },
   'splash': {
     'tagline': 'آپ کا سروس مارکیٹ پلیس',

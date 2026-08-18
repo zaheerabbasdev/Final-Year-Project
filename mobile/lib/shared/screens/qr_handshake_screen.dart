@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:qr_flutter/qr_flutter.dart';
@@ -7,6 +8,7 @@ import '../../core/services/handshake_service.dart';
 import '../../features/customer/job_service.dart';
 import '../../core/providers/language_provider.dart';
 import '../../core/theme.dart';
+import '../services/booking_service.dart';
 
 class QrHandshakeScreen extends StatefulWidget {
   final int bookingId;
@@ -26,13 +28,61 @@ class _QrHandshakeScreenState extends State<QrHandshakeScreen> {
   String? _handshakeToken;
   bool _isVerifying = false;
 
+  // Provider side: poll booking status every 3 s so the screen auto-closes
+  // as soon as the customer scans the QR (backend flips status → in_progress).
+  Timer? _pollTimer;
+
   @override
   void initState() {
     super.initState();
     if (widget.isProvider) {
       _fetchToken();
+      _startPolling();
     }
   }
+
+  @override
+  void dispose() {
+    _pollTimer?.cancel();
+    super.dispose();
+  }
+
+  // ── Polling ────────────────────────────────────────────────────────────────
+
+  void _startPolling() {
+    _pollTimer = Timer.periodic(const Duration(seconds: 3), (_) {
+      _checkIfScanned();
+    });
+  }
+
+  Future<void> _checkIfScanned() async {
+    if (!mounted) return;
+    final booking = await context
+        .read<BookingService>()
+        .getBookingById(widget.bookingId);
+    if (!mounted) return;
+
+    if (booking != null && booking['status'] == 'in_progress') {
+      _pollTimer?.cancel();
+      context.read<JobService>().fetchJobs();
+      final lang = context.read<LanguageProvider>();
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            lang.t('handshake.qrScanned'),
+            style: GoogleFonts.outfit(color: Colors.white),
+          ),
+          backgroundColor: AppTheme.successColor,
+          behavior: SnackBarBehavior.floating,
+          shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+          margin: const EdgeInsets.all(12),
+        ),
+      );
+      Navigator.of(context).pop(true);
+    }
+  }
+
+  // ── Token fetch ────────────────────────────────────────────────────────────
 
   Future<void> _fetchToken() async {
     final handshakeService = context.read<HandshakeService>();
