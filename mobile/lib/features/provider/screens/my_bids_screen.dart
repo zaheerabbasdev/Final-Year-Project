@@ -19,22 +19,19 @@ class MyBidsScreen extends StatefulWidget {
 }
 
 class _MyBidsScreenState extends State<MyBidsScreen> {
-  bool _isLoading = true;
-
+  // Data is pre-loaded by SyncProvider; only re-fetch when list is empty.
   @override
   void initState() {
     super.initState();
-    _loadBids();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      if (context.read<JobService>().providerBids.isEmpty) {
+        context.read<JobService>().fetchProviderBids();
+      }
+    });
   }
 
   Future<void> _loadBids() async {
-    setState(() => _isLoading = true);
     await context.read<JobService>().fetchProviderBids();
-    if (mounted) {
-      setState(() {
-        _isLoading = false;
-      });
-    }
   }
 
   @override
@@ -136,7 +133,7 @@ class _MyBidsScreenState extends State<MyBidsScreen> {
 
   Widget _buildBidsList(List<dynamic> bids, AppColors colors) {
     final lang = context.read<LanguageProvider>();
-    if (_isLoading) {
+    if (context.read<JobService>().isLoading) {
       return const Center(child: CircularProgressIndicator(color: AppTheme.primaryColor));
     }
     if (bids.isEmpty) {

@@ -29,11 +29,7 @@ class _ProviderDashboardScreenState extends State<ProviderDashboardScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<JobService>().fetchJobs();
-      context.read<JobService>().fetchProviderBids();
-      context.read<ProviderService>().fetchDashboardStats();
-    });
+    // Data is pre-loaded by SyncProvider on login and resume.
   }
 
   Future<void> _toggleNearMe() async {

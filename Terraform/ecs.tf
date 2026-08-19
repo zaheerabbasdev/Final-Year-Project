@@ -379,6 +379,11 @@ resource "aws_lb" "main" {
   load_balancer_type = "application"
   security_groups    = [aws_security_group.alb.id]
   subnets            = [aws_subnet.public_a.id, aws_subnet.public_b.id]
+
+  # Extend idle timeout so WebSocket connections (Socket.IO) are not
+  # dropped between heartbeats.  Socket.IO pings every 25 s; 300 s gives
+  # plenty of headroom on slow mobile networks.
+  idle_timeout = 300
 }
 
 resource "aws_lb_target_group" "backend" {
@@ -443,6 +448,25 @@ resource "aws_lb_listener" "http" {
       target_group {
         arn = aws_lb_target_group.frontend.arn
       }
+    }
+  }
+}
+
+resource "aws_lb_listener_rule" "socketio" {
+  listener_arn = aws_lb_listener.http.arn
+  priority     = 5   # must be before the /api/* rule
+
+  action {
+    type             = "forward"
+    target_group_arn = aws_lb_target_group.backend.arn
+  }
+
+  condition {
+    path_pattern {
+      # Socket.IO upgrade requests land here — without this rule the ALB
+      # forwards /socket.io/* to the frontend (Next.js), which has no
+      # socket.io server, causing a connection timeout on the client.
+      values = ["/socket.io", "/socket.io/*"]
     }
   }
 }

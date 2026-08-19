@@ -23,9 +23,8 @@ class JobService extends ChangeNotifier {
         final cleanFilters = Map<String, dynamic>.from(filters)..remove('recommended');
         try {
           response = await _apiClient.dio.get('/ai/matching-jobs', queryParameters: cleanFilters);
-        } catch (aiError) {
+        } catch (_) {
           // AI endpoint failed — fall back to standard job listing
-          print('AI matching endpoint failed, using standard fetch: $aiError');
           final fallbackFilters = Map<String, dynamic>.from(cleanFilters);
           fallbackFilters['status'] = 'open';
           response = await _apiClient.dio.get('/jobs', queryParameters: fallbackFilters);
@@ -33,10 +32,8 @@ class JobService extends ChangeNotifier {
       } else {
         response = await _apiClient.dio.get('/jobs', queryParameters: filters);
       }
-      print('DEBUG: Jobs from API: ${response.data}');
       _jobs = response.data is List ? response.data : [];
     } catch (e) {
-      print('fetchJobs error: $e');
       _jobs = [];
     } finally {
       _isLoading = false;
@@ -68,7 +65,6 @@ class JobService extends ChangeNotifier {
       }
       return false;
     } catch (e) {
-      print('Error creating job: $e');
       return false;
     }
   }
@@ -79,7 +75,7 @@ class JobService extends ChangeNotifier {
       final response = await _apiClient.dio.get('/jobs/$id');
       return response.data;
     } catch (e) {
-      print(e);
+      debugPrint(e.toString());
       return null;
     }
   }
@@ -89,7 +85,7 @@ class JobService extends ChangeNotifier {
       final response = await _apiClient.dio.get('/bids/job/$jobId');
       return response.data;
     } catch (e) {
-      print('Error fetching job bids: $e');
+      debugPrint('Error fetching job bids: $e');
       return [];
     }
   }
@@ -112,10 +108,10 @@ class JobService extends ChangeNotifier {
       final msg = e.response?.data is Map
           ? e.response!.data['message'] as String?
           : null;
-      print('Error accepting bid: $e');
+      debugPrint('Error accepting bid: $e');
       return {'success': false, 'message': msg ?? 'Failed to accept bid'};
     } catch (e) {
-      print('Error accepting bid: $e');
+      debugPrint('Error accepting bid: $e');
       return {'success': false, 'message': 'An error occurred. Please try again.'};
     }
   }
@@ -125,7 +121,7 @@ class JobService extends ChangeNotifier {
       _providerBids = response.data;
       notifyListeners();
     } catch (e) {
-      print('Error fetching provider bids: $e');
+      debugPrint('Error fetching provider bids: $e');
     }
   }
 
@@ -138,7 +134,7 @@ class JobService extends ChangeNotifier {
       }
       return false;
     } catch (e) {
-      print('Error creating bid: $e');
+      debugPrint('Error creating bid: $e');
       return false;
     }
   }
@@ -151,7 +147,7 @@ class JobService extends ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print('Error in express hire: $e');
+      debugPrint('Error in express hire: $e');
     }
     return false;
   }
@@ -161,7 +157,7 @@ class JobService extends ChangeNotifier {
       final response = await _apiClient.dio.get('/ai/suggest-bid/$jobId');
       return response.data;
     } catch (e) {
-      print('Error fetching suggested bid price: $e');
+      debugPrint('Error fetching suggested bid price: $e');
       return null;
     }
   }
@@ -173,7 +169,7 @@ class JobService extends ChangeNotifier {
       });
       return response.data;
     } catch (e) {
-      print('Error getting autocomplete suggestion: $e');
+      debugPrint('Error getting autocomplete suggestion: $e');
       return null;
     }
   }
@@ -186,7 +182,7 @@ class JobService extends ChangeNotifier {
         return true;
       }
     } catch (e) {
-      print('Error cancelling job: $e');
+      debugPrint('Error cancelling job: $e');
     }
     return false;
   }

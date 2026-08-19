@@ -22,7 +22,7 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   final _searchController = TextEditingController();
   // Internal keys — kept in English for comparison logic
   String selectedCategory = 'All Categories';
-  String selectedSort = 'AI Recommended';
+  String selectedSort = 'Most Recent';
   Timer? _debounce;
   bool _isNearMeEnabled = false;
   bool _isLocating = false;
@@ -137,9 +137,14 @@ class _BrowseJobsScreenState extends State<BrowseJobsScreen> {
   @override
   void initState() {
     super.initState();
+    // SyncProvider fetches jobs on login. Only fetch categories if not yet loaded.
     WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<JobService>().fetchJobs(filters: {'status': 'open', 'recommended': true});
-      context.read<CategoryService>().fetchCategories();
+      if (context.read<CategoryService>().categories.isEmpty) {
+        context.read<CategoryService>().fetchCategories();
+      }
+      if (context.read<JobService>().jobs.isEmpty) {
+        context.read<JobService>().fetchJobs(filters: {'status': 'open'});
+      }
     });
   }
 

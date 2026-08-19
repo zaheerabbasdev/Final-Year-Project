@@ -22,7 +22,7 @@ class ProviderService extends ChangeNotifier {
       final response = await _apiClient.dio.get('/users/providers/top');
       _topProviders = response.data;
     } catch (e) {
-      print('Error fetching top providers: $e');
+      debugPrint('Error fetching top providers: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -39,7 +39,7 @@ class ProviderService extends ChangeNotifier {
         _isOnline = _dashboardStats?['is_online'] == true || _dashboardStats?['is_online'] == 1 || _dashboardStats?['is_online'] == 'true';
       }
     } catch (e) {
-      print('Error fetching dashboard stats: $e');
+      debugPrint('Error fetching dashboard stats: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -59,7 +59,7 @@ class ProviderService extends ChangeNotifier {
       }
       return false;
     } catch (e) {
-      print('Error toggling online status: $e');
+      debugPrint('Error toggling online status: $e');
       return false;
     }
   }
@@ -76,7 +76,7 @@ class ProviderService extends ChangeNotifier {
       final response = await _apiClient.dio.get('/users/providers', queryParameters: {'search': query});
       _searchResults = response.data;
     } catch (e) {
-      print('Error searching providers: $e');
+      debugPrint('Error searching providers: $e');
     } finally {
       _isLoading = false;
       notifyListeners();
@@ -88,7 +88,7 @@ class ProviderService extends ChangeNotifier {
       final response = await _apiClient.dio.get('/users/$id');
       return response.data;
     } catch (e) {
-      print('Error fetching user by ID: $e');
+      debugPrint('Error fetching user by ID: $e');
       return null;
     }
   }

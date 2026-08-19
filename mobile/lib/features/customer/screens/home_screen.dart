@@ -45,11 +45,8 @@ class _CustomerHomeScreenState extends State<CustomerHomeScreen> {
   @override
   void initState() {
     super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      context.read<CategoryService>().fetchCategories();
-      context.read<JobService>().fetchJobs();
-      context.read<ProviderService>().fetchTopProviders();
-    });
+    // Data is pre-loaded by SyncProvider on login and resume.
+    // Pull-to-refresh (RefreshIndicator) handles manual re-fetching.
   }
 
   @override

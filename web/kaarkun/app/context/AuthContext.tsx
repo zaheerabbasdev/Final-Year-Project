@@ -1,8 +1,23 @@
 'use client';
 
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import React, { createContext, useContext, useState, useEffect, useMemo, useCallback } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '../utils/api';
+
+// Helpers to sync an httpOnly-style cookie so the middleware can gate routes
+// without touching localStorage (which is unavailable on the server).
+const AUTH_COOKIE = 'kk_auth';
+const COOKIE_MAX_AGE = 60 * 60 * 24 * 7; // 7 days
+
+function setAuthCookie() {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${AUTH_COOKIE}=1; path=/; max-age=${COOKIE_MAX_AGE}; SameSite=Lax`;
+}
+
+function clearAuthCookie() {
+  if (typeof document === 'undefined') return;
+  document.cookie = `${AUTH_COOKIE}=; path=/; max-age=0`;
+}
 
 interface User {
   id: number;
@@ -46,10 +61,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       try {
         setToken(storedToken);
         setUser(JSON.parse(storedUser));
+        setAuthCookie(); // keep cookie in sync with localStorage
       } catch (e) {
         console.error('Failed to parse stored user', e);
         localStorage.removeItem('token');
         localStorage.removeItem('user');
+        clearAuthCookie();
       }
     }
     setLoading(false);
@@ -63,6 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (data.token && data.user) {
         localStorage.setItem('token', data.token);
         localStorage.setItem('user', JSON.stringify(data.user));
+        setAuthCookie();
         setToken(data.token);
         setUser(data.user);
         
@@ -107,35 +125,37 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
+  const logout = useCallback(() => {
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    clearAuthCookie();
     setToken(null);
     setUser(null);
     router.push('/login');
-  };
+  }, [router]);
 
-  const updateUser = (updatedUser: Partial<User>) => {
+  const updateUser = useCallback((updatedUser: Partial<User>) => {
     if (user) {
       const newUser = { ...user, ...updatedUser };
       setUser(newUser);
       localStorage.setItem('user', JSON.stringify(newUser));
     }
-  };
+  }, [user]);
+
+  const value = useMemo(() => ({
+    user,
+    token,
+    loading,
+    login,
+    register,
+    verifyOtp,
+    logout,
+    updateUser,
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [user, token, loading, logout, updateUser]);
 
   return (
-    <AuthContext.Provider
-      value={{
-        user,
-        token,
-        loading,
-        login,
-        register,
-        verifyOtp,
-        logout,
-        updateUser,
-      }}
-    >
+    <AuthContext.Provider value={value}>
       {children}
     </AuthContext.Provider>
   );

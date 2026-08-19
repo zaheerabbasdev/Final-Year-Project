@@ -1,4 +1,3 @@
-import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -85,6 +84,7 @@ class MainNavigationScreen extends StatelessWidget {
             child: SafeArea(
               child: Container(
                 height: 72,
+                clipBehavior: Clip.antiAlias,
                 decoration: BoxDecoration(
                   gradient: LinearGradient(
                     colors: isDark
@@ -114,11 +114,7 @@ class MainNavigationScreen extends StatelessWidget {
                     ),
                   ],
                 ),
-                child: ClipRRect(
-                  borderRadius: BorderRadius.circular(28),
-                  child: BackdropFilter(
-                    filter: ImageFilter.blur(sigmaX: 16, sigmaY: 16),
-                    child: Padding(
+                child: Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 12),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -189,9 +185,7 @@ class MainNavigationScreen extends StatelessWidget {
                         }),
                       ),
                     ),
-                  ),
                 ),
-              ),
             ),
           ),
         ],
