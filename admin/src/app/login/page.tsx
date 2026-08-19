@@ -2,7 +2,7 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { Zap, Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, AlertCircle, Loader2 } from 'lucide-react';
 
 export default function LoginPage() {
   const [email,       setEmail]       = useState('');
@@ -50,9 +50,11 @@ export default function LoginPage() {
         <div className="bg-[var(--surface)] border border-[var(--border-color)] rounded-3xl shadow-2xl shadow-black/10 p-8">
           {/* Logo */}
           <div className="flex flex-col items-center gap-3 mb-8">
-            <div className="h-14 w-14 bg-gradient-to-br from-blue-600 to-sky-500 rounded-2xl flex items-center justify-center shadow-lg shadow-blue-500/25">
-              <Zap size={28} className="text-white" />
-            </div>
+            <img
+              src="/icon.png"
+              alt="Kaarkun"
+              className="h-16 w-16 rounded-2xl shadow-lg shadow-blue-500/25 object-cover"
+            />
             <div className="text-center">
               <h1 className="text-2xl font-bold text-[var(--text)] tracking-tight">Admin Console</h1>
               <p className="text-sm text-[var(--subtext)] mt-0.5">Kaarkun Marketplace Management</p>

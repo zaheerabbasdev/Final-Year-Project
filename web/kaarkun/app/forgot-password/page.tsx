@@ -4,7 +4,7 @@ import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '../context/LanguageContext';
-import { KeyRound, Mail, Lock, ArrowLeft, CheckCircle2, AlertCircle } from 'lucide-react';
+import { KeyRound, Mail, Lock, ArrowLeft, CheckCircle2, AlertCircle, Eye, EyeOff } from 'lucide-react';
 
 // ── tiny API helper (no auth needed) ────────────────────────────────────────
 const API = process.env.NEXT_PUBLIC_API_URL ?? 'http://localhost:5000/api';
@@ -173,8 +173,9 @@ export default function ForgotPasswordPage() {
                     className="block w-full pl-9 pr-10 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                   />
                   <button type="button" onClick={() => setShowNew(v => !v)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 text-xs">
-                    {showNew ? 'Hide' : 'Show'}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                    tabIndex={-1}>
+                    {showNew ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>
@@ -195,8 +196,9 @@ export default function ForgotPasswordPage() {
                     className="block w-full pl-9 pr-10 py-2.5 border border-zinc-200 dark:border-zinc-700 rounded-lg bg-white dark:bg-zinc-900 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                   />
                   <button type="button" onClick={() => setShowConfirm(v => !v)}
-                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 text-xs">
-                    {showConfirm ? 'Hide' : 'Show'}
+                    className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                    tabIndex={-1}>
+                    {showConfirm ? <EyeOff size={18} /> : <Eye size={18} />}
                   </button>
                 </div>
               </div>

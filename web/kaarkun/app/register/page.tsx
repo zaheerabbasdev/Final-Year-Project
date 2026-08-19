@@ -15,7 +15,9 @@ import {
   Upload,
   AlertCircle,
   CheckCircle,
-  FileCheck
+  FileCheck,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 
 interface Category {
@@ -52,6 +54,7 @@ export default function RegisterPage() {
   const [cnic, setCnic] = useState<File | null>(null);
   const [certificates, setCertificates] = useState<File | null>(null);
 
+  const [showPassword, setShowPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [localLoading, setLocalLoading] = useState(false);
@@ -238,14 +241,22 @@ export default function RegisterPage() {
                   <Lock size={18} />
                 </div>
                 <input
-                  type="password"
+                  type={showPassword ? 'text' : 'password'}
                   required
                   minLength={8}
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="block w-full pl-10 pr-3 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
+                  className="block w-full pl-10 pr-10 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
                   placeholder={t('auth.register.passwordPlaceholder')}
                 />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(v => !v)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
               </div>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{t('auth.register.passwordHint')}</p>
             </div>
