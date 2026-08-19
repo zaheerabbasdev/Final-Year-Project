@@ -311,7 +311,7 @@ export default function RegisterPage() {
               {t('auth.register.profilePhoto')}
             </label>
             <div className="flex items-center gap-4">
-              <label tabIndex={0} className="flex items-center justify-center px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors gap-2">
+              <label tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }} className="flex items-center justify-center px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors gap-2">
                 <Upload size={16} />
                 {t('auth.register.choosePhoto')}
                 <input
@@ -373,7 +373,7 @@ export default function RegisterPage() {
                     {t('auth.register.cnicLabel')}
                   </label>
                   <div className="flex items-center gap-3">
-                    <label tabIndex={0} className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
+                    <label tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }} className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
                       <Upload size={16} />
                       {t('auth.register.uploadCnic')}
                       <input
@@ -393,7 +393,7 @@ export default function RegisterPage() {
                     Certifications
                   </label>
                   <div className="flex items-center gap-3">
-                    <label tabIndex={0} className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
+                    <label tabIndex={0} onKeyDown={(e) => { if (e.key === 'Enter' || e.key === ' ') e.currentTarget.click(); }} className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
                       <Upload size={16} />
                       {t('auth.register.uploadFile')}
                       <input
