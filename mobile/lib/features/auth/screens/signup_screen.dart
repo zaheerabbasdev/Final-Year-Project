@@ -37,6 +37,24 @@ class _SignupScreenState extends State<SignupScreen> {
   int? _selectedCategoryId;
   bool _hasAttemptedSubmit = false; // triggers inline error states on upload fields
 
+  void _resetForm() {
+    _nameController.clear();
+    _emailController.clear();
+    _phoneController.clear();
+    _passwordController.clear();
+    _confirmPasswordController.clear();
+    _experienceController.clear();
+    _avatarFile = null;
+    _avatarBytes = null;
+    _cnicFile = null;
+    _certificateFile = null;
+    _selectedCategoryId = null;
+    _isPasswordVisible = false;
+    _isConfirmPasswordVisible = false;
+    _agreeToTerms = false;
+    _hasAttemptedSubmit = false;
+  }
+
   @override
   void initState() {
     super.initState();
@@ -284,7 +302,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             title: lang.t('auth.signup.hireServices'),
                             icon: Icons.person_outline_rounded,
                             isSelected: _selectedRole == 'customer',
-                            onTap: () => setState(() => _selectedRole = 'customer'),
+                            onTap: () => setState(() { _resetForm(); _selectedRole = 'customer'; }),
                           ),
                         ),
                         const SizedBox(width: 12),
@@ -293,7 +311,7 @@ class _SignupScreenState extends State<SignupScreen> {
                             title: lang.t('auth.signup.offerServices'),
                             icon: Icons.build_outlined,
                             isSelected: _selectedRole == 'provider',
-                            onTap: () => setState(() => _selectedRole = 'provider'),
+                            onTap: () => setState(() { _resetForm(); _selectedRole = 'provider'; }),
                           ),
                         ),
                       ],
@@ -482,7 +500,7 @@ class _SignupScreenState extends State<SignupScreen> {
                         errorText: lang.t('auth.signup.cnicRequired'),
                       ),
                       const SizedBox(height: 20),
-                      _buildUploadLabel(lang.t('auth.signup.uploadCertificates'), lang.t('auth.signup.optional'), colors),
+                      _buildLabel(lang.t('auth.signup.uploadCertificates'), colors),
                       _buildFileUploadTile(
                         title: _certificateFile == null ? lang.t('auth.signup.selectCertificate') : _certificateFile!.name,
                         icon: Icons.card_membership_outlined,
