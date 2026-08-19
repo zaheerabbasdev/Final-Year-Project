@@ -42,6 +42,15 @@ export default function RegisterPage() {
   ]);
 
   const [role, setRole] = useState<'customer' | 'provider'>('customer');
+
+  const resetForm = () => {
+    setFullName(''); setEmail(''); setPhone('');
+    setPassword(''); setConfirmPassword('');
+    setShowPassword(false); setShowConfirmPassword(false);
+    setExperience(''); setCategoryId('');
+    setAvatar(null); setCnic(null); setCertificates(null);
+    setError(null); setSuccessMsg(null);
+  };
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [phone, setPhone] = useState('');
@@ -151,7 +160,7 @@ export default function RegisterPage() {
         <div className="flex bg-zinc-100 dark:bg-zinc-950 p-1.5 rounded-xl border border-zinc-200/50 dark:border-zinc-800/80">
           <button
             type="button"
-            onClick={() => setRole('customer')}
+            onClick={() => { resetForm(); setRole('customer'); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
               role === 'customer'
                 ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
@@ -162,7 +171,7 @@ export default function RegisterPage() {
           </button>
           <button
             type="button"
-            onClick={() => setRole('provider')}
+            onClick={() => { resetForm(); setRole('provider'); }}
             className={`flex-1 py-2 text-sm font-semibold rounded-lg transition-all ${
               role === 'provider'
                 ? 'bg-white dark:bg-zinc-900 text-blue-600 dark:text-blue-400 shadow-sm'
@@ -268,7 +277,7 @@ export default function RegisterPage() {
             </div>
 
             <div className="sm:col-span-2">
-              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('auth.register.confirmPassword') || 'Confirm Password'}</label>
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">Confirm Password</label>
               <div className="mt-1 relative">
                 <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
                   <Lock size={18} />
@@ -302,7 +311,7 @@ export default function RegisterPage() {
               {t('auth.register.profilePhoto')}
             </label>
             <div className="flex items-center gap-4">
-              <label className="flex items-center justify-center px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors gap-2">
+              <label tabIndex={0} className="flex items-center justify-center px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors gap-2">
                 <Upload size={16} />
                 {t('auth.register.choosePhoto')}
                 <input
@@ -364,7 +373,7 @@ export default function RegisterPage() {
                     {t('auth.register.cnicLabel')}
                   </label>
                   <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
+                    <label tabIndex={0} className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
                       <Upload size={16} />
                       {t('auth.register.uploadCnic')}
                       <input
@@ -381,10 +390,10 @@ export default function RegisterPage() {
 
                 <div>
                   <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
-                    {t('auth.register.certificationsLabel')}
+                    Certifications
                   </label>
                   <div className="flex items-center gap-3">
-                    <label className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
+                    <label tabIndex={0} className="flex items-center gap-2 px-4 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg text-sm font-medium text-zinc-700 dark:text-zinc-300 bg-white dark:bg-zinc-950 hover:bg-zinc-50 dark:hover:bg-zinc-900 cursor-pointer transition-colors">
                       <Upload size={16} />
                       {t('auth.register.uploadFile')}
                       <input
