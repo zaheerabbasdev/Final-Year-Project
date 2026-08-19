@@ -16,6 +16,7 @@ import {
   X,
   Info,
 } from 'lucide-react';
+import { FullPageSpinner } from '../../components/ui';
 
 interface Transaction {
   id: number;
@@ -101,16 +102,7 @@ export default function ProviderWalletPage() {
       ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/30 dark:text-emerald-400'
       : 'bg-rose-100 text-rose-700 dark:bg-rose-900/30 dark:text-rose-400';
 
-  if (loading) {
-    return (
-      <div className="flex items-center justify-center min-h-[60vh]">
-        <div className="flex flex-col items-center gap-3 text-zinc-400">
-          <RefreshCw size={28} className="animate-spin" />
-          <p className="text-sm">{t('wallet.loading')}</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return <FullPageSpinner />;
 
   return (
     <div className="max-w-3xl mx-auto px-4 py-8 space-y-6">

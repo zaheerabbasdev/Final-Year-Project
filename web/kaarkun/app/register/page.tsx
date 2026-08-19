@@ -55,6 +55,8 @@ export default function RegisterPage() {
   const [certificates, setCertificates] = useState<File | null>(null);
 
   const [showPassword, setShowPassword] = useState(false);
+  const [confirmPassword, setConfirmPassword] = useState('');
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [successMsg, setSuccessMsg] = useState<string | null>(null);
   const [localLoading, setLocalLoading] = useState(false);
@@ -81,6 +83,10 @@ export default function RegisterPage() {
     }
     if (!/[A-Za-z]/.test(password) || !/[0-9]/.test(password)) {
       setError('Password must contain at least one letter and one number.');
+      return;
+    }
+    if (password !== confirmPassword) {
+      setError('Passwords do not match.');
       return;
     }
 
@@ -259,6 +265,34 @@ export default function RegisterPage() {
                 </button>
               </div>
               <p className="mt-1 text-xs text-zinc-500 dark:text-zinc-400">{t('auth.register.passwordHint')}</p>
+            </div>
+
+            <div className="sm:col-span-2">
+              <label className="block text-sm font-medium text-zinc-700 dark:text-zinc-300">{t('auth.register.confirmPassword') || 'Confirm Password'}</label>
+              <div className="mt-1 relative">
+                <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-zinc-400">
+                  <Lock size={18} />
+                </div>
+                <input
+                  type={showConfirmPassword ? 'text' : 'password'}
+                  required
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  className="block w-full pl-10 pr-10 py-2 border border-zinc-200 dark:border-zinc-800 rounded-lg bg-white dark:bg-zinc-950 text-zinc-900 dark:text-zinc-50 placeholder-zinc-400 focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-all"
+                  placeholder="Repeat your password"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowConfirmPassword(v => !v)}
+                  className="absolute inset-y-0 right-0 pr-3 flex items-center text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300 transition-colors"
+                  tabIndex={-1}
+                >
+                  {showConfirmPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+                </button>
+              </div>
+              {confirmPassword && password !== confirmPassword && (
+                <p className="mt-1 text-xs text-rose-500">Passwords do not match.</p>
+              )}
             </div>
           </div>
 
