@@ -9,8 +9,19 @@ import 'socket_service.dart';
 /// Uses [Geolocator.getPositionStream] instead of a Timer+getCurrentPosition
 /// loop so updates arrive from an already-locked GPS receiver instead of
 /// triggering a cold fix every interval.
+///
+/// A periodic heartbeat re-emits the last known position every
+/// [_heartbeatInterval] seconds so that the customer's tracking screen
+/// receives an update even when the provider is stationary (i.e. hasn't
+/// moved the [distanceFilter] threshold to trigger a new stream event).
 class LocationTrackingService extends ChangeNotifier {
   StreamSubscription<Position>? _positionSubscription;
+  Timer? _heartbeatTimer;
+  Position? _lastPosition;   // last GPS fix — re-emitted by the heartbeat
+  SocketService? _socket;    // kept so the heartbeat can reach it
+
+  static const Duration _heartbeatInterval = Duration(seconds: 10);
+
   bool _isTracking = false;
   int? _activeJobId;
   int? _activeCustomerId;
@@ -65,6 +76,7 @@ class LocationTrackingService extends ChangeNotifier {
 
     _activeJobId = jobId;
     _activeCustomerId = customerId;
+    _socket = socket;
     _isTracking = true;
     notifyListeners();
 
@@ -80,6 +92,8 @@ class LocationTrackingService extends ChangeNotifier {
       ),
     ).listen(
       (position) {
+        _lastPosition = position; // cache for the heartbeat
+
         debugPrint(
           '[LocationTracking] Stream update: ${position.latitude}, '
           '${position.longitude} for job $_activeJobId',
@@ -105,13 +119,31 @@ class LocationTrackingService extends ChangeNotifier {
       cancelOnError: false, // keep stream alive through transient errors
     );
 
+    // ── Heartbeat timer ──────────────────────────────────────────────────────
+    // Re-emits the last GPS fix every [_heartbeatInterval] seconds so the
+    // customer's tracking screen stays up-to-date even when the provider is
+    // standing still (no movement → no distanceFilter event).
+    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (_) {
+      final pos = _lastPosition;
+      if (pos != null && _isTracking && _socket != null) {
+        debugPrint('[LocationTracking] Heartbeat → re-emitting last position');
+        _socket!.emitLocationUpdate(
+          jobId: _activeJobId!,
+          customerId: _activeCustomerId!,
+          latitude: pos.latitude,
+          longitude: pos.longitude,
+        );
+      }
+    });
+
     return true;
   }
 
   /// Stop streaming location and notify the customer.
   void stopTracking({SocketService? socket}) {
-    if (socket != null && _activeJobId != null && _activeCustomerId != null) {
-      socket.emitLocationStopped(
+    final activeSocket = socket ?? _socket;
+    if (activeSocket != null && _activeJobId != null && _activeCustomerId != null) {
+      activeSocket.emitLocationStopped(
         jobId: _activeJobId!,
         customerId: _activeCustomerId!,
       );
@@ -119,8 +151,12 @@ class LocationTrackingService extends ChangeNotifier {
           '[LocationTracking] Sent location_stopped to customer $_activeCustomerId');
     }
 
+    _heartbeatTimer?.cancel();
+    _heartbeatTimer = null;
     _positionSubscription?.cancel();
     _positionSubscription = null;
+    _lastPosition = null;
+    _socket = null;
     _isTracking = false;
     _activeJobId = null;
     _activeCustomerId = null;

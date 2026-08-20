@@ -45,10 +45,15 @@ class ApiClient {
       },
       onError: (e, handler) {
         if (e.response?.statusCode == 403) {
-          final message = e.response?.data['message'] ?? 'Your account has been suspended.';
-          
-          // Only show automatic toast if it's NOT a login attempt.
-          // LoginScreen handles its own error messages.
+          // 403 = business-logic denial (bidding on an accepted job, rate limit,
+          // or account suspended). Show the server's message as a toast so the
+          // user understands what happened, but do NOT log them out — only an
+          // invalid/expired JWT (401) should force a re-login.
+          final message = e.response?.data is Map
+              ? (e.response!.data['message'] ?? 'Access denied.')
+              : 'Access denied.';
+
+          // Skip the automatic toast on login screens — they handle errors themselves.
           final isLogin = e.requestOptions.extra['isLogin'] == true;
           if (!isLogin) {
             Fluttertoast.showToast(
@@ -59,11 +64,9 @@ class ApiClient {
               timeInSecForIosWeb: 5,
             );
           }
-          
-          if (onUnauthorized != null) {
-            onUnauthorized!();
-          }
+          // ← Do NOT call onUnauthorized() — that would incorrectly log the user out.
         } else if (e.response?.statusCode == 401) {
+          // 401 = invalid or expired JWT → must re-login.
           if (onUnauthorized != null) {
             onUnauthorized!();
           }
