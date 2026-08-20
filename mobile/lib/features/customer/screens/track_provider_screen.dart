@@ -5,6 +5,68 @@ import '../../../core/providers/language_provider.dart';
 import '../../../core/services/socket_service.dart';
 import '../../../core/theme.dart';
 
+// ─────────────────────────────────────────────────────────────────────────────
+// Isolated map widget — only rebuilds when the provider's position changes.
+// Keeping the GoogleMap in its own StatefulWidget prevents it from being torn
+// down and re-inflated every time the parent screen calls setState (e.g. on
+// each GPS update or animation tick), which was causing the Davey jank.
+// ─────────────────────────────────────────────────────────────────────────────
+class _TrackingMap extends StatefulWidget {
+  final GoogleMapController? controller;
+  final void Function(GoogleMapController) onMapCreated;
+  final LatLng? providerPosition;
+  final String providerName;
+  final String serviceProviderLabel;
+
+  const _TrackingMap({
+    required this.controller,
+    required this.onMapCreated,
+    required this.providerPosition,
+    required this.providerName,
+    required this.serviceProviderLabel,
+  });
+
+  @override
+  State<_TrackingMap> createState() => _TrackingMapState();
+}
+
+class _TrackingMapState extends State<_TrackingMap> {
+  static const LatLng _defaultCenter = LatLng(33.6844, 73.0479);
+
+  @override
+  Widget build(BuildContext context) {
+    return GoogleMap(
+      initialCameraPosition: CameraPosition(
+        target: widget.providerPosition ?? _defaultCenter,
+        zoom: 14,
+      ),
+      onMapCreated: widget.onMapCreated,
+      // myLocationEnabled = true forces the map to render a GPS-tracked blue
+      // dot at 60 fps even when nothing moves → floods BufferQueueProducer.
+      // The provider's position is shown via the marker instead.
+      myLocationEnabled: false,
+      myLocationButtonEnabled: false,
+      zoomControlsEnabled: false,
+      mapToolbarEnabled: false,
+      markers: widget.providerPosition != null
+          ? {
+              Marker(
+                markerId: const MarkerId('provider'),
+                position: widget.providerPosition!,
+                icon: BitmapDescriptor.defaultMarkerWithHue(
+                  BitmapDescriptor.hueViolet,
+                ),
+                infoWindow: InfoWindow(
+                  title: widget.providerName,
+                  snippet: widget.serviceProviderLabel,
+                ),
+              ),
+            }
+          : {},
+    );
+  }
+}
+
 /// Customer-facing screen showing the provider's live GPS position on a map.
 class TrackProviderScreen extends StatefulWidget {
   final int jobId;
@@ -113,17 +175,20 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
 
   @override
   void dispose() {
-    // Stop listening
     context.read<SocketService>().stopListeningProviderLocation();
     _pulseController.dispose();
-    _mapController?.dispose();
+    // Do NOT dispose _mapController here — _TrackingMap owns its lifetime.
     super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
     final colors = Theme.of(context).appColors;
-    final lang = context.watch<LanguageProvider>();
+    // Use read, not watch — language never changes while the screen is open.
+    // watch<LanguageProvider> was rebuilding the entire screen (including
+    // the expensive GoogleMap widget) every time LanguageProvider notified,
+    // causing 292-frame drops and the "Davey!" 3278 ms jank report.
+    final lang = context.read<LanguageProvider>();
     return Scaffold(
       backgroundColor: colors.background,
       extendBodyBehindAppBar: true,
@@ -204,31 +269,16 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
       body: Stack(
         children: [
           // ─── Google Map ─────────────────────────────────────────────────
-          GoogleMap(
-            initialCameraPosition: CameraPosition(
-              target: _providerPosition ?? _defaultCenter,
-              zoom: 14,
+          // RepaintBoundary: isolates the map's GPU layer so parent-widget
+          // repaints don't invalidate the map's render layer and vice-versa.
+          RepaintBoundary(
+            child: _TrackingMap(
+              controller: _mapController,
+              onMapCreated: (c) => _mapController = c,
+              providerPosition: _providerPosition,
+              providerName: widget.providerName,
+              serviceProviderLabel: lang.t('tracking.serviceProvider'),
             ),
-            onMapCreated: (controller) => _mapController = controller,
-            myLocationEnabled: true,
-            myLocationButtonEnabled: false,
-            zoomControlsEnabled: false,
-            mapToolbarEnabled: false,
-            markers: _providerPosition != null
-                ? {
-                    Marker(
-                      markerId: const MarkerId('provider'),
-                      position: _providerPosition!,
-                      icon: BitmapDescriptor.defaultMarkerWithHue(
-                        BitmapDescriptor.hueViolet,
-                      ),
-                      infoWindow: InfoWindow(
-                        title: widget.providerName,
-                        snippet: lang.t('tracking.serviceProvider'),
-                      ),
-                    ),
-                  }
-                : {},
           ),
 
           // ─── Waiting Overlay ────────────────────────────────────────────
