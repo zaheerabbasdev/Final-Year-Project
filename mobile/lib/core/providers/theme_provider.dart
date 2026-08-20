@@ -12,7 +12,14 @@ class ThemeProvider extends ChangeNotifier {
 
   ThemeMode get themeMode => _themeMode;
 
-  bool get isDarkMode => _themeMode == ThemeMode.dark;
+  bool get isDarkMode {
+    if (_themeMode == ThemeMode.dark) return true;
+    if (_themeMode == ThemeMode.light) return false;
+    // ThemeMode.system — mirror the actual platform brightness so the
+    // toggle in Settings reflects what the user actually sees.
+    return WidgetsBinding.instance.platformDispatcher.platformBrightness ==
+        Brightness.dark;
+  }
 
   Future<void> _loadThemePreference() async {
     final prefs = await SharedPreferences.getInstance();

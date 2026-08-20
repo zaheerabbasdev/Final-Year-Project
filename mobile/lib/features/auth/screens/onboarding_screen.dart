@@ -89,49 +89,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           SafeArea(
             child: Column(
               children: [
-                // Brand Header
-                Padding(
-                  padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 20),
-                  child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Container(
-                            padding: const EdgeInsets.all(8),
-                            decoration: BoxDecoration(
-                              color: Theme.of(context).colorScheme.primary.withOpacity(0.1),
-                              borderRadius: BorderRadius.circular(12),
-                            ),
-                            child: Icon(
-                              Icons.business_center_rounded, 
-                              size: 20, 
-                              color: Theme.of(context).colorScheme.primary,
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-                          Text(
-                            'Kaarkun',
-                            style: GoogleFonts.outfit(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: colors.text,
-                              letterSpacing: -0.5,
-                            ),
-                          ),
-                        ],
-                      ),
-                      TextButton(
-                        onPressed: () => _finishOnboarding(),
-                        child: Text(
-                          lang.t('onboarding.skip'),
-                          style: GoogleFonts.outfit(
-                            color: colors.subtext,
-                            fontWeight: FontWeight.w600,
-                          ),
+                // Skip button only — no brand header on onboarding
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                    child: TextButton(
+                      onPressed: () => _finishOnboarding(),
+                      child: Text(
+                        lang.t('onboarding.skip'),
+                        style: GoogleFonts.outfit(
+                          color: colors.subtext,
+                          fontWeight: FontWeight.w600,
                         ),
                       ),
-                    ],
+                    ),
                   ),
                 ),
 
