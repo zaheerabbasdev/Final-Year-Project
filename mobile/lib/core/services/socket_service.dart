@@ -72,14 +72,21 @@ class SocketService {
     logDebug('Creating socket → $serverUrl');
 
     _socket = IO.io(serverUrl, <String, dynamic>{
-      'transports': ['websocket'],
+      // Start with polling so the ALB can route the handshake, then
+      // upgrade to websocket.  websocket-only skips polling and the
+      // ALB drops the upgrade when the backend task is under load.
+      'transports': ['polling', 'websocket'],
       'autoConnect': false,
       'auth': {'token': token},
-      // Let socket.io's built-in back-off loop handle reconnection.
-      // Reconnect every 1–10 s so location gaps are short.
+      // Exponential back-off: 2 s → 60 s max.
+      // The old 1 s / 10 s setting caused a reconnect storm that
+      // made the backend even slower.
       'reconnection': true,
-      'reconnectionDelay': 1000,
-      'reconnectionDelayMax': 10000,
+      'reconnectionDelay': 2000,
+      'reconnectionDelayMax': 60000,
+      'randomizationFactor': 0.5,
+      // Abort a single connect attempt after 20 s instead of waiting forever.
+      'timeout': 20000,
     });
 
     _socket!.connect();

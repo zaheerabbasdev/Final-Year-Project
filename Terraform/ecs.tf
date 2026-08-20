@@ -393,6 +393,16 @@ resource "aws_lb_target_group" "backend" {
   vpc_id      = aws_vpc.main.id
   target_type = "ip"
 
+  # Sticky sessions: Socket.IO WebSocket connections must always reach the
+  # same ECS task.  Without this the ALB round-robins requests to different
+  # tasks, none of which share in-memory socket state, causing constant
+  # reconnect loops and timeouts.
+  stickiness {
+    type            = "lb_cookie"
+    cookie_duration = 86400   # 1 day in seconds
+    enabled         = true
+  }
+
   health_check {
     path                = "/"
     matcher             = "200"

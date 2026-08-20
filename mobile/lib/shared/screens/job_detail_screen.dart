@@ -1575,7 +1575,9 @@ class _JobDetailScreenState extends State<JobDetailScreen> {
               position: LatLng(lat, lng),
             ),
           },
-          liteModeEnabled: true, // Optimized for detail screens
+          // liteModeEnabled floods BufferQueueProducer with frame renders
+          // and doesn't support gestures — disabled for smooth performance.
+          liteModeEnabled: false,
           myLocationButtonEnabled: false,
           zoomControlsEnabled: false,
           scrollGesturesEnabled: false,

@@ -26,8 +26,13 @@ class ApiClient {
   ApiClient._internal() {
     _dio = Dio(BaseOptions(
       baseUrl: baseUrl,
-      connectTimeout: const Duration(seconds: 30),
+      // Fail fast on connection: 10 s is plenty to reach the ALB.
+      // The old 30 s connect timeout caused the UI to freeze visibly.
+      connectTimeout: const Duration(seconds: 10),
+      // Keep receive at 30 s for large payloads (job images, AI responses).
       receiveTimeout: const Duration(seconds: 30),
+      // Send timeout for uploads (avatars, job images).
+      sendTimeout: const Duration(seconds: 60),
     ));
 
     _dio.interceptors.add(InterceptorsWrapper(
