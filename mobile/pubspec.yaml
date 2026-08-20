@@ -57,6 +57,14 @@ dev_dependencies:
     sdk: flutter
   flutter_lints: ^6.0.0
 
+# Override socket_io_client with a local fork that adds IOPollingTransport —
+# a dart:io-based HTTP long-polling transport for Android / iOS.
+# The published package only ships WebSocket for native targets; polling is
+# immune to carrier transparent proxies that strip WebSocket upgrade headers.
+dependency_overrides:
+  socket_io_client:
+    path: packages/socket_io_client
+
 flutter:
   uses-material-design: true
 

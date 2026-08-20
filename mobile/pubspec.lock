@@ -944,10 +944,9 @@ packages:
   socket_io_client:
     dependency: "direct main"
     description:
-      name: socket_io_client
-      sha256: ef6c989e5eee8d04baf18482ec3d7699b91bc41e279794a99d8e3bef897b074a
-      url: "https://pub.dev"
-    source: hosted
+      path: "packages/socket_io_client"
+      relative: true
+    source: path
     version: "3.1.4"
   socket_io_common:
     dependency: transitive
