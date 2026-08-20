@@ -1,0 +1,78 @@
+name: Add Socket.IO ALB Rule (one-time fix)
+
+# Run this once manually, then delete the file.
+on:
+  workflow_dispatch:
+
+jobs:
+  add-rule:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v4
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-region: ap-south-1
+
+      - name: Get ALB listener ARN
+        id: listener
+        run: |
+          LISTENER_ARN=$(aws elbv2 describe-listeners \
+            --region ap-south-1 \
+            --query "Listeners[?LoadBalancerArn && Port==\`80\`].ListenerArn" \
+            --output text \
+            $(aws elbv2 describe-load-balancers \
+                --names academy-dev-alb \
+                --query "LoadBalancers[0].LoadBalancerArn" \
+                --output text \
+              | xargs -I{} echo "--load-balancer-arn {}"))
+          echo "ARN=$LISTENER_ARN"
+          echo "arn=$LISTENER_ARN" >> $GITHUB_OUTPUT
+
+      - name: Get backend target group ARN
+        id: tg
+        run: |
+          TG_ARN=$(aws elbv2 describe-target-groups \
+            --names academy-dev-backend-tg \
+            --query "TargetGroups[0].TargetGroupArn" \
+            --output text)
+          echo "ARN=$TG_ARN"
+          echo "arn=$TG_ARN" >> $GITHUB_OUTPUT
+
+      - name: Check if socketio rule already exists
+        id: check
+        run: |
+          COUNT=$(aws elbv2 describe-rules \
+            --listener-arn "${{ steps.listener.outputs.arn }}" \
+            --query "length(Rules[?Conditions[?PathPatternConfig.Values[?contains(@, '/socket.io')]]])" \
+            --output text)
+          echo "Existing socketio rules: $COUNT"
+          echo "exists=$COUNT" >> $GITHUB_OUTPUT
+
+      - name: Create /socket.io/* → backend rule
+        if: steps.check.outputs.exists == '0'
+        run: |
+          aws elbv2 create-rule \
+            --listener-arn "${{ steps.listener.outputs.arn }}" \
+            --priority 1 \
+            --conditions '[
+              {
+                "Field": "path-pattern",
+                "PathPatternConfig": {
+                  "Values": ["/socket.io", "/socket.io/*"]
+                }
+              }
+            ]' \
+            --actions '[
+              {
+                "Type": "forward",
+                "TargetGroupArn": "${{ steps.tg.outputs.arn }}"
+              }
+            ]'
+          echo "✅ Rule created — /socket.io/* now routes to backend"
+
+      - name: Rule already exists
+        if: steps.check.outputs.exists != '0'
+        run: echo "ℹ️ Socket.IO rule already exists — nothing to do"
