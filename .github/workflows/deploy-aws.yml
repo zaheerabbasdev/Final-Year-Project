@@ -67,6 +67,10 @@ jobs:
       - name: Register backend task definition with S3 env vars
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          # Comma-separated list of origins allowed to connect to the backend.
+          # The ALB URL is included so Socket.IO accepts both web and mobile
+          # connections that arrive through the load balancer.
+          ALLOWED_ORIGINS: "http://academy-dev-alb-1117329025.ap-south-1.elb.amazonaws.com"
         run: |
           # Fetch the current task definition, strip read-only fields, then inject
           # the updated image and S3 environment variables.
@@ -80,12 +84,21 @@ jobs:
             --arg IMAGE "$ECR_REGISTRY/$ECR_REPOSITORY_BACKEND:latest" \
             --arg BUCKET "$S3_BUCKET" \
             --arg REGION "$AWS_REGION" \
+            --arg ORIGINS "$ALLOWED_ORIGINS" \
             'del(.taskDefinitionArn,.revision,.status,.requiresAttributes,.compatibilities,.registeredAt,.registeredBy) |
              .containerDefinitions[0].image = $IMAGE |
              .containerDefinitions[0].environment = (
                (.containerDefinitions[0].environment // []) |
-               map(select(.name != "AWS_S3_BUCKET" and .name != "AWS_REGION")) +
-               [{"name":"AWS_S3_BUCKET","value":$BUCKET},{"name":"AWS_REGION","value":$REGION}]
+               map(select(
+                 .name != "AWS_S3_BUCKET" and
+                 .name != "AWS_REGION" and
+                 .name != "ALLOWED_ORIGINS"
+               )) +
+               [
+                 {"name":"AWS_S3_BUCKET","value":$BUCKET},
+                 {"name":"AWS_REGION","value":$REGION},
+                 {"name":"ALLOWED_ORIGINS","value":$ORIGINS}
+               ]
              )')
 
           NEW_ARN=$(aws ecs register-task-definition \
