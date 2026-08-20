@@ -1,63 +1,86 @@
-import 'dart:async';
 import 'package:flutter/material.dart';
+import 'package:flutter_foreground_task/flutter_foreground_task.dart';
 import 'package:geolocator/geolocator.dart';
 import 'socket_service.dart';
+import 'foreground_location_task.dart';
 
-/// Provider-side service that streams GPS position and emits coordinates
-/// to the backend via Socket.io.
+/// Provider-side service that obtains GPS position via an Android foreground
+/// service and relays coordinates to the customer through Socket.IO.
 ///
-/// Uses [Geolocator.getPositionStream] instead of a Timer+getCurrentPosition
-/// loop so updates arrive from an already-locked GPS receiver instead of
-/// triggering a cold fix every interval.
+/// Architecture
+/// ────────────
+/// All GPS work runs inside [LocationForegroundHandler], which lives in the
+/// Android foreground service's background Dart isolate.  That isolate stays
+/// alive even when the provider locks their screen because the OS treats any
+/// process with an active foreground service as a foreground process.
 ///
-/// A periodic heartbeat re-emits the last known position every
-/// [_heartbeatInterval] seconds so that the customer's tracking screen
-/// receives an update even when the provider is stationary (i.e. hasn't
-/// moved the [distanceFilter] threshold to trigger a new stream event).
+///   Background isolate (foreground service)
+///     GPS stream (distanceFilter 3 m) ─► sendDataToMain({'lat','lng'})
+///     onRepeatEvent every 4 s ──────────► sendDataToMain({'type':'heartbeat'})
+///
+///   Main isolate
+///     _onReceiveTaskData ──────────────► socket.emitLocationUpdate()
+///
+/// The heartbeat covers the stationary case: when the provider hasn't moved
+/// 3 m since the last stream event (standing at a door, waiting in traffic),
+/// the customer's map still receives a position update every 4 seconds.
 class LocationTrackingService extends ChangeNotifier {
-  StreamSubscription<Position>? _positionSubscription;
-  Timer? _heartbeatTimer;
-  Position? _lastPosition;   // last GPS fix — re-emitted by the heartbeat
-  SocketService? _socket;    // kept so the heartbeat can reach it
-
-  static const Duration _heartbeatInterval = Duration(seconds: 10);
-
   bool _isTracking = false;
   int? _activeJobId;
   int? _activeCustomerId;
   String? _lastError;
+  SocketService? _socket;
 
   bool get isTracking => _isTracking;
   int? get activeJobId => _activeJobId;
   String? get lastError => _lastError;
 
-  /// Begin streaming location to the customer via [socket].
+  // ── One-time app-level init ────────────────────────────────────────────────
+
+  /// Call once from [main] before [runApp] so the IPC communication port is
+  /// registered before any foreground service can send data, and the Android
+  /// notification channel is configured.
+  static void initForegroundTask() {
+    FlutterForegroundTask.initCommunicationPort();
+    FlutterForegroundTask.init(
+      androidNotificationOptions: AndroidNotificationOptions(
+        channelId: 'kaarkun_location_channel',
+        channelName: 'Kaarkun Location',
+        channelImportance: NotificationChannelImportance.LOW,
+        priority: NotificationPriority.LOW,
+      ),
+      iosNotificationOptions: const IOSNotificationOptions(
+        showNotification: false,
+        playSound: false,
+      ),
+      foregroundTaskOptions: const ForegroundTaskOptions(
+        eventAction: ForegroundTaskEventAction.repeat(4000), // 4 s heartbeat
+        autoRunOnBoot: false,
+      ),
+    );
+  }
+
+  // ── Start / stop ───────────────────────────────────────────────────────────
+
+  /// Begin GPS tracking and notify the customer via [socket].
   ///
-  /// [distanceFilter] (metres) is the minimum distance the device must move
-  /// before a new location is emitted — keeps traffic reasonable without
-  /// sacrificing responsiveness.  5 m is a sensible default for on-foot work.
-  ///
-  /// Returns false (with [lastError] set) if GPS/permissions are unavailable,
-  /// so the caller can show feedback instead of silently doing nothing.
+  /// Starts the Android foreground service so the process survives a locked
+  /// screen, registers the IPC data callback, then returns.  GPS events
+  /// and heartbeats arrive asynchronously via [_onReceiveTaskData].
   Future<bool> startTracking(
     SocketService socket, {
     required int jobId,
     required int customerId,
-    int intervalSeconds = 5,     // retained in signature for API compatibility
-    int distanceFilter = 5,      // metres
+    int intervalSeconds = 5,  // kept for API compatibility — unused
+    int distanceFilter = 3,   // hardcoded in foreground_location_task.dart
   }) async {
-    if (_isTracking) {
-      debugPrint('[LocationTracking] Already tracking, returning');
-      return true;
-    }
-
+    if (_isTracking) return true;
     _lastError = null;
 
-    // ── Permission & service checks ─────────────────────────────────────────
+    // ── Permission & service checks ────────────────────────────────────────
     final serviceEnabled = await Geolocator.isLocationServiceEnabled();
     if (!serviceEnabled) {
-      _lastError =
-          'Location services are turned off. Please enable GPS to share your location.';
+      _lastError = 'Location services are off. Please enable GPS.';
       notifyListeners();
       return false;
     }
@@ -68,105 +91,83 @@ class LocationTrackingService extends ChangeNotifier {
     }
     if (permission == LocationPermission.denied ||
         permission == LocationPermission.deniedForever) {
-      _lastError =
-          'Location permission is required to share your live location with the customer.';
+      _lastError = 'Location permission is required to share your live location.';
       notifyListeners();
       return false;
     }
 
-    _activeJobId = jobId;
+    _activeJobId    = jobId;
     _activeCustomerId = customerId;
-    _socket = socket;
-    _isTracking = true;
+    _socket         = socket;
+    _isTracking     = true;
     notifyListeners();
 
-    debugPrint(
-        '[LocationTracking] Started stream for job $jobId → customer $customerId');
+    // Register callback BEFORE starting the service so no position events
+    // are missed between service start and callback registration.
+    FlutterForegroundTask.addTaskDataCallback(_onReceiveTaskData);
 
-    // ── Subscribe to the position stream ────────────────────────────────────
-    // distanceFilter avoids flooding the socket when the provider is stationary.
-    _positionSubscription = Geolocator.getPositionStream(
-      locationSettings: LocationSettings(
-        accuracy: LocationAccuracy.high,
-        distanceFilter: distanceFilter,
-      ),
-    ).listen(
-      (position) {
-        _lastPosition = position; // cache for the heartbeat
-
-        debugPrint(
-          '[LocationTracking] Stream update: ${position.latitude}, '
-          '${position.longitude} for job $_activeJobId',
-        );
-
-        socket.emitLocationUpdate(
-          jobId: _activeJobId!,
-          customerId: _activeCustomerId!,
-          latitude: position.latitude,
-          longitude: position.longitude,
-        );
-
-        if (_lastError != null) {
-          _lastError = null;
-          notifyListeners();
-        }
-      },
-      onError: (e) {
-        debugPrint('[LocationTracking] GPS stream error: $e');
-        _lastError = 'Lost GPS signal — retrying…';
-        notifyListeners();
-      },
-      cancelOnError: false, // keep stream alive through transient errors
+    // Start the foreground service.  This creates the persistent notification
+    // ("Kaarkun is sharing your location") and launches the background isolate
+    // that runs LocationForegroundHandler and opens the GPS stream.
+    await FlutterForegroundTask.startService(
+      notificationTitle: 'Kaarkun',
+      notificationText: 'Sharing your location with the customer...',
+      callback: startLocationCallback,
     );
 
-    // ── Heartbeat timer ──────────────────────────────────────────────────────
-    // Re-emits the last GPS fix every [_heartbeatInterval] seconds so the
-    // customer's tracking screen stays up-to-date even when the provider is
-    // standing still (no movement → no distanceFilter event).
-    _heartbeatTimer = Timer.periodic(_heartbeatInterval, (_) {
-      final pos = _lastPosition;
-      if (pos != null && _isTracking && _socket != null) {
-        debugPrint('[LocationTracking] Heartbeat → re-emitting last position');
-        _socket!.emitLocationUpdate(
-          jobId: _activeJobId!,
-          customerId: _activeCustomerId!,
-          latitude: pos.latitude,
-          longitude: pos.longitude,
-        );
-      }
-    });
-
+    debugPrint('[LocationTracking] Foreground service started — '
+        'job $jobId → customer $customerId');
     return true;
   }
 
-  /// Stop streaming location and notify the customer.
+  /// Receives position and heartbeat data from the foreground task isolate
+  /// and relays them to the customer via Socket.IO.
+  void _onReceiveTaskData(dynamic data) {
+    if (data is! Map) return;
+    final lat = (data['lat'] as num?)?.toDouble();
+    final lng = (data['lng'] as num?)?.toDouble();
+    if (lat == null || lng == null || !_isTracking || _socket == null) return;
+
+    debugPrint('[LocationTracking] ${data['type'] ?? 'position'}: $lat, $lng');
+
+    _socket!.emitLocationUpdate(
+      jobId:      _activeJobId!,
+      customerId: _activeCustomerId!,
+      latitude:   lat,
+      longitude:  lng,
+    );
+  }
+
+  /// Stop sharing location, notify the customer that tracking has ended,
+  /// and tear down the foreground service.
   void stopTracking({SocketService? socket}) {
     final activeSocket = socket ?? _socket;
-    if (activeSocket != null && _activeJobId != null && _activeCustomerId != null) {
+    if (activeSocket != null &&
+        _activeJobId != null &&
+        _activeCustomerId != null) {
       activeSocket.emitLocationStopped(
-        jobId: _activeJobId!,
+        jobId:      _activeJobId!,
         customerId: _activeCustomerId!,
       );
-      debugPrint(
-          '[LocationTracking] Sent location_stopped to customer $_activeCustomerId');
+      debugPrint('[LocationTracking] Sent location_stopped to customer '
+          '$_activeCustomerId');
     }
 
-    _heartbeatTimer?.cancel();
-    _heartbeatTimer = null;
-    _positionSubscription?.cancel();
-    _positionSubscription = null;
-    _lastPosition = null;
-    _socket = null;
-    _isTracking = false;
-    _activeJobId = null;
+    FlutterForegroundTask.removeTaskDataCallback(_onReceiveTaskData);
+    FlutterForegroundTask.stopService();
+
+    _isTracking       = false;
+    _activeJobId      = null;
     _activeCustomerId = null;
+    _socket           = null;
+    _lastError        = null;
     notifyListeners();
-    debugPrint('[LocationTracking] Stopped');
+    debugPrint('[LocationTracking] Stopped, foreground service stopped');
   }
 
   @override
   void dispose() {
-    stopTracking();
+    if (_isTracking) stopTracking();
     super.dispose();
   }
 }

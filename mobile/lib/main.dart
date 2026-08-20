@@ -56,7 +56,12 @@ final GlobalKey<NavigatorState> navigatorKey = GlobalKey<NavigatorState>();
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
-  
+
+  // Register the IPC port that lets the foreground-service isolate talk to the
+  // main isolate, and configure the Android notification channel.
+  // Must be called before runApp so the port exists when the service starts.
+  LocationTrackingService.initForegroundTask();
+
   runApp(
     MultiProvider(
       providers: [
