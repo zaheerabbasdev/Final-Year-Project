@@ -421,12 +421,15 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
                                 ),
                               ),
                               const SizedBox(width: 6),
-                              Text(
-                                lang.t('tracking.sharingLocation'),
-                                style: const TextStyle(
-                                  color: Color(0xFF10B981),
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w500,
+                              Expanded(
+                                child: Text(
+                                  lang.t('tracking.sharingLocation'),
+                                  style: const TextStyle(
+                                    color: Color(0xFF10B981),
+                                    fontSize: 13,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
                                 ),
                               ),
                             ],
