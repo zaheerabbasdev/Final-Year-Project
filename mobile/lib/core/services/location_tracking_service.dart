@@ -53,7 +53,7 @@ class LocationTrackingService extends ChangeNotifier {
         showNotification: false,
         playSound: false,
       ),
-      foregroundTaskOptions: const ForegroundTaskOptions(
+      foregroundTaskOptions: ForegroundTaskOptions(
         eventAction: ForegroundTaskEventAction.repeat(4000), // 4 s heartbeat
         autoRunOnBoot: false,
       ),

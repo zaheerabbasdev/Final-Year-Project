@@ -26,7 +26,7 @@ class LocationForegroundHandler extends TaskHandler {
   double? _lastLng;
 
   @override
-  Future<void> onStart(DateTime timestamp) async {
+  Future<void> onStart(DateTime timestamp, TaskStarter starter) async {
     _posSub = Geolocator.getPositionStream(
       locationSettings: const LocationSettings(
         accuracy: LocationAccuracy.high,
