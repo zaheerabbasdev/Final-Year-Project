@@ -1,0 +1,111 @@
+graph LR
+    ACTOR["Service Provider"]
+
+    subgraph SYSTEM["KAARKUN SYSTEM"]
+
+        subgraph AUTH["Authentication"]
+            UC1(["Register Account"])
+            UC2(["Upload CNIC"])
+            UC3(["Upload Certificates"])
+            UC4(["Verify OTP"])
+            UC5(["Login"])
+            UC6(["Forgot Password"])
+            UC7(["Reset Password"])
+        end
+
+        subgraph PROFILE["Profile Management"]
+            UC8(["View Profile"])
+            UC9(["Update Profile"])
+            UC10(["Upload Avatar"])
+            UC11(["Update Bio & Skills"])
+            UC12(["Set Availability"])
+            UC13(["Update Location"])
+        end
+
+        subgraph DASHBOARD["Dashboard"]
+            UC14(["View Dashboard"])
+            UC15(["View Earnings Summary"])
+            UC16(["View Performance Stats"])
+        end
+
+        subgraph JOBS["Job Discovery"]
+            UC17(["Browse Available Jobs"])
+            UC18(["Filter Jobs by Category"])
+            UC19(["View Job Details"])
+            UC20(["View Job Location on Map"])
+        end
+
+        subgraph BIDS["Bid Management"]
+            UC21(["Place a Bid"])
+            UC22(["View My Bids"])
+            UC23(["View Bid Status"])
+        end
+
+        subgraph BOOKINGS["Booking Management"]
+            UC24(["View My Bookings"])
+            UC25(["Accept Booking"])
+            UC26(["Start Service"])
+            UC27(["Complete Service"])
+        end
+
+        subgraph REVIEWS["Reviews & Ratings"]
+            UC28(["View My Reviews"])
+            UC29(["View My Average Rating"])
+        end
+
+        subgraph COMMUNICATION["Communication"]
+            UC30(["Chat with Customer"])
+            UC31(["Send Image in Chat"])
+            UC32(["View Notifications"])
+            UC33(["Mark Notifications Read"])
+        end
+
+        subgraph SUPPORT["Support"]
+            UC34(["Use AI Support Chatbot"])
+        end
+
+    end
+
+    ACTOR --- UC1
+    ACTOR --- UC2
+    ACTOR --- UC3
+    ACTOR --- UC4
+    ACTOR --- UC5
+    ACTOR --- UC6
+    ACTOR --- UC7
+    ACTOR --- UC8
+    ACTOR --- UC9
+    ACTOR --- UC10
+    ACTOR --- UC11
+    ACTOR --- UC12
+    ACTOR --- UC13
+    ACTOR --- UC14
+    ACTOR --- UC15
+    ACTOR --- UC16
+    ACTOR --- UC17
+    ACTOR --- UC18
+    ACTOR --- UC19
+    ACTOR --- UC20
+    ACTOR --- UC21
+    ACTOR --- UC22
+    ACTOR --- UC23
+    ACTOR --- UC24
+    ACTOR --- UC25
+    ACTOR --- UC26
+    ACTOR --- UC27
+    UC28 --- ACTOR
+    UC29 --- ACTOR
+    UC30 --- ACTOR
+    UC31 --- ACTOR
+    UC32 --- ACTOR
+    UC33 --- ACTOR
+    UC34 --- ACTOR
+
+    UC1 -. "include" .-> UC2
+    UC1 -. "include" .-> UC3
+    UC1 -. "include" .-> UC4
+    UC6 -. "include" .-> UC7
+    UC17 -. "include" .-> UC18
+    UC19 -. "include" .-> UC21
+    UC25 -. "include" .-> UC24
+    UC30 -. "include" .-> UC31

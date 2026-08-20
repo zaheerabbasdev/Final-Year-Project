@@ -1,0 +1,68 @@
+graph TB
+    %% ── Client Layer ──────────────────────────────────────────────────
+    subgraph CLIENTS["CLIENT LAYER"]
+        direction LR
+        MOB["Flutter Mobile App\nAndroid / iOS"]
+        WEB["Next.js Web App\nCustomer · Provider"]
+        ADM["Next.js Admin Panel"]
+    end
+
+    %% ── CI/CD ─────────────────────────────────────────────────────────
+    subgraph CICD["CI / CD PIPELINE"]
+        direction LR
+        GH["GitHub Repository"]
+        GA["GitHub Actions Workflow"]
+        ECR["AWS ECR\nContainer Registry"]
+    end
+
+    %% ── AWS Cloud ─────────────────────────────────────────────────────
+    subgraph AWS["AWS CLOUD  (ap-south-1)"]
+
+        ALB["Application Load Balancer\n\n/api/*   →  Backend\n/admin*  →  Admin\n/*       →  Frontend"]
+
+        subgraph ECS["ECS Fargate Cluster"]
+            direction TB
+            BE["Backend Service\nNode.js 20 · Express 5\nPort 5000"]
+            FE["Frontend Service\nNext.js 16\nPort 3000"]
+            AS["Admin Service\nNext.js 16\nPort 3000"]
+        end
+
+        subgraph DATA["Data Layer"]
+            RDS["AWS RDS\nMySQL 8.0\nPrivate Subnet"]
+            S3["AWS S3\nacademy-dev-uploads\nAvatars · Images · Documents"]
+        end
+    end
+
+    %% ── External Services ─────────────────────────────────────────────
+    subgraph EXT["EXTERNAL SERVICES"]
+        direction TB
+        MAIL["Gmail SMTP\nNodemailer\nOTP · Password Reset"]
+        GROQ["Groq AI\nChat Support Bot"]
+        GEM["Gemini AI\nJob Summarisation"]
+        CLA["Claude AI\nDispute Analysis"]
+    end
+
+    %% ── Client → ALB ──────────────────────────────────────────────────
+    MOB  -- "HTTPS / WebSocket" --> ALB
+    WEB  -- "HTTPS / WebSocket" --> ALB
+    ADM  -- "HTTPS"             --> ALB
+
+    %% ── ALB → ECS ─────────────────────────────────────────────────────
+    ALB -- "Port 5000" --> BE
+    ALB -- "Port 3000" --> FE
+    ALB -- "Port 3000" --> AS
+
+    %% ── Backend → Data ────────────────────────────────────────────────
+    BE -- "mysql2 connection pool" --> RDS
+    BE -- "AWS SDK PutObject"      --> S3
+
+    %% ── Backend → External ────────────────────────────────────────────
+    BE -- "SMTP"     --> MAIL
+    BE -- "REST API" --> GROQ
+    BE -- "REST API" --> GEM
+    BE -- "REST API" --> CLA
+
+    %% ── CI/CD Flow ────────────────────────────────────────────────────
+    GH -- "push to master"       --> GA
+    GA -- "docker push"          --> ECR
+    ECR -- "force-new-deployment" --> ECS

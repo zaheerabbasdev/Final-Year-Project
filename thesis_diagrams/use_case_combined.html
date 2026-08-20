@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Use Case Diagrams — Kaarkun</title>
+<style>
+  @page { size: A4 landscape; margin: 6mm; }
+  body { margin: 0; padding: 0; background: white; }
+  svg { width: 100%; height: auto; display: block; }
+</style>
+</head>
+<body>
+<?xml version="1.0" encoding="utf-8"?>
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 1680 825"
+     style="font-family: Arial, sans-serif; background: white;">
+
+  <!-- Page title -->
+  <text x="840" y="22" text-anchor="middle" font-family="Arial"
+        font-size="15" font-weight="bold" fill="#1e3a5f" letter-spacing="0.5">
+    KAARKUN — USE CASE DIAGRAMS
+  </text>
+
+  <!-- Sub-titles -->
+  <text x="460" y="40" text-anchor="middle" font-family="Arial"
+        font-size="11" fill="#444">FIGURE 3.3 — Customer Actor</text>
+  <text x="1220" y="40" text-anchor="middle" font-family="Arial"
+        font-size="11" fill="#444">FIGURE 3.4 — Service Provider Actor</text>
+
+  <!-- Vertical divider -->
+  <line x1="840" y1="30" x2="840" y2="815" stroke="#cccccc" stroke-width="1" stroke-dasharray="5,5"/>
+
+  <!-- Actor labels -->
+  <text x="38" y="490" text-anchor="middle"
+        font-family="Arial" font-size="12" font-weight="bold" fill="#1e3a5f">Customer</text>
+  <text x="1635" y="490" text-anchor="middle"
+        font-family="Arial" font-size="12" font-weight="bold" fill="#1e3a5f">Service Provider</text>
+
+  <!-- LEFT: Customer diagram -->
+  <rect x="90" y="48" width="740" height="745" fill="none" stroke="#1e3a5f" stroke-width="2.5"/>
+<line x1="38" y1="420" x2="90" y2="134" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="38" y1="420" x2="90" y2="256" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="38" y1="420" x2="90" y2="351" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="38" y1="420" x2="90" y2="446" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="38" y1="420" x2="90" y2="541" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="38" y1="420" x2="90" y2="636" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="38" y1="420" x2="90" y2="731" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<rect x="98" y="63" width="724" height="142" rx="5" fill="#e8f0fb" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="106" y="77" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Authentication</text>
+<ellipse cx="221" cy="112" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="221" y="116" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Register Account</text><ellipse cx="459" cy="112" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="116" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Login</text><ellipse cx="697" cy="112" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="697" y="116" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Verify OTP</text><ellipse cx="221" cy="167" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="221" y="171" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Forgot Password</text><ellipse cx="459" cy="167" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="171" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Reset Password</text><rect x="98" y="213" width="724" height="87" rx="5" fill="#e8f7ee" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="106" y="227" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Job Management</text>
+<ellipse cx="221" cy="262" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="221" y="266" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Post a Job</text><ellipse cx="459" cy="262" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="266" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View My Jobs</text><ellipse cx="697" cy="262" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="697" y="266" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Job Details</text><rect x="98" y="308" width="724" height="87" rx="5" fill="#fff4e6" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="106" y="322" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Provider Discovery</text>
+<ellipse cx="221" cy="357" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="221" y="361" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Browse Providers</text><ellipse cx="459" cy="357" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="361" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Provider Profile</text><ellipse cx="697" cy="357" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="697" y="361" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Provider Reviews</text><rect x="98" y="403" width="724" height="87" rx="5" fill="#f5e8fb" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="106" y="417" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Bid Management</text>
+<ellipse cx="221" cy="452" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="221" y="456" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Bids on Job</text><ellipse cx="459" cy="452" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="456" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Accept a Bid</text><ellipse cx="697" cy="452" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="697" y="456" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Reject a Bid</text><rect x="98" y="498" width="724" height="87" rx="5" fill="#fbe8e8" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="106" y="512" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Booking Management</text>
+<ellipse cx="221" cy="547" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="221" y="551" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View My Bookings</text><ellipse cx="459" cy="547" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="551" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Track Booking</text><ellipse cx="697" cy="547" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="697" y="551" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Complete Booking</text><rect x="98" y="593" width="724" height="87" rx="5" fill="#e8fbfb" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="106" y="607" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Communication & Reviews</text>
+<ellipse cx="221" cy="642" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="221" y="646" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Chat with Provider</text><ellipse cx="459" cy="642" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="646" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Notifications</text><ellipse cx="697" cy="642" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="697" y="646" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Submit Review</text><rect x="98" y="688" width="724" height="87" rx="5" fill="#fffff0" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="106" y="702" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Support</text>
+<ellipse cx="459" cy="737" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="459" y="741" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">AI Support Chatbot</text>
+  <circle cx="38" cy="355" r="22" fill="none" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="38" y1="377" x2="38" y2="420" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="10" y1="395" x2="66" y2="395" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="38" y1="420" x2="16" y2="460" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="38" y1="420" x2="60" y2="460" stroke="#1e3a5f" stroke-width="2"/>
+
+
+  <!-- RIGHT: Provider diagram -->
+  <rect x="850" y="48" width="740" height="745" fill="none" stroke="#1e3a5f" stroke-width="2.5"/>
+<line x1="1635" y1="420" x2="850" y2="134" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="1635" y1="420" x2="850" y2="256" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="1635" y1="420" x2="850" y2="351" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="1635" y1="420" x2="850" y2="446" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="1635" y1="420" x2="850" y2="541" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="1635" y1="420" x2="850" y2="636" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<line x1="1635" y1="420" x2="850" y2="731" stroke="#1e3a5f" stroke-width="1" opacity="0.55"/>
+<rect x="858" y="63" width="724" height="142" rx="5" fill="#e8f0fb" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="866" y="77" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Authentication & Registration</text>
+<ellipse cx="981" cy="112" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="116" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Register Account</text><ellipse cx="1219" cy="112" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="116" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Upload CNIC</text><ellipse cx="1457" cy="112" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="116" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Login</text><ellipse cx="981" cy="167" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="171" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Upload Certificates</text><ellipse cx="1219" cy="167" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="171" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Verify OTP</text><ellipse cx="1457" cy="167" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="171" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Reset Password</text><rect x="858" y="213" width="724" height="87" rx="5" fill="#e8f7ee" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="866" y="227" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Profile Management</text>
+<ellipse cx="981" cy="262" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="266" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Update Profile</text><ellipse cx="1219" cy="262" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="266" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Update Bio & Skills</text><ellipse cx="1457" cy="262" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="266" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Set Availability</text><rect x="858" y="308" width="724" height="87" rx="5" fill="#fff4e6" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="866" y="322" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Job Discovery</text>
+<ellipse cx="981" cy="357" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="361" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Browse Available Jobs</text><ellipse cx="1219" cy="357" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="361" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Filter by Category</text><ellipse cx="1457" cy="357" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="361" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Job Details</text><rect x="858" y="403" width="724" height="87" rx="5" fill="#f5e8fb" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="866" y="417" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Bid Management</text>
+<ellipse cx="981" cy="452" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="456" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Place a Bid</text><ellipse cx="1219" cy="452" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="456" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View My Bids</text><ellipse cx="1457" cy="452" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="456" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Bid Status</text><rect x="858" y="498" width="724" height="87" rx="5" fill="#fbe8e8" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="866" y="512" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Booking & Service Delivery</text>
+<ellipse cx="981" cy="547" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="551" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Accept Booking</text><ellipse cx="1219" cy="547" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="551" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Start Service</text><ellipse cx="1457" cy="547" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="551" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Complete Service</text><rect x="858" y="593" width="724" height="87" rx="5" fill="#e8fbfb" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="866" y="607" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Reviews & Communication</text>
+<ellipse cx="981" cy="642" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="646" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">Chat with Customer</text><ellipse cx="1219" cy="642" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="646" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Notifications</text><ellipse cx="1457" cy="642" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="646" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View My Reviews</text><rect x="858" y="688" width="724" height="87" rx="5" fill="#fffff0" stroke="#3a6fa0" stroke-width="1" opacity="0.85"/>
+<text x="866" y="702" font-family="Arial" font-size="9.5" font-weight="bold" fill="#1e3a5f">Dashboard & Support</text>
+<ellipse cx="981" cy="737" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="981" y="741" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Dashboard</text><ellipse cx="1219" cy="737" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1219" y="741" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">View Earnings</text><ellipse cx="1457" cy="737" rx="105" ry="20" fill="white" stroke="#1e3a5f" stroke-width="1.5"/>
+<text x="1457" y="741" text-anchor="middle" font-family="Arial" font-size="11" fill="#111111">AI Support Chatbot</text>
+  <circle cx="1635" cy="355" r="22" fill="none" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="1635" y1="377" x2="1635" y2="420" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="1607" y1="395" x2="1663" y2="395" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="1635" y1="420" x2="1613" y2="460" stroke="#1e3a5f" stroke-width="2"/>
+  <line x1="1635" y1="420" x2="1657" y2="460" stroke="#1e3a5f" stroke-width="2"/>
+
+
+</svg>
+</body>
+</html>

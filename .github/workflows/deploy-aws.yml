@@ -50,8 +50,8 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
-            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-229377740.ap-south-1.elb.amazonaws.com/api \
-            --build-arg NEXT_PUBLIC_WS_URL=http://academy-dev-alb-229377740.ap-south-1.elb.amazonaws.com \
+            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-1117329025.ap-south-1.elb.amazonaws.com/api \
+            --build-arg NEXT_PUBLIC_WS_URL=http://academy-dev-alb-1117329025.ap-south-1.elb.amazonaws.com \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest ./web/kaarkun
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
 
@@ -60,7 +60,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
-            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-229377740.ap-south-1.elb.amazonaws.com/api \
+            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-1117329025.ap-south-1.elb.amazonaws.com/api \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest ./admin
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest
 
