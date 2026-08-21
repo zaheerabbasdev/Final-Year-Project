@@ -291,8 +291,12 @@ class _KaarkunAppState extends State<KaarkunApp> with WidgetsBindingObserver {
     // Connect socket if authenticated
 
     if (authService.isAuthenticated && authService.user != null) {
+      final notificationService = context.read<NotificationService>();
+      notificationService.onNewJobPosted = () =>
+          context.read<JobService>().fetchJobs(filters: {'status': 'open'});
       socketService.connect(authService.user!['id']);
     } else {
+      context.read<NotificationService>().onNewJobPosted = null;
       socketService.disconnect();
     }
 

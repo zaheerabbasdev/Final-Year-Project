@@ -4,6 +4,7 @@ import '../../features/notifications/notification_provider.dart';
 
 class NotificationService {
   NotificationProvider? _provider;
+  Future<void> Function()? onNewJobPosted;
   final GlobalKey<ScaffoldMessengerState> messengerKey = GlobalKey<ScaffoldMessengerState>();
 
   void setProvider(NotificationProvider provider) {
@@ -13,6 +14,11 @@ class NotificationService {
   void handleNewNotification(dynamic data) {
     if (_provider != null) {
       _provider!.addNotification(data);
+    }
+
+    if (data is Map &&
+        (data['type'] == 'new_job_posted' || data['type'] == 'emergency_job_posted')) {
+      onNewJobPosted?.call();
     }
 
     // Show a SnackBar or Toast

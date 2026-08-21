@@ -26,7 +26,7 @@ const updateBookingStatus = async (req, res) => {
         const existing = await Booking.findById(req.params.id);
         if (!existing) return res.status(404).json({ message: 'Booking not found' });
         if (req.user.id !== existing.customer_id && req.user.id !== existing.provider_id) {
-            return res.status(403).json({ message: 'You are not part of this booking' });
+            return res.status(409).json({ message: 'This job is already booked.' });
         }
 
         await Booking.updateStatus(req.params.id, status);
@@ -85,7 +85,7 @@ const getBookingByJob = async (req, res) => {
 
         const booking = rows[0];
         if (req.user.id !== booking.customer_id && req.user.id !== booking.provider_id) {
-            return res.status(403).json({ message: 'You are not part of this booking' });
+            return res.status(409).json({ message: 'This job is already booked.' });
         }
 
         res.json(booking);

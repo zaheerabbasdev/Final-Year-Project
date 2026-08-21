@@ -55,7 +55,11 @@ class ApiClient {
 
           // Skip the automatic toast on login screens — they handle errors themselves.
           final isLogin = e.requestOptions.extra['isLogin'] == true;
-          if (!isLogin) {
+            // Booking details are optional while viewing another provider's job.
+            // Do not surface an authorization response as a misleading toast.
+            final isBookingLookup = e.requestOptions.method == 'GET' &&
+              e.requestOptions.path.contains('/bookings/job/');
+            if (!isLogin && !isBookingLookup) {
             Fluttertoast.showToast(
               msg: message,
               backgroundColor: Colors.red,

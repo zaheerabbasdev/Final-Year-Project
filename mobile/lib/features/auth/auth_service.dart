@@ -159,11 +159,13 @@ class AuthService extends ChangeNotifier {
       return {
         'success': response.statusCode == 201,
         'requiresOTP': response.data['requiresOTP'] ?? false,
+        'emailSent': response.data['emailSent'] == true,
+        'message': response.data['message'],
       };
     } catch (e) {
       logDebug(e);
     }
-    return {'success': false, 'requiresOTP': false};
+    return {'success': false, 'requiresOTP': false, 'emailSent': false};
   }
 
   Future<Map<String, dynamic>> forgotPassword(String email) async {

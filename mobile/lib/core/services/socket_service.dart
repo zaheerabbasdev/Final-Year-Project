@@ -72,6 +72,9 @@ class SocketService {
     logDebug('Creating socket → $serverUrl');
 
     _socket = IO.io(serverUrl, <String, dynamic>{
+      // The ALB routes /api/* to the backend; the default /socket.io path
+      // can otherwise be handled by the frontend service.
+      'path': '/api/socket.io',
       // Start with polling so the ALB can route the handshake, then
       // upgrade to websocket.  websocket-only skips polling and the
       // ALB drops the upgrade when the backend task is under load.

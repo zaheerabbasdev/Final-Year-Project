@@ -10,6 +10,9 @@ const initSocket = (server) => {
         .filter(Boolean);
 
     io = new Server(server, {
+        // Keep the socket endpoint under the API ALB rule so it cannot be
+        // routed to the frontend service.
+        path: '/api/socket.io',
         cors: {
             origin: allowedOrigins,
             methods: ["GET", "POST"],
