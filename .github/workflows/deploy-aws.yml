@@ -50,8 +50,8 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
-            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-983829450.ap-south-1.elb.amazonaws.com/api \
-            --build-arg NEXT_PUBLIC_WS_URL=http://academy-dev-alb-983829450.ap-south-1.elb.amazonaws.com \
+            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-2776693.ap-south-1.elb.amazonaws.com/api \
+            --build-arg NEXT_PUBLIC_WS_URL=http://academy-dev-alb-2776693.ap-south-1.elb.amazonaws.com \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest ./web/kaarkun
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_FRONTEND:latest
 
@@ -60,7 +60,7 @@ jobs:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
         run: |
           docker build \
-            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-983829450.ap-south-1.elb.amazonaws.com/api \
+            --build-arg NEXT_PUBLIC_API_URL=http://academy-dev-alb-2776693.ap-south-1.elb.amazonaws.com/api \
             -t $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest ./admin
           docker push $ECR_REGISTRY/$ECR_REPOSITORY_ADMIN:latest
 
@@ -70,7 +70,7 @@ jobs:
           # Comma-separated list of origins allowed to connect to the backend.
           # The ALB URL is included so Socket.IO accepts both web and mobile
           # connections that arrive through the load balancer.
-          ALLOWED_ORIGINS: "http://academy-dev-alb-983829450.ap-south-1.elb.amazonaws.com"
+          ALLOWED_ORIGINS: "http://academy-dev-alb-2776693.ap-south-1.elb.amazonaws.com"
         run: |
           # Fetch the current task definition, strip read-only fields, then inject
           # the updated image and S3 environment variables.
