@@ -444,7 +444,16 @@ class _TrackProviderScreenState extends State<TrackProviderScreen>
           RepaintBoundary(
             child: _TrackingMap(
               controller: _mapController,
-              onMapCreated: (c) => _mapController = c,
+              onMapCreated: (c) {
+                _mapController = c;
+                final providerPosition = _providerPosition;
+                if (providerPosition != null) {
+                  c.animateCamera(
+                    CameraUpdate.newLatLngZoom(providerPosition, 16),
+                  );
+                  _hasReceivedFirstFix = true;
+                }
+              },
               providerPosition: _providerPosition,
               providerName: widget.providerName,
               serviceProviderLabel: lang.t('tracking.serviceProvider'),
