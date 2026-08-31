@@ -267,13 +267,13 @@ CLAUDE_API_KEY=<anthropic key>
 
 ### Frontend Build Args (set in `deploy-aws.yml`)
 ```
-NEXT_PUBLIC_API_URL=http://academy-dev-alb-1664407925.ap-south-1.elb.amazonaws.com/api
-NEXT_PUBLIC_WS_URL=http://academy-dev-alb-1664407925.ap-south-1.elb.amazonaws.com
+NEXT_PUBLIC_API_URL=http://academy-dev-alb-547831537.ap-south-1.elb.amazonaws.com/api
+NEXT_PUBLIC_WS_URL=http://academy-dev-alb-547831537.ap-south-1.elb.amazonaws.com
 ```
 
 ### Flutter (compile-time define)
 ```
-API_BASE_URL=http://academy-dev-alb-1664407925.ap-south-1.elb.amazonaws.com/api
+API_BASE_URL=http://academy-dev-alb-547831537.ap-south-1.elb.amazonaws.com/api
 ```
 Set via `flutter run --dart-define=API_BASE_URL=...` or hardcoded default in `mobile/lib/core/api_client.dart`.
 
@@ -312,7 +312,7 @@ terraform apply -var-file=terraform.tfvars -var-file=secrets.tfvars -auto-approv
 | Cluster | — | `academy-dev-cluster` |
 
 ### ALB
-- **Current DNS**: `academy-dev-alb-1664407925.ap-south-1.elb.amazonaws.com`
+- **Current DNS**: `academy-dev-alb-547831537.ap-south-1.elb.amazonaws.com`
 - ⚠️ When Terraform destroys and recreates the ALB, the suffix number changes. After any `terraform apply` that recreates the ALB, update these 3 places:
   1. `web/kaarkun/next.config.ts` → `remotePatterns hostname`
   2. `.github/workflows/deploy-aws.yml` → both `NEXT_PUBLIC_API_URL` build args
