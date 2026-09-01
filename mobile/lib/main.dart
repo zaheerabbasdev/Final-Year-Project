@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
-impa1ort 'package:go_router/go_router.dart';
+import 'package:go_router/go_router.dart';
 import 'core/theme.dart';
 import 'core/providers/theme_provider.dart';
 import 'core/providers/currency_provider.dart';
