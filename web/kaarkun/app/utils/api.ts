@@ -1,6 +1,9 @@
-// NEXT_PUBLIC_API_URL is baked in at build time (both dev and prod Docker builds).
-// Falls back to the relative /api path when not set (ALB routes /api/* to backend).
-const API_URL = process.env.NEXT_PUBLIC_API_URL ?? '/api';
+// Browser requests must stay on the same ALB origin as the page. This prevents
+// a cached or stale build-time ALB hostname from breaking the API after an ALB
+// replacement. Server-side callers may still use the configured API URL.
+const API_URL = typeof window !== 'undefined'
+  ? '/api'
+  : (process.env.NEXT_PUBLIC_API_URL ?? '/api');
 
 // Resolve any stored file path to a browser-fetchable URL.
 // New uploads return a full S3 https:// URL — return those as-is.
