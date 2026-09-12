@@ -55,3 +55,9 @@ variable "email_pass" {
   sensitive = true
   default   = ""
 }
+
+variable "gemini_api_key" {
+  type      = string
+  sensitive = true
+  default   = ""
+}

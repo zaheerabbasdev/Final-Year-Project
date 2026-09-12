@@ -137,6 +137,7 @@ resource "aws_secretsmanager_secret_version" "backend_secrets_version" {
     ADMIN_SETUP_KEY    = "admin_setup_key_kaarkun_2026"
     EMAIL_USER         = var.email_user
     EMAIL_PASS         = var.email_pass
+    GEMINI_API_KEY     = var.gemini_api_key
   })
 }
 
@@ -289,6 +290,10 @@ resource "aws_ecs_task_definition" "backend" {
         {
           name      = "EMAIL_PASS"
           valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:EMAIL_PASS::"
+        },
+        {
+          name      = "GEMINI_API_KEY"
+          valueFrom = "${aws_secretsmanager_secret.backend_secrets.arn}:GEMINI_API_KEY::"
         }
       ]
       logConfiguration = {

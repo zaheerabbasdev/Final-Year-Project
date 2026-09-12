@@ -596,7 +596,7 @@ Return ONLY a JSON object:
                  return { confidence: 50, notes: "AI Vision API not configured." };
             }
 
-            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${GEMINI_KEY}`;
+            const url = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3.6-flash:generateContent?key=${GEMINI_KEY}`;
             const response = await axios.post(url, {
                 contents: [{
                     role: 'user',
@@ -730,7 +730,7 @@ Please provide a 3-part summary using the exact structure below. Be concise and 
 
         // ─── 2. Gemini (Google AI Studio free tier) ───────────────────────────
         if (GEMINI_KEY && !GEMINI_KEY.includes('your_gemini_api_key')) {
-            const geminiModels = ['gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'];
+            const geminiModels = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
             for (const model of geminiModels) {
                 try {
                     console.log(`[AI] Calling Gemini (${model})...`);
@@ -830,7 +830,7 @@ Please provide a 3-part summary using the exact structure below. Be concise and 
 
         // ─── 2. Gemini — inject history into contents array ───────────────────
         if (GEMINI_KEY && !GEMINI_KEY.includes('your_gemini_api_key')) {
-            const geminiModels = ['gemini-1.5-flash', 'gemini-2.0-flash-lite', 'gemini-2.0-flash'];
+            const geminiModels = ['gemini-3.6-flash', 'gemini-3.5-flash-lite'];
             for (const model of geminiModels) {
                 try {
                     console.log(`[ChatBot] Calling Gemini (${model})...`);
