@@ -1,38 +1,46 @@
 # Kaarkun — Complete Project Documentation
 
-Kaarkun is a full-stack, multi-platform **on-demand home services marketplace** that connects **customers** who need work done (plumbing, electrical, cleaning, etc.) with **service providers** who bid on and complete that work. It is a Final Year Project (FYP) demonstrating end-to-end engineering across a backend API, an admin panel, a customer/provider web app, and a native mobile app.
+Kaarkun is a full-stack, multi-platform **on-demand home services marketplace** that connects **customers** who need work done (plumbing, electrical, cleaning, etc.) with **service providers** who bid on and complete that work. It is a Final Year Project (FYP) demonstrating end-to-end engineering across a cloud-hosted backend API, an admin panel, a customer/provider web app, and a native mobile app — all deployed on AWS.
 
 ---
 
 ## 1. High-Level Architecture
 
 ```
-                            ┌─────────────────────────┐
-                            │   MySQL Database         │
-                            │   (kaarkun_db)            │
-                            └───────────┬──────────────┘
-                                        │
-                            ┌───────────▼──────────────┐
-                            │   Backend API              │
-                            │   Node.js + Express 5      │
-                            │   Port 5000                │
-                            │   - REST API (/api/...)    │
-                            │   - Socket.io (real-time)  │
-                            │   - JWT auth               │
-                            │   - AI service (LLM chain) │
-                            └───┬────────┬────────┬─────┘
-                                │        │        │
-              ┌─────────────────┘        │        └────────────────────┐
-              │                          │                             │
-    ┌─────────▼─────────┐     ┌──────────▼──────────┐      ┌───────────▼───────────┐
-    │  Admin Panel        │     │  Customer/Provider   │      │  Mobile App            │
-    │  Next.js (web)       │     │  Web App              │      │  Flutter (Android/iOS/ │
-    │  Port 3000            │     │  Next.js, Port 3001    │      │  Web/Desktop)           │
-    │  Staff/ops only        │     │  Public-facing          │      │  Primary end-user app   │
-    └────────────────────┘     └──────────────────────┘      └────────────────────────┘
+┌──────────────────────────────────────────────────────────────────────┐
+│                          AWS Cloud (ap-south-1)                       │
+│                                                                        │
+│   ┌─────────────┐     ┌──────────────────────────────────────────┐   │
+│   │   AWS ECR    │     │         Application Load Balancer         │   │
+│   │ (3 images)   │────►│  academy-dev-alb-*.ap-south-1.elb.       │   │
+│   └─────────────┘     │  amazonaws.com                            │   │
+│                        └────────┬──────────┬──────────┬───────────┘   │
+│                                 │          │          │               │
+│                    ┌────────────▼──┐  ┌────▼────┐  ┌─▼──────────┐   │
+│                    │  ECS Fargate   │  │  ECS    │  │   ECS      │   │
+│                    │  Backend API   │  │Frontend │  │  Admin     │   │
+│                    │  Node.js 5000  │  │Next.js  │  │  Next.js   │   │
+│                    └───────┬────────┘  └─────────┘  └────────────┘   │
+│                            │                                          │
+│              ┌─────────────┼──────────────────────┐                  │
+│              │             │                      │                  │
+│   ┌──────────▼──┐  ┌───────▼──────┐  ┌───────────▼──┐              │
+│   │  MySQL RDS   │  │   AWS S3      │  │  AWS Secrets  │              │
+│   │ kaarkun_db   │  │academy-dev-   │  │   Manager     │              │
+│   │              │  │uploads        │  │ (JWT, DB creds│              │
+│   └─────────────┘  └──────────────┘  │  email, keys) │              │
+│                                       └───────────────┘              │
+└──────────────────────────────────────────────────────────────────────┘
+              ▲                    ▲                    ▲
+              │                   │                    │
+   ┌──────────┴──────┐  ┌─────────┴──────┐  ┌─────────┴──────┐
+   │   Flutter App    │  │  Customer/      │  │  Admin Panel    │
+   │  Android / iOS   │  │  Provider Web   │  │  Next.js        │
+   │  (Mobile)        │  │  Next.js        │  │  Staff/ops only │
+   └─────────────────┘  └────────────────┘  └────────────────┘
 ```
 
-All three frontends (admin, web, mobile) talk to the **same backend REST API** and the **same Socket.io server**, so a job posted on mobile shows up identically on the web app, and an admin action (suspend, delete) takes effect everywhere immediately.
+All three frontends talk to the **same backend REST API** and the **same Socket.IO server** via the ALB. A job posted on mobile appears on the web app instantly; an admin action (suspend, verify) takes effect everywhere immediately.
 
 ---
 
@@ -40,12 +48,14 @@ All three frontends (admin, web, mobile) talk to the **same backend REST API** a
 
 | Layer | Technology |
 |---|---|
-| Backend | Node.js, Express 5, MySQL (`mysql2`), Socket.io, JWT (`jsonwebtoken`), bcryptjs, Multer (file uploads), Nodemailer (email), express-rate-limit |
-| Admin Panel | Next.js 16, React 19, TypeScript, TailwindCSS 4, react-hot-toast |
-| Web App | Next.js 16, React 19, TypeScript, TailwindCSS 4, lucide-react |
-| Mobile App | Flutter/Dart, Provider (state management), GoRouter (navigation), Dio (HTTP), socket_io_client, flutter_secure_storage, image_picker, google_maps_flutter |
-| AI / LLM | Groq (Llama 3.3 70B, free) → Google Gemini (free) → Anthropic Claude (paid) — cascading fallback chain, plus rule-based offline fallback |
-| Geocoding/Maps | OpenStreetMap Nominatim (search/reverse-geocode, backend-proxied), Google Maps SDK (mobile map rendering) |
+| Backend | Node.js + Express, MySQL (`mysql2/promise`), Socket.IO, JWT (`jsonwebtoken`), bcryptjs, Multer + `multer-s3` (file uploads → S3), Nodemailer (Gmail SMTP), express-rate-limit |
+| Admin Panel | Next.js 15 (App Router), React, TypeScript, TailwindCSS, react-hot-toast |
+| Web App | Next.js 15 (App Router), React, TypeScript, TailwindCSS, Axios |
+| Mobile App | Flutter/Dart, Provider (state management), GoRouter (navigation), Dio (HTTP), socket_io_client, flutter_secure_storage, google_maps_flutter, geolocator, **flutter_foreground_task** (background GPS), image_picker, fluttertoast |
+| AI / LLM | Groq (Llama 3.3 70B) → Google Gemini (1.5 flash) → Anthropic Claude (claude-3-haiku) — 3-tier cascading fallback chain; rule-based offline fallback if all fail |
+| Geocoding / Maps | OpenStreetMap Nominatim (address search/reverse-geocode, backend-proxied), Google Maps SDK (mobile map rendering) |
+| Cloud Infrastructure | AWS ECS Fargate (3 services), AWS ECR (3 image repos), AWS ALB (L7 load balancer), AWS RDS MySQL, AWS S3 (uploads bucket), AWS Secrets Manager (runtime secrets), Terraform (IaC) |
+| CI/CD | GitHub Actions — on push to `master`: build 3 Docker images → push to ECR → update ECS services |
 
 ---
 
@@ -53,344 +63,487 @@ All three frontends (admin, web, mobile) talk to the **same backend REST API** a
 
 | Table | Purpose | Key Fields |
 |---|---|---|
-| `users` | All accounts (customers, providers, and a `role` flag for admin-like access) | `role` (customer/provider/admin), `status` (pending/verified/rejected/blocked), `status_reason`, `latitude`/`longitude`, `otp_code`/`otp_expiry` |
-| `provider_profiles` | Extra data only for provider accounts | `bio`, `skills` (JSON), `rating`, `total_jobs`, `success_rate`, `category_id`, `cnic_url`, `certificates_url`, `is_online`, `ai_confidence_score`, `ai_verification_notes` |
-| `categories` | Service types | `Plumber, Electrician, Carpenter, Painter, Cleaner, Gardener, AC Repair, Appliance Repair` (seeded) |
-| `jobs` | Customer-posted job requests | `budget`, `location`, `latitude`/`longitude`, `images` (JSON array), `status` (open/active/completed/cancelled), `is_negotiable`, `is_emergency`, `ai_dispute_summary` |
-| `bids` | Provider offers on a job | `amount`, `estimated_time`, `cover_letter`, `status` (pending/accepted/rejected) |
-| `bookings` | A confirmed job-provider pairing | `status` (confirmed/in_progress/awaiting_confirmation/completed/cancelled), `verification_token` (QR handshake PIN) |
-| `reviews` | Post-job ratings | `rating` (1–5, DB-enforced via `CHECK`), `comment`; one review per booking (`UNIQUE` on `booking_id`) |
-| `messages` | Chat between customer & provider, per job | `content`, `image_url`, `is_read` |
-| `admins` | Separate table from `users` — staff accounts | `username`, `email`, `password_hash` |
+| `users` | All user accounts (customers and providers) | `role` (customer/provider), `status` (pending/verified/rejected/blocked), `latitude`/`longitude`, `otp_code`/`otp_expiry` |
+| `admins` | Separate staff accounts (not in `users`) | `username`, `email`, `password_hash`, `full_name` |
+| `provider_profiles` | Extra data for provider accounts | `bio`, `skills` (JSON), `rating`, `total_jobs`, `success_rate`, `category_id`, `cnic_url`, `certificates_url`, `is_online`, `ai_confidence_score`, `ai_verification_notes` |
+| `categories` | Service types | Plumber, Electrician, Carpenter, Painter, Cleaner, Gardener, AC Repair, Appliance Repair (seeded) |
+| `jobs` | Customer-posted job requests | `budget` (PKR decimal), `location`, `lat`/`lng`, `images` (JSON array), `status` (open/active/completed/cancelled), `is_negotiable`, `is_emergency` |
+| `bids` | Provider offers on a job | `amount` (PKR), `estimated_time`, `cover_letter`, `status` (pending/accepted/rejected) |
+| `bookings` | Confirmed job-provider pairing | `status` (confirmed/in_progress/awaiting_confirmation/completed/cancelled), `verification_token` (QR/PIN handshake) |
+| `reviews` | Post-job ratings | `rating` (1–5), `comment`; one review per booking (`UNIQUE` on `booking_id`) |
+| `messages` | Chat between customer and provider per job | `content`, `image_url`, `is_read` |
 | `notifications` | In-app notifications | `title`, `message`, `type`, `is_read` |
 | `refresh_tokens` | JWT refresh-token rotation | `token`, `expires_at` |
 
-All foreign keys cascade-delete appropriately (e.g. deleting a user removes their jobs/bids/bookings).
+All foreign keys cascade-delete appropriately (deleting a user removes their jobs, bids, bookings, messages, and notifications).
+
+> **Schema management**: `backend/schema.sql` runs automatically on every server start via `initializeDatabase()` in `app.js` using `CREATE TABLE IF NOT EXISTS` — safe to re-run, never destructive.
 
 ---
 
 ## 4. Backend API Reference
 
-Base URL: `http://<host>:5000/api`. JWT is sent as `Authorization: Bearer <token>`.
+**Production base URL**: `http://academy-dev-alb-*.ap-south-1.elb.amazonaws.com/api`  
+**Local dev**: `http://localhost:5000/api`  
+JWT is sent as `Authorization: Bearer <token>`.
 
 ### `/api/auth` — Authentication
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/register` | none | Register as customer or provider. Accepts file uploads (avatar, CNIC, certificates) via `multipart/form-data`. Sends an OTP email. |
-| POST | `/login` | none (rate-limited: 10/15min) | Email+password login → JWT. |
-| POST | `/verify-otp` | none (rate-limited: 10/10min) | Confirms the 6-digit email OTP sent at registration, activating the account. |
+| POST | `/register` | none | Register as customer or provider. Accepts `multipart/form-data` (avatar, CNIC, certificates). Sends 6-digit OTP email to customers. Returns `{ requiresOTP, emailSent }`. |
+| POST | `/login` | none (rate-limited: 10/15 min) | Email + password → `accessToken` + `refreshToken`. |
+| POST | `/verify-otp` | none (rate-limited: 10/10 min) | Confirm the 6-digit OTP → sets `status=verified`. |
+| POST | `/resend-otp` | none | Resend OTP to email. |
+| POST | `/forgot-password` | none | Send password-reset OTP. |
+| POST | `/reset-password` | none | Reset password using OTP token. |
 
 ### `/api/users` — Profile & Discovery
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/me` | JWT | Get the logged-in user's full profile. |
 | PUT | `/me` | JWT | Update profile fields. |
+| DELETE | `/me` | JWT | Delete own account. |
 | PATCH | `/me/online-status` | JWT | Provider toggles online/offline availability. |
-| POST | `/me/avatar` | JWT | Upload/replace profile photo. |
-| GET | `/providers/top` | none | Top-rated providers (for homepage/marketing). |
-| GET | `/providers/:id` / `/providers` | none | Provider detail / provider directory (browsable by category). |
-| GET | `/:id` | none | Public-safe user lookup by ID. |
+| POST | `/me/avatar` | JWT | Upload/replace profile photo → S3. |
+| GET | `/providers/top` | none | Top-rated providers (homepage). |
+| GET | `/providers` | none | All providers (filterable by category). |
+| GET | `/providers/:id` | none | Provider public profile. |
+| GET | `/:id` | none | Any user by ID. |
 
 ### `/api/categories`
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/` | none | List all service categories. |
+| POST | `/` | admin | Create a category. |
+| DELETE | `/:id` | admin | Delete a category. |
 
 ### `/api/jobs` — Job Lifecycle
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/` | optional | Browse open jobs. If the caller is a logged-in **provider**, results are auto-filtered to a 20 km radius around their GPS/profile location. |
-| POST | `/` | customer | Post a new job (up to 6 images). Auto-notifies every provider in the matching category (and flags emergency jobs distinctly). |
-| GET | `/my/jobs` | JWT | Get jobs posted by the current customer. |
-| POST | `/:id/express-accept` | provider | **Emergency instant-accept**: skips the bidding flow entirely — first provider to tap "accept" on an emergency job is immediately booked. |
+| GET | `/` | optional | Browse open jobs. Provider callers get proximity-filtered results (20 km radius). |
+| POST | `/` | customer | Post a new job (up to 6 images → S3). Notifies every provider in the matching category. |
+| GET | `/my/jobs` | JWT | Jobs posted by the current user. |
 | GET | `/:id` | none | Job details. |
 | PUT | `/:id` | customer (owner) | Edit a job. |
 | DELETE | `/:id` | customer (owner) | Delete a job. |
+| POST | `/:id/express-accept` | provider | **Emergency instant-accept**: skips bidding — first provider to tap is immediately booked. Race-condition-safe via atomic DB transaction. |
 
 ### `/api/bids`
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/` | provider | Place a bid (amount, estimated time, cover letter) on a job. |
-| GET | `/job/:jobId` | JWT | All bids on a given job (for the customer reviewing offers). |
+| POST | `/` | provider | Place a bid (amount, estimated time, cover letter). |
+| GET | `/job/:jobId` | JWT | All bids on a given job. |
 | GET | `/my/bids` | provider | Bids placed by the current provider. |
-| PUT | `/:id/accept` | customer | Accept a bid → creates a `booking`, marks the job `active`. |
+| PUT | `/:id/accept` | customer | Accept a bid → creates a booking, marks the job `active`. Atomic — two concurrent accepts cannot both succeed. |
 
 ### `/api/bookings` — Confirmed Work
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/my` | JWT | Bookings for the current user (as customer or provider). |
+| GET | `/my` | JWT | All bookings for the current user (as customer or provider). |
 | GET | `/job/:jobId` | JWT | Booking tied to a specific job. |
-| PUT | `/job/:jobId/status` / `/:id/status` | JWT (participant) | Advance booking status. `completed` auto-marks the job completed and notifies the provider; `awaiting_confirmation` notifies the customer to confirm. |
-| POST | `/:id/handshake/generate` | provider (owner) | **Arrival handshake**: provider generates a random 6-digit PIN to prove they're physically on-site. Surfaced as a scannable QR code on mobile and a plain PIN display on the web app. |
-| POST | `/:id/handshake/verify` | customer (owner) | Customer scans (mobile) or types in (web) the PIN to confirm the provider arrived → booking moves to `in_progress`; token is single-use (cleared after verification). |
-| PUT | `/:id/cancel` | participant | Cancel a `confirmed`/`in_progress` booking — reopens the job, resets/deletes the accepted bid so other providers can bid again, notifies the other party. |
+| PUT | `/job/:jobId/status` / `/:id/status` | JWT (participant) | Advance booking status through the lifecycle. |
+| POST | `/:id/handshake/generate` | provider | Generate a random 6-digit PIN to prove physical on-site arrival. Shown as a QR code on mobile, plain PIN on web. |
+| POST | `/:id/handshake/verify` | customer | Customer scans/enters the PIN → booking moves to `in_progress`. Token is single-use (cleared after verification). |
+| PUT | `/:id/cancel` | participant | Cancel a confirmed/in-progress booking → reopens the job, resets the accepted bid, notifies the other party. |
 
-> **Note:** `acceptBid` and `expressAccept` claim a job atomically (`UPDATE jobs SET status='active' WHERE id=? AND status='open'` inside a transaction), so two concurrent accept/express-accept attempts on the same job can never both succeed — the loser gets a clean `409 Conflict` instead of a duplicate booking. `findByJobId`-style lookups always return the most recent booking for a job (`ORDER BY id DESC LIMIT 1`), so a job that was cancelled and successfully rebooked doesn't resolve to its stale, cancelled booking.
+### `/api/messages` — Chat
 
-### `/api/admin` — Staff/Ops Console
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/auth/register` | `ADMIN_SETUP_KEY` (env secret) | One-time admin account creation gate. |
-| POST | `/auth/login` | none (rate-limited) | Admin login → admin JWT. |
-| GET | `/stats` | admin | Dashboard aggregates: user/job/bid/category counts, 12-month signup trend, top-5 categories by job volume. |
-| GET/DELETE | `/users`, `/users/:id` | admin | List, inspect, delete users. |
-| PUT | `/users/:id/status` | admin | Verify / reject / suspend a user, with an optional reason (emails the user). If the user is suspended (`blocked`) and has any `confirmed`/`in_progress` bookings, the other party on each booking gets a real-time notification that their booking is affected, since suspension doesn't auto-cancel anything. |
-| POST | `/providers/:id/auto-verify` | admin | **AI-assisted KYC**: runs the uploaded CNIC image through Gemini Vision to auto-suggest a confidence score + notes for manual review. |
-| GET/DELETE | `/jobs`, `/jobs/:id` | admin | Moderate job listings. |
-| POST | `/jobs/:id/summarize-dispute` | admin | **AI dispute summarizer**: feeds the full chat transcript to the LLM chain and returns a structured 3-part summary (customer's claim / provider's claim / recommendation). |
-| GET | `/bids` | admin | All bids platform-wide. |
-| GET/POST/DELETE | `/categories` | admin | Manage service categories. |
+| GET | `/list` | JWT | Chat thread list (all conversations). |
+| GET | `/:jobId/:otherUserId` | JWT | Message history for one job conversation. |
+| POST | `/send` | JWT | Send a message (text and/or image → S3). Authorized only between legitimate job participants. |
+| PUT | `/read/:jobId/:senderId` | JWT | Mark messages in a thread as read. |
 
 ### `/api/reviews`
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| POST | `/` | JWT | Submit a 1–5 star review for a completed booking (one per booking, DB-enforced). |
+| POST | `/` | JWT | Submit a 1–5 star review for a completed booking (one per booking). |
 | GET | `/provider/:providerId` | none | All reviews for a provider. |
-| GET | `/booking/:bookingId` | none | The review tied to one booking. |
+| GET | `/booking/:bookingId` | none | Review for a specific booking. |
 
 ### `/api/notifications`
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
 | GET | `/` | JWT | List the user's notifications. |
 | GET | `/unread-count` | JWT | Badge count. |
-| PUT | `/mark-all-read` / `/:id/read` | JWT | Mark as read. |
+| PUT | `/mark-all-read` | JWT | Mark all as read. |
+| PATCH | `/:id/read` | JWT | Mark one as read. |
+| DELETE | `/` | JWT | Clear all notifications. |
 
-### `/api/messages` — Chat
-| Method | Path | Auth | Description |
-|---|---|---|---|
-| GET | `/list` | JWT | Chat thread list (conversations grouped by job + other participant). |
-| GET | `/:jobId/:otherUserId` | JWT | Message history for one job conversation. |
-| POST | `/send` | JWT | Send a message (text and/or image attachment). Authorized only between a job's customer and a legitimate counterpart on that job (a bidder or the booked provider) — an arbitrary user ID can't be messaged just by guessing it. |
-| PUT | `/read/:jobId/:senderId` | JWT | Mark a thread as read. |
+### `/api/geocode` — Location (proxies OpenStreetMap Nominatim, Pakistan-biased)
 
-### `/api/geocode` — Location Search (proxies OpenStreetMap Nominatim, biased to Pakistan)
 | Method | Path | Description |
 |---|---|---|
-| GET | `/autocomplete?input=` | Address search-as-you-type suggestions. |
-| GET | `/search?q=` | Text address → lat/lng. |
+| GET | `/autocomplete?input=` | Address search-as-you-type. |
+| GET | `/search?q=` | Address → lat/lng. |
 | GET | `/reverse?lat=&lon=` | Lat/lng → human-readable address. |
 
 ### `/api/ai` — Smart Features
+
 | Method | Path | Auth | Description |
 |---|---|---|---|
-| GET | `/matching-jobs` | provider | **Smart job matching**: scores every open job for this provider (category match, GPS proximity via Haversine formula, provider rating/success-rate, emergency-job bonus) and returns them ranked with human-readable match reasons. |
-| GET | `/suggest-bid/:jobId` | JWT | **Bid price suggestion**: analyzes historical accepted bids in the same category (min 3 data points) to suggest a min/max/average price range; falls back to ±15–20% of the job's stated budget if no history exists. |
-| GET | `/fraud-reviews` | admin | **Review fraud detection**: flags reviews posted suspiciously fast after booking creation (<120s, "velocity anomaly"), and repeated near-perfect rating patterns between the same customer/provider pair ("reciprocal rating collusion"). |
-| POST | `/autocomplete` | JWT | **Job-description autocomplete**: given a partial description, the LLM (or an offline keyword-matched template bank as fallback) returns a complete description, suggested category, and suggested PKR budget. |
-| POST | `/support-chatbot` | JWT | **Support chatbot**: answers user questions with live app context injected into the prompt (online provider count, open job count, the asking user's own stats) — falls back to canned FAQ answers if no LLM key is configured/available. |
+| GET | `/matching-jobs` | provider | **Smart job matching**: scores every open job for this provider (category, GPS proximity via Haversine, rating, emergency bonus) and returns ranked results with human-readable match reasons. |
+| GET | `/suggest-bid/:jobId` | JWT | **Bid price suggestion**: analyzes historical accepted bids in the same category; falls back to ±15–20% of the stated budget if fewer than 3 data points exist. |
+| POST | `/autocomplete` | JWT | **Job-description autocomplete**: LLM returns a complete description, suggested category, and PKR budget from a partial input. Offline keyword-template fallback when no LLM is available. |
+| POST | `/support-chatbot` | JWT | **Support chatbot**: LLM with live DB context injected (online provider count, open jobs, user stats). Offline FAQ fallback. |
+| GET | `/fraud-reviews` | admin | **Review fraud detection**: flags velocity anomalies (<120 s between booking and review) and reciprocal rating collusion between the same pair. |
+
+### `/api/admin` — Staff Console
+
+| Method | Path | Auth | Description |
+|---|---|---|---|
+| POST | `/auth/register` | `ADMIN_SETUP_KEY` | One-time admin account creation. |
+| POST | `/auth/login` | none | Admin login → admin JWT. |
+| GET | `/stats` | admin | KPI dashboard: totals, 12-month signup trend, top-5 categories. |
+| GET/DELETE | `/users`, `/users/:id` | admin | List, inspect, delete users. |
+| PUT | `/users/:id/status` | admin | Verify / reject / suspend a user (with reason + email notification). |
+| POST | `/providers/:id/auto-verify` | admin | **AI-assisted KYC**: runs uploaded CNIC through Gemini Vision for confidence score + notes. |
+| GET/DELETE | `/jobs`, `/jobs/:id` | admin | Moderate job listings. |
+| POST | `/jobs/:id/summarize-dispute` | admin | **AI dispute summarizer**: feeds the full chat transcript to the LLM chain, returns structured 3-part summary. |
+| GET | `/bids` | admin | Platform-wide bid visibility. |
+| GET/POST/DELETE | `/categories` | admin | Manage service categories. |
 
 ---
 
 ## 5. The AI Layer (`backend/services/aiService.js`)
 
-Kaarkun uses a **3-tier LLM fallback chain** so AI features keep working even if a provider is rate-limited or unconfigured:
+Kaarkun uses a **3-tier LLM fallback chain** so AI features keep working even when a provider is rate-limited or a key is unconfigured:
 
-1. **Groq** (`llama-3.3-70b-versatile`) — tried first, free and fast.
-2. **Google Gemini** (`gemini-1.5-flash` → `gemini-2.0-flash-lite` → `gemini-2.0-flash`) — tried next if Groq fails/429s.
+1. **Groq** (`llama-3.3-70b-versatile`) — tried first; free and fast.
+2. **Google Gemini** (`gemini-1.5-flash`) — tried if Groq fails or returns 429.
 3. **Anthropic Claude** (`claude-3-haiku-20240307`) — final paid fallback.
-4. **Rule-based offline fallback** — if no key is configured or all three fail, hand-written keyword/template logic answers instead of returning an error.
+4. **Rule-based offline fallback** — hand-written keyword/template logic; never returns an error to the user even with zero API keys configured.
 
-Six distinct AI-powered features run on top of this chain:
-- Smart job-provider matching (scoring algorithm, not LLM-based — pure math)
-- Bid price suggestions (historical-data driven, not LLM-based)
-- Review fraud/anomaly detection (rule-based pattern matching, not LLM-based)
-- Job description autocomplete (LLM, with offline template fallback)
-- Support chatbot (LLM, with live DB stats injected as context, offline FAQ fallback)
-- KYC document (CNIC) verification — uses **Gemini Vision** specifically (multimodal image + text prompt) to cross-check the uploaded ID photo against the user's claimed name
-- Dispute summarization — LLM reads the full chat transcript of a job and produces a structured "who's right" summary for admin review
+**Seven AI-powered features:**
 
-> **Caveat:** unlike the other five AI features, KYC verification has no fallback chain — it calls Gemini Vision directly, since Groq/Claude weren't multimodal-vision-capable at the time of writing. If the Gemini key's Google Cloud project has no billing enabled, Google returns `429 RESOURCE_EXHAUSTED` with zero free-tier quota (a project/billing-level restriction, not a bad key). When that happens, the function returns `{ confidence: null, notes: '...verify manually...' }` instead of a fabricated score, and the admin can still manually verify/reject providers — auto-verify is an assist feature, not a hard dependency for provider onboarding.
+| Feature | Method | Notes |
+|---|---|---|
+| Smart job-provider matching | Scoring algorithm (math) | Category match + Haversine GPS proximity + rating + emergency bonus |
+| Bid price suggestion | Historical-data driven | Needs ≥3 historical bids in the category; falls back to budget ±15% |
+| Job description autocomplete | LLM + offline templates | Returns description, category, PKR budget |
+| Support chatbot | LLM + live DB context | Knows current online providers, open jobs, user's own stats |
+| Review fraud detection | Rule-based pattern matching | Velocity anomaly + reciprocal collusion detection |
+| AI dispute summarizer | LLM (admin-only) | Reads full chat transcript → structured 3-part summary |
+| KYC CNIC verification | **Gemini Vision** (multimodal) | No fallback chain — requires Gemini with billing enabled |
 
----
-
-## 6. Real-Time Features (Socket.io)
-
-The backend runs a Socket.io server alongside the REST API (`socketManager.js`), authenticated via a JWT handshake (`auth: { token }`) — the server verifies the token before allowing a connection and auto-joins the user to their own room.
-
-- **Live chat** — `new_message`, `user_typing`/`user_stop_typing` events, scoped per job conversation.
-- **In-app notifications** — `new_notification` pushed instantly (job posted, bid accepted, booking status changes, etc.) without polling.
-- **Live provider GPS tracking** — while en route, a provider emits `location_update` (lat/lng); the customer's app listens via `provider_location` to show a live map marker; `location_stopped` ends tracking when the job starts or is cancelled. **Mobile-only by design** — the web app doesn't connect to Socket.io at all; a desktop browser tab is a poor fit for continuous background GPS reporting, so this stays a native-app feature.
+> **KYC note**: Gemini Vision requires a Google Cloud project with billing enabled for non-zero quota. Without it, auto-verify returns `{ confidence: null, notes: 'verify manually' }` — admin can still manually approve/reject providers. This is an assist feature, not a hard dependency.
 
 ---
 
-## 7. Admin Panel (`admin/`) — Staff Console
+## 6. Real-Time Features (Socket.IO)
 
-Runs on Next.js, separate login (`admins` table, not `users`), gated by `ADMIN_SETUP_KEY` for the one-time first-account creation.
+The backend runs Socket.IO alongside the REST API (`backend/socketManager.js`), authenticated via JWT handshake. Each connected user auto-joins their private room (`user_<userId>`).
+
+| Feature | Events | Notes |
+|---|---|---|
+| Live chat | `new_message`, `typing`, `user_stop_typing`, `read_receipt` | Scoped per job conversation room |
+| In-app notifications | `new_notification` | Instant push — no polling |
+| Live GPS tracking | `location_update` (provider→server), `provider_location` (server→customer), `location_stopped` | Mobile-only feature; foreground service keeps it alive when screen is off |
+
+**GPS tracking architecture** (mobile):
+```
+Android Foreground Service (persistent notification shown)
+  └── Background Dart isolate (LocationForegroundHandler)
+        ├── Geolocator stream  distanceFilter: 3 m  → fires on real movement
+        └── onRepeatEvent  every 4 s  → heartbeat re-emits last position
+              │
+              ▼ IPC (FlutterForegroundTask.sendDataToMain)
+        Main isolate (LocationTrackingService)
+              └── socket.emitLocationUpdate() → backend → customer's TrackProviderScreen
+```
+
+Customer tracking screen features:
+- **Smooth marker animation** — marker glides between GPS updates (1.2 s ease-in-out, same as Careem/Uber)
+- **Smart camera follow** — zooms to level 16 on first fix, then pans only (preserves customer's zoom)
+- **3-state status chip** — ⏳ WAITING (no fix yet) → 📶 SIGNAL LOST (no update > 8 s) → 🟢 LIVE (active)
+- **ETA estimate** — straight-line distance to job location; walking speed (<500 m) or vehicle speed (≥500 m)
+- **"On their way" banner** — SnackBar fires on the very first GPS fix received
+
+---
+
+## 7. Admin Panel (`admin/`)
+
+Runs on Next.js with a separate login (`admins` table, not `users`).
 
 | Page | Features |
 |---|---|
-| `/login`, `/signup` | Admin authentication |
-| `/dashboard` | Real KPI cards (total users, active jobs, bids, categories), a 12-month user-signup bar chart, and a top-5 popular-categories breakdown — all backed by live SQL aggregates (no mock data) |
-| `/dashboard/users` | Customer management: view/suspend (with a reason)/unsuspend/delete; avatar with graceful fallback; **CSV export** of the visible customer list |
-| `/dashboard/providers` | Provider management: view profile + uploaded CNIC/certificates, **AI-assisted auto-verify** (runs Gemini Vision KYC check), approve/reject/suspend |
-| `/dashboard/jobs` | Job moderation: view details, **AI dispute summarizer** for jobs with chat history, delete |
+| `/login`, `/signup` | Admin authentication (signup gated by `ADMIN_SETUP_KEY`) |
+| `/dashboard` | Real KPI cards, 12-month signup trend chart, top-5 popular categories — all live SQL aggregates |
+| `/dashboard/users` | View/suspend (with reason)/unsuspend/delete customers; CSV export |
+| `/dashboard/providers` | View profile + CNIC/certificates, AI-assisted KYC auto-verify, approve/reject/suspend |
+| `/dashboard/jobs` | Job moderation, AI dispute summarizer |
 | `/dashboard/bids` | Platform-wide bid visibility |
 | `/dashboard/categories` | Add/delete service categories |
 
-Security: JWT stored client-side, automatic logout + redirect on any `401` response, all destructive actions behind `confirm()` dialogs, toast-based (not native `alert()`) feedback throughout.
+Security: JWT stored client-side, auto logout on 401, all destructive actions behind confirm dialogs.
 
 ---
 
-## 8. Customer/Provider Web App (`web/kaarkun/`) — Public Browser App
-
-The browser-based counterpart to the mobile app — full product functionality without installing anything.
+## 8. Customer/Provider Web App (`web/kaarkun/`)
 
 | Area | Pages | Features |
 |---|---|---|
-| Auth | `/login`, `/register`, `/verify-otp` | Sign-up with role selection, password-strength validation (min 8 chars, letter+number), OTP email verification |
+| Auth | `/login`, `/register`, `/verify-otp`, `/forgot-password` | Role selection, password-strength validation, OTP email verification, 60 s resend cooldown |
 | Shared | `/profile`, `/notifications`, `/chat`, `/support-chatbot` | Profile editing, live notification feed, real-time chat, AI support chatbot |
-| Customer | `/customer/dashboard`, `/customer/jobs`, `/customer/jobs/[id]`, `/customer/post-job`, `/customer/bookings`, `/customer/submit-review` | Post jobs with photos/budget/location (with address-autocomplete `LocationInput`), review incoming bids, track bookings, **enter the provider's arrival PIN to start the job**, leave reviews |
-| Provider | `/provider/dashboard`, `/provider/browse-jobs`, `/provider/bids`, `/provider/[id]` | Browse/filter open jobs, place bids, track bid status, **generate an arrival PIN for confirmed bookings**, public provider profile page |
-
-Cross-cutting: `AuthContext` (session), `CurrencyContext`, `ThemeContext` (dark/light mode), automatic `401` logout, environment-driven image URLs (no hardcoded backend host).
+| Customer | `/customer/dashboard`, `/customer/jobs`, `/customer/jobs/[id]`, `/customer/post-job`, `/customer/bookings`, `/customer/submit-review` | Post jobs with photos/budget/location (address autocomplete), review bids, track bookings, **enter provider's arrival PIN**, leave reviews |
+| Provider | `/provider/dashboard`, `/provider/browse-jobs`, `/provider/bids`, `/provider/[id]` | Browse/filter open jobs, place bids with AI price suggestions, **generate arrival PIN**, public profile page |
 
 ---
 
-## 9. Mobile App (`mobile/`) — Primary End-User App
+## 9. Mobile App (`mobile/`)
 
-Flutter app targeting Android/iOS (and Web/Desktop as secondary Flutter targets). This is the main, full-featured client.
+Flutter app targeting Android and iOS. Primary end-user client.
 
-**Auth & onboarding** (`features/auth/`): splash screen, onboarding carousel, login, signup (with file picker for avatar/CNIC/certificates), OTP verification, forgot password.
+### Auth & Onboarding (`features/auth/`)
+Splash screen, onboarding carousel, login, signup (with file picker for avatar/CNIC/certificates), OTP verification with resend, forgot/reset password.
 
-**Customer features** (`features/customer/`):
+### Customer Features (`features/customer/`)
 - Home screen (category browse, top providers, emergency job shortcut)
-- Post a job (with photos, budget, location picker, negotiable/emergency flags, AI-assisted description autocomplete)
+- Post a job (photos, budget, location picker, negotiable/emergency flags, AI description autocomplete)
 - My Jobs (track status, view/accept bids)
-- Track Provider screen (live GPS map while a provider is en route)
+- **Track Provider screen** — live GPS map while provider is en route:
+  - Android Foreground Service (`flutter_foreground_task`) keeps GPS alive with screen off
+  - Smooth Careem/Uber-style marker animation
+  - ETA estimate updated on every GPS fix
+  - 3-state status chip (WAITING / SIGNAL LOST / LIVE)
+  - "On their way!" banner on first fix
 
-`LocationTrackingService` checks GPS-enabled/permission status before starting and surfaces a clear error (SnackBar + inline warning) if location can't be shared, instead of silently doing nothing while the customer waits indefinitely. Note: tracking runs on a foreground Dart timer, not a background service — it will stop reporting if the provider backgrounds the app for an extended period (a known platform limitation, not a bug).
-
-**Provider features** (`features/provider/`):
+### Provider Features (`features/provider/`)
 - Dashboard (online/offline toggle, stats)
-- Browse Jobs (proximity-filtered, AI smart-matched with reasons, emergency jobs highlighted for express-accept)
-- Place Bid screen (AI bid-price suggestion shown inline)
-- My Bids (track bid status)
-- Reviews screen (see customer feedback)
+- Browse Jobs (proximity-filtered, AI smart-matched with reasons, emergency express-accept)
+- Place Bid (AI price suggestion inline)
+- My Bids (track bid status, start GPS tracking on accepted bookings)
+- Reviews (see customer feedback)
 
-**Chat** (`features/chat/`): chat list, real-time chat room (text + images, typing indicators), support chatbot screen.
+### Chat (`features/chat/`)
+Chat list, real-time chat room (text + images, typing indicators), AI support chatbot.
 
-**Notifications** (`features/notifications/`): notification list + a `NotificationProvider`/`NotificationBell` widget for unread badge counts app-wide.
+### Shared Screens (`shared/`)
+- Job detail, customer/provider profile screens, settings (dark/light theme, currency, language)
+- **QR Handshake screen** — provider shows QR/PIN on arrival, customer scans/enters to start the job
+- Map location picker (Google Maps)
+- Submit review screen
+- Bottom-nav shell with role-based tabs
 
-**Shared screens** (`shared/`):
-- Job detail, customer/provider profile screens, settings
-- **QR handshake screen** — provider shows a QR/PIN on arrival, customer scans/enters it to confirm and start the job
-- **Map picker** — pick a job location visually (Google Maps)
-- **Submit review** screen
-- `navigation_screen.dart` — bottom-nav shell with role-based tabs
-- Services: `BookingService`, `ReviewService`, `SyncProvider` (refreshes app state on resume/login)
-
-**Core infrastructure** (`core/`):
-- `ApiClient` (Dio) — configurable base URL via `--dart-define=API_BASE_URL`
-- `TokenStorage` — JWT stored in OS keystore (`flutter_secure_storage`), not plaintext prefs
-- `SocketService` — JWT-authenticated real-time layer (chat, notifications, live location)
-- `app_logger.dart` — debug-only logging, stripped from release builds
+### Core Infrastructure (`core/`)
+| File | Role |
+|---|---|
+| `api_client.dart` | Dio HTTP client; 403 → show toast only (never logout); 401 → logout |
+| `token_storage.dart` | JWT stored in OS keystore via `flutter_secure_storage` |
+| `socket_service.dart` | JWT-authenticated Socket.IO; auto-reconnect; re-joins rooms on reconnect |
+| `location_tracking_service.dart` | Provider-side GPS: starts/stops foreground service, relays positions via socket |
+| `foreground_location_task.dart` | Background isolate handler: GPS stream (distanceFilter: 3 m) + 4 s heartbeat |
 
 ---
 
-## 10. Security Measures Implemented
+## 10. AWS Infrastructure (Terraform — `terraform/`)
+
+**Region**: `ap-south-1` (Mumbai)
+
+| Resource | Details |
+|---|---|
+| VPC | `10.0.0.0/16`, 2 public + 2 private subnets |
+| ALB | Internet-facing, listeners on port 80; routes `/api/*` and `/socket.io/*` to backend, `/admin*` to admin, everything else to frontend |
+| ECS Cluster | `academy-dev-cluster` |
+| ECS Services | `academy-dev-backend`, `academy-dev-frontend`, `academy-dev-admin` |
+| ECR Repos | `academy-dev-backend`, `academy-dev-frontend`, `academy-dev-admin` |
+| RDS | MySQL 8, `kaarkun_db` |
+| S3 Bucket | `academy-dev-uploads` (avatars, job images, chat attachments) |
+| Secrets Manager | `EMAIL_USER`, `EMAIL_PASS`, `JWT_SECRET`, `DB_PASSWORD` — injected as env vars into ECS task at runtime |
+
+**Apply command:**
+```bash
+cd terraform
+terraform apply -var-file=terraform.tfvars -var-file=secrets.tfvars -auto-approve
+```
+
+> ⚠️ When Terraform recreates the ALB the DNS suffix changes. Update the ALB hostname in 3 places: `web/kaarkun/next.config.ts` (remotePatterns), `.github/workflows/deploy-aws.yml` (both `NEXT_PUBLIC_API_URL` build args), `mobile/lib/core/api_client.dart` (defaultValue).
+
+---
+
+## 11. CI/CD Pipeline (`.github/workflows/deploy-aws.yml`)
+
+Triggered on push to `master`.
+
+1. Configure AWS credentials (GitHub Secrets: `AWS_ACCESS_KEY_ID`, `AWS_SECRET_ACCESS_KEY`)
+2. Login to ECR
+3. Build + push **backend** Docker image (no build args — secrets injected from Secrets Manager at runtime)
+4. Build + push **frontend** Docker image (with `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_WS_URL`)
+5. Build + push **admin** Docker image (with `NEXT_PUBLIC_API_URL`)
+6. Register new backend ECS task definition (preserves Secrets Manager secret refs)
+7. Update all 3 ECS services with new image tags → rolling deploy
+
+---
+
+## 12. Security Measures
 
 - **Password hashing**: bcryptjs (cost factor 12) for both user and admin accounts.
-- **JWT auth** with role checks (`authorize('customer'|'provider')`) and a separate `adminAuth` middleware that cross-checks against the dedicated `admins` table (an admin token can't be forged from a regular user token).
-- **Account status enforcement**: blocked/rejected users are locked out at the middleware level (`suspendedCheck` + `authMiddleware`) on every request, not just at login.
-- **Rate limiting**: login (10 attempts/15 min) and OTP verification (10/10 min) to blunt brute-force/credential-stuffing attempts.
-- **File upload validation**: Multer restricts to image MIME types/extensions and a 5MB size cap.
-- **CORS allow-list**: explicit origin list for production frontends, plus a safe `localhost`-only exception for local dev tooling (Flutter web's random debug port) — never opened to arbitrary remote origins.
-- **Secrets hygiene**: `.env` files gitignored going forward; JWT secrets and `ADMIN_SETUP_KEY` are long random values, not defaults.
-- **Mobile secure storage**: JWT tokens stored in the OS keystore via `flutter_secure_storage`, not plaintext `SharedPreferences`.
-- **No stack-trace leakage**: every controller catch-block returns a generic message to the client while logging full details server-side only.
-- **Socket.io auth**: real-time connections require a valid JWT handshake, preventing anonymous clients from joining notification/chat rooms.
-- **Chat authorization**: sending a message requires the sender/receiver pair to actually correspond to the job's customer and a legitimate bidder/booked provider on that job — not an arbitrary user ID.
-- **Race-condition-safe job claiming**: bid acceptance and emergency express-accept both use a DB transaction with an atomic conditional `UPDATE ... WHERE status='open'` to claim the job, so two concurrent accept attempts on the same job can never both succeed (verified with real concurrent-request tests).
-- **Suspension-aware notifications**: suspending a user with an active booking notifies the other party immediately rather than leaving them waiting on someone who can no longer respond.
+- **JWT auth** with role enforcement (`authorize('customer'|'provider')`) and a separate `adminAuth` middleware that checks the `admins` table — a regular user token cannot impersonate an admin.
+- **Account status enforcement**: blocked/rejected users are locked out at middleware level (`suspendedCheck`) on every request.
+- **Rate limiting**: login (10/15 min) and OTP verification (10/10 min) to blunt brute-force attempts.
+- **HTTP 403 vs 401**: mobile `api_client.dart` distinguishes them — 403 (business logic denial, e.g. bidding on an already-booked job) shows a toast; only 401 (expired JWT) triggers logout.
+- **File upload validation**: Multer restricts to image MIME types and a 5 MB size cap; files go to S3 (not local disk).
+- **CORS allow-list**: explicit production origins; `localhost` only for local dev.
+- **Secrets hygiene**: all sensitive values in AWS Secrets Manager (production) or `.env` gitignored (local); no hardcoded secrets in source.
+- **Mobile secure storage**: JWT stored in OS keystore via `flutter_secure_storage` — not plaintext SharedPreferences.
+- **Socket.IO auth**: connections require a valid JWT handshake.
+- **Chat authorization**: sending a message requires the sender/receiver pair to correspond to actual job participants.
+- **Race-condition-safe job claiming**: bid acceptance and express-accept both use an atomic DB transaction (`UPDATE jobs SET status='active' WHERE id=? AND status='open'`) — two concurrent accepts cannot both succeed.
 
 ---
 
-## 11. Complete Feature Checklist
+## 13. Configuration Reference
 
-**Account & Identity**
+### Backend (`backend/.env` local / AWS Secrets Manager in production)
+
+| Variable | Purpose |
+|---|---|
+| `PORT` | Backend listen port (default 5000) |
+| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL connection |
+| `JWT_SECRET`, `JWT_REFRESH_SECRET` | Token signing keys (long random hex) |
+| `ACCESS_TOKEN_EXPIRY`, `REFRESH_TOKEN_EXPIRY` | Token lifetimes (e.g. `7d`) |
+| `ALLOWED_ORIGINS` | Comma-separated CORS allow-list |
+| `AWS_REGION` | AWS region (e.g. `ap-south-1`) |
+| `AWS_S3_BUCKET` | S3 bucket name (`academy-dev-uploads`) |
+| `EMAIL_USER`, `EMAIL_PASS` | Gmail + App Password for Nodemailer |
+| `GROQ_API_KEY`, `GEMINI_API_KEY`, `CLAUDE_API_KEY` | LLM provider keys for AI fallback chain |
+
+### Frontends
+
+| Variable | Used by | Purpose |
+|---|---|---|
+| `NEXT_PUBLIC_API_URL` | admin, web | Backend REST base URL |
+| `NEXT_PUBLIC_WS_URL` | web | Backend Socket.IO URL |
+| `--dart-define=API_BASE_URL=` | mobile | Overrides default backend URL at build time |
+| `MAPS_API_KEY` | mobile (`local.properties`) | Google Maps key — gitignored, never committed |
+
+---
+
+## 14. Complete Feature Checklist
+
+### Account & Identity
 - [x] Role-based signup (customer / provider)
-- [x] Email OTP verification
-- [x] Login/JWT auth with refresh tokens
-- [x] Forgot password flow
-- [x] Profile editing + avatar upload
-- [x] Provider KYC: CNIC + certificate upload, admin manual review, AI-assisted confidence scoring
-- [x] Admin-controlled account states: pending / verified / rejected / blocked (with reason)
+- [x] Email OTP verification with 60 s resend cooldown
+- [x] Login / JWT auth with refresh tokens
+- [x] Forgot password / reset password flow
+- [x] Profile editing + avatar upload (→ S3)
+- [x] Provider KYC: CNIC + certificate upload, admin manual review, AI-assisted confidence scoring (Gemini Vision)
+- [x] Admin-controlled account states: pending / verified / rejected / blocked (with reason + email notification)
 
-**Jobs & Bidding**
-- [x] Post a job (title, description, category, budget, location, photos, date/time, negotiable flag)
+### Jobs & Bidding
+- [x] Post a job (title, description, category, budget, location, photos, date/time, negotiable flag, emergency flag)
 - [x] AI-assisted job description autocomplete + budget/category suggestion
-- [x] Browse/filter open jobs (proximity-aware for providers)
-- [x] AI smart job-provider matching with explainable scoring
+- [x] Browse/filter open jobs (proximity-aware for providers, 20 km radius)
+- [x] AI smart job-provider matching with explainable scoring and reasons
 - [x] Place / accept / reject bids
-- [x] AI bid price suggestion based on historical data
-- [x] Emergency jobs with instant express-accept (skips bidding)
-- [x] Edit/delete own job postings
+- [x] AI bid price suggestion based on historical accepted bids
+- [x] Emergency jobs with instant express-accept (skips bidding, race-condition-safe)
+- [x] Edit / delete own job postings
 
-**Bookings & Job Execution**
-- [x] Booking creation on bid acceptance (atomic — race-condition-safe)
-- [x] Arrival handshake to verify on-site presence before starting work — QR/PIN on mobile, PIN entry on web
+### Bookings & Job Execution
+- [x] Booking creation on bid acceptance (atomic, race-condition-safe)
+- [x] Arrival handshake: QR/PIN on mobile, PIN entry on web — proves physical on-site presence
 - [x] Status lifecycle: confirmed → in_progress → awaiting_confirmation → completed
-- [x] Booking cancellation with automatic job reopening + bid reset
-- [x] Live GPS tracking of provider en route to job (mobile-only)
+- [x] Booking cancellation with automatic job reopening and bid reset
+- [x] **Live GPS tracking of provider en route** (Android Foreground Service — survives screen off)
+- [x] **Smooth Careem/Uber-style animated map marker**
+- [x] **ETA estimate on tracking screen** (auto-updated every GPS fix)
+- [x] **3-state tracking chip**: WAITING / SIGNAL LOST / LIVE
+- [x] **"On their way!" notification** on first GPS fix received
 - [x] Affected-party notification when the other side of an active booking is suspended
 
-**Communication**
-- [x] Real-time chat per job (text + image attachments, typing indicators, read receipts)
-- [x] In-app notifications (real-time via Socket.io)
+### Communication
+- [x] Real-time chat per job (text + image attachments → S3, typing indicators, read receipts)
+- [x] In-app notifications (real-time via Socket.IO, unread badge)
 - [x] AI support chatbot with live app-context awareness
 
-**Reviews & Trust**
-- [x] 1–5 star reviews, one per booking
-- [x] Provider rating/success-rate aggregation
-- [x] AI-based fake-review/fraud pattern detection (admin-only)
+### Reviews & Trust
+- [x] 1–5 star reviews, one per booking (DB-enforced)
+- [x] Provider rating and success-rate aggregation
+- [x] AI review fraud/anomaly detection (admin-only)
 - [x] AI dispute summarization from chat transcripts (admin-only)
 
-**Admin Operations**
-- [x] Real-time dashboard analytics (signups trend, category popularity, platform totals)
+### Admin Operations
+- [x] Real-time dashboard analytics (signup trend, category popularity, platform totals)
 - [x] User management (view/suspend/unsuspend/delete, with reason + email notification)
-- [x] Provider verification workflow (manual + AI-assisted)
+- [x] Provider verification workflow (manual + AI-assisted Gemini Vision KYC)
 - [x] Job moderation (view/delete, AI dispute summary)
 - [x] Bid oversight
 - [x] Category management
 - [x] CSV export of customer data
 
-**Cross-Platform**
-- [x] Same backend/API powering mobile, web app, and admin panel
-- [x] Dark/light theme support (web app)
-- [x] Multi-currency display support (web app `CurrencyContext`)
+### Cross-Platform & Infrastructure
+- [x] Same backend API powering mobile, web app, and admin panel
+- [x] Dark/light theme support (mobile + web)
+- [x] Multi-currency display support (PKR / USD / AED)
+- [x] Multi-language support (mobile)
+- [x] Full AWS cloud deployment (ECS Fargate, RDS, S3, ALB, Secrets Manager)
+- [x] GitHub Actions CI/CD (push to master → auto-deploy all 3 services)
+- [x] Terraform IaC for reproducible infrastructure
 
 ---
 
-## 12. Configuration Reference
+## 15. Local Development
 
-| Variable (`backend/.env`) | Purpose |
-|---|---|
-| `PORT` | Backend listen port (default 5000) |
-| `DB_HOST`, `DB_USER`, `DB_PASSWORD`, `DB_NAME` | MySQL connection |
-| `JWT_SECRET`, `JWT_REFRESH_SECRET` | Token signing keys |
-| `ACCESS_TOKEN_EXPIRY`, `REFRESH_TOKEN_EXPIRY` | Token lifetimes |
-| `ALLOWED_ORIGINS` | Comma-separated CORS allow-list for production frontend domains |
-| `ADMIN_SETUP_KEY` | One-time secret gating admin account creation |
-| `EMAIL_USER`, `EMAIL_PASS` | Gmail credentials for OTP/notification emails (use an App Password) |
-| `GROQ_API_KEY`, `GEMINI_API_KEY`, `CLAUDE_API_KEY` | LLM provider keys for the AI fallback chain |
+### Backend
+```bash
+cd e:/fyp/backend
+npm install
+# Ensure MySQL is running with kaarkun_db
+node app.js   # runs on port 5000
+```
 
-| Variable (frontends) | Purpose |
-|---|---|
-| `NEXT_PUBLIC_API_URL` (admin, web) | Backend REST base URL |
-| `NEXT_PUBLIC_WS_URL` (web) | Backend Socket.io URL |
-| `--dart-define=API_BASE_URL=` (mobile) | Overrides the default backend URL at build time |
-| `MAPS_API_KEY` (`mobile/android/local.properties`) | Google Maps key, injected via Gradle `manifestPlaceholders` (gitignored, never committed) |
+### Web (Customer + Provider)
+```bash
+cd e:/fyp/web/kaarkun
+npm install
+npm run dev   # port 3000
+```
+
+### Admin
+```bash
+cd e:/fyp/admin
+npm install
+npm run dev   # port 3001
+```
+
+### Mobile
+```bash
+cd e:/fyp/mobile
+flutter pub get
+# Android emulator:
+flutter run --dart-define=API_BASE_URL=http://10.0.2.2:5000/api
+# iOS simulator:
+flutter run --dart-define=API_BASE_URL=http://localhost:5000/api
+# Release APK:
+flutter build apk --release
+# Output: build/app/outputs/flutter-apk/app-release.apk
+```
 
 ---
 
-## 13. Known Deployment Considerations (not code defects)
+## 16. Common Issues & Solutions
 
-These require real-world values once a hosting target is chosen — they are not bugs in the code itself:
-- Production database credentials and CORS origins must replace the local-dev defaults in `backend/.env`.
-- `NEXT_PUBLIC_API_URL`/`NEXT_PUBLIC_WS_URL` in `admin/.env.local` and `web/kaarkun/.env.local` must point at the deployed backend domain (HTTPS).
-- The mobile app's default `API_BASE_URL` must be overridden at build time for release APKs.
-- File uploads (`backend/uploads/`) are stored on local disk — fine on a persistent VM, but requires migrating to object storage (S3-style) on ephemeral-filesystem hosts.
-- The Android release build currently signs with the debug keystore — a real release keystore is required before Play Store submission.
-- The Google Maps API key should be restricted in Google Cloud Console (Android package + SHA-1, Web HTTP referrer) to prevent abuse.
-- The Gemini API key needs a Google Cloud project with billing enabled to get non-zero free-tier quota (account/region-level requirement, not a code or key-format issue) — until then, KYC auto-verify falls back to "verify manually" rather than erroring out.
-- Real background location tracking for providers (continuing reliably while the app is backgrounded) would need a native foreground service (e.g. `flutter_background_service`) — current tracking is foreground-only.
+| Issue | Cause | Fix |
+|---|---|---|
+| `ClusterNotFoundException` in GitHub Actions | ECS cluster destroyed/inactive; or AWS region outage | Run `terraform apply` to recreate; or wait for AWS recovery and re-run the failed job |
+| ALB DNS changed after `terraform apply` | Terraform recreated the ALB | Update hostname in 3 files (see §10) |
+| OTP email not sending | `EMAIL_USER`/`EMAIL_PASS` missing or Gmail App Password invalid | Check AWS Secrets Manager; ensure `secrets.tfvars` was used in `terraform apply` |
+| Provider logout when bidding on accepted job | `api_client.dart` was treating 403 same as 401 | Fixed: 403 shows toast only; 401 triggers logout |
+| "Waiting for provider" never clears | GPS stream with large `distanceFilter` never fired when stationary | Fixed: foreground service heartbeat re-emits last position every 4 s |
+| GPS stops when screen is off | Dart timer paused by Android OS | Fixed: `flutter_foreground_task` Android Foreground Service keeps process alive |
+| Marker teleports on GPS update | Map marker jumped instantly to new coordinates | Fixed: `AnimationController` + `Tween<double>` for 1.2 s smooth glide |
+| `onStart` signature error (foreground task) | `flutter_foreground_task` v8.17.0 changed API vs v8.13.0 | Fixed: added `TaskStarter starter` 2nd parameter to `onStart` |
+| `const` error on `ForegroundTaskEventAction.repeat` | Same package version change | Fixed: removed `const` from `ForegroundTaskOptions` |
+| `Invalid Date` in chat | `new Date(null).toLocaleDateString()` | Use `formatDate()` helper that returns `''` for null/bad dates |
+| Bid amount has decimals | `.toFixed()` instead of `Math.round()` | Always `Math.round(convertFromPkr(amount))` |
+| AI category not matching on job autocomplete | Exact string mismatch | `findCategory()` fuzzy matcher in post-job page handles contains-match in either direction |
